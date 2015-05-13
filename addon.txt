@@ -1,0 +1,5 @@
+"AddonInfo"
+{
+	"name"		"Vurtual's camo"
+	"override"	"1"
+}
