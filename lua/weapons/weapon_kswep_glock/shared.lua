@@ -40,22 +40,27 @@ SWEP.WorldModel = "models/weapons/w_pist_glock18.mdl"
 SWEP.Primary.Automatic = false
 SWEP.UseHands = true
 SWEP.Magazines = 3
-SWEP.ClipSize = 17
+SWEP.MagSize = 17
+SWEP.Primary.ClipSize = SWEP.MagSize
 SWEP.Caliber = "pistol"
 SWEP.Primary.Sound = Sound("weapon_glock.single")
 SWEP.ViewModelFlip = false
 
-SWEP.Secondary.Ammo = nil
-
+SWEP.Secondary.Ammo = ""
+SWEP.CurrentlyReloading=0
+SWEP.ReloadAnimTime=0
 function SWEP:Initialize()
         self:SetNWBool("Sight",false)
         self:SetNWInt("Zoom",1)
         self:SetNWBool("FiringPin",true)
         self:SetNWInt("MagazineCount",3)
         self:SetNWBool("Safe",false)
+	self:SetNWBool("Chambered",true)
         self:SetNWString("HoldType","pistol")
         self:SetNWString("IdleType","normal")	
 	self.Ammo = vurtual_ammodata[self.Caliber]
+	self.DefaultMagazines = {self.MagSize,self.MagSize,self.MagSize}
+	self.Magazines = table.Copy(self.DefaultMagazines)
 end
 
 function SWEP:PrimaryAttack()
@@ -63,14 +68,57 @@ function SWEP:PrimaryAttack()
 	if (!self:CanPrimaryAttack() ) then return end
 	self.Weapon:EmitSound(self.Primary.Sound)
 	self:ShootBullet(self.Primary.Damage*self.Ammo.damagescale, self.Ammo.projectiles, self.Ammo.spreadscale*self.Primary.Spread,1)
-	
+	if (self:Clip1()>0) then
+		self:TakePrimaryAmmo(1)
+	else
+		self:SetNWBool("Chambered",false)
+	end
 end
 
+
+function SWEP:Reload()
+	if (self.CurrentlyReloading==1) then return end
+	self.Weapon:SendWeaponAnim(ACT_VM_RELOAD)
+	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()
+	self.CurrentlyReloading=1
+		
+end
+function SWEP:FinishReload()
+	self:SetNWBool("FiringPin",true)
+	table.insert(self.Magazines,self:Clip1())
+	table.sort(self.Magazines)
+	self:SetClip1(table.GetLastValue(self.Magazines))
+	table.remove(self.Magazines)
+	if (self.Magazines[1]==0) then
+		table.remove(self.Magazines,1)
+	end
+	if (self:GetNWBool("Chambered")==false) then
+		self:TakePrimaryAmmo(1)
+		self:SetNWBool("Chambered",true)
+	end
+	self.CurrentlyReloading=0
+	self.ReloadAnimTime=0
+	self:SetNWInt("MagazineCount",#self.Magazines)
+end
 
 function SWEP:DoDrawCrosshair()
-	return true
+	return !self:GetNWBool("Sight")
+
 end
 
+function SWEP:CanPrimaryAttack()
+
+        if ( self.Weapon:Clip1() <= 0 && !self:GetNWBool("Chambered") ) then
+		if (self:GetNWBool("FiringPin")==true) then
+	                self:EmitSound( "Weapon_Pistol.Empty" )
+			self:SetNWBool("FiringPin",false)
+		end
+                self:SetNextPrimaryFire( CurTime() + 0.2 )
+                return false
+        end
+        return true
+end
 
 
 
@@ -80,6 +128,13 @@ function SWEP:SecondaryAttack()
 end
 
 
+function SWEP:CustomAmmoDisplay()
+	self.AmmoDisplay = self.AmmoDisplay or {}
+	self.AmmoDisplay.Draw=true
+	self.AmmoDisplay.PrimaryClip=self:Clip1()
+	self.AmmoDisplay.PrimaryAmmo=self:GetNWInt("MagazineCount")
+	return self.AmmoDisplay
+end
 function SWEP:ToggleZoom()
         --Are we using the sight?
         if (self:GetNWBool("Sight")==true) then
@@ -93,6 +148,11 @@ end
 
 
 function SWEP:Think()
+	if (SERVER) then
+		if (self.ReloadAnimTime!=0 && CurTime()>self.ReloadAnimTime && self.CurrentlyReloading==1) then
+		self:FinishReload()
+	end
+	end
         if (self:IsRunning() || self:GetNWBool("Sight")==false) then
                 self:SetWeaponHoldType(self:GetNWString("IdleType"))
 		if (CLIENT) then self.Owner:DrawViewModel(false) end
