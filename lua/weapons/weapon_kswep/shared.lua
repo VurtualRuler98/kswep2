@@ -52,6 +52,7 @@ SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
 SWEP.Firemode=0
+SWEP.SingleReload=false
 function SWEP:Initialize()
         self:SetNWBool("Sight",false)
         self:SetNWInt("Zoom",1)
@@ -68,6 +69,11 @@ function SWEP:Initialize()
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.DefaultMagazines = {self.MagSize,self.MagSize,self.MagSize}
 	self.Magazines = table.Copy(self.DefaultMagazines)
+	if (self.SingleReload==true) then
+		self.DefaultMagazines={self.MagSize*self.MagazineCount}
+		self.Magazines = table.Copy(self.DefaultMagazines)
+		self:SetNWBool("MagazineCount",self.Magazines[1])
+	end
 end
 
 function SWEP:PrimaryAttack()
@@ -87,6 +93,19 @@ function SWEP:NormalFire()
 		self:SetNextPrimaryFire(CurTime()+self.Primary.Delay)
 end
 
+function SWEP:ShotgunFire()
+	if (!self:CanPrimaryAttack()) then return end
+	if (!self:GetNWBool("Chambered")) then
+		self:SetNextPrimaryFire(CurTime()+self.Primary.Delay)
+		self:SetNWBool("Chambered",true)
+		self:TakePrimaryAmmo(1)
+		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
+	else
+		
+		
+		self:NormalFire()
+	end
+end
 
 function SWEP:ReloadMag()
 	if (self.CurrentlyReloading==1) then return end
@@ -96,6 +115,17 @@ function SWEP:ReloadMag()
 	self.CurrentlyReloading=1
 		
 end
+
+function SWEP:ReloadTube()
+	if (self.CurrentlyReloading==1) then return end
+	if (self:Clip1()>=self.Primary.ClipSize) then return end
+	self.Weapon:SendWeaponAnim(ACT_VM_RELOAD)
+	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration()+0.4)
+	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()
+	self.CurrentlyReloading=1	
+		
+end
+
 
 function SWEP:BurstFire()
 	self:NormalFire()
@@ -131,6 +161,20 @@ function SWEP:DoDrawCrosshair()
 
 end
 
+function SWEP:FinishReloadSingle()
+	if (self:Clip1()==self.Primary.Clipsize) then return end
+	self.Magazines[1]=self.Magazines[1]-1
+	self:SetClip1(self:Clip1()+1)
+	self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
+	self.CurrentlyReloading=0
+	self.ReloadAnimTime=0
+	self:SetNWInt("MagazineCount",self.Magazines[1])
+end
+
+function SWEP:DoDrawCrosshair()
+	return !self:GetNWBool("Sight")
+
+end
 function SWEP:CanPrimaryAttack()
 
         if ( self.Weapon:Clip1() <= 0 && !self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 && self.OpenBolt==true) then
@@ -143,6 +187,9 @@ function SWEP:CanPrimaryAttack()
         end
         return true
 end
+
+
+
 
 
 
@@ -174,7 +221,11 @@ end
 function SWEP:Think()
 	if (SERVER) then
 		if (self.ReloadAnimTime!=0 && CurTime()>self.ReloadAnimTime && self.CurrentlyReloading==1) then
-		self:FinishReload()
+		if (self.SingleReload) then
+			self:FinishReloadSingle()
+		else
+			self:FinishReload()
+		end
 	end
 	end
         if (self:IsRunning() || self:GetNWBool("Sight")==false) then
