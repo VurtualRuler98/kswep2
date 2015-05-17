@@ -51,7 +51,8 @@ SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
 
 SWEP.Burst=3
-SWEP.Auto=true
+SWEP.Auto=false
+SWEP.Firemode=true
 
 function SWEP:Reload()
 	self:ReloadMag()	

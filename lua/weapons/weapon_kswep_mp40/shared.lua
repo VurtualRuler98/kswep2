@@ -22,36 +22,42 @@ if (SERVER) then
 end
 
 if (CLIENT) then
-	SWEP.PrintName = "Glock 17"
+	SWEP.PrintName = "MP 40"
 	SWEP.Author = "vurtual"
-	SWEP.Slot = 1
+	SWEP.Slot = 2
 	SWEP.SlotPos = 0
 end
 
 SWEP.Category = "Vurtual's K-Weapons"
 SWEP.Base = "weapon_kswep"
-SWEP.Primary.Delay = 0.08
-SWEP.Primary.Damage = 8
+SWEP.Primary.Delay = 0.12
+SWEP.Primary.Damage = 10
 SWEP.Primary.Spread = 0.004
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
-SWEP.ViewModel = "models/weapons/cstrike/c_pist_glock18.mdl"
-SWEP.WorldModel = "models/weapons/w_pist_glock18.mdl"
-SWEP.Primary.Automatic = false
-SWEP.UseHands = true
+SWEP.ViewModel = "models/weapons/v_mp40.mdl"
+SWEP.WorldModel = "models/weapons/w_mp40.mdl"
+
+SWEP.UseHands = false
 SWEP.Magazines = 3
-SWEP.MagSize = 17
+SWEP.MagSize = 32
 SWEP.Primary.ClipSize = SWEP.MagSize
 SWEP.Caliber = "vammo_9x19_FMJ"
-SWEP.Primary.Sound = Sound("weapon_glock.single")
+SWEP.Primary.Sound = Sound("weapon_mp40.shoot")
 SWEP.ViewModelFlip = false
 
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
 
-
+SWEP.Burst=0
+SWEP.Auto=true
+SWEP.OpenBolt=true
 
 function SWEP:Reload()
 	self:ReloadMag()	
+end
+
+function SWEP:PrimaryAttack()
+	self:NormalFire()
 end

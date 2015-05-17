@@ -47,9 +47,11 @@ SWEP.Primary.Sound = Sound("weapon_glock.single")
 SWEP.ViewModelFlip = false
 SWEP.Burst=0
 SWEP.Auto=false
+SWEP.OpenBolt=false
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
+SWEP.Firemode=0
 function SWEP:Initialize()
         self:SetNWBool("Sight",false)
         self:SetNWInt("Zoom",1)
@@ -60,7 +62,9 @@ function SWEP:Initialize()
         self:SetNWString("HoldType","pistol")
         self:SetNWString("IdleType","normal")
 	self:SetNWInt("Burst",self.Burst)
-	self:SetNWBool("Auto",self.Auto)
+	self:SetNWBool("Firemode1",true)
+	self:SetNWBool("Firemode0",self.Auto)
+	self:SetNWBool("Firemode",false)
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.DefaultMagazines = {self.MagSize,self.MagSize,self.MagSize}
 	self.Magazines = table.Copy(self.DefaultMagazines)
@@ -74,7 +78,7 @@ function SWEP:NormalFire()
 	if (self:IsRunning() || self:GetNWBool("Sight")==false) then return end
 	if (!self:CanPrimaryAttack() ) then return end
 	self.Weapon:EmitSound(self.Primary.Sound)
-	self:ShootBullet(self.Primary.Damage*self.Ammo.damagescale, self.Ammo.projectiles, self.Ammo.spreadscale*self.Primary.Spread,1)
+	self:ShootBullet(self.Primary.Damage*self.Ammo.damagescale, self.Ammo.projectiles, self.Ammo.spreadscale*self.Primary.Spread,self.Ammo.name)
 	if (self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
 	else
@@ -98,7 +102,7 @@ function SWEP:BurstFire()
 	if (SERVER) then
 	self:SetNWInt("Burst",self:GetNWInt("Burst")-1)
 	if (self:GetNWInt("Burst")<1) then
-		self:SetNWBool("Auto",false)
+		self:SetNWBool("Firemode1",false)
 		print("FINISHED BURST")
 		self:SetNWInt("Burst",self.Burst)
 	end
@@ -113,10 +117,10 @@ function SWEP:FinishReload()
 	if (self.Magazines[1]==0) then
 		table.remove(self.Magazines,1)
 	end
-	if (self:GetNWBool("Chambered")==false) then
+	if (self:GetNWBool("Chambered")==false && self.OpenBolt==false) then
 		self:TakePrimaryAmmo(1)
-		self:SetNWBool("Chambered",true)
 	end
+	self:SetNWBool("Chambered",true)
 	self.CurrentlyReloading=0
 	self.ReloadAnimTime=0
 	self:SetNWInt("MagazineCount",#self.Magazines)
@@ -129,7 +133,7 @@ end
 
 function SWEP:CanPrimaryAttack()
 
-        if ( self.Weapon:Clip1() <= 0 && !self:GetNWBool("Chambered") ) then
+        if ( self.Weapon:Clip1() <= 0 && !self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 && self.OpenBolt==true) then
 		if (self:GetNWBool("FiringPin")==true) then
 	                self:EmitSound( "Weapon_Pistol.Empty" )
 			self:SetNWBool("FiringPin",false)
@@ -181,10 +185,23 @@ function SWEP:Think()
                 self:SetWeaponHoldType(self:GetNWString("HoldType"))
 		if (CLIENT) then self.Owner:DrawViewModel(true) end
         end
-	if (self.Burst>0 && self:GetNWBool("Auto")==false && self.Owner:KeyDown(IN_ATTACK)==false) then
-		self:SetNWBool("Auto",true)
+	if (self.Burst>0 && self:GetNWBool("Firemode1")==false && self.Owner:KeyDown(IN_ATTACK)==false) then
+		self:SetNWBool("Firemode1",true)
 	end
-	self.Primary.Automatic=self:GetNWBool("Auto")
+	if (self:GetNWBool("Firemode")) then
+		self.Primary.Automatic=self:GetNWBool("Firemode1")
+	else
+		self.Primary.Automatic=self:GetNWBool("Firemode0")
+	end
+end
+
+function SWEP:Firemode()
+	if (!self.Firemode) then return end
+	if (self:GetNWBool("Firemode")) then
+		self:SetNWBool("Firemode",false)
+	else
+		self:SetNWBool("Firemode",true)
+	end
 end
 
 
