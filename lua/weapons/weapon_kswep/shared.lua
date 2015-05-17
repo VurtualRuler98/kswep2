@@ -48,7 +48,8 @@ SWEP.ViewModelFlip = false
 SWEP.Burst=0
 SWEP.Auto=false
 SWEP.OpenBolt=false
-SWEP.Secondary.Ammo = ""
+SWEP.Secondary.Ammo = SWEP.Primary.Ammo
+SWEP.Secondary.ClipSize = 1
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
 SWEP.Firemode=0
@@ -118,6 +119,7 @@ end
 
 function SWEP:ReloadTube()
 	if (self.CurrentlyReloading==1) then return end
+	if (self.Magazines[1]<1) then return end
 	if (self:Clip1()>=self.Primary.ClipSize) then return end
 	self.Weapon:SendWeaponAnim(ACT_VM_RELOAD)
 	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration()+0.4)
@@ -162,7 +164,6 @@ function SWEP:DoDrawCrosshair()
 end
 
 function SWEP:FinishReloadSingle()
-	if (self:Clip1()==self.Primary.Clipsize) then return end
 	self.Magazines[1]=self.Magazines[1]-1
 	self:SetClip1(self:Clip1()+1)
 	self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
