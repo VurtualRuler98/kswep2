@@ -22,42 +22,45 @@ if (SERVER) then
 end
 
 if (CLIENT) then
-	SWEP.PrintName = "M3 Super 90"
+	SWEP.PrintName = "AKM"
 	SWEP.Author = "vurtual"
-	SWEP.Slot = 3
+	SWEP.Slot = 2
 	SWEP.SlotPos = 0
 end
 
 SWEP.Category = "Vurtual's K-Weapons"
 SWEP.Base = "weapon_kswep"
-SWEP.Primary.Delay = 0.8
-SWEP.Primary.Damage = 20
-SWEP.Primary.Spread = 0.008
+SWEP.Primary.Delay = 0.08
+SWEP.Primary.Damage = 18
+SWEP.Primary.Spread = 0.004
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
-SWEP.ViewModel = "models/weapons/cstrike/c_shot_m3super90.mdl"
-SWEP.WorldModel = "models/weapons/w_shot_m3super90.mdl"
-SWEP.Primary.Automatic = false
+SWEP.ViewModel = "models/weapons/cstrike/c_rif_ak47.mdl"
+SWEP.WorldModel = "models/weapons/w_rif_ak47.mdl"
+
 SWEP.UseHands = true
-SWEP.MagazineCount = 3
-SWEP.MagSize = 8
+SWEP.MagazineCount = 4
+SWEP.MagSize = 30
 SWEP.Primary.ClipSize = SWEP.MagSize
-SWEP.Caliber = "vammo_12gauge_00buck"
-SWEP.Primary.Sound = Sound("weapon_m3.single")
-SWEP.Secondary.Sound = Sound("weapon_xm1014.single")
+SWEP.Caliber = "vammo_762x39_m67"
+SWEP.Primary.Sound = Sound("weapon_ak47.single")
 SWEP.ViewModelFlip = false
 
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
-SWEP.Firemode=1
-SWEP.SingleReload=true
+
+
+SWEP.Auto=false
+SWEP.Firemode=true
 SWEP.HoldType="ar2"
 SWEP.IdleType="passive"
+SWEP.SelectFire=true
+
 function SWEP:Reload()
-	self:ReloadTube()	
+	self:ReloadMag()	
 end
 
 function SWEP:PrimaryAttack()
-	self:ShotgunFire()
+	self:NormalFire()
 end

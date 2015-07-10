@@ -54,6 +54,12 @@ SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
 SWEP.Firemode=0
 SWEP.SingleReload=false
+SWEP.HoldType="pistol"
+SWEP.IdleType="normal"
+SWEP.SelectFire=false
+SWEP.vurtualkeys_firemode=true
+SWEP.MaxRecoil=5
+SWEP.RecoilControl=4
 function SWEP:Initialize()
         self:SetNWBool("Sight",false)
         self:SetNWInt("Zoom",1)
@@ -61,12 +67,14 @@ function SWEP:Initialize()
         self:SetNWInt("MagazineCount",3)
         self:SetNWBool("Safe",false)
 	self:SetNWBool("Chambered",true)
-        self:SetNWString("HoldType","pistol")
-        self:SetNWString("IdleType","normal")
+        self:SetNWString("HoldType",self.HoldType)
+        self:SetNWString("IdleType",self.IdleType)
 	self:SetNWInt("Burst",self.Burst)
 	self:SetNWBool("Firemode1",true)
 	self:SetNWBool("Firemode0",self.Auto)
+	self:SetNWBool("SelectFire",self.SelectFire)
 	self:SetNWBool("Firemode",false)
+	self:SetNWFloat("Recoil",0)
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.DefaultMagazines = {self.MagSize,self.MagSize,self.MagSize}
 	self.Magazines = table.Copy(self.DefaultMagazines)
@@ -149,10 +157,10 @@ function SWEP:FinishReload()
 	if (self.Magazines[1]==0) then
 		table.remove(self.Magazines,1)
 	end
-	if (self:GetNWBool("Chambered")==false && self.OpenBolt==false) then
+	if (self:GetNWBool("Chambered")==false && self.OpenBolt==false && self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
+		self:SetNWBool("Chambered",true)
 	end
-	self:SetNWBool("Chambered",true)
 	self.CurrentlyReloading=0
 	self.ReloadAnimTime=0
 	self:SetNWInt("MagazineCount",#self.Magazines)
@@ -218,6 +226,12 @@ function SWEP:ToggleZoom()
         end
 end
 
+function SWEP:SwitchFiremode()
+	if (self:GetNWBool("SelectFire")==false) then return end
+	self:SetNWBool("Firemode",!self:GetNWBool("Firemode"))
+	self.Weapon:EmitSound("weapon_smg1.special1")
+end
+
 
 function SWEP:Think()
 	if (SERVER) then
@@ -227,14 +241,20 @@ function SWEP:Think()
 		else
 			self:FinishReload()
 		end
-	end
+		end
+		if (self:GetNWFloat("Recoil")>0) then
+				self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")-(FrameTime()*self.RecoilControl))
+				if (self:GetNWFloat("Recoil")<0) then
+				self:SetNWFloat("Recoil",0)
+			end
+		end
 	end
         if (self:IsRunning() || self:GetNWBool("Sight")==false) then
-                self:SetWeaponHoldType(self:GetNWString("IdleType"))
+                self:SetHoldType(self:GetNWString("IdleType"))
 		if (CLIENT) then self.Owner:DrawViewModel(false) end
 		
         else
-                self:SetWeaponHoldType(self:GetNWString("HoldType"))
+                self:SetHoldType(self:GetNWString("HoldType"))
 		if (CLIENT) then self.Owner:DrawViewModel(true) end
         end
 	if (self.Burst>0 && self:GetNWBool("Firemode1")==false && self.Owner:KeyDown(IN_ATTACK)==false) then
@@ -284,7 +304,7 @@ end
 
 
 function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
-	local recoil = 0
+	local recoil = self:GetNWFloat("Recoil")
         local bullet = {}
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()                      -- Source
@@ -298,6 +318,12 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         self.Owner:FireBullets( bullet )
 
         self:ShootEffects()
-
+	self:Recoil(self.Ammo.recoil)
 end
 
+function SWEP:Recoil(recoil)
+	self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")+recoil)
+	if (self:GetNWFloat("Recoil")>self.MaxRecoil) then
+		self:SetNWFloat("Recoil",5)
+	end
+end

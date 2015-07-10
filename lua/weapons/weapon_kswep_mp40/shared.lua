@@ -53,7 +53,9 @@ SWEP.ReloadAnimTime=0
 SWEP.Burst=0
 SWEP.Auto=true
 SWEP.OpenBolt=true
-
+SWEP.RecoilControl=5
+SWEP.HoldType="ar2"
+SWEP.IdleType="passive"
 function SWEP:Reload()
 	self:ReloadMag()	
 end

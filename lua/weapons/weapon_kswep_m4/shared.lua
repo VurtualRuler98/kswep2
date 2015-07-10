@@ -53,6 +53,9 @@ SWEP.ReloadAnimTime=0
 SWEP.Burst=3
 SWEP.Auto=false
 SWEP.Firemode=true
+SWEP.HoldType="ar2"
+SWEP.IdleType="passive"
+SWEP.SelectFire=true
 
 function SWEP:Reload()
 	self:ReloadMag()	

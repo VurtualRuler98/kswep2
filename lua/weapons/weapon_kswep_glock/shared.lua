@@ -49,7 +49,7 @@ SWEP.ViewModelFlip = false
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
-
+SWEP.RecoilControl=2.4
 
 
 function SWEP:Reload()
