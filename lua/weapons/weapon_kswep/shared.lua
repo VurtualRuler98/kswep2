@@ -227,6 +227,7 @@ function SWEP:ToggleZoom()
 end
 
 function SWEP:SwitchFiremode()
+	print("test")
 	if (self:GetNWBool("SelectFire")==false) then return end
 	self:SetNWBool("Firemode",!self:GetNWBool("Firemode"))
 	self.Weapon:EmitSound("weapon_smg1.special1")
