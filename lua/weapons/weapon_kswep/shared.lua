@@ -143,7 +143,7 @@ function SWEP:BurstFire()
 	self:SetNWInt("Burst",self:GetNWInt("Burst")-1)
 	if (self:GetNWInt("Burst")<1) then
 		self:SetNWBool("Firemode1",false)
-		print("FINISHED BURST")
+		kevlardebugprint("FINISHED BURST")
 		self:SetNWInt("Burst",self.Burst)
 	end
 	end
@@ -227,7 +227,7 @@ function SWEP:ToggleZoom()
 end
 
 function SWEP:SwitchFiremode()
-	print("test")
+	kevlardebugprint("test")
 	if (self:GetNWBool("SelectFire")==false) then return end
 	self:SetNWBool("Firemode",!self:GetNWBool("Firemode"))
 	self.Weapon:EmitSound("weapon_smg1.special1")
