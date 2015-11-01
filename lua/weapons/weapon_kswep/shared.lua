@@ -203,7 +203,7 @@ end
 
 
 function SWEP:SecondaryAttack()
-	self:ToggleZoom()
+	--self:ToggleZoom()
 	self:SetNextSecondaryFire(CurTime() + 0.1 )
 end
 
