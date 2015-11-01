@@ -61,6 +61,8 @@ SWEP.SelectFire=false
 SWEP.vurtualkeys_firemode=true
 SWEP.MaxRecoil=5
 SWEP.RecoilControl=4
+SWEP.RecoilMassModifier=1
+SWEP.HandlingModifier=200
 function SWEP:Initialize()
         self:SetNWBool("Sight",false)
         self:SetNWInt("Zoom",1)
@@ -247,7 +249,8 @@ function SWEP:Think()
 		end
 		end
 		if (self:GetNWFloat("Recoil")>0) then
-				self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")-(FrameTime()*self.RecoilControl))
+				--self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")-(FrameTime()*self.RecoilControl))
+				self:SetNWFloat("Recoil",Lerp(FrameTime()*self.RecoilControl/2,self:GetNWFloat("Recoil"),0))
 				if (self:GetNWFloat("Recoil")<0) then
 				self:SetNWFloat("Recoil",0)
 			end
@@ -271,6 +274,11 @@ function SWEP:Think()
 	end
 end
 
+function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
+	pos=oldPos+Vector(0,self:GetNWFloat("Recoil")*0.1,0)
+	ang=oldAng+Angle(self:GetNWFloat("Recoil")*-0.5,0,0)
+	return pos,ang
+end
 function SWEP:Firemode()
 	if (!self.Firemode) then return end
 	if (self:GetNWBool("Firemode")) then
@@ -312,7 +320,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         local bullet = {}
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()                      -- Source
-        bullet.Dir              = self.Owner:GetAimVector()+(0.01*recoil*VectorRand())                  -- Dir of bullet
+        bullet.Dir              = self.Owner:GetAimVector()+(0.005*recoil*VectorRand()*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+(0.01*Vector(0,0,recoil))                  -- Dir of bullet
         bullet.Spread   = Vector( aimcone, aimcone, 0 )         -- Aim Cone
         bullet.Tracer   = 0                                                                     -- Show a tracer on every x bullets 
         bullet.Force    = 1                                                                     -- Amount of force to give to phys objects
@@ -322,7 +330,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         self.Owner:FireBullets( bullet )
 
         self:ShootEffects()
-	self:Recoil(self.Ammo.recoil)
+	self:Recoil(self.Ammo.recoil*self.RecoilMassModifier)
 end
 
 function SWEP:Recoil(recoil)

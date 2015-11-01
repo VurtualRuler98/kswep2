@@ -49,7 +49,7 @@ SWEP.ViewModelFlip = false
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
-
+SWEP.HandlingModifier=300
 
 SWEP.Auto=false
 SWEP.Firemode=true

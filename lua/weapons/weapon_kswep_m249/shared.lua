@@ -49,9 +49,10 @@ SWEP.Primary.DefaultClip=200
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
-
+SWEP.RecoilMassModifier=0.6
 SWEP.Burst=0
 SWEP.Auto=true
+SWEP.MaxRecoil=8
 SWEP.OpenBolt=true
 SWEP.RecoilControl=7
 SWEP.HoldType="ar2"
