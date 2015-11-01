@@ -45,7 +45,7 @@ SWEP.Primary.ClipSize = 200
 SWEP.Caliber = "vammo_556x45_m855"
 SWEP.Primary.Sound = Sound("weapon_m249.single")
 SWEP.ViewModelFlip = false
-
+SWEP.Primary.DefaultClip=200
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0

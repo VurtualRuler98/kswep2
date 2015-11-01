@@ -40,6 +40,7 @@ SWEP.WorldModel = "models/weapons/w_pist_glock18.mdl"
 SWEP.Primary.Automatic = false
 SWEP.UseHands = true
 SWEP.Magazines = 3
+SWEP.Primary.DefaultClip = SWEP.MagSize
 SWEP.MagSize = 17
 SWEP.Primary.ClipSize = SWEP.MagSize
 SWEP.Caliber = "pistol"
@@ -83,6 +84,8 @@ function SWEP:Initialize()
 		self.Magazines = table.Copy(self.DefaultMagazines)
 		self:SetNWBool("MagazineCount",self.Magazines[1])
 	end
+	self.Primary.DefaultClip = self.MagSize
+	self.Primary.ClipSize = self.MagSize
 end
 
 function SWEP:PrimaryAttack()
