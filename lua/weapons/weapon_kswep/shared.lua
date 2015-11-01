@@ -63,6 +63,7 @@ SWEP.MaxRecoil=5
 SWEP.RecoilControl=4
 SWEP.RecoilMassModifier=1
 SWEP.HandlingModifier=200
+SWEP.HoldAngle=20
 function SWEP:Initialize()
         self:SetNWBool("Sight",false)
         self:SetNWInt("Zoom",1)
@@ -78,6 +79,7 @@ function SWEP:Initialize()
 	self:SetNWBool("SelectFire",self.SelectFire)
 	self:SetNWBool("Firemode",false)
 	self:SetNWFloat("Recoil",0)
+	self:SetNWBool("Lowered",false)
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.DefaultMagazines = {self.MagSize,self.MagSize,self.MagSize}
 	self.Magazines = table.Copy(self.DefaultMagazines)
@@ -185,10 +187,6 @@ function SWEP:FinishReloadSingle()
 	self:SetNWInt("MagazineCount",self.Magazines[1])
 end
 
-function SWEP:DoDrawCrosshair()
-	return !self:GetNWBool("Sight")
-
-end
 function SWEP:CanPrimaryAttack()
 
         if ( self.Weapon:Clip1() <= 0 && !self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 && self.OpenBolt==true) then
@@ -258,11 +256,10 @@ function SWEP:Think()
 	end
         if (self:IsRunning() || self:GetNWBool("Sight")==false) then
                 self:SetHoldType(self:GetNWString("IdleType"))
-		if (CLIENT) then self.Owner:DrawViewModel(false) end
-		
+		self:SetNWBool("Lowered",true)	
         else
                 self:SetHoldType(self:GetNWString("HoldType"))
-		if (CLIENT) then self.Owner:DrawViewModel(true) end
+		self:SetNWBool("Lowered",false)	
         end
 	if (self.Burst>0 && self:GetNWBool("Firemode1")==false && self.Owner:KeyDown(IN_ATTACK)==false) then
 		self:SetNWBool("Firemode1",true)
@@ -273,12 +270,30 @@ function SWEP:Think()
 		self.Primary.Automatic=self:GetNWBool("Firemode0")
 	end
 end
-
+--TODO: this code is kind of ugly
 function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
+	self.smoothAng=self.smoothAng or ang
+	self.smoothPos=self.smoothPos or pos
 	pos=oldPos+Vector(0,self:GetNWFloat("Recoil")*0.1,0)
 	ang=oldAng+Angle(self:GetNWFloat("Recoil")*-0.5,0,0)
-	return pos,ang
+	if (self:GetNWBool("Chambered")==false || self:GetNWBool("Lowered")==true) then
+		if (self:GetNWBool("Lowered")==true) then self.lowerTime=0 end
+		self.lowerTime=self.lowerTime or 1
+		self.lowerTime=self.lowerTime-FrameTime()
+		if (self.lowerTime<0) then
+			self.lowerTime=0
+			ang=ang+Angle(self.HoldAngle,self.HoldAngle*2,0)
+			pos=pos+Vector(0,0,5)
+		end
+	end
+	if (self:GetNWBool("Chambered") && !self:GetNWBool("Lowered")) then
+		self.lowerTime=1
+	end
+	self.smoothAng=LerpAngle(0.1,self.smoothAng,ang)
+	self.smoothPos=LerpVector(0.1,self.smoothPos,pos)
+	return self.smoothPos,self.smoothAng
 end
+
 function SWEP:Firemode()
 	if (!self.Firemode) then return end
 	if (self:GetNWBool("Firemode")) then

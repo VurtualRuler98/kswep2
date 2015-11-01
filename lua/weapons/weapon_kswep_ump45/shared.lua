@@ -1,5 +1,5 @@
 --[[
-Copyright 2015 vurtual 
+opyright 2015 vurtual 
 VurtualRuler98@gmail.com
 vurtual.org
 
@@ -22,7 +22,7 @@ if (SERVER) then
 end
 
 if (CLIENT) then
-	SWEP.PrintName = "MP 40"
+	SWEP.PrintName = "UMP 45"
 	SWEP.Author = "vurtual"
 	SWEP.Slot = 2
 	SWEP.SlotPos = 0
@@ -35,15 +35,15 @@ SWEP.Primary.Damage = 10
 SWEP.Primary.Spread = 0.004
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
-SWEP.ViewModel = "models/weapons/v_mp40.mdl"
-SWEP.WorldModel = "models/weapons/w_mp40.mdl"
+SWEP.ViewModel = "models/weapons/cstrike/c_smg_ump45.mdl"
+SWEP.WorldModel = "models/weapons/w_smg_ump45.mdl"
 
 SWEP.UseHands = false
 SWEP.Magazines = 3
-SWEP.MagSize = 32
+SWEP.MagSize = 25
 SWEP.Primary.ClipSize = SWEP.MagSize
-SWEP.Caliber = "vammo_9x19_FMJ"
-SWEP.Primary.Sound = Sound("weapon_mp40.shoot")
+SWEP.Caliber = "vammo_45acp_FMJ"
+SWEP.Primary.Sound = Sound("weapon_ump45.single")
 SWEP.ViewModelFlip = false
 
 SWEP.Secondary.Ammo = ""
