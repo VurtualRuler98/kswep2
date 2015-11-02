@@ -49,7 +49,8 @@ SWEP.ViewModelFlip = false
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
-
+SWEP.IronSightsPos = Vector( -8.7335, -12.5938, 4.0261 )
+SWEP.IronSightsAng = Vector( -1.3337, -0.2749, -1.4508 )
 SWEP.Burst=0
 SWEP.Auto=true
 SWEP.OpenBolt=true

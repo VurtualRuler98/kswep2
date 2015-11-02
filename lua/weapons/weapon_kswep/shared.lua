@@ -65,7 +65,8 @@ SWEP.RecoilMassModifier=1
 SWEP.HandlingModifier=200
 SWEP.HoldAngle=20
 function SWEP:Initialize()
-        self:SetNWBool("Sight",false)
+        self:SetNWBool("Raised",false)
+	self:SetNWBool("Sight",false)
         self:SetNWInt("Zoom",1)
         self:SetNWBool("FiringPin",true)
         self:SetNWInt("MagazineCount",3)
@@ -97,7 +98,7 @@ function SWEP:PrimaryAttack()
 end
 
 function SWEP:NormalFire()
-	if (self:IsRunning() || self:GetNWBool("Sight")==false) then return end
+	if (self:IsRunning() || self:GetNWBool("Raised")==false) then return end
 	if (!self:CanPrimaryAttack() ) then return end
 	self.Weapon:EmitSound(self.Primary.Sound)
 	self:ShootBullet(self.Primary.Damage*self.Ammo.damagescale, self.Ammo.projectiles, self.Ammo.spreadscale*self.Primary.Spread,self.Ammo.name)
@@ -174,7 +175,8 @@ function SWEP:FinishReload()
 end
 
 function SWEP:DoDrawCrosshair()
-	return !self:GetNWBool("Sight")
+	--return !self:GetNWBool("Raised")
+	return true
 
 end
 
@@ -220,12 +222,13 @@ function SWEP:CustomAmmoDisplay()
 end
 function SWEP:ToggleZoom()
         --Are we using the sight?
-        if (self:GetNWBool("Sight")==true) then
+        if (self:GetNWBool("Raised")==true) then
                 --Stop using sight
-                self:SetNWBool("Sight",false)
+                self:SetNWBool("Raised",false)
+		self:SetNWBool("Sight",false)
         else
                 --Start using sight
-                self:SetNWBool("Sight",true)
+                self:SetNWBool("Raised",true)
         end
 end
 
@@ -254,7 +257,7 @@ function SWEP:Think()
 			end
 		end
 	end
-        if (self:IsRunning() || self:GetNWBool("Sight")==false) then
+        if (self:IsRunning() || self:GetNWBool("Raised")==false) then
                 self:SetHoldType(self:GetNWString("IdleType"))
 		self:SetNWBool("Lowered",true)	
         else
@@ -269,13 +272,16 @@ function SWEP:Think()
 	else
 		self.Primary.Automatic=self:GetNWBool("Firemode0")
 	end
+	self.WeaponSway=self.WeaponSway or self.Owner:GetAimVector()
+	self.WeaponSway=Lerp(0.1,self.WeaponSway,self.Owner:GetAimVector())
 end
 --TODO: this code is kind of ugly
 function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
+	local modPos = oldPos
 	self.smoothAng=self.smoothAng or ang
-	self.smoothPos=self.smoothPos or pos
-	pos=oldPos+Vector(0,self:GetNWFloat("Recoil")*0.1,0)
-	ang=oldAng+Angle(self:GetNWFloat("Recoil")*-0.5,0,0)
+	self.smoothPos=self.smoothPos or Vector(0,0,0)
+	modpos=oldPos+Vector(0,self:GetNWFloat("Recoil")*0.01,0)
+	ang=oldAng+Angle(self:GetNWFloat("Recoil")*-0.05,0,0)
 	if (self:GetNWBool("Chambered")==false || self:GetNWBool("Lowered")==true) then
 		if (self:GetNWBool("Lowered")==true) then self.lowerTime=0 end
 		self.lowerTime=self.lowerTime or 1
@@ -283,15 +289,24 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 		if (self.lowerTime<0) then
 			self.lowerTime=0
 			ang=ang+Angle(self.HoldAngle,self.HoldAngle*2,0)
-			pos=pos+Vector(0,0,5)
+			modpos=modpos+Vector(0,0,5)
 		end
+	elseif (self:GetNWBool("Sight")==true) then
+		ang:RotateAroundAxis(ang:Right(),self.IronSightsAng.x)
+		ang:RotateAroundAxis(ang:Up(),self.IronSightsAng.y)
+		ang:RotateAroundAxis(ang:Forward(),self.IronSightsAng.z)
+		modpos=modpos+self.IronSightsPos.x * ang:Right()
+		modpos=modpos+self.IronSightsPos.y * ang:Forward()
+		modpos=modpos+self.IronSightsPos.z * ang:Up()
 	end
+	
 	if (self:GetNWBool("Chambered") && !self:GetNWBool("Lowered")) then
 		self.lowerTime=1
 	end
+	modpos = modpos - oldPos
 	self.smoothAng=LerpAngle(0.1,self.smoothAng,ang)
-	self.smoothPos=LerpVector(0.1,self.smoothPos,pos)
-	return self.smoothPos,self.smoothAng
+	self.smoothPos=LerpVector(0.1,self.smoothPos,modpos)
+	return modPos+self.smoothPos,self.smoothAng
 end
 
 function SWEP:Firemode()
@@ -305,7 +320,7 @@ end
 
 
 function SWEP:TranslateFOV(fov)
-        if (self:GetNWBool("Sight")==true) then
+        if (self:GetNWBool("Raised")==true) then
                 return fov/self:GetNWInt("Zoom")
         else
                 return fov
@@ -313,7 +328,7 @@ function SWEP:TranslateFOV(fov)
 end
 
 function SWEP:AdjustMouseSensitivity()
-        if (self:GetNWBool("Sight")==true) then
+        if (self:GetNWBool("Raised")==true) then
                 return 1/self:GetNWInt("Zoom")
         else
                 return 1
@@ -331,11 +346,15 @@ end
 
 
 function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
+	local aimPenalty=1
+	if (!self:GetNWBool("Sight")) then
+		aimPenalty=1.5
+	end
 	local recoil = self:GetNWFloat("Recoil")
         local bullet = {}
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()                      -- Source
-        bullet.Dir              = self.Owner:GetAimVector()+(0.005*recoil*VectorRand()*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+(0.01*Vector(0,0,recoil))                  -- Dir of bullet
+        bullet.Dir              = self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+(0.01*Vector(0,0,recoil))                  -- Dir of bullet
         bullet.Spread   = Vector( aimcone, aimcone, 0 )         -- Aim Cone
         bullet.Tracer   = 0                                                                     -- Show a tracer on every x bullets 
         bullet.Force    = 1                                                                     -- Amount of force to give to phys objects
@@ -345,7 +364,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         self.Owner:FireBullets( bullet )
 
         self:ShootEffects()
-	self:Recoil(self.Ammo.recoil*self.RecoilMassModifier)
+	self:Recoil(self.Ammo.recoil*self.RecoilMassModifier*aimPenalty)
 end
 
 function SWEP:Recoil(recoil)
@@ -353,4 +372,15 @@ function SWEP:Recoil(recoil)
 	if (self:GetNWFloat("Recoil")>self.MaxRecoil) then
 		self:SetNWFloat("Recoil",5)
 	end
+end
+
+function SWEP:ToggleAim()
+	if (self:GetNWBool("Raised")==false) then return end
+        if (self:GetNWBool("Sight")==true) then
+                --Stop using sight
+                self:SetNWBool("Sight",false)
+        else
+                --Start using sight
+                self:SetNWBool("Sight",true)
+        end
 end

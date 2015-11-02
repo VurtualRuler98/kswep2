@@ -37,7 +37,8 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.ViewModel = "models/weapons/cstrike/c_rif_ak47.mdl"
 SWEP.WorldModel = "models/weapons/w_rif_ak47.mdl"
-
+SWEP.IronSightsPos = Vector( -6.634, -14.6079, 2.729 )
+SWEP.IronSightsAng = Vector( 2.3949, -0.0121, 0.0996 )
 SWEP.UseHands = true
 SWEP.MagazineCount = 4
 SWEP.MagSize = 30

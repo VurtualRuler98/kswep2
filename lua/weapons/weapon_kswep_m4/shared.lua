@@ -37,7 +37,8 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.ViewModel = "models/weapons/cstrike/c_rif_m4a1.mdl"
 SWEP.WorldModel = "models/weapons/w_rif_m4a1.mdl"
-
+SWEP.IronSightsPos = Vector( -7.7316, -9.9309, -0.6341 )
+SWEP.IronSightsAng = Vector( 2.9814, -1.7191, -2.27 )
 SWEP.UseHands = true
 SWEP.MagazineCount = 4
 SWEP.MagSize = 30
@@ -64,3 +65,9 @@ end
 function SWEP:PrimaryAttack()
 	self:BurstFire()
 end
+function SWEP:DoDrawCrosshair()
+        --return !self:GetNWBool("Raised")
+        return !self:GetNWBool("Sight")
+
+end
+

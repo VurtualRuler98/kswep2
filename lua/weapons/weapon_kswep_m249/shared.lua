@@ -37,7 +37,8 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.ViewModel = "models/weapons/cstrike/c_mach_m249para.mdl"
 SWEP.WorldModel = "models/weapons/w_mach_m249para.mdl"
-
+SWEP.IronSightsPos = Vector( -6.0075, -8.073, 2.3324 )
+SWEP.IronSightsAng = Vector( -0.0083, -0.1457, 0.5781 )
 SWEP.UseHands = true
 SWEP.Magazines = 2
 SWEP.MagSize = 200

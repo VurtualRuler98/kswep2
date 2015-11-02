@@ -46,7 +46,8 @@ SWEP.Caliber = "vammo_12gauge_00buck"
 SWEP.Primary.Sound = Sound("weapon_m3.single")
 SWEP.Secondary.Sound = Sound("weapon_xm1014.single")
 SWEP.ViewModelFlip = false
-
+SWEP.IronSightsPos = Vector( -7.6631, -11.191, 3.4869 )
+SWEP.IronSightsAng = Vector( 0.1421, -0.0286, 0.5781 )
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0

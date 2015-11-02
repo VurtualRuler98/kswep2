@@ -45,7 +45,8 @@ SWEP.Primary.ClipSize = SWEP.MagSize
 SWEP.Caliber = "vammo_9x19_FMJ"
 SWEP.Primary.Sound = Sound("weapon_glock.single")
 SWEP.ViewModelFlip = false
-
+SWEP.IronSightsPos = Vector( -5.8061, -11.191, 2.7822 )
+SWEP.IronSightsAng = Vector( 0.6772, -0.1099, 0.5162 )
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
