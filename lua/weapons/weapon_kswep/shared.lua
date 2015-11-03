@@ -71,7 +71,7 @@ function SWEP:Initialize()
         self:SetNWBool("FiringPin",true)
         self:SetNWInt("MagazineCount",3)
         self:SetNWBool("Safe",false)
-	self:SetNWBool("Chambered",false)
+	self:SetNWBool("Chambered",self.OpenBolt)
         self:SetNWString("HoldType",self.HoldType)
         self:SetNWString("IdleType",self.IdleType)
 	self:SetNWInt("Burst",self.Burst)
@@ -125,7 +125,7 @@ function SWEP:ShotgunFire()
 end
 
 function SWEP:Deploy()
-	if (self:GetNWBool("Chambered")==false && self:Clip1()>0) then
+	if (self:GetNWBool("Chambered")==false && self:Clip1()>0 && self.OpenBolt==false) then
 		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
 		self:SetNWBool("Chambered",true)
 		self:TakePrimaryAmmo(1)
