@@ -71,7 +71,7 @@ function SWEP:Initialize()
         self:SetNWBool("FiringPin",true)
         self:SetNWInt("MagazineCount",3)
         self:SetNWBool("Safe",false)
-	self:SetNWBool("Chambered",true)
+	self:SetNWBool("Chambered",false)
         self:SetNWString("HoldType",self.HoldType)
         self:SetNWString("IdleType",self.IdleType)
 	self:SetNWInt("Burst",self.Burst)
@@ -123,6 +123,33 @@ function SWEP:ShotgunFire()
 		self:NormalFire()
 	end
 end
+
+function SWEP:Deploy()
+	if (self:GetNWBool("Chambered")==false && self:Clip1()>0) then
+		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
+		self:SetNWBool("Chambered",true)
+		self:TakePrimaryAmmo(1)
+		self:SetDeploySpeed(1)
+		print("INITIAL DRAW")
+	else
+		self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
+		print("LATER DRAW")
+	end
+end
+
+function SWEP:Holster(wep)
+	if (!IsFirstTimePredicted()) then return end
+	if (self:GetNWBool("Raised")==false && self:GetNWBool("Sight")==false) then
+		return true
+	else
+		self:SetNWBool("Raised",false)
+		self:SetNWBool("Sight",false)
+		return false
+	end
+	
+end
+
+
 
 function SWEP:ReloadMag()
 	if (self.CurrentlyReloading==1) then return end
@@ -282,7 +309,7 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	self.smoothPos=self.smoothPos or Vector(0,0,0)
 	modpos=oldPos+Vector(0,self:GetNWFloat("Recoil")*0.01,0)
 	ang=oldAng+Angle(self:GetNWFloat("Recoil")*-0.05,0,0)
-	if (self:GetNWBool("Chambered")==false || self:GetNWBool("Lowered")==true) then
+	--[[if (self:GetNWBool("Chambered")==false || self:GetNWBool("Lowered")==true) then
 		if (self:GetNWBool("Lowered")==true) then self.lowerTime=0 end
 		self.lowerTime=self.lowerTime or 1
 		self.lowerTime=self.lowerTime-FrameTime()
@@ -299,9 +326,26 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 		modpos=modpos+self.IronSightsPos.y * ang:Forward()
 		modpos=modpos+self.IronSightsPos.z * ang:Up()
 	end
+	]]--
 	
-	if (self:GetNWBool("Chambered") && !self:GetNWBool("Lowered")) then
-		self.lowerTime=1
+	if (self:GetNWBool("Lowered")==true) then
+		ang=ang+Angle(self.HoldAngle,self.HoldAngle*2,0)
+		modpos=modpos+Vector(0,0,5)
+	elseif (self:GetNWBool("Chambered")==false)  then
+		self.lowerTime=self.lowerTime or 1
+		self.lowerTime=self.lowerTime-FrameTime()
+		if (self.lowerTime<0) then
+			self.lowerTime=0
+			ang=ang+Angle(self.HoldAngle,self.HoldAngle*0.9,0)
+			modpos=modpos+Vector(0,0,5)
+		end
+	elseif (self:GetNWBool("Sight")==true) then
+		ang:RotateAroundAxis(ang:Right(),self.IronSightsAng.x)
+		ang:RotateAroundAxis(ang:Up(),self.IronSightsAng.y)
+		ang:RotateAroundAxis(ang:Forward(),self.IronSightsAng.z)
+		modpos=modpos+self.IronSightsPos.x * ang:Right()
+		modpos=modpos+self.IronSightsPos.y * ang:Forward()
+		modpos=modpos+self.IronSightsPos.z * ang:Up()
 	end
 	modpos = modpos - oldPos
 	self.smoothAng=LerpAngle(0.1,self.smoothAng,ang)
