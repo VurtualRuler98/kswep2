@@ -381,7 +381,7 @@ function SWEP:Think()
                 self:SetHoldType(self:GetNWString("HoldType"))
 		self:SetNWBool("Lowered",false)	
         end
-	if (self:Clip1()<1) then
+	if (self:Clip1()<1 && (self.OpenBolt || !self:GetNWBool("Chambered"))) then
 		self:SetNWBool("Sight",false)
 	end
 	if (self.Burst>0 && self:GetNWBool("Firemode1")==false && self.Owner:KeyDown(IN_ATTACK)==false) then
