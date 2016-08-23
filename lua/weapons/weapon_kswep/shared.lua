@@ -10,7 +10,7 @@ if (CLIENT) then
 end
 
 SWEP.Category = "Vurtual's K-Weapons"
-SWEP.Base = "weapon_sim_base"
+SWEP.Base = "weapon_base"
 SWEP.Primary.Delay = 0.08
 SWEP.Primary.Damage = 8
 SWEP.Primary.Spread = 0.004
