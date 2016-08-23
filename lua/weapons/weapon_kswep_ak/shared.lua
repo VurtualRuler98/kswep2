@@ -58,7 +58,7 @@ SWEP.HoldType="ar2"
 SWEP.IdleType="passive"
 SWEP.SelectFire=true
 
-function SWEP:Reload()
+function SWEP:ReloadAct()
 	self:ReloadMag()	
 end
 

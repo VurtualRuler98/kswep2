@@ -56,7 +56,8 @@ SWEP.SingleReload=true
 SWEP.HoldType="ar2"
 SWEP.IdleType="passive"
 SWEP.MaxMags = 24
-function SWEP:Reload()
+SWEP.ModeName0 = "PUMP"
+function SWEP:ReloadAct()
 	self:ReloadTube()	
 end
 

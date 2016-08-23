@@ -53,6 +53,6 @@ SWEP.ReloadAnimTime=0
 SWEP.RecoilControl=2.4
 SWEP.MaxMags = 4
 
-function SWEP:Reload()
+function SWEP:ReloadAct()
 	self:ReloadMag()	
 end

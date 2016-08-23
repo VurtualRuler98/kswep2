@@ -58,6 +58,8 @@ SWEP.IdleType="normal"
 SWEP.SelectFire=false
 SWEP.vurtualkeys_firemode=true
 SWEP.MaxRecoil=5
+SWEP.ModeName0="SEMI"
+SWEP.ModeName1="FULL"
 SWEP.RecoilControl=4
 SWEP.RecoilMassModifier=1
 SWEP.HandlingModifier=200
@@ -77,10 +79,13 @@ function SWEP:Initialize()
 	self:SetNWInt("Burst",self.Burst)
 	self:SetNWBool("Firemode1",true)
 	self:SetNWBool("Firemode0",self.Auto)
+	self:SetNWBool("FiremodeSelected",false)
 	self:SetNWBool("SelectFire",self.SelectFire)
 	self:SetNWBool("Firemode",false)
 	self:SetNWFloat("Recoil",0)
 	self:SetNWBool("Lowered",false)
+	self:SetNWFloat("ReloadMessage",0)
+	self:SetNWInt("ReloadWeight",0)
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.DefaultMagazines = {}
 	self.Magazines = {}
@@ -131,8 +136,9 @@ function SWEP:Rearm()
 	return rearmed
 end
 function SWEP:PrimaryAttack()
-	if (self.Owner:KeyDown(IN_USE)) then
+	if (self.Owner:KeyDown(IN_USE) && !self:GetNWBool("FiremodeSelected")) then
 		self:SwitchFiremode()
+		self:SetNWBool("FiremodeSelected",true)
 		self:SetNextPrimaryFire(CurTime()+0.5)
 	else
 		self:PrimaryFire()
@@ -195,7 +201,14 @@ function SWEP:Holster(wep)
 	
 end
 
-
+function SWEP:Reload()
+	if (self.Owner:KeyDown(IN_USE)) then
+		self:SetNWFloat("ReloadMessage",CurTime()+2)
+		self:SetNWInt("ReloadWeight",self:Clip1())
+	else
+		self:ReloadAct()
+	end
+end
 
 function SWEP:ReloadMag()
 	if (self.CurrentlyReloading==1) then return end
@@ -217,7 +230,33 @@ function SWEP:ReloadTube()
 		
 end
 
-
+function SWEP:DrawHUD()
+	draw.DrawText(self:FiremodeName(),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.11,Color(255, 255, 0,255))
+	if (self:GetNWFloat("ReloadMessage") > CurTime()) then
+		draw.DrawText(self:MagWeight(self:GetNWInt("ReloadWeight"),self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
+	end
+end 
+function SWEP:MagWeight(reloadweight,magsize)
+	local weightratio=reloadweight/magsize
+	if (weightratio>0.9) then
+		return "Mag feels heavy."
+	elseif (weightratio>0.6) then
+		return "Mag feels slightly heavy."
+	elseif (weightratio>0.3) then
+		return "Mag feels light."
+	elseif (weightratio>0) then
+		return "Mag very light."
+	else
+		return "Mag is empty."
+	end
+end
+function SWEP:FiremodeName()
+	if (self:GetNWBool("Firemode")) then
+		return self.ModeName1
+	else
+		return self.ModeName0
+	end
+end
 function SWEP:BurstFire()
 	self:NormalFire()
 	if (SERVER) then
@@ -243,6 +282,8 @@ function SWEP:FinishReload()
 	end
 	self.CurrentlyReloading=0
 	self.ReloadAnimTime=0
+	self:SetNWFloat("ReloadMessage",CurTime()+2)
+	self:SetNWInt("ReloadWeight",self:Clip1())
 	self:SetNWInt("MagazineCount",#self.Magazines)
 end
 
@@ -262,7 +303,9 @@ function SWEP:FinishReloadSingle()
 end
 
 function SWEP:CanPrimaryAttack()
-
+	if ( self:GetNWBool("FiremodeSelected") ) then
+		return false
+	end
         if ( self.Weapon:Clip1() <= 0 && !self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 && self.OpenBolt==true) then
 		if (self:GetNWBool("FiringPin")==true) then
 	                self:EmitSound( "Weapon_Pistol.Empty" )
@@ -343,6 +386,9 @@ function SWEP:Think()
 	end
 	if (self.Burst>0 && self:GetNWBool("Firemode1")==false && self.Owner:KeyDown(IN_ATTACK)==false) then
 		self:SetNWBool("Firemode1",true)
+	end
+	if (self:GetNWBool("FiremodeSelected") && !self.Owner:KeyDown(IN_ATTACK)) then
+		self:SetNWBool("FiremodeSelected",false)
 	end
 	if (self:GetNWBool("Firemode")) then
 		self.Primary.Automatic=self:GetNWBool("Firemode1")
