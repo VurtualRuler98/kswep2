@@ -1,3 +1,20 @@
+--[[
+Copyright 2015 vurtual 
+VurtualRuler98@gmail.com
+vurtual.org
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+]]--
 if (SERVER) then
 	AddCSLuaFile("shared.lua")
 end
@@ -46,11 +63,11 @@ SWEP.RecoilMassModifier=1
 SWEP.HandlingModifier=200
 SWEP.HoldAngle=20
 function SWEP:Initialize()
-        self:SetNWBool("Raised",false)
+        self:SetNWBool("Raised",true)
 	self:SetNWBool("Sight",false)
         self:SetNWInt("Zoom",1)
         self:SetNWBool("FiringPin",true)
-        self:SetNWInt("MagazineCount",3)
+        self:SetNWInt("MagazineCount",1)
         self:SetNWBool("Safe",false)
 	self:SetNWBool("Chambered",self.OpenBolt)
         self:SetNWString("HoldType",self.HoldType)
@@ -63,7 +80,7 @@ function SWEP:Initialize()
 	self:SetNWFloat("Recoil",0)
 	self:SetNWBool("Lowered",false)
 	self.Ammo = vurtual_ammodata[self.Caliber]
-	self.DefaultMagazines = {self.MagSize,self.MagSize,self.MagSize}
+	self.DefaultMagazines = {self.MagSize}
 	self.Magazines = table.Copy(self.DefaultMagazines)
 	if (self.SingleReload==true) then
 		self.DefaultMagazines={self.MagSize*self.MagazineCount}
@@ -73,8 +90,39 @@ function SWEP:Initialize()
 	self.Primary.DefaultClip = self.MagSize
 	self.Primary.ClipSize = self.MagSize
 end
-
+function SWEP:Rearm()
+	local autofillmag=false
+	if (self.SingleReload==true) then
+		if (self:Clip1()==self.MagSize || !autofillmag) then
+			self.Magazines={self.Magazines[1]+self.MagSize}
+			self:SetNWInt("MagazineCount",self.Magazines[1])
+		else
+			self:SetClip1(self.MagSize)
+		end
+	else
+		if ((#self.Magazines==0 || self.Magazines[1]==self.MagSize) && (self:Clip1()==self.MagSize || !autofillmag)) then
+			table.insert(self.Magazines,self.MagSize)
+			self:SetNWInt("MagazineCount",#self.Magazines)
+		else
+			if (autofillmag) then
+				self:SetClip1(self.MagSize)
+			end
+			for k,v in pairs(self.Magazines) do
+				self.Magazines[k]=self.MagSize
+			end
+		end
+	end
+end
 function SWEP:PrimaryAttack()
+	if (self.Owner:KeyDown(IN_USE)) then
+		self:SwitchFiremode()
+		self:SetNextPrimaryFire(CurTime()+0.5)
+	else
+		self:PrimaryFire()
+	end
+end
+
+function SWEP:PrimaryFire()
 	self:NormalFire()
 end
 
@@ -111,22 +159,22 @@ function SWEP:Deploy()
 		self:SetNWBool("Chambered",true)
 		self:TakePrimaryAmmo(1)
 		self:SetDeploySpeed(1)
-		print("INITIAL DRAW")
 	else
 		self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
-		print("LATER DRAW")
 	end
+	self:SetNWBool("Raised",true)
 end
 
 function SWEP:Holster(wep)
-	if (!IsFirstTimePredicted()) then return end
+	if (!IsFirstTimePredicted()) then return end--[[
 	if (self:GetNWBool("Raised")==false && self:GetNWBool("Sight")==false) then
 		return true
 	else
 		self:SetNWBool("Raised",false)
 		self:SetNWBool("Sight",false)
 		return false
-	end
+	end]]
+	return true
 	
 end
 
@@ -159,7 +207,6 @@ function SWEP:BurstFire()
 	self:SetNWInt("Burst",self:GetNWInt("Burst")-1)
 	if (self:GetNWInt("Burst")<1) then
 		self:SetNWBool("Firemode1",false)
-		kevlardebugprint("FINISHED BURST")
 		self:SetNWInt("Burst",self.Burst)
 	end
 	end
@@ -216,7 +263,11 @@ end
 
 
 function SWEP:SecondaryAttack()
-	--self:ToggleZoom()
+	if (self.Owner:KeyDown(IN_USE)) then
+		self:ToggleZoom()
+	else
+		self:ToggleAim()
+	end
 	self:SetNextSecondaryFire(CurTime() + 0.1 )
 end
 
@@ -224,8 +275,7 @@ end
 function SWEP:CustomAmmoDisplay()
 	self.AmmoDisplay = self.AmmoDisplay or {}
 	self.AmmoDisplay.Draw=true
-	self.AmmoDisplay.PrimaryClip=self:Clip1()
-	self.AmmoDisplay.PrimaryAmmo=self:GetNWInt("MagazineCount")
+	self.AmmoDisplay.PrimaryClip=self:GetNWInt("MagazineCount")
 	return self.AmmoDisplay
 end
 function SWEP:ToggleZoom()
@@ -241,7 +291,6 @@ function SWEP:ToggleZoom()
 end
 
 function SWEP:SwitchFiremode()
-	kevlardebugprint("test")
 	if (self:GetNWBool("SelectFire")==false) then return end
 	self:SetNWBool("Firemode",!self:GetNWBool("Firemode"))
 	self.Weapon:EmitSound("weapon_smg1.special1")
@@ -379,7 +428,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         local bullet = {}
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()                      -- Source
-        bullet.Dir              = self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+(0.01*Vector(0,0,recoil))                  -- Dir of bullet
+        bullet.Dir              = self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))                  -- Dir of bullet +(0.01*Vector(0,0,recoil))
         bullet.Spread   = Vector( aimcone, aimcone, 0 )         -- Aim Cone
         bullet.Tracer   = 0                                                                     -- Show a tracer on every x bullets 
         bullet.Force    = 1                                                                     -- Amount of force to give to phys objects

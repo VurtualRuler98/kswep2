@@ -62,7 +62,7 @@ function SWEP:Reload()
 	self:ReloadMag()	
 end
 
-function SWEP:PrimaryAttack()
+function SWEP:PrimaryFire()
 	self:BurstFire()
 end
 function SWEP:DoDrawCrosshair()

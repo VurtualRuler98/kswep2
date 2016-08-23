@@ -63,6 +63,3 @@ function SWEP:Reload()
 	self:ReloadMag()	
 end
 
-function SWEP:PrimaryAttack()
-	self:NormalFire()
-end
