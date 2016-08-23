@@ -31,7 +31,7 @@ end
 SWEP.Category = "Vurtual's K-Weapons"
 SWEP.Base = "weapon_kswep"
 SWEP.Primary.Delay = 0.075
-SWEP.Primary.Damage = 14
+SWEP.Primary.Damage = 30
 SWEP.Primary.Spread = 0.005
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
