@@ -29,8 +29,10 @@ end
 function ENT:Use( activator, caller )
 	if ( activator:IsPlayer() )  then
 		if (activator:GetActiveWeapon():IsValid() && string.find(activator:GetActiveWeapon():GetClass(),"weapon_kswep")) then
-		activator:GetActiveWeapon():Rearm()
-		self.Entity:EmitSound("BaseCombatCharacter.AmmoPickup")
+			local rearmed=activator:GetActiveWeapon():Rearm()
+			if (rearmed) then 
+				self.Entity:EmitSound("BaseCombatCharacter.AmmoPickup")
+			end
 		end
 	end
 end

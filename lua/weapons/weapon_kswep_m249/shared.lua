@@ -58,6 +58,7 @@ SWEP.OpenBolt=true
 SWEP.RecoilControl=7
 SWEP.HoldType="ar2"
 SWEP.IdleType="passive"
+SWEP.MaxMags = 2
 function SWEP:Reload()
 	self:ReloadMag()	
 end

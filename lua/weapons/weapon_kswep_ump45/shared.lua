@@ -38,7 +38,7 @@ SWEP.AdminSpawnable = true
 SWEP.ViewModel = "models/weapons/cstrike/c_smg_ump45.mdl"
 SWEP.WorldModel = "models/weapons/w_smg_ump45.mdl"
 
-SWEP.UseHands = false
+SWEP.UseHands = true
 SWEP.Magazines = 3
 SWEP.MagSize = 25
 SWEP.Primary.ClipSize = SWEP.MagSize
@@ -59,6 +59,7 @@ SWEP.OpenBolt=false
 SWEP.RecoilControl=5
 SWEP.HoldType="ar2"
 SWEP.IdleType="passive"
+SWEP.MaxMags = 3
 function SWEP:Reload()
 	self:ReloadMag()	
 end

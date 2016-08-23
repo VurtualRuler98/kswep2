@@ -62,12 +62,14 @@ SWEP.RecoilControl=4
 SWEP.RecoilMassModifier=1
 SWEP.HandlingModifier=200
 SWEP.HoldAngle=20
+SWEP.MaxMags=6
+SWEP.SpawnChambered=false
 function SWEP:Initialize()
         self:SetNWBool("Raised",true)
 	self:SetNWBool("Sight",false)
         self:SetNWInt("Zoom",1)
         self:SetNWBool("FiringPin",true)
-        self:SetNWInt("MagazineCount",1)
+        self:SetNWInt("MagazineCount",0)
         self:SetNWBool("Safe",false)
 	self:SetNWBool("Chambered",self.OpenBolt)
         self:SetNWString("HoldType",self.HoldType)
@@ -80,10 +82,10 @@ function SWEP:Initialize()
 	self:SetNWFloat("Recoil",0)
 	self:SetNWBool("Lowered",false)
 	self.Ammo = vurtual_ammodata[self.Caliber]
-	self.DefaultMagazines = {self.MagSize}
+	self.DefaultMagazines = {}
 	self.Magazines = table.Copy(self.DefaultMagazines)
 	if (self.SingleReload==true) then
-		self.DefaultMagazines={self.MagSize*self.MagazineCount}
+		self.DefaultMagazines={0}
 		self.Magazines = table.Copy(self.DefaultMagazines)
 		self:SetNWBool("MagazineCount",self.Magazines[1])
 	end
@@ -92,26 +94,41 @@ function SWEP:Initialize()
 end
 function SWEP:Rearm()
 	local autofillmag=false
+	local rearmed=false
 	if (self.SingleReload==true) then
 		if (self:Clip1()==self.MagSize || !autofillmag) then
-			self.Magazines={self.Magazines[1]+self.MagSize}
-			self:SetNWInt("MagazineCount",self.Magazines[1])
+			if (self.Magazines[1]<self.MaxMags) then
+				self.Magazines={self.Magazines[1]+self.MagSize}
+				self:SetNWInt("MagazineCount",self.Magazines[1])
+				rearmed=true
+			end
+			if (self.Magazines[1]>self.MaxMags) then
+				self.Magazines={self.MaxMags}
+				self:SetNWInt("MagazineCount",self.Magazines[1])
+			end
 		else
 			self:SetClip1(self.MagSize)
+			rearmed=true
 		end
 	else
 		if ((#self.Magazines==0 || self.Magazines[1]==self.MagSize) && (self:Clip1()==self.MagSize || !autofillmag)) then
-			table.insert(self.Magazines,self.MagSize)
-			self:SetNWInt("MagazineCount",#self.Magazines)
+			if (#self.Magazines<self.MaxMags) then
+				table.insert(self.Magazines,self.MagSize)
+				self:SetNWInt("MagazineCount",#self.Magazines)
+				rearmed=true
+			end
 		else
 			if (autofillmag) then
 				self:SetClip1(self.MagSize)
+				rearmed=true
 			end
 			for k,v in pairs(self.Magazines) do
 				self.Magazines[k]=self.MagSize
+				rearmed=true
 			end
 		end
 	end
+	return rearmed
 end
 function SWEP:PrimaryAttack()
 	if (self.Owner:KeyDown(IN_USE)) then
