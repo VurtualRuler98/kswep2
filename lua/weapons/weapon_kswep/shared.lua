@@ -83,7 +83,7 @@ function SWEP:Initialize()
 	self:SetNWBool("Lowered",false)
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.DefaultMagazines = {}
-	self.Magazines = table.Copy(self.DefaultMagazines)
+	self.Magazines = {}
 	if (self.SingleReload==true) then
 		self.DefaultMagazines={0}
 		self.Magazines = table.Copy(self.DefaultMagazines)
@@ -338,6 +338,9 @@ function SWEP:Think()
                 self:SetHoldType(self:GetNWString("HoldType"))
 		self:SetNWBool("Lowered",false)	
         end
+	if (self:Clip1()<1) then
+		self:SetNWBool("Sight",false)
+	end
 	if (self.Burst>0 && self:GetNWBool("Firemode1")==false && self.Owner:KeyDown(IN_ATTACK)==false) then
 		self:SetNWBool("Firemode1",true)
 	end
@@ -470,7 +473,7 @@ function SWEP:ToggleAim()
         if (self:GetNWBool("Sight")==true) then
                 --Stop using sight
                 self:SetNWBool("Sight",false)
-        else
+        elseif (!self:GetNWBool("Lowered")) then
                 --Start using sight
                 self:SetNWBool("Sight",true)
         end
