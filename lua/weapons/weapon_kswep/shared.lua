@@ -238,11 +238,11 @@ function SWEP:DrawHUD()
 end 
 function SWEP:MagWeight(reloadweight,magsize)
 	local weightratio=reloadweight/magsize
-	if (weightratio>0.9) then
+	if (weightratio>0.8) then
 		return "Mag feels heavy."
-	elseif (weightratio>0.6) then
+	elseif (weightratio>0.5) then
 		return "Mag feels slightly heavy."
-	elseif (weightratio>0.3) then
+	elseif (weightratio>0.2) then
 		return "Mag feels light."
 	elseif (weightratio>0) then
 		return "Mag very light."
@@ -276,6 +276,7 @@ function SWEP:FinishReload()
 	if (self.Magazines[1]==0) then
 		table.remove(self.Magazines,1)
 	end
+	self:ServeNWInt("ReloadWeight",self:Clip1())
 	if (self:GetNWBool("Chambered")==false && self.OpenBolt==false && self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
 		self:ServeNWBool("Chambered",true)
@@ -283,7 +284,6 @@ function SWEP:FinishReload()
 	self.CurrentlyReloading=0
 	self.ReloadAnimTime=0
 	self:SetNWFloat("ReloadMessage",CurTime()+2)
-	self:ServeNWInt("ReloadWeight",self:Clip1())
 	self:ServeNWInt("MagazineCount",#self.Magazines)
 end
 function SWEP:ServeNWInt(var,int)
