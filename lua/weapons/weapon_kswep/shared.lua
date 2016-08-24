@@ -405,7 +405,7 @@ function SWEP:Think()
 		self.Primary.Automatic=self:GetNWBool("Firemode0")
 	end
 	self.WeaponSway=self.WeaponSway or self.Owner:GetAimVector()
-	self.WeaponSway=Lerp(0.1,self.WeaponSway,self.Owner:GetAimVector())
+	self.WeaponSway=Lerp(FrameTime()*30,self.WeaponSway,self.Owner:GetAimVector())
 end
 --TODO: this code is kind of ugly
 function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
@@ -453,8 +453,8 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 		modpos=modpos+self.IronSightsPos.z * ang:Up()
 	end
 	modpos = modpos - oldPos
-	self.smoothAng=LerpAngle(0.1,self.smoothAng,ang)
-	self.smoothPos=LerpVector(0.1,self.smoothPos,modpos)
+	self.smoothAng=LerpAngle(FrameTime()*30,self.smoothAng,ang)
+	self.smoothPos=LerpVector(FrameTime()*30,self.smoothPos,modpos)
 	return modPos+self.smoothPos,self.smoothAng
 end
 
