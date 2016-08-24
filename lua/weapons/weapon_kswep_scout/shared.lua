@@ -30,7 +30,7 @@ end
 
 SWEP.Category = "Vurtual's K-Weapons"
 SWEP.Base = "weapon_kswep"
-SWEP.Primary.Delay = self.Owner:GetViewModel:SequenceDuration(ACT_VM_PRIMARYATTACK) 
+SWEP.Primary.Delay = self.Owner:GetViewModel():SequenceDuration(ACT_VM_PRIMARYATTACK) 
 SWEP.Primary.Damage = 42
 SWEP.Primary.Spread = 0.0001
 SWEP.Spawnable = true
