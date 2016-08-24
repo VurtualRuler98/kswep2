@@ -30,7 +30,7 @@ end
 
 SWEP.Category = "Vurtual's K-Weapons"
 SWEP.Base = "weapon_kswep"
-SWEP.Primary.Delay = SWEP.Owner:GetViewModel():SequenceDuration(ACT_VM_PRIMARYATTACK) 
+SWEP.Primary.Delay = 1.4
 SWEP.Primary.Damage = 42
 SWEP.Primary.Spread = 0.0001
 SWEP.Spawnable = true
@@ -40,19 +40,26 @@ SWEP.WorldModel = "models/weapons/w_snip_scout.mdl"
 SWEP.Primary.Automatic = false
 SWEP.UseHands = true
 SWEP.Magazines = 4
+SWEP.ModeName0 = "BOLT"
 SWEP.MagSize = 10
 SWEP.Primary.ClipSize = SWEP.MagSize
-SWEP.Caliber = "vammo_762x51_M80"
+SWEP.Caliber = "vammo_762x51_m80"
 SWEP.Primary.Sound = Sound("weapon_scout.single")
 SWEP.ViewModelFlip = false
-SWEP.IronSightsPos = Vector( 0, 0, 0 )
+SWEP.IronSightsPos = Vector( 0, 0, -1000 )
 SWEP.IronSightsAng = Vector( 0, 0, 0 )
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
 SWEP.RecoilControl=4
 SWEP.MaxMags = 4
-
+SWEP.ScopeZoom = 8
 function SWEP:ReloadAct()
 	self:ReloadMag()	
 end
+function SWEP:DoDrawCrosshair()
+        --return !self:GetNWBool("Raised")
+        return !self:GetNWBool("Sight")
+
+end
+

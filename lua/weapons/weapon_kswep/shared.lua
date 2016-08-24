@@ -66,11 +66,11 @@ SWEP.HandlingModifier=200
 SWEP.HoldAngle=20
 SWEP.MaxMags=6
 SWEP.SpawnChambered=false
+SWEP.ScopeZoom = 1
 function SWEP:Initialize()
         self:SetNWBool("Raised",true)
 	self:SetNWBool("Sight",false)
-        self:SetNWInt("Zoom",1)
-        self:SetNWBool("FiringPin",true)
+	self:SetNWBool("FiringPin",true)
         self:SetNWInt("MagazineCount",0)
         self:SetNWBool("Safe",false)
 	self:SetNWBool("Chambered",self.OpenBolt)
@@ -469,16 +469,16 @@ end
 
 
 function SWEP:TranslateFOV(fov)
-        if (self:GetNWBool("Raised")==true) then
-                return fov/self:GetNWInt("Zoom")
+        if (self:GetNWBool("sight")) then
+                return fov/self.ScopeZoom
         else
                 return fov
         end
 end
 
 function SWEP:AdjustMouseSensitivity()
-        if (self:GetNWBool("Raised")==true) then
-                return 1/self:GetNWInt("Zoom")
+        if (self:GetNWBool("sight")==true) then
+                return 1/self.ScopeZoom
         else
                 return 1
         end
