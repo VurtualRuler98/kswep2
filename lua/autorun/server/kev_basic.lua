@@ -1,3 +1,4 @@
+CreateConVar("kswep_slow",0)
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 end

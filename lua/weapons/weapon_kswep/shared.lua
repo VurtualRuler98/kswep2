@@ -186,6 +186,10 @@ function SWEP:Deploy()
 		self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
 	end
 	self:ServeNWBool("Raised",true)
+	if (GetConVar("kswep_slow"):GetBool()) then
+		self.Owner:SetRunSpeed(250)
+		self.Owner:SetWalkSpeed(175)
+	end
 end
 
 function SWEP:Holster(wep)

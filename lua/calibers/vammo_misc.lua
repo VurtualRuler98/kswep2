@@ -153,9 +153,9 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.powermax=8
 	tbl.helmetpenetration=0
 	tbl.armordamagemult=0.5
-	tbl.projectiles = 8
+	tbl.projectiles = 9
 	tbl.spreadscale = 3
-	tbl.damagescale = 0.2
+	tbl.damagescale = 0.11
 	tbl.recoil = 4
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_12gauge_00buck",DMG_BULLET,0,0,80,10,5})
