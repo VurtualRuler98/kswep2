@@ -69,6 +69,9 @@ SWEP.MaxMags=6
 SWEP.DoubleAction=false
 SWEP.SpawnChambered=false
 SWEP.ScopeZoom = 1
+SWEP.ReloadModLight=1
+SWEP.ReloadModMedium=1.10
+SWEP.ReloadModHeavy=1.20
 function SWEP:Initialize()
         self:SetNWBool("Raised",true)
 	self:SetNWBool("Sight",false)
@@ -218,9 +221,18 @@ end
 
 function SWEP:ReloadMag()
 	if (self.CurrentlyReloading==1) then return end
+	local reloadspeed=self.ReloadModLight
+	if (self.Owner.ksarmor) then
+		if (self.Owner.ksarmor==2) then
+			reloadspeed=self.ReloadModHeavy
+		elseif (self.Owner.ksarmor==1) then
+			reloadspeed=self.ReloadModMedium
+		end
+	end
 	self.Weapon:SendWeaponAnim(ACT_VM_RELOAD)
-	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
-	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()
+	self.Owner:GetViewModel():SetPlaybackRate(1/reloadspeed)
+	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed)
+	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed
 	self.CurrentlyReloading=1
 		
 end
@@ -229,10 +241,19 @@ function SWEP:ReloadTube()
 	if (self.CurrentlyReloading==1) then return end
 	if (self.Magazines[1]<1) then return end
 	if (self:Clip1()>=self.Primary.ClipSize) then return end
+	local reloadspeed=self.ReloadModLight
+	if (self.Owner.ksarmor) then
+		if (self.Owner.ksarmor==2) then
+			reloadspeed=self.ReloadModHeavy
+		elseif (self.Owner.ksarmor==1) then
+			reloadspeed=self.ReloadModMedium
+		end
+	end
 	self.Weapon:SendWeaponAnim(ACT_VM_RELOAD)
-	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration()+0.4)
-	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()
-	self.CurrentlyReloading=1	
+	self.Owner:GetViewModel():SetPlaybackRate(1/reloadspeed)
+	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed)
+	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed
+	self.CurrentlyReloading=1
 		
 end
 
