@@ -37,7 +37,7 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.ViewModel = "models/weapons/cstrike/c_smg_mac10.mdl"
 SWEP.WorldModel = "models/weapons/w_smg_mac10.mdl"
-
+SWEP.HoldOpen=true
 SWEP.UseHands = true
 SWEP.Magazines = 3
 SWEP.MagSize = 30

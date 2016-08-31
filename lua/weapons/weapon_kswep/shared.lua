@@ -47,6 +47,7 @@ SWEP.ViewModelFlip = false
 SWEP.Burst=0
 SWEP.Auto=false
 SWEP.OpenBolt=false
+SWEP.HoldOpen=false
 SWEP.Secondary.Ammo = SWEP.Primary.Ammo
 SWEP.Secondary.ClipSize = 1
 SWEP.CurrentlyReloading=0
@@ -65,6 +66,7 @@ SWEP.RecoilMassModifier=1
 SWEP.HandlingModifier=200
 SWEP.HoldAngle=20
 SWEP.MaxMags=6
+SWEP.DoubleAction=false
 SWEP.SpawnChambered=false
 SWEP.ScopeZoom = 1
 function SWEP:Initialize()
@@ -320,8 +322,10 @@ function SWEP:CanPrimaryAttack()
 		return false
 	end
         if ( self.Weapon:Clip1() <= 0 && !self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 && self.OpenBolt==true) then
-		if (self:GetNWBool("FiringPin")==true) then
-	                self:EmitSound( "Weapon_Pistol.Empty" )
+		if (self:GetNWBool("FiringPin")==true || self.DoubleAction) then
+			if (!self.HoldOpen) then
+	                	self:EmitSound( "Weapon_Pistol.Empty" )
+			end
 			self:ServeNWBool("FiringPin",false)
 		end
                 self:SetNextPrimaryFire( CurTime() + 0.2 )
@@ -394,7 +398,7 @@ function SWEP:Think()
                 self:SetHoldType(self:GetNWString("HoldType"))
 		self:ServeNWBool("Lowered",false)	
         end
-	if (self:Clip1()<1 && (self.OpenBolt || !self:GetNWBool("Chambered"))) then
+	if (self:Clip1()<1 && (self.OpenBolt || !self:GetNWBool("FiringPin"))) then
 		self:ServeNWBool("Sight",false)
 	end
 	if (self.Burst>0 && self:GetNWBool("Firemode1")==false && self.Owner:KeyDown(IN_ATTACK)==false) then
@@ -440,7 +444,7 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	if (self:GetNWBool("Lowered")==true) then
 		ang=ang+Angle(self.HoldAngle,self.HoldAngle*2,0)
 		modpos=modpos+Vector(0,0,5)
-	elseif (self:GetNWBool("Chambered")==false)  then
+	elseif (self:GetNWBool("FiringPin")==false)  then
 		self.lowerTime=self.lowerTime or 1
 		self.lowerTime=self.lowerTime-FrameTime()
 		if (self.lowerTime<0) then

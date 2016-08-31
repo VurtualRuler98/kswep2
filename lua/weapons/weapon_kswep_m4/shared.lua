@@ -41,6 +41,7 @@ SWEP.IronSightsPos = Vector( -7.7316, -9.9309, -0.6341 )
 SWEP.IronSightsAng = Vector( 2.9814, -1.7191, -2.27 )
 SWEP.UseHands = true
 SWEP.MagazineCount = 4
+SWEP.HoldOpen=true
 SWEP.MagSize = 30
 SWEP.Primary.ClipSize = SWEP.MagSize
 SWEP.Caliber = "vammo_556x45_m855"

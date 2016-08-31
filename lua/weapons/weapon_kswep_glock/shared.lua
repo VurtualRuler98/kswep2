@@ -40,6 +40,7 @@ SWEP.WorldModel = "models/weapons/w_pist_glock18.mdl"
 SWEP.Primary.Automatic = false
 SWEP.UseHands = true
 SWEP.Magazines = 3
+SWEP.HoldOpen=true
 SWEP.MagSize = 17
 SWEP.Primary.ClipSize = SWEP.MagSize
 SWEP.Caliber = "vammo_9x19_FMJ"

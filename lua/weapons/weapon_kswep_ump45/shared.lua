@@ -37,6 +37,7 @@ SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.ViewModel = "models/weapons/cstrike/c_smg_ump45.mdl"
 SWEP.WorldModel = "models/weapons/w_smg_ump45.mdl"
+SWEP.HoldOpen=true
 
 SWEP.UseHands = true
 SWEP.Magazines = 3
