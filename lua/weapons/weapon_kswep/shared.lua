@@ -43,6 +43,7 @@ SWEP.MagSize = 17
 SWEP.Primary.ClipSize = SWEP.MagSize
 SWEP.Caliber = "pistol"
 SWEP.Primary.Sound = Sound("weapon_glock.single")
+SWEP.Primary.SoundEmpty = Sound("Weapon_Pistol.Empty")
 SWEP.ViewModelFlip = false
 SWEP.Burst=0
 SWEP.Auto=false
@@ -190,6 +191,7 @@ function SWEP:Deploy()
 		self:ServeNWBool("Chambered",true)
 		self:TakePrimaryAmmo(1)
 		self:SetDeploySpeed(1)
+		self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 	else
 		self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
 	end
@@ -352,7 +354,7 @@ function SWEP:CanPrimaryAttack()
         if ( self.Weapon:Clip1() <= 0 && !self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 && self.OpenBolt==true) then
 		if (self:GetNWBool("FiringPin")==true || self.DoubleAction) then
 			if (!self.HoldOpen) then
-	                	self:EmitSound( "Weapon_Pistol.Empty" )
+	                	self:EmitSound(self.Primary.SoundEmpty )
 			end
 			self:ServeNWBool("FiringPin",false)
 		end
