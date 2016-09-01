@@ -99,10 +99,7 @@ function SWEP:Initialize()
         self:SetNWString("HoldType",self.HoldType)
         self:SetNWString("IdleType",self.IdleType)
 	self:SetNWInt("Burst",self.Burst)
-	self:SetNWBool("Firemode1",true)
-	self:SetNWBool("Firemode0",self.Auto)
 	self:SetNWBool("FiremodeSelected",false)
-	self:SetNWBool("SelectFire",self.SelectFire)
 	self:SetNWBool("Firemode",false)
 	self:SetNWFloat("Recoil",0)
 	self:SetNWFloat("NextIdle",0)
@@ -110,6 +107,7 @@ function SWEP:Initialize()
 	self:SetNWFloat("ReloadMessage",0)
 	self:SetNWInt("ReloadWeight",0)
 	self:SetNWBool("DidLowerAnim",false)
+	self:SetNWFloat("NextBurst",0)
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.DefaultMagazines = {}
 	self.Magazines = {}
@@ -170,7 +168,7 @@ function SWEP:PrimaryAttack()
 				anim = self.IronSafetyAnim
 				anim2 =self.IronAnim
 			end
-			self.Weapon:SendWeaponAnim(anim)
+			self:SendWeaponAnim(anim)
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
 			self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 		else
@@ -184,13 +182,15 @@ function SWEP:PrimaryFire()
 	self:NormalFire()
 end
 function SWEP:NextIdle(idle,anim)
-	self:ServeNWBool("NextIdle",idle)
+	self:ServeNWFloat("NextIdle",idle)
 	self.NextIdleAnim=anim
 end
 function SWEP:NormalFire()
 	if (self:IsRunning() || self:GetNWBool("Raised")==false) then return end
 	if (!self:CanPrimaryAttack() ) then return end
-	self.Weapon:EmitSound(self.Primary.Sound)
+	if (IsFirstTimePredicted()) then
+		self.Weapon:EmitSound(self.Primary.Sound)
+	end
 	self:ShootBullet(self.Primary.Damage*self.Ammo.damagescale, self.Ammo.projectiles, self.Ammo.spreadscale*self.Primary.Spread,self.Ammo.name)
 	if (self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
@@ -341,13 +341,13 @@ function SWEP:FiremodeName()
 	end
 end
 function SWEP:BurstFire()
-	self:NormalFire()
-	if (SERVER) then
-	self:ServeNWInt("Burst",self:GetNWInt("Burst")-1)
-	if (self:GetNWInt("Burst")<1) then
-		self:ServeNWBool("Firemode1",false)
-		self:ServeNWInt("Burst",self.Burst)
-	end
+	if (self:GetNWInt("Burst")>0) then
+		self:NormalFire()
+		print ("feeoop")
+		self:SetNWInt("Burst",self:GetNWInt("Burst")-1)
+		if (IsFirstTimePredicted()) then
+			print("Burst counter: ",self:GetNWInt("Burst"))
+		end
 	end
 end
 function SWEP:FinishReload()
@@ -379,6 +379,11 @@ function SWEP:ServeNWBool(var,bool)
 		self:SetNWBool(var,bool)
 	end
 end
+function SWEP:ServeNWFloat(var,float)
+	if (SERVER) then
+		self:SetNWFloat(var,float)
+	end
+end
 function SWEP:DoDrawCrosshair()
 	--return !self:GetNWBool("Raised")
 	return true
@@ -403,7 +408,7 @@ function SWEP:CanPrimaryAttack()
 			if (!self.HoldOpen) then
 	                	self:EmitSound(self.Primary.SoundEmpty )
 			end
-			self:ServeNWBool("FiringPin",false)
+			self:SetNWBool("FiringPin",false)
 		end
                 self:SetNextPrimaryFire( CurTime() + 0.2 )
                 return false
@@ -443,9 +448,10 @@ function SWEP:ToggleZoom()
         end
 end
 function SWEP:SwitchFiremode()
-	if (self:GetNWBool("SelectFire")==false) then return end
-	self:ServeNWBool("Firemode",!self:GetNWBool("Firemode"))
-	if (!self.SafetyAnim) then
+	if (!self.SelectFire) then return end
+	self:SetNWBool("Firemode",!self:GetNWBool("Firemode"))
+	self.Primary.Automatic=self:GetNWBool("Firemode")
+	if (!self.InsAnims) then
 		self.Weapon:EmitSound("weapon_smg1.special1")
 	end
 end
@@ -468,10 +474,8 @@ function SWEP:Think()
 			end
 		end
 	end
-	if (self:GetNWBool("NextIdle")!=0 && self:GetNWBool("NextIdle")<CurTime()) then
-		if (SERVER) then
-			self:SendWeaponAnim(self.NextIdleAnim)
-		end
+	if (self:GetNWFloat("NextIdle")!=0 && self:GetNWFloat("NextIdle")<CurTime()) then
+		self:SendWeaponAnim(self.NextIdleAnim)
 		self:ServeNWBool("NextIdle",0)
 	end
         if (self:IsRunning() && !self:GetNWBool("CurrentlyReloading") && self:GetNextPrimaryFire()<CurTime()) then
@@ -487,16 +491,16 @@ function SWEP:Think()
 			self.Weapon:SendWeaponAnim(self.LowerAnim)
 		end
 	end
-	if (self.Burst>0 && self:GetNWBool("Firemode1")==false && self.Owner:KeyDown(IN_ATTACK)==false) then
-		self:ServeNWBool("Firemode1",true)
+	if (self:GetNWBool("Burst")==0 && self.Burst>0 && !self.Owner:KeyDown(IN_ATTACK)) then
+		self:SetNWBool("Burst",self.Burst)
 	end
 	if (self:GetNWBool("FiremodeSelected") && !self.Owner:KeyDown(IN_ATTACK)) then
 		self:ServeNWBool("FiremodeSelected",false)
 	end
 	if (self:GetNWBool("Firemode")) then
-		self.Primary.Automatic=self:GetNWBool("Firemode1")
+		self.Primary.Automatic=true
 	else
-		self.Primary.Automatic=self:GetNWBool("Firemode0")
+		self.Primary.Automatic=self.Auto
 	end
 	self.WeaponSway=self.WeaponSway or self.Owner:GetAimVector()
 	self.WeaponSway=Lerp(FrameTime()*30,self.WeaponSway,self.Owner:GetAimVector())
@@ -664,10 +668,10 @@ function SWEP:ToggleAim()
         if (self:GetNWBool("Sight")==true) then
                 --Stop using sight
 		self:ServeNWBool("Sight",false)
-		if (self.InsAnims) then self.Weapon:SendWeaponAnim(self.IronOutAnim) end
+		if (self.InsAnims) then self:SendWeaponAnim(self.IronOutAnim) end
         elseif (!self:GetNWBool("Lowered")) then
                 --Start using sight
                 self:ServeNWBool("Sight",true)
-		if (self.InsAnims) then self.Weapon:SendWeaponAnim(self.IronInAnim) end
+		if (self.InsAnims) then self:SendWeaponAnim(self.IronInAnim) end
         end
 end
