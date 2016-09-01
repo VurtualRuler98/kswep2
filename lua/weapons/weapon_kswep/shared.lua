@@ -72,6 +72,9 @@ SWEP.ScopeZoom = 1
 SWEP.ReloadModLight=1
 SWEP.ReloadModMedium=1.10
 SWEP.ReloadModHeavy=1.20
+SWEP.ReloadAnim = ACT_VM_RELOAD
+SWEP.ReloadAnimEmpty = ACT_VM_RELOAD
+SWEP.LoweredOffset = 5
 function SWEP:Initialize()
         self:SetNWBool("Raised",true)
 	self:SetNWBool("Sight",false)
@@ -229,7 +232,11 @@ function SWEP:ReloadMag()
 			reloadspeed=self.ReloadModMedium
 		end
 	end
-	self.Weapon:SendWeaponAnim(ACT_VM_RELOAD)
+	if ((self.OpenBolt && self:Clip1()==0) || (!self.OpenBolt && !self:GetNWBool("Chambered"))) then
+		self.Weapon:SendWeaponAnim(self.ReloadAnimEmpty)
+	else
+		self.Weapon:SendWeaponAnim(self.ReloadAnim)
+	end
 	self.Owner:GetViewModel():SetPlaybackRate(1/reloadspeed)
 	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed)
 	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed
@@ -249,7 +256,7 @@ function SWEP:ReloadTube()
 			reloadspeed=self.ReloadModMedium
 		end
 	end
-	self.Weapon:SendWeaponAnim(ACT_VM_RELOAD)
+	self.Weapon:SendWeaponAnim(self.ReloadAnim)
 	self.Owner:GetViewModel():SetPlaybackRate(1/reloadspeed)
 	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed)
 	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed
@@ -464,14 +471,14 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	
 	if (self:GetNWBool("Lowered")==true) then
 		ang=ang+Angle(self.HoldAngle,self.HoldAngle*2,0)
-		modpos=modpos+Vector(0,0,5)
+		modpos=modpos+Vector(0,0,self.LoweredOffset)
 	elseif (self:GetNWBool("FiringPin")==false)  then
 		self.lowerTime=self.lowerTime or 1
 		self.lowerTime=self.lowerTime-FrameTime()
 		if (self.lowerTime<0) then
 			self.lowerTime=0
 			ang=ang+Angle(self.HoldAngle,self.HoldAngle*0.9,0)
-			modpos=modpos+Vector(0,0,5)
+			modpos=modpos+Vector(0,0,self.LoweredOffset)
 		end
 	elseif (self:GetNWBool("Sight")==true) then
 		ang:RotateAroundAxis(ang:Right(),self.IronSightsAng.x)
