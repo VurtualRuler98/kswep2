@@ -50,7 +50,6 @@ SWEP.OpenBolt=false
 SWEP.HoldOpen=false
 SWEP.Secondary.Ammo = SWEP.Primary.Ammo
 SWEP.Secondary.ClipSize = 1
-SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
 SWEP.Firemode=0
 SWEP.SingleReload=false
@@ -79,6 +78,7 @@ function SWEP:Initialize()
         self:SetNWBool("Raised",true)
 	self:SetNWBool("Sight",false)
 	self:SetNWBool("FiringPin",true)
+	self:SetNWBool("CurrentlyReloading",false)
         self:SetNWInt("MagazineCount",0)
         self:SetNWBool("Safe",false)
 	self:SetNWBool("Chambered",self.OpenBolt)
@@ -223,7 +223,7 @@ function SWEP:Reload()
 end
 
 function SWEP:ReloadMag()
-	if (self.CurrentlyReloading==1) then return end
+	if (self:GetNWBool("CurrentlyReloading")==true) then return end
 	local reloadspeed=self.ReloadModLight
 	if (self.Owner.ksarmor) then
 		if (self.Owner.ksarmor==2) then
@@ -240,12 +240,12 @@ function SWEP:ReloadMag()
 	self.Owner:GetViewModel():SetPlaybackRate(1/reloadspeed)
 	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed)
 	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed
-	self.CurrentlyReloading=1
+	self:ServeNWBool("CurrentlyReloading",true)
 		
 end
 
 function SWEP:ReloadTube()
-	if (self.CurrentlyReloading==1) then return end
+	if (self:GetNWBool("CurrentlyReloading")==true) then return end
 	if (self.Magazines[1]<1) then return end
 	if (self:Clip1()>=self.Primary.ClipSize) then return end
 	local reloadspeed=self.ReloadModLight
@@ -260,7 +260,7 @@ function SWEP:ReloadTube()
 	self.Owner:GetViewModel():SetPlaybackRate(1/reloadspeed)
 	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed)
 	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed
-	self.CurrentlyReloading=1
+	self:ServeNWBool("CurrentlyReloading",true)
 		
 end
 
@@ -315,7 +315,7 @@ function SWEP:FinishReload()
 		self:TakePrimaryAmmo(1)
 		self:ServeNWBool("Chambered",true)
 	end
-	self.CurrentlyReloading=0
+	self:ServeNWBool("CurrentlyReloading",false)
 	self.ReloadAnimTime=0
 	self:SetNWFloat("ReloadMessage",CurTime()+2)
 	self:ServeNWInt("MagazineCount",#self.Magazines)
@@ -340,7 +340,7 @@ function SWEP:FinishReloadSingle()
 	self.Magazines[1]=self.Magazines[1]-1
 	self:SetClip1(self:Clip1()+1)
 	self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
-	self.CurrentlyReloading=0
+	self:ServeNWBool("CurrentlyReloading",false)
 	self.ReloadAnimTime=0
 	self:ServeNWInt("MagazineCount",self.Magazines[1])
 end
@@ -404,7 +404,7 @@ end
 
 function SWEP:Think()
 	if (SERVER) then
-		if (self.ReloadAnimTime!=0 && CurTime()>self.ReloadAnimTime && self.CurrentlyReloading==1) then
+		if (self.ReloadAnimTime!=0 && CurTime()>self.ReloadAnimTime && self:GetNWBool("CurrentlyReloading")==true) then
 		if (self.SingleReload) then
 			self:FinishReloadSingle()
 		else
