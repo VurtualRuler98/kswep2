@@ -472,7 +472,7 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	if (self:GetNWBool("Lowered")==true) then
 		ang=ang+Angle(self.HoldAngle,self.HoldAngle*2,0)
 		modpos=modpos+Vector(0,0,self.LoweredOffset)
-	elseif (self:GetNWBool("FiringPin")==false)  then
+	elseif (self:GetNWBool("FiringPin")==false && self.ReloadAnimTime<CurTime())  then
 		self.lowerTime=self.lowerTime or 1
 		self.lowerTime=self.lowerTime-FrameTime()
 		if (self.lowerTime<0) then
