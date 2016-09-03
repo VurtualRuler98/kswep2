@@ -69,6 +69,7 @@ SWEP.MaxMags=6
 SWEP.DoubleAction=false
 SWEP.SpawnChambered=false
 SWEP.ScopeZoom = 1
+SWEP.CurRecoil=0
 SWEP.ReloadModLight=1
 SWEP.ReloadModMedium=1.10
 SWEP.ReloadModHeavy=1.20
@@ -88,6 +89,12 @@ SWEP.IronShootAnim=ACT_VM_ISHOOT
 SWEP.StowAnim=ACT_VM_HOLSTER
 SWEP.UnstowAnim=ACT_VM_DRAW
 SWEP.NextIdleAnim=ACT_VM_IDLE
+SWEP.DidLowerAnim=false
+SWEP.ReloadMessage=0
+SWEP.ReloadWeight=0
+if (CLIENT) then
+	SWEP.NextPrimaryAttack=0
+end
 function SWEP:Initialize()
         self:SetNWBool("Raised",true)
 	self:SetNWBool("Sight",false)
@@ -101,13 +108,9 @@ function SWEP:Initialize()
 	self:SetNWInt("Burst",self.Burst)
 	self:SetNWBool("FiremodeSelected",false)
 	self:SetNWBool("Firemode",false)
-	self:SetNWFloat("Recoil",0)
 	self:SetNWFloat("NextIdle",0)
 	self:SetNWBool("Lowered",false)
-	self:SetNWFloat("ReloadMessage",0)
-	self:SetNWInt("ReloadWeight",0)
-	self:SetNWBool("DidLowerAnim",false)
-	self:SetNWFloat("NextBurst",0)
+	self:SetNWFloat("NextPrimaryAttack",0)
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.DefaultMagazines = {}
 	self.Magazines = {}
@@ -118,6 +121,7 @@ function SWEP:Initialize()
 	end
 	self.Primary.DefaultClip = self.MagSize
 	self.Primary.ClipSize = self.MagSize
+	self.LastBurst=self.Burst
 end
 function SWEP:Rearm()
 	local autofillmag=false
@@ -158,9 +162,12 @@ function SWEP:Rearm()
 	return rearmed
 end
 function SWEP:PrimaryAttack()
+	if (self:CanPrimaryAttack()) then
 	if (self.Owner:KeyDown(IN_USE) && !self:GetNWBool("FiremodeSelected") && !self:GetNWBool("Lowered")) then
 		self:SwitchFiremode()
-		self:ServeNWBool("FiremodeSelected",true)
+		self:SetNWBool("FiremodeSelected",true)
+		if (SERVER) then
+		end
 		if (self.SafetyAnim) then
 			local anim = self.SafetyAnim
 			local anim2=ACT_VM_IDLE
@@ -170,12 +177,13 @@ function SWEP:PrimaryAttack()
 			end
 			self:SendWeaponAnim(anim)
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
-			self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+			self:SetNextAttack(CurTime()+0.5)
 		else
-			self:SetNextPrimaryFire(CurTime()+0.5)
+			self:SetNextAttack(CurTime()+0.5)
 		end
 		else
 			self:PrimaryFire()
+	end
 	end
 end
 function SWEP:PrimaryFire()
@@ -187,33 +195,31 @@ function SWEP:NextIdle(idle,anim)
 end
 function SWEP:NormalFire()
 	if (self:IsRunning() || self:GetNWBool("Raised")==false) then return end
-	if (!self:CanPrimaryAttack() ) then return end
-	if (IsFirstTimePredicted()) then
-		self.Weapon:EmitSound(self.Primary.Sound)
-	end
+	if (!self:TryPrimaryAttack() ) then return end
+	self.Weapon:EmitSound(self.Primary.Sound)
 	self:ShootBullet(self.Primary.Damage*self.Ammo.damagescale, self.Ammo.projectiles, self.Ammo.spreadscale*self.Primary.Spread,self.Ammo.name)
 	if (self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
 	else
 		self:ServeNWBool("Chambered",false)
 	end
-		local anim=ACT_VM_IDLE
-		if (self:GetNWBool("Sight")) then
-			anim=self.IronAnim
-		end
-		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
-		self:SetNextPrimaryFire(CurTime()+self.Primary.Delay)
+	local anim=ACT_VM_IDLE
+	if (self:GetNWBool("Sight")) then
+		anim=self.IronAnim
+	end
+	self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
+	self:SetNextAttack(CurTime()+self.Primary.Delay)
 end
 
 function SWEP:ShotgunFire()
-	if (!self:CanPrimaryAttack()) then return end
+	if (!self:TryPrimaryAttack()) then return end
 	if (!self:GetNWBool("Chambered")) then
 		local anim=ACT_VM_IDLE
 		if (self:GetNWBool("Sight")) then
 			anim=self.IronAnim
 		end
 		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
-		self:SetNextPrimaryFire(CurTime()+self.Primary.Delay)
+		self:SetNextAttack(CurTime()+self.Primary.Delay)
 		self:ServeNWBool("Chambered",true)
 		self:TakePrimaryAmmo(1)
 		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
@@ -230,13 +236,13 @@ function SWEP:Deploy()
 		self:ServeNWBool("Chambered",true)
 		self:TakePrimaryAmmo(1)
 		self:SetDeploySpeed(1)
-		self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 	else
 		if (self.DrawOnce) then
 			self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
 		else
 			self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
-			self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+			self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 		end
 	end
 	self:ServeNWBool("Raised",true)
@@ -244,6 +250,7 @@ function SWEP:Deploy()
 		self.Owner:SetRunSpeed(250)
 		self.Owner:SetWalkSpeed(175)
 	end
+	self:ServeNWBool("Lowered",false)
 end
 
 function SWEP:Holster(wep)
@@ -252,7 +259,7 @@ function SWEP:Holster(wep)
 		return true
 	else
 		self:ServeNWBool("Raised",false)
-		self:ServeNWBool("Sight",false)
+		self:SetNWBool("Sight",false)
 		return false
 	end]]
 	return true
@@ -260,17 +267,23 @@ function SWEP:Holster(wep)
 end
 
 function SWEP:Reload()
-	if (self:GetNWBool("Lowered")) then return end
+	if (!self:GetNWBool("Raised")) then return end
 	if (self.Owner:KeyDown(IN_USE)) then
-		self:SetNWFloat("ReloadMessage",CurTime()+2)
-		self:ServeNWInt("ReloadWeight",self:Clip1())
+		self.ReloadMessage=CurTime()+2
+		self.ReloadWeight=self:Clip1()
 	else
+		self:SetNWBool("Lowered",false)
 		self:ReloadAct()
 	end
 end
-
+function SWEP:SendWeaponAnimIdles(anim,idle)
+	idle = idle or ACT_VM_IDLE
+	self:SendWeaponAnim(anim)
+	self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),idle)
+end
 function SWEP:ReloadMag()
 	if (self:GetNWBool("CurrentlyReloading")==true) then return end
+	self:SetNWFloat("NextIdle",0)
 	local reloadspeed=self.ReloadModLight
 	if (self.Owner.ksarmor) then
 		if (self.Owner.ksarmor==2) then
@@ -279,16 +292,16 @@ function SWEP:ReloadMag()
 			reloadspeed=self.ReloadModMedium
 		end
 	end
-	self:ServeNWBool("Sight",false)
-	if ((self.OpenBolt && self:Clip1()==0) || (!self.OpenBolt && !self:GetNWBool("Chambered"))) then
-		self.Weapon:SendWeaponAnim(self.ReloadAnimEmpty)
-	else
-		self.Weapon:SendWeaponAnim(self.ReloadAnim)
-	end
+	self:SetNWBool("Sight",false)
+		if ((self.OpenBolt && self:Clip1()==0) || (!self.OpenBolt && !self:GetNWBool("Chambered"))) then
+			self:SendWeaponAnim(self.ReloadAnimEmpty)
+		else
+			self:SendWeaponAnim(self.ReloadAnim)
+		end
 	self.Owner:GetViewModel():SetPlaybackRate(1/reloadspeed)
-	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed)
+	self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed)
 	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed
-	self:ServeNWBool("CurrentlyReloading",true)
+	self:SetNWBool("CurrentlyReloading",true)
 		
 end
 
@@ -304,10 +317,10 @@ function SWEP:ReloadTube()
 			reloadspeed=self.ReloadModMedium
 		end
 	end
-	self:ServeNWBool("Sight",false)
+	self:SetNWBool("Sight",false)
 	self.Weapon:SendWeaponAnim(self.ReloadAnim)
 	self.Owner:GetViewModel():SetPlaybackRate(1/reloadspeed)
-	self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed)
+	self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed)
 	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed
 	self:ServeNWBool("CurrentlyReloading",true)
 		
@@ -315,8 +328,8 @@ end
 
 function SWEP:DrawHUD()
 	draw.DrawText(self:FiremodeName(),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.11,Color(255, 255, 0,255))
-	if (self:GetNWFloat("ReloadMessage") > CurTime()) then
-		draw.DrawText(self:MagWeight(self:GetNWInt("ReloadWeight"),self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
+	if (self.ReloadMessage > CurTime()) then
+		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
 	end
 end 
 function SWEP:MagWeight(reloadweight,magsize)
@@ -341,13 +354,15 @@ function SWEP:FiremodeName()
 	end
 end
 function SWEP:BurstFire()
+	if (self.LastBurst<1  && CLIENT) then return end
 	if (self:GetNWInt("Burst")>0) then
 		self:NormalFire()
-		print ("feeoop")
 		self:SetNWInt("Burst",self:GetNWInt("Burst")-1)
-		if (IsFirstTimePredicted()) then
-			print("Burst counter: ",self:GetNWInt("Burst"))
+		if (self:GetNWInt("Burst")==0) then
+			self:SetNWBool("FiremodeSelected",true)
 		end
+		self.LastBurst=self.LastBurst-1
+	else
 	end
 end
 function SWEP:FinishReload()
@@ -359,14 +374,15 @@ function SWEP:FinishReload()
 	if (self.Magazines[1]==0) then
 		table.remove(self.Magazines,1)
 	end
-	self:ServeNWInt("ReloadWeight",self:Clip1())
+	self.ReloadWeight=self:Clip1()
 	if (self:GetNWBool("Chambered")==false && self.OpenBolt==false && self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
 		self:ServeNWBool("Chambered",true)
 	end
 	self:ServeNWBool("CurrentlyReloading",false)
 	self.ReloadAnimTime=0
-	self:SetNWFloat("ReloadMessage",CurTime()+2)
+	self.ReloadMessage=CurTime()+2
+	self:SendWeaponAnim(ACT_VM_IDLE)
 	self:ServeNWInt("MagazineCount",#self.Magazines)
 end
 function SWEP:ServeNWInt(var,int)
@@ -400,34 +416,45 @@ function SWEP:FinishReloadSingle()
 end
 
 function SWEP:CanPrimaryAttack()
+	if ( CLIENT && self.NextPrimaryAttack>CurTime()) then return false end
+	if ( self:GetNWFloat("NextPrimaryAttack")>CurTime()) then return false  end
 	if ( self:GetNWBool("FiremodeSelected") ) then
 		return false
 	end
-        if ( self.Weapon:Clip1() <= 0 && !self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 && self.OpenBolt==true) then
+        return true
+end
+function SWEP:TryPrimaryAttack()
+	if (!self:CanPrimaryAttack()) then return false end
+	if ( self.Weapon:Clip1() <= 0 && !self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 && self.OpenBolt==true) then
 		if (self:GetNWBool("FiringPin")==true || self.DoubleAction) then
 			if (!self.HoldOpen) then
 	                	self:EmitSound(self.Primary.SoundEmpty )
 			end
 			self:SetNWBool("FiringPin",false)
 		end
-                self:SetNextPrimaryFire( CurTime() + 0.2 )
+                self:SetNextAttack( CurTime() + 0.2 )
                 return false
         end
-        return true
+	return true
+end
+function SWEP:SetNextAttack(time)
+	self:SetNWFloat("NextPrimaryAttack", time )
+	if (CLIENT) then
+		self.NextPrimaryAttack=time
+	end
 end
 
 
 
 
 
-
 function SWEP:SecondaryAttack()
+	self:SetNextSecondaryFire(CurTime() + 0.4 )
 	if (self.Owner:KeyDown(IN_USE)) then
 		self:ToggleZoom()
 	else
 		self:ToggleAim()
 	end
-	self:SetNextSecondaryFire(CurTime() + 0.1 )
 end
 
 
@@ -441,6 +468,7 @@ function SWEP:ToggleZoom()
         --Are we using the sight?
         if (self:GetNWBool("Raised")==true) then
                 --Stop using sight
+		self:SetNWBool("Lowered",false)
                 self:LowerHolster(true)
         else
                 --Start using sight
@@ -449,7 +477,7 @@ function SWEP:ToggleZoom()
 end
 function SWEP:SwitchFiremode()
 	if (!self.SelectFire) then return end
-	self:SetNWBool("Firemode",!self:GetNWBool("Firemode"))
+	self:ServeNWBool("Firemode",!self:GetNWBool("Firemode"))
 	self.Primary.Automatic=self:GetNWBool("Firemode")
 	if (!self.InsAnims) then
 		self.Weapon:EmitSound("weapon_smg1.special1")
@@ -458,7 +486,7 @@ end
 
 
 function SWEP:Think()
-	if (SERVER) then
+	if (IsFirstTimePredicted()) then
 		if (self.ReloadAnimTime!=0 && CurTime()>self.ReloadAnimTime && self:GetNWBool("CurrentlyReloading")==true) then
 		if (self.SingleReload) then
 			self:FinishReloadSingle()
@@ -466,35 +494,49 @@ function SWEP:Think()
 			self:FinishReload()
 		end
 		end
-		if (self:GetNWFloat("Recoil")>0) then
-				--self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")-(FrameTime()*self.RecoilControl))
-				self:SetNWFloat("Recoil",Lerp(FrameTime()*self.RecoilControl/2,self:GetNWFloat("Recoil"),0))
-				if (self:GetNWFloat("Recoil")<0) then
-				self:SetNWFloat("Recoil",0)
-			end
+	end
+	if (self.CurRecoil>0) then
+		--self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")-(FrameTime()*self.RecoilControl))
+		self.CurRecoil=Lerp(FrameTime()*self.RecoilControl/2,self.CurRecoil,0)
+		if (self.CurRecoil<0.01) then
+			self.CurRecoil=0
 		end
 	end
 	if (self:GetNWFloat("NextIdle")!=0 && self:GetNWFloat("NextIdle")<CurTime()) then
-		self:SendWeaponAnim(self.NextIdleAnim)
-		self:ServeNWBool("NextIdle",0)
-	end
-        if (self:IsRunning() && !self:GetNWBool("CurrentlyReloading") && self:GetNextPrimaryFire()<CurTime()) then
-                self:SetHoldType(self:GetNWString("IdleType"))
-		self:Lower(true)
-        elseif (self:GetNWBool("Raised")) then
-                self:SetHoldType(self:GetNWString("HoldType"))
-		self:Lower(false)	
-        end
-	if (self:Clip1()<1 && (self.OpenBolt || (!self:GetNWBool("FiringPin") && !self:GetNWBool("CurrentlyReloading")))) then
-		self:ServeNWBool("Sight",false)
-		if (self.InsAnims) then
-			self.Weapon:SendWeaponAnim(self.LowerAnim)
+		if (SERVER || (CLIENT && !game.SinglePlayer())) then
+			self:SendWeaponAnim(self.NextIdleAnim)
 		end
+		self:ServeNWFloat("NextIdle",0)
+	end
+	local hold=self:GetNWString("HoldType")
+        --[[if (self:IsRunning() && !self:GetNWBool("CurrentlyReloading") && self:GetNWFloat("NextPrimaryAttack")<CurTime() && !self.DidLowerAnim && !self:GetNWBool("Lowered")) then
+		hold = self:GetNWString("IdleType")
+		self:Lower(true)
+        elseif (self:GetNWBool("Raised") && self.DidLowerAnim) then
+		self:Lower(false)
+		self.DidLowerAnim=false
+	end
+	if (!self:GetNWBool("Raised")) then
+		hold = self:GetNWString("IdleType")
+	end]]--
+	self:SetHoldType(hold)
+	if (self:Clip1()<1 && (self.OpenBolt || (!self:GetNWBool("FiringPin")) && !self:GetNWBool("CurrentlyReloading"))) then
+		self:SetNWBool("Sight",false)
+		if (self.InsAnims) then
+			if (!self:GetNWBool("Lowered")) then
+				self:SetNWFloat("NextIdle",0)
+				self:SendWeaponAnim(self.LowerAnim)
+				self:SetNWBool("Lowered",true)
+			end
+		end
+	else
+		self:SetNWBool("Lowered",false)
 	end
 	if (self:GetNWBool("Burst")==0 && self.Burst>0 && !self.Owner:KeyDown(IN_ATTACK)) then
 		self:SetNWBool("Burst",self.Burst)
 	end
 	if (self:GetNWBool("FiremodeSelected") && !self.Owner:KeyDown(IN_ATTACK)) then
+		self.LastBurst=self.Burst
 		self:ServeNWBool("FiremodeSelected",false)
 	end
 	if (self:GetNWBool("Firemode")) then
@@ -507,24 +549,27 @@ function SWEP:Think()
 end
 function SWEP:LowerDo(lower,anim,anim2,canfire)
 	if (lower) then
-		self:ServeNWBool("Sight",false)
-		if (self.InsAnims && !self:GetNWBool("DidLowerAnim")) then
-			self.Weapon:SendWeaponAnim(anim)
-			self:ServeNWBool("DidLowerAnim",true)
+		self:SetNWBool("Sight",false)
+		if (self.InsAnims) then
+			self:SendWeaponAnim(anim)
+			--self.DidLowerAnim=true
+			self:SetNextSecondaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 		end
 	else
 		self:ServeNWBool("Lowered",false)
-		if (self.InsAnims && self:GetNWBool("DidLowerAnim")) then
+		if (self.InsAnims) then
 			self.Weapon:SendWeaponAnim(anim2)
 			if (!canfire) then
-				self:SetNextPrimaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+				self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+				self:SetNextSecondaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 			end
-			self:ServeNWBool("DidLowerAnim",false)
+			--self.DidLowerAnim=false
 		end
 	end
 end
 function SWEP:Lower(lower)
-	self:ServeNWBool("Lowered",lower)
+	if (!self:GetNWBool("Raised")) then return end
+	self:SetNWBool("Lowered",lower)
 	local anim=self.LowerAnim
 	local anim2=ACT_VM_IDLE
 	self:LowerDo(lower,anim,anim2,true)
@@ -533,6 +578,7 @@ function SWEP:LowerHolster(lower)
 	self:SetNWBool("Raised",!lower)
 	local anim=self.StowAnim
 	local anim2=self.UnstowAnim
+	if (CLIENT) then return end
 	self:LowerDo(lower,anim,anim2,false)
 end
 --TODO: this code is kind of ugly
@@ -540,8 +586,8 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	local modPos = oldPos
 	self.smoothAng=self.smoothAng or ang
 	self.smoothPos=self.smoothPos or Vector(0,0,0)
-	modpos=oldPos+Vector(0,self:GetNWFloat("Recoil")*0.01,0)
-	ang=oldAng+Angle(self:GetNWFloat("Recoil")*-0.05,0,0)
+	modpos=oldPos+Vector(0,self.CurRecoil*0.01,0)
+	ang=oldAng+Angle(self.CurRecoil*-0.05,0,0)
 	--[[if (self:GetNWBool("Chambered")==false || self:GetNWBool("Lowered")==true) then
 		if (self:GetNWBool("Lowered")==true) then self.lowerTime=0 end
 		self.lowerTime=self.lowerTime or 1
@@ -587,14 +633,6 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	return modPos+self.smoothPos,self.smoothAng
 end
 
-function SWEP:Firemode()
-	if (!self.Firemode) then return end
-	if (self:GetNWBool("Firemode")) then
-		self:ServeNWBool("Firemode",false)
-	else
-		self:ServeNWBool("Firemode",true)
-	end
-end
 
 
 function SWEP:TranslateFOV(fov)
@@ -628,7 +666,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 	if (!self:GetNWBool("Sight")) then
 		aimPenalty=1.5
 	end
-	local recoil = self:GetNWFloat("Recoil")
+	local recoil = self.CurRecoil
         local bullet = {}
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()                      -- Source
@@ -656,9 +694,9 @@ function SWEP:ShootEffects()
 end
 
 function SWEP:Recoil(recoil)
-	self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")+recoil)
-	if (self:GetNWFloat("Recoil")>self.MaxRecoil) then
-		self:SetNWFloat("Recoil",5)
+	self.CurRecoil=self.CurRecoil+recoil
+	if (self.CurRecoil>self.MaxRecoil) then
+		self.CurRecoil=5
 	end
 end
 
@@ -668,10 +706,16 @@ function SWEP:ToggleAim()
         if (self:GetNWBool("Sight")==true) then
                 --Stop using sight
 		self:ServeNWBool("Sight",false)
-		if (self.InsAnims) then self:SendWeaponAnim(self.IronOutAnim) end
+		if (self.InsAnims) then
+			self:SendWeaponAnim(self.IronOutAnim)
+			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),ACT_VM_IDLE)
+		end
         elseif (!self:GetNWBool("Lowered")) then
                 --Start using sight
                 self:ServeNWBool("Sight",true)
-		if (self.InsAnims) then self:SendWeaponAnim(self.IronInAnim) end
+		if (self.InsAnims) then
+			self:SendWeaponAnim(self.IronInAnim)
+			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.IronAnim)
+		end
         end
 end
