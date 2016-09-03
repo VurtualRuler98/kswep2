@@ -1,4 +1,5 @@
 CreateConVar("kswep_slow",0)
+util.AddNetworkString("kswep_magazines")
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 end
