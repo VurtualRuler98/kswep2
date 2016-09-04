@@ -538,11 +538,9 @@ function SWEP:Think()
 		end
 	end
 	if (self:IsRunning() && !self.DidLowerAnim && self:GetNWBool("Raised") && self:GetNWFloat("NextIdle")==0 && !self:GetNWBool("CurrentlyReloading")) then
-		print("beep")
 		self:Lower(true)
 		self.DidLowerAnim=true
 	elseif (self:GetNWBool("Raised") && !self:IsRunning() && self:GetNWFloat("NextIdle")==0 && self.DidLowerAnim) && !self:GetNWBool("CurrentlyReloading") then
-		print("boop")
 		self:Lower(false)
 		self.DidLowerAnim=false
 	end
