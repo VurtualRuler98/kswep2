@@ -253,12 +253,14 @@ function SWEP:Deploy()
 		self:TakePrimaryAmmo(1)
 		self:SetDeploySpeed(1)
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),ACT_VM_IDLE)
 	else
 		if (self.DrawOnce) then
 			self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
 		else
 			self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
 			self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),ACT_VM_IDLE)
 		end
 	end
 	self:ServeNWBool("Raised",true)
@@ -534,6 +536,15 @@ function SWEP:Think()
 		if (self.CurRecoil<0.01) then
 			self.CurRecoil=0
 		end
+	end
+	if (self:IsRunning() && !self.DidLowerAnim && self:GetNWBool("Raised") && self:GetNWFloat("NextIdle")==0 && !self:GetNWBool("CurrentlyReloading")) then
+		print("beep")
+		self:Lower(true)
+		self.DidLowerAnim=true
+	elseif (self:GetNWBool("Raised") && !self:IsRunning() && self:GetNWFloat("NextIdle")==0 && self.DidLowerAnim) && !self:GetNWBool("CurrentlyReloading") then
+		print("boop")
+		self:Lower(false)
+		self.DidLowerAnim=false
 	end
 	if (self:GetNWFloat("NextIdle")!=0 && self:GetNWFloat("NextIdle")<CurTime()) then
 		if (SERVER) then
