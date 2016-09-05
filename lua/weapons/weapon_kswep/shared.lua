@@ -102,6 +102,9 @@ SWEP.ShootLastIronAnim=ACT_VM_ISHOOT
 SWEP.DidLowerAnim=false
 SWEP.ReloadMessage=0
 SWEP.ReloadWeight=0
+SWEP.InsNoSafetySound=false
+SWEP.RTScope=false
+SWEP.ScopeRes=2048
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -132,6 +135,12 @@ function SWEP:Initialize()
 	self.Primary.DefaultClip = self.MagSize
 	self.Primary.ClipSize = self.MagSize
 	self.LastBurst=self.Burst
+	if (CLIENT && self.RTScope) then
+		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
+		local mat
+		mat = Material("models/weapons/lense/lense_rt")
+		mat:SetTexture("$basetexture",self.RenderTarget)
+	end
 end
 function SWEP:Rearm()
 	local autofillmag=false
@@ -514,7 +523,7 @@ function SWEP:SwitchFiremode()
 	if (!self.SelectFire) then return end
 	self:ServeNWBool("Firemode",!self:GetNWBool("Firemode"))
 	self.Primary.Automatic=self:GetNWBool("Firemode")
-	if (!self.InsAnims) then
+	if (!self.InsAnims || self.InsNoSafetySound) then
 		self.Weapon:EmitSound("weapon_smg1.special1")
 	end
 end
@@ -635,6 +644,27 @@ function SWEP:LowerHolster(lower)
 	if (CLIENT) then return end
 	self:LowerDo(lower,anim,anim2,false)
 end
+function SWEP:PostDrawViewModel()
+	if (!self.RTScope) then return end
+	if (!self:GetNWBool("Sight")) then return end
+	local old
+	old = render.GetRenderTarget()
+	render.SetRenderTarget( self.RenderTarget )
+	render.SetViewPort(0,0,size,size)
+	local viewinfo = {}
+	viewinfo.w = self.ScopeRes
+	viewinfo.h = self.ScopeRes
+	viewinfo.x = 0
+	viewinfo.y = 0
+	viewinfo.drawviewmodel = false
+	viewinfo.drawhud = false
+	viewinfo.fov = (LocalPlayer():GetFOV()*(ScrW()/self.ScopeRes/2))/self.ScopeZoom
+	render.RenderView(viewinfo)
+	render.SetViewPort(0,0,ScrW(),ScrH())
+	render.SetRenderTarget(old)
+end
+--hook.Add("RenderScene","BLARPFIX",BLARPFIX)
+
 --TODO: this code is kind of ugly
 function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	local modPos = oldPos
@@ -690,7 +720,7 @@ end
 
 
 function SWEP:TranslateFOV(fov)
-        if (self:GetNWBool("sight")) then
+        if (self:GetNWBool("sight") && !self.RTScope) then
                 return fov/self.ScopeZoom
         else
                 return fov
