@@ -67,7 +67,6 @@ SWEP.MaxMags=6
 SWEP.DoubleAction=false
 SWEP.SpawnChambered=false
 SWEP.ScopeZoom = 1
-SWEP.CurRecoil=0
 SWEP.ReloadModLight=1
 SWEP.ReloadModMedium=1.10
 SWEP.ReloadModHeavy=1.20
@@ -351,7 +350,6 @@ net.Receive("kswep_magazines",function(len,ply)
 	local self=net.ReadEntity()
 	self.Magazines=net.ReadTable()
 end)
-
 function SWEP:ReloadTube()
 	if (self:GetNWBool("CurrentlyReloading")==true) then return end
 	if (self.Magazines[1]<1) then return end
@@ -546,11 +544,11 @@ function SWEP:Think()
 		end
 		end
 	end
-	if (self.CurRecoil>0) then
+	if (self:GetNWFloat("CurRecoil")>0) then
 		--self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")-(FrameTime()*self.RecoilControl))
-		self.CurRecoil=Lerp(FrameTime()*self.RecoilControl/2,self.CurRecoil,0)
-		if (self.CurRecoil<0.01) then
-			self.CurRecoil=0
+		self:SetNWFloat("CurRecoil",Lerp(FrameTime()*self.RecoilControl/2,self:GetNWFloat("CurRecoil"),0))
+		if (self:GetNWFloat("CurRecoil")<0.01) then
+			self:SetNWFloat("CurRecoil",0)
 		end
 	end
 	if (self:IsRunning() && !self.DidLowerAnim && self:GetNWBool("Raised") && self:GetNWFloat("NextIdle")==0 && !self:GetNWBool("CurrentlyReloading")) then
@@ -677,8 +675,8 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	local modPos = oldPos
 	self.smoothAng=self.smoothAng or ang
 	self.smoothPos=self.smoothPos or Vector(0,0,0)
-	modpos=oldPos+Vector(0,self.CurRecoil*0.01,0)
-	ang=oldAng+Angle(self.CurRecoil*-0.05,0,0)
+	modpos=oldPos+Vector(0,self:GetNWFloat("CurRecoil")*0.01,0)
+	ang=oldAng+Angle(self:GetNWFloat("CurRecoil")*-0.05,0,0)
 	--[[if (self:GetNWBool("Chambered")==false || self:GetNWBool("Lowered")==true) then
 		if (self:GetNWBool("Lowered")==true) then self.lowerTime=0 end
 		self.lowerTime=self.lowerTime or 1
@@ -757,7 +755,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 	if (!self:GetNWBool("Sight")) then
 		aimPenalty=1.5
 	end
-	local recoil = self.CurRecoil
+	local recoil = self:GetNWFloat("CurRecoil")
         local bullet = {}
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()                      -- Source
@@ -793,9 +791,9 @@ function SWEP:ShootEffects()
 end
 
 function SWEP:Recoil(recoil)
-	self.CurRecoil=self.CurRecoil+recoil
-	if (self.CurRecoil>self.MaxRecoil) then
-		self.CurRecoil=self.MaxRecoil
+	self:SetNWFloat("CurRecoil",self:GetNWFloat("CurRecoil")+recoil)
+	if (self:GetNWFloat("CurRecoil")>self.MaxRecoil) then
+		self:SetNWFloat("CurRecoil",self.MaxRecoil)
 	end
 end
 
