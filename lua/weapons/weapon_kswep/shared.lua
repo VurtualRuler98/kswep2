@@ -38,9 +38,7 @@ SWEP.WorldModel = "models/weapons/w_pist_glock18.mdl"
 SWEP.Primary.Automatic = false
 SWEP.UseHands = true
 SWEP.Magazines = 3
-SWEP.Primary.DefaultClip = SWEP.MagSize
 SWEP.MagSize = 17
-SWEP.Primary.ClipSize = SWEP.MagSize
 SWEP.Caliber = "pistol"
 SWEP.Primary.Sound = Sound("weapon_glock.single")
 SWEP.Primary.SoundEmpty = Sound("Weapon_Pistol.Empty")
@@ -105,6 +103,7 @@ SWEP.ReloadWeight=0
 SWEP.InsNoSafetySound=false
 SWEP.RTScope=false
 SWEP.ScopeRes=2048
+SWEP.ScopeMat = nil
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -134,11 +133,12 @@ function SWEP:Initialize()
 	end
 	self.Primary.DefaultClip = self.MagSize
 	self.Primary.ClipSize = self.MagSize
+
 	self.LastBurst=self.Burst
 	if (CLIENT && self.RTScope) then
 		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
 		local mat
-		mat = Material("models/weapons/lense/lense_rt")
+		mat = Material(self.ScopeMat)
 		mat:SetTexture("$basetexture",self.RenderTarget)
 	end
 end
@@ -254,8 +254,12 @@ function SWEP:ShotgunFire()
 		self:NormalFire()
 	end
 end
-
+SWEP.InitialDraw=true
 function SWEP:Deploy()
+	if (self.InitialDraw) then
+		self:SetClip1(self.MagSize)
+		self.InitialDraw=false
+	end
 	if (self:GetNWBool("Chambered")==false && self:Clip1()>0 && self.OpenBolt==false) then
 		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
 		self:ServeNWBool("Chambered",true)
@@ -327,7 +331,7 @@ function SWEP:ReloadMag()
 	end
 	self:SetNWBool("Sight",false)
 	local anim=self.ReloadAnim
-	if ((self.OpenBolt && self:Clip1()==0) || (!self.OpenBolt && !self:GetNWBool("Chambered"))) then
+	if (!self:GetNWBool("Chambered") || (self.OpenBolt && self:Clip1()==0)) then
 		anim = self.ReloadAnimEmpty
 	end
 	self:SendWeaponAnim(anim)
@@ -421,6 +425,9 @@ function SWEP:FinishReload()
 	self.ReloadWeight=self:Clip1()
 	if (self:GetNWBool("Chambered")==false && self.OpenBolt==false && self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
+		self:ServeNWBool("Chambered",true)
+	end
+	if (self.OpenBolt==true) then
 		self:ServeNWBool("Chambered",true)
 	end
 	self:ServeNWBool("CurrentlyReloading",false)
@@ -571,7 +578,7 @@ function SWEP:Think()
 		hold = self:GetNWString("IdleType")
 	end]]--
 	self:SetHoldType(hold)
-	if (self:Clip1()<1 && !self.EmptyAnims && (self.OpenBolt || (!self:GetNWBool("FiringPin")) && !self:GetNWBool("CurrentlyReloading"))) then
+	if (self:Clip1()<1 && !self.EmptyAnims && ((!self:GetNWBool("FiringPin")) && !self:GetNWBool("CurrentlyReloading"))) then
 		self:SetNWBool("Sight",false)
 		if (self.InsAnims) then
 			if (!self:GetNWBool("Lowered")) then
@@ -650,7 +657,7 @@ function SWEP:PostDrawViewModel()
 	local old
 	old = render.GetRenderTarget()
 	render.SetRenderTarget( self.RenderTarget )
-	render.SetViewPort(0,0,size,size)
+	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)
 	local viewinfo = {}
 	viewinfo.w = self.ScopeRes
 	viewinfo.h = self.ScopeRes
@@ -658,7 +665,7 @@ function SWEP:PostDrawViewModel()
 	viewinfo.y = 0
 	viewinfo.drawviewmodel = false
 	viewinfo.drawhud = false
-	viewinfo.fov = (LocalPlayer():GetFOV()*(ScrW()/self.ScopeRes/2))/self.ScopeZoom
+	viewinfo.fov = self.ScopeFOV
 	render.RenderView(viewinfo)
 	render.SetViewPort(0,0,ScrW(),ScrH())
 	render.SetRenderTarget(old)
@@ -788,7 +795,7 @@ end
 function SWEP:Recoil(recoil)
 	self.CurRecoil=self.CurRecoil+recoil
 	if (self.CurRecoil>self.MaxRecoil) then
-		self.CurRecoil=5
+		self.CurRecoil=self.MaxRecoil
 	end
 end
 
