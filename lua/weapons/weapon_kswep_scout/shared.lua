@@ -54,6 +54,7 @@ SWEP.ReloadAnimTime=0
 SWEP.RecoilControl=4
 SWEP.MaxMags = 4
 SWEP.ScopeZoom = 8
+SWEP.MagType = "Scout308"
 function SWEP:ReloadAct()
 	self:ReloadMag()	
 end

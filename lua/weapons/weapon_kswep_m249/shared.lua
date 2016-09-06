@@ -60,6 +60,7 @@ SWEP.HoldType="ar2"
 SWEP.IdleType="passive"
 SWEP.MaxMags = 2
 SWEP.ModeName0 = "FULL"
+SWEP.MagType="249Belt"
 function SWEP:ReloadAct()
 	self:ReloadMag()	
 end

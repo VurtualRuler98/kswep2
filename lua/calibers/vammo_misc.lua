@@ -12,6 +12,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 4
+	tbl.velocity = 3260
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_300wm",DMG_BULLET,0,0,80,10,5})
 	
@@ -28,6 +29,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 4
+	tbl.velocity = 2733 --24 in barrel
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_762x51_m80",DMG_BULLET,0,0,80,10,5})
 	
@@ -44,6 +46,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 4.5
+	tbl.velocity = 2700
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_762x54_7n1",DMG_BULLET,0,0,80,10,5})
 	
@@ -59,6 +62,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.velocity = 2985 
 	tbl.recoil = 4
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_762x51_m993",DMG_BULLET,0,0,80,10,5})
@@ -76,6 +80,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 0.5
 	tbl.damagescale = 1
 	tbl.recoil = 5
+	tbl.velocity = 2580 --M118LR is the same projectile
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_762x51_mk316mod0",DMG_BULLET,0,0,80,10,5})
 
@@ -92,6 +97,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 1
+	tbl.velocity =	1300 --115gr fmj
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_9x19_FMJ",DMG_BULLET,0,0,80,10,5})
 	
@@ -108,6 +114,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 1
+	tbl.velocity = 1030 --makarov
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_9x18_FMJ",DMG_BULLET,0,0,80,10,5})
 
@@ -124,6 +131,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 1.2
+	tbl.velocity = 825 --1911
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_45acp_FMJ",DMG_BULLET,0,0,80,10,5})
 
@@ -139,6 +147,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.velocity = 1240 --116gr JHP
 	tbl.recoil = 1
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_9x19_JHP",DMG_BULLET,0,0,80,10,5})
@@ -152,6 +161,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_9x19_plusP_FMJ"
 	tbl.printname = "9x19mm +P FMJ"
 	tbl.caliber = "vammo_9x19"
+	tbl.velocity = 1300 --same as regular for now
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1.1
@@ -172,6 +182,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.velocity = 2733 --like M80
 	tbl.recoil = 2
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_rifle",DMG_BULLET,0,0,80,10,5})
@@ -189,6 +200,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 3
 	tbl.damagescale = 0.11
 	tbl.recoil = 4
+	tbl.velocity = 1200 --00buck
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_12gauge_00buck",DMG_BULLET,0,0,80,10,5})
 
@@ -205,6 +217,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 4
+	tbl.velocity = 1800
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_12gauge_slug",DMG_BULLET,0,0,80,10,5})
 
@@ -222,6 +235,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.velocity = 891
 	tbl.recoil = 1
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_762x38",DMG_BULLET,0,0,80,10,5})

@@ -37,7 +37,6 @@ SWEP.ViewModel = "models/weapons/cstrike/c_pist_glock18.mdl"
 SWEP.WorldModel = "models/weapons/w_pist_glock18.mdl"
 SWEP.Primary.Automatic = false
 SWEP.UseHands = true
-SWEP.Magazines = 3
 SWEP.MagSize = 17
 SWEP.Caliber = "pistol"
 SWEP.Primary.Sound = Sound("weapon_glock.single")
@@ -103,6 +102,11 @@ SWEP.InsNoSafetySound=false
 SWEP.RTScope=false
 SWEP.ScopeRes=2048
 SWEP.ScopeMat = nil
+SWEP.MuzzleVelMod = 1
+SWEP.Bullets={}
+SWEP.MagType=nil
+SWEP.ChamberAmmo={}
+SWEP.IsSecondaryWeapon=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -123,6 +127,7 @@ function SWEP:Initialize()
 	self:SetNWBool("Lowered",false)
 	self:SetNWFloat("NextPrimaryAttack",0)
 	self.Ammo = vurtual_ammodata[self.Caliber]
+	self.Caliber=self.Ammo.caliber
 	self.DefaultMagazines = {}
 	self.Magazines = {}
 	if (self.SingleReload==true) then
@@ -140,8 +145,14 @@ function SWEP:Initialize()
 		mat = Material(self.ScopeMat)
 		mat:SetTexture("$basetexture",self.RenderTarget)
 	end
+	if (self:GetNWBool("Chambered")==false && self:Clip1()>0 && self.OpenBolt==false) then
+		self:ServeNWBool("Chambered",true)
+		self:TakePrimaryAmmo(1)
+		self:SetDeploySpeed(1)
+		self.ChamberAmmo=table.Copy(self.Ammo)
+	end
 end
-function SWEP:Rearm()
+function SWEP:OldRearm()
 	local autofillmag=false
 	local rearmed=false
 	if (self.SingleReload==true) then
@@ -179,6 +190,25 @@ function SWEP:Rearm()
 	end
 	return rearmed
 end
+function SWEP:Rearm()
+	local rearmed=false
+	if (self.SingleReload==true) then
+		if (self:Clip1()==self.MagSize || !autofillmag) then
+			if (self.Magazines[1]<self.MaxMags) then
+				self.Magazines={self.Magazines[1]+self.MagSize}
+				self:ServeNWInt("MagazineCount",self.Magazines[1])
+				rearmed=true
+			end
+			if (self.Magazines[1]>self.MaxMags) then
+				self.Magazines={self.MaxMags}
+				self:ServeNWInt("MagazineCount",self.Magazines[1])
+			end
+		else
+			self:SetClip1(self.MagSize)
+			rearmed=true
+		end
+	end
+end
 function SWEP:PrimaryAttack()
 	if (self:CanPrimaryAttack()) then
 	if (self.Owner:KeyDown(IN_USE) && !self:GetNWBool("FiremodeSelected") && !self:GetNWBool("Lowered")) then
@@ -215,8 +245,16 @@ function SWEP:NormalFire()
 	if (self:IsRunning() || self:GetNWBool("Raised")==false) then return end
 	if (!self:TryPrimaryAttack() ) then return end
 	self.Weapon:EmitSound(self.Primary.Sound)
+	local ammo = self.Ammo
+	if (!self.OpenBolt) then
+		ammo = self.ChamberAmmo
+	end
+	self:ShootBullet(self.Primary.Damage*ammo.damagescale, ammo.projectiles, ammo.spreadscale*self.Primary.Spread,ammo.name)
 	if (self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
+		if (self.ChamberAmmo.name!=self.Ammo.name) then
+			self.ChamberAmmo=table.Copy(self.Ammo)
+		end
 	else
 		self:ServeNWBool("Chambered",false)
 	end
@@ -230,7 +268,6 @@ function SWEP:NormalFire()
 	elseif (!self:GetNWBool("Chambered")) then
 		anim=self.IdleAnimEmpty
 	end
-	self:ShootBullet(self.Primary.Damage*self.Ammo.damagescale, self.Ammo.projectiles, self.Ammo.spreadscale*self.Primary.Spread,self.Ammo.name)
 	self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
 	self:SetNextAttack(CurTime()+self.Primary.Delay)
 end
@@ -257,24 +294,17 @@ SWEP.InitialDraw=true
 function SWEP:Deploy()
 	if (self.InitialDraw) then
 		self:SetClip1(self.MagSize)
+		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
 		self.InitialDraw=false
 	end
-	if (self:GetNWBool("Chambered")==false && self:Clip1()>0 && self.OpenBolt==false) then
+	if (self.DrawOnce) then
+		self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
+	else
 		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
-		self:ServeNWBool("Chambered",true)
-		self:TakePrimaryAmmo(1)
-		self:SetDeploySpeed(1)
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),ACT_VM_IDLE)
-	else
-		if (self.DrawOnce) then
-			self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
-		else
-			self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
-			self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
-			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),ACT_VM_IDLE)
-		end
 	end
+	
 	self:ServeNWBool("Raised",true)
 	if (GetConVar("kswep_slow"):GetBool()) then
 		self.Owner:SetRunSpeed(250)
@@ -350,6 +380,21 @@ net.Receive("kswep_magazines",function(len,ply)
 	local self=net.ReadEntity()
 	self.Magazines=net.ReadTable()
 end)
+net.Receive("kswep_chamberammo",function(len,ply)
+	self=net.ReadEntity()
+	self.Ammo=net.ReadTable()
+	self.ChamberAmmo=net.ReadTable()
+end)
+function SWEP:SetChamberAmmo(ammo)
+	if (SERVER) then
+	self.ChamberAmmo=table.Copy(ammo)
+	net.Start("kswep_chamberammo")
+	net.WriteEntity(self)
+	net.WriteTable(self.Ammo)
+	net.WriteTable(ammo)
+	net.Send(self.Owner)
+	end
+end
 function SWEP:ReloadTube()
 	if (self:GetNWBool("CurrentlyReloading")==true) then return end
 	if (self.Magazines[1]<1) then return end
@@ -412,23 +457,26 @@ function SWEP:BurstFire()
 	end
 end
 function SWEP:FinishReload()
+	self:ServeNWBool("CurrentlyReloading",false)
 	self:ServeNWBool("FiringPin",true)
-	table.insert(self.Magazines,self:Clip1())
-	table.sort(self.Magazines)
-	self:SetClip1(table.GetLastValue(self.Magazines))
+	table.insert(self.Magazines,{caliber=self.Ammo.name,num = self:Clip1()})
+	table.SortByMember(self.Magazines,"num",true)
+	local mag=table.GetLastValue(self.Magazines)
+	self:SetClip1(mag.num)
+	self.Ammo=vurtual_ammodata[mag.caliber]
 	table.remove(self.Magazines)
-	if (self.Magazines[1]==0) then
+	if (self.Magazines[1].num==0) then
 		table.remove(self.Magazines,1)
 	end
 	self.ReloadWeight=self:Clip1()
 	if (self:GetNWBool("Chambered")==false && self.OpenBolt==false && self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
 		self:ServeNWBool("Chambered",true)
+		self:SetChamberAmmo(self.Ammo)
 	end
 	if (self.OpenBolt==true) then
 		self:ServeNWBool("Chambered",true)
 	end
-	self:ServeNWBool("CurrentlyReloading",false)
 	self.ReloadAnimTime=0
 	self.ReloadMessage=CurTime()+2
 	self:SendWeaponAnim(ACT_VM_IDLE)
@@ -535,7 +583,27 @@ end
 
 
 function SWEP:Think()
+	if (SERVER) then
+		local plmags=self.Owner.KPrimaryMags
+		local pltype=self.Owner.KPrimaryType
+		if (self.IsSecondaryWeapon) then
+			plmags=self.Owner.KSecondaryMags
+			pltype=self.Owner.KSecondaryType
+		end
+		if (pltype==self.MagType) then
+			self.Magazines=plmags
+			self:ServeNWInt("MagazineCount",#self.Magazines)
+		else
+			self.Magazines={}
+			self:ServeNWInt("MagazineCount",#self.Magazines)
+		end
+	end
 	if (IsFirstTimePredicted()) then
+	for k,v in pairs(self.Bullets) do
+		if (v.time<CurTime()) then
+			self.Bullets[k]=self:FlyBullet(v)
+		end
+	end
 		if (self.ReloadAnimTime!=0 && CurTime()>self.ReloadAnimTime && self:GetNWBool("CurrentlyReloading")==true) then
 		if (self.SingleReload) then
 			self:FinishReloadSingle()
@@ -765,13 +833,41 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         bullet.Force    = 1                                                                     -- Amount of force to give to phys objects
         bullet.Damage   = damage
         bullet.AmmoType = ammo
-
-        self.Owner:FireBullets( bullet )
-
+	if (bullet.Num==1 && GetConVar("kswep_phys"):GetBool()) then
+		self:FlyBulletStart(bullet)
+	else
+        	self.Owner:FireBullets( bullet )
+	end
         self:ShootEffects()
 	self:Recoil(self.Ammo.recoil*self.RecoilMassModifier*aimPenalty)
 end
-
+function SWEP:FlyBulletStart(bullet)
+	local shot = {}
+	shot.pos=bullet.Src
+	shot.speed=self.Ammo.velocity*self.MuzzleVelMod
+	shot.ang=bullet.Dir
+	shot.bullet=bullet
+	shot.time = CurTime()
+	table.insert(self.Bullets,shot)
+end
+function SWEP:FlyBullet(shot)
+	local travel = shot.pos + (shot.ang*shot.speed*16*FrameTime())
+	local tr = util.TraceLine( {
+		filter = self.Owner,
+		start = shot.pos,
+		endpos = travel,
+		mask = MASK_SHOT
+		})
+	if (tr.Hit) then
+		shot.bullet.src=pos
+		self.Owner:FireBullets(shot.bullet)
+		return nil
+	else
+		shot.pos=travel
+		shot.time=CurTime()+FrameTime()
+		return shot
+	end
+end
 function SWEP:ShootEffects()
 	if (self.InsAnims && self:GetNWBool("Sight")) then
 		local anim=self.IronShootAnim

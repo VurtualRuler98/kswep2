@@ -53,7 +53,8 @@ SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
 SWEP.RecoilControl=2.4
 SWEP.MaxMags = 4
-
+SWEP.MagType="G17"
+SWEP.IsSecondaryWeapon=true
 function SWEP:ReloadAct()
 	self:ReloadMag()	
 end

@@ -1,5 +1,9 @@
 CreateConVar("kswep_slow",0)
+CreateConVar("kswep_phys",1)
 util.AddNetworkString("kswep_magazines")
+util.AddNetworkString("kswep_chamberammo")
+util.AddNetworkString("kswep_rearm")
+util.AddNetworkString("kswep_rearm_cl")
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 end
@@ -19,6 +23,31 @@ end
 if (vurtual_ammotypes==nil) then
 	SetupAmmoTypes()
 end
+function RearmMags(len,pl)
+	if (IsValid(pl) && pl:IsPlayer()) then
+		local caliber=net.ReadString()
+		local wep=pl:GetActiveWeapon()
+		if (wep:IsValid() && string.find(wep:GetClass(),"weapon_kswep") && wep.MagType!=nil) then
+			local magcount=wep.MaxMags
+			pl.KPrimaryMags={}
+			pl.KPrimaryType=wep.MagType
+			for i=1,magcount do
+				table.insert(pl.KPrimaryMags,{caliber=caliber,num=wep.MagSize})
+			end
+			
+		end
+	end
+end
+net.Receive("kswep_rearm_cl",RearmMags)
+
+function SetSpawnMagazines(ply)
+	ply.KPrimaryMags={}
+	ply.KPrimaryType=nil
+	ply.KSecondaryMags={}
+	ply.KSecondaryType=nil
+end
+hook.Add("PlayerSpawn","setspawnmagazines",SetSpawnMagazines)
+
 
 hook.Add("PlayerInitialSpawn", "plyspawnammotypes",function(ply)
 	net.Start("kevlar_ammo")

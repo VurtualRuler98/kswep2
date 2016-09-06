@@ -11,6 +11,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.armordamagemult=1
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.velocity = 2200 --DM31
 	AddAmmodata(tbl)
 
 	local tbl = {}
@@ -23,6 +24,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.velocity = 1300 --115gr fmj
 	AddAmmodata(tbl)
 
 	local tbl = {}
@@ -35,6 +37,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.velocity = 1200 --00buck
 	AddAmmodata(tbl)
 
 	local tbl = {}
@@ -47,6 +50,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.velocity = 1125 --speed of sound because why not
 	AddAmmodata(tbl)
 
 	local tbl = {}
@@ -59,6 +63,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.velocity = 1395 --NIJ II test round
 	AddAmmodata(tbl)
 
 
