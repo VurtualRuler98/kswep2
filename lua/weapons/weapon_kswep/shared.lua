@@ -880,15 +880,52 @@ function SWEP:FlyBullet(shot)
 		endpos = travel,
 		mask = MASK_SHOT
 		})
-	if (tr.Hit) then
-		shot.bullet.src=pos
+	if (tr.Hit && !tr.AllSolid) then
+		
+		shot.bullet.Src=shot.pos
 		self.Owner:FireBullets(shot.bullet)
-		return nil
-	else
-		shot.pos=travel
-		shot.time=CurTime()+FrameTime()
-		return shot
+	
 	end
+	if ((!tr.Hit || (tr.HitWorld && !tr.HitSky)) && travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
+		if (tr.HitWorld) then
+			shot.speed, shot.pos=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel)
+		else
+			shot.pos=travel
+		end
+		shot.time=CurTime()+FrameTime()
+		if (shot.speed>100) then --TODO: better minimum lethal velocity
+			return shot
+		else
+			return nil
+		end
+	else
+		return nil
+	end
+end
+function SWEP:CalcPenetration(mat,shot,hitpos,travel)
+	local tr = util.TraceLine( {
+		filter = self.Owner,
+		start = hitpos,
+		endpos = travel,
+		mask = MASK_SHOT
+		})
+	local penetration = 0
+	if (mat==MAT_WOOD || mat==MAT_PLASTIC || mat==MAT_GRATE || mat==MAT_GLASS || mat==MAT_TILE) then
+		penetration = 0.5
+	elseif (mat==MAT_GRASS || mat==MAT_DIRT || mat==MAT_FLESH || mat==MAT_SNOW || mat==MAT_SAND || mat==MAT_SLOSH || mat==MAT_BLOODYFLESH || mat==MAT_ALIENFLESH || mat==MAT_ANTLION || mat==MAT_CONCRETE) then
+		penetration = 1
+	elseif (mat==MAT_METAL ) then
+		penetration = 2
+	end
+	if (penetration>0) then
+		local basespeed=vurtual_ammodata[shot.bullet.AmmoType].velocity --standard velocity of bullet
+		local wallcost=basespeed/vurtual_ammodata[shot.bullet.AmmoType].wallbang --how much speed is required to penetrate one unit of dirt
+		local barrier=tr.FractionLeftSolid*(hitpos:Distance(travel)) --Amount of wall we're going through
+		if (tr.AllSolid) then barrier=hitpos:Distance(travel) end
+		if (SERVER) then
+		end
+		return shot.speed-(wallcost*barrier*penetration),hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*5)--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
+	else return 0,travel  end
 end
 function SWEP:ShootEffects()
 	if (self.InsAnims && self:GetNWBool("Sight")) then

@@ -13,6 +13,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.damagescale = 1
 	tbl.recoil = 1
 	tbl.velocity = 3165 --20" barrel
+	tbl.wallbang = 4
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_556x45_m193",DMG_BULLET,0,0,80,10,5})
 
@@ -30,6 +31,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.damagescale = 1
 	tbl.recoil = 1
 	tbl.velocity = 3100 -- 20"
+	tbl.wallbang = 6
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_556x45_m855",DMG_BULLET,0,0,80,10,5})
 
@@ -46,6 +48,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 1
+	tbl.wallbang = 10
 	tbl.velocity = 3324 --20" barrel I think?
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_556x45_m995",DMG_BULLET,0,0,80,10,5})
@@ -62,6 +65,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.wallbang = 4
 	tbl.recoil = 1
 	tbl.velocity = 2750 --might be for a 16 or 18
 	AddAmmodata(tbl)
