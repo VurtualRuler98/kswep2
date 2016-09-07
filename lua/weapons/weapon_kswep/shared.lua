@@ -129,12 +129,14 @@ function SWEP:Initialize()
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.Caliber=self.Ammo.caliber
 	self.DefaultMagazines = {}
-	self.Magazines = {}
-	if (self.SingleReload==true) then
-		self.DefaultMagazines={0}
-		self.Magazines = table.Copy(self.DefaultMagazines)
-		self:SetNWBool("MagazineCount",self.Magazines[1])
+	if (self.SingleReload) then
+		self.MagTable = {}
+		for i=1,self.MagSize do
+			table.insert(self.MagTable,{caliber=self.Ammo.name,num=1})
+		end
+		self.MagType=self.Caliber
 	end
+	self.Magazines = {}
 	self.Primary.DefaultClip = self.MagSize
 	self.Primary.ClipSize = self.MagSize
 
@@ -149,64 +151,6 @@ function SWEP:Initialize()
 		self:ServeNWBool("Chambered",true)
 		self:TakePrimaryAmmo(1)
 		self:SetDeploySpeed(1)
-		self.ChamberAmmo=table.Copy(self.Ammo)
-	end
-end
-function SWEP:OldRearm()
-	local autofillmag=false
-	local rearmed=false
-	if (self.SingleReload==true) then
-		if (self:Clip1()==self.MagSize || !autofillmag) then
-			if (self.Magazines[1]<self.MaxMags) then
-				self.Magazines={self.Magazines[1]+self.MagSize}
-				self:ServeNWInt("MagazineCount",self.Magazines[1])
-				rearmed=true
-			end
-			if (self.Magazines[1]>self.MaxMags) then
-				self.Magazines={self.MaxMags}
-				self:ServeNWInt("MagazineCount",self.Magazines[1])
-			end
-		else
-			self:SetClip1(self.MagSize)
-			rearmed=true
-		end
-	else
-		if ((#self.Magazines==0 || self.Magazines[1]==self.MagSize) && (self:Clip1()==self.MagSize || !autofillmag)) then
-			if (#self.Magazines<self.MaxMags) then
-				table.insert(self.Magazines,self.MagSize)
-				self:ServeNWInt("MagazineCount",#self.Magazines)
-				rearmed=true
-			end
-		else
-			if (autofillmag) then
-				self:SetClip1(self.MagSize)
-				rearmed=true
-			end
-			for k,v in pairs(self.Magazines) do
-				self.Magazines[k]=self.MagSize
-				rearmed=true
-			end
-		end
-	end
-	return rearmed
-end
-function SWEP:Rearm()
-	local rearmed=false
-	if (self.SingleReload==true) then
-		if (self:Clip1()==self.MagSize || !autofillmag) then
-			if (self.Magazines[1]<self.MaxMags) then
-				self.Magazines={self.Magazines[1]+self.MagSize}
-				self:ServeNWInt("MagazineCount",self.Magazines[1])
-				rearmed=true
-			end
-			if (self.Magazines[1]>self.MaxMags) then
-				self.Magazines={self.MaxMags}
-				self:ServeNWInt("MagazineCount",self.Magazines[1])
-			end
-		else
-			self:SetClip1(self.MagSize)
-			rearmed=true
-		end
 	end
 end
 function SWEP:PrimaryAttack()
@@ -237,6 +181,11 @@ end
 function SWEP:PrimaryFire()
 	self:NormalFire()
 end
+function SWEP:NextBolt(idle,anim,bolt)
+	self:SetNWFloat("NextIdle",idle)
+	self.NextBoltAnim=bolt
+	self.NextIdleAnim=anim
+end
 function SWEP:NextIdle(idle,anim)
 	self:ServeNWFloat("NextIdle",idle)
 	self.NextIdleAnim=anim
@@ -252,14 +201,13 @@ function SWEP:NormalFire()
 	self:ShootBullet(self.Primary.Damage*ammo.damagescale, ammo.projectiles, ammo.spreadscale*self.Primary.Spread,ammo.name)
 	if (self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
-		if (self.ChamberAmmo.name!=self.Ammo.name) then
-			self.ChamberAmmo=table.Copy(self.Ammo)
-		end
 	else
 		self:ServeNWBool("Chambered",false)
 	end
 	local anim=ACT_VM_IDLE
+	local animbolt = self.BoltAnim
 	if (self:GetNWBool("Sight")) then
+		animbolt = self.BoltAnimIron
 		if (self:GetNWBool("Chambered")) then
 			anim=self.IronAnim
 		else
@@ -268,10 +216,26 @@ function SWEP:NormalFire()
 	elseif (!self:GetNWBool("Chambered")) then
 		anim=self.IdleAnimEmpty
 	end
-	self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
-	self:SetNextAttack(CurTime()+self.Primary.Delay)
+	local bolttime = 0
+	if (animbolt) then
+		self:NextBolt(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim,animbolt)
+		bolttime = self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(animbolt))
+	else
+		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
+	end
+	self:SetNextAttack(CurTime()+self.Primary.Delay+bolttime+self:AttackAnimWait())
 end
-
+function SWEP:AttackAnimWait()
+	local wait=self.WaitShot
+	if (self:GetNWBool("Sight")) then
+		wait=self.WaitShotIron
+	end
+	if (wait) then
+		return self.Owner:GetViewModel():SequenceDuration()
+	else
+		return 0
+	end
+end
 function SWEP:ShotgunFire()
 	if (!self:TryPrimaryAttack()) then return end
 	if (!self:GetNWBool("Chambered")) then
@@ -289,6 +253,19 @@ function SWEP:ShotgunFire()
 		
 		self:NormalFire()
 	end
+end
+function SWEP:TakePrimaryAmmo(num)
+		if (self.SingleReload) then
+			self:SetChamberAmmo(vurtual_ammodata[self.MagTable[1].caliber])
+			table.remove(self.MagTable,1)
+			self.Weapon:SetClip1(#self.MagTable)
+		else
+			if (self.ChamberAmmo.name!=self.Ammo.name) then
+				self.ChamberAmmo=table.Copy(self.Ammo)
+				
+			end
+			self.Weapon:SetClip1(self.Weapon:Clip1()-num)
+		end
 end
 SWEP.InitialDraw=true
 function SWEP:Deploy()
@@ -327,6 +304,12 @@ function SWEP:Holster(wep)
 end
 
 function SWEP:Reload()
+	if (self.ChainReload && !self:GetNWBool("CurrentlyReloading")) then
+		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(self.MidReloadAnim)))
+		self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(self.MidReloadAnim))
+		self:ServeNWBool("CurrentlyReloading",true)
+		return
+	end
 	if (!self:GetNWBool("Raised")) then return end
 	if (self.Owner:KeyDown(IN_USE)) then
 		self.ReloadMessage=CurTime()+2
@@ -383,23 +366,31 @@ net.Receive("kswep_magazines",function(len,ply)
 end)
 net.Receive("kswep_chamberammo",function(len,ply)
 	self=net.ReadEntity()
-	self.Ammo=net.ReadTable()
+	if (self.SingleReload) then
+		self.MagTable=net.ReadTable()
+	else
+		self.Ammo=net.ReadTable()
+	end
 	self.ChamberAmmo=net.ReadTable()
 end)
 function SWEP:SetChamberAmmo(ammo)
-	if (SERVER) then
 	self.ChamberAmmo=table.Copy(ammo)
+	if (SERVER) then
 	net.Start("kswep_chamberammo")
 	net.WriteEntity(self)
-	net.WriteTable(self.Ammo)
+	if (self.SingleReload) then
+		net.WriteTable(self.MagTable)
+	else
+		net.WriteTable(self.Ammo)
+	end
 	net.WriteTable(ammo)
 	net.Send(self.Owner)
 	end
 end
 function SWEP:ReloadTube()
 	if (self:GetNWBool("CurrentlyReloading")==true) then return end
-	if (self.Magazines[1]<1) then return end
-	if (self:Clip1()>=self.Primary.ClipSize) then return end
+	if (#self.Magazines<1) then return end
+	if (#self.MagTable>=self.Primary.ClipSize) then return end
 	self:SetNWBool("Lowered",false)
 	local reloadspeed=self.ReloadModLight
 	if (self.Owner.ksarmor) then
@@ -410,7 +401,12 @@ function SWEP:ReloadTube()
 		end
 	end
 	self:SetNWBool("Sight",false)
-	self.Weapon:SendWeaponAnim(self.ReloadAnim)
+	if (self.StartReloadAnim) then
+		reloadspeed=1
+		self.Weapon:SendWeaponAnim(self.StartReloadAnim)
+	else
+		self.Weapon:SendWeaponAnim(self.ReloadAnim)
+	end
 	self.Owner:GetViewModel():SetPlaybackRate(1/reloadspeed)
 	self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed)
 	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed
@@ -419,7 +415,11 @@ function SWEP:ReloadTube()
 end
 
 function SWEP:DrawHUD()
-	draw.DrawText(self:FiremodeName() .. "  " .. self.Ammo.printname,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
+	local ammo = self.Ammo
+	if (self.SingleReload) then
+		ammo =self.ChamberAmmo
+	end
+	draw.DrawText(self:FiremodeName() .. "  " .. ammo.printname,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
 	if (self.ReloadMessage > CurTime()) then
 		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
 	end
@@ -473,7 +473,6 @@ function SWEP:FinishReload()
 	if (self:GetNWBool("Chambered")==false && self.OpenBolt==false && self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
 		self:ServeNWBool("Chambered",true)
-		self:SetChamberAmmo(self.Ammo)
 	end
 	if (self.OpenBolt==true) then
 		self:ServeNWBool("Chambered",true)
@@ -505,12 +504,27 @@ function SWEP:DoDrawCrosshair()
 end
 
 function SWEP:FinishReloadSingle()
-	self.Magazines[1]=self.Magazines[1]-1
+	self.ChainReload=false
 	self:SetClip1(self:Clip1()+1)
-	self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
+	local mag=table.GetLastValue(self.Magazines)
+	table.insert(self.MagTable,mag)
+	table.remove(self.Magazines)
+	local anim = ACT_VM_IDLE
+	if (self.StartReloadAnim) then
+		anim = self.MidReloadAnim
+	end
+	self.Weapon:SendWeaponAnim(anim)
+	if (self.StartReloadAnim) then
+		if (self.Owner:KeyDown(IN_RELOAD) && #self.MagTable<self.Primary.ClipSize) then
+			self.ChainReload=true
+			self:SetNWFloat("NextIdle",0)
+		else
+			self:NextBolt(CurTime()+self.Owner:GetViewModel():SequenceDuration()+0.05,ACT_VM_IDLE,self.EndReloadAnim)
+		end
+	end
 	self:ServeNWBool("CurrentlyReloading",false)
 	self.ReloadAnimTime=0
-	self:ServeNWInt("MagazineCount",self.Magazines[1])
+	self:ServeNWInt("MagazineCount",#self.Magazines)
 end
 
 function SWEP:CanPrimaryAttack()
@@ -629,9 +643,18 @@ function SWEP:Think()
 	end
 	if (self:GetNWFloat("NextIdle")!=0 && self:GetNWFloat("NextIdle")<CurTime()) then
 		if (SERVER) then
-			self:SendWeaponAnim(self.NextIdleAnim)
+			if (self.NextBoltAnim) then
+				self:SendWeaponAnim(self.NextBoltAnim)
+				print("BOLT!")
+				self.NextBoltAnim=nil
+				self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.NextIdleAnim)
+				self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+			else
+				print("IDLE")
+				self:SendWeaponAnim(self.NextIdleAnim)
+				self:ServeNWFloat("NextIdle",0)
+			end
 		end
-		self:ServeNWFloat("NextIdle",0)
 	end
 	local hold=self:GetNWString("HoldType")
         --[[if (self:IsRunning() && !self:GetNWBool("CurrentlyReloading") && self:GetNWFloat("NextPrimaryAttack")<CurTime() && !self.DidLowerAnim && !self:GetNWBool("Lowered")) then

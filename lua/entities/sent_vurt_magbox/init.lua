@@ -30,12 +30,7 @@ function ENT:Use( activator, caller )
 	if ( activator:IsPlayer() )  then
 		local wep=activator:GetActiveWeapon()
 		if (wep:IsValid() && string.find(wep:GetClass(),"weapon_kswep")) then
-			if (wep.MagType==nil) then
-				local rearmed=wep:Rearm()
-				if (rearmed) then 
-					self.Entity:EmitSound("BaseCombatCharacter.AmmoPickup")
-				end
-			else
+			if (wep.MagType || wep.SingleReload) then
 				net.Start("kswep_rearm")
 				net.WriteEntity(wep)
 				net.WriteTable(vurtual_ammodata)
