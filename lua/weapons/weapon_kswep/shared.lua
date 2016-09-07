@@ -256,8 +256,8 @@ function SWEP:ShotgunFire()
 end
 function SWEP:TakePrimaryAmmo(num)
 		if (self.SingleReload) then
-			self:SetChamberAmmo(vurtual_ammodata[self.MagTable[1].caliber])
-			table.remove(self.MagTable,1)
+			self:SetChamberAmmo(vurtual_ammodata[self.MagTable[#self.MagTable].caliber])
+			table.remove(self.MagTable)
 			self.Weapon:SetClip1(#self.MagTable)
 		else
 			if (self.ChamberAmmo.name!=self.Ammo.name) then
@@ -645,12 +645,10 @@ function SWEP:Think()
 		if (SERVER) then
 			if (self.NextBoltAnim) then
 				self:SendWeaponAnim(self.NextBoltAnim)
-				print("BOLT!")
 				self.NextBoltAnim=nil
 				self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.NextIdleAnim)
 				self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 			else
-				print("IDLE")
 				self:SendWeaponAnim(self.NextIdleAnim)
 				self:ServeNWFloat("NextIdle",0)
 			end
