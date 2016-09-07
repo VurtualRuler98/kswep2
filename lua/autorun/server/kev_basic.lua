@@ -29,10 +29,17 @@ function RearmMags(len,pl)
 		local wep=pl:GetActiveWeapon()
 		if (wep:IsValid() && string.find(wep:GetClass(),"weapon_kswep") && wep.MagType!=nil) then
 			local magcount=wep.MaxMags
-			pl.KPrimaryMags={}
-			pl.KPrimaryType=wep.MagType
+			local tbl=pl.KPrimaryMags
+			if (wep.IsSecondaryWeapon) then
+				tbl=pl.KSecondaryMags
+				pl.KSecondaryType=wep.MagType
+			else
+				pl.KPrimaryType=wep.MagType
+			end
+			
+			table.Empty(tbl)
 			for i=1,magcount do
-				table.insert(pl.KPrimaryMags,{caliber=caliber,num=wep.MagSize})
+				table.insert(tbl,{caliber=caliber,num=wep.MagSize})
 			end
 			
 		end
