@@ -28,17 +28,14 @@ function ENT:Initialize()
 end
 function ENT:Use( activator, caller )
 	if ( activator:IsPlayer() )  then
-		print("ply!")
 		local wep=activator:GetActiveWeapon()
 		if (wep:IsValid() && string.find(wep:GetClass(),"weapon_kswep")) then
-			print("wep!")
 			if (wep.MagType==nil) then
 				local rearmed=wep:Rearm()
 				if (rearmed) then 
 					self.Entity:EmitSound("BaseCombatCharacter.AmmoPickup")
 				end
 			else
-				print("bep")
 				net.Start("kswep_rearm")
 				net.WriteEntity(wep)
 				net.WriteTable(vurtual_ammodata)
