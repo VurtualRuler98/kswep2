@@ -327,11 +327,12 @@ function SWEP:Holster(wep)
 end
 
 function SWEP:Reload()
-	if (!self:GetNWBool("Raised") || !self:CanReload()) then return end
+	if (!self:GetNWBool("Raised")) then return end
 	if (self.Owner:KeyDown(IN_USE)) then
 		self.ReloadMessage=CurTime()+2
 		self.ReloadWeight=self:Clip1()
 	else
+		if (!self:CanReload()) then return end)
 		self:ReloadAct()
 	end
 end
