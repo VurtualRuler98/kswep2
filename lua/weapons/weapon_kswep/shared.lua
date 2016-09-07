@@ -505,7 +505,12 @@ end
 
 function SWEP:FinishReloadSingle()
 	self.ChainReload=false
-	self:SetClip1(self:Clip1()+1)
+	if (#self.Magazines==0) then
+	if (self.StartReloadAnim) then
+		self:NextBolt(CurTime(),ACT_VM_IDLE,self.EndReloadAnim)
+	end
+	return
+	end
 	local mag=table.GetLastValue(self.Magazines)
 	table.insert(self.MagTable,mag)
 	table.remove(self.Magazines)
@@ -525,6 +530,10 @@ function SWEP:FinishReloadSingle()
 	self:ServeNWBool("CurrentlyReloading",false)
 	self.ReloadAnimTime=0
 	self:ServeNWInt("MagazineCount",#self.Magazines)
+	if (self.SingleReloadChambers && !self:GetNWBool("Chambered")) then
+		self:TakePrimaryAmmo(1)
+		self:SetNWBool("Chambered",true)
+	end
 end
 
 function SWEP:CanPrimaryAttack()
@@ -598,6 +607,9 @@ end
 
 
 function SWEP:Think()
+	if (self.SingleReload && self:Clip1()!=#self.MagTable) then
+		self:SetClip1(#self.MagTable)
+	end
 	if (SERVER) then
 		local plmags=self.Owner.KPrimaryMags
 		local pltype=self.Owner.KPrimaryType
@@ -655,33 +667,7 @@ function SWEP:Think()
 		end
 	end
 	local hold=self:GetNWString("HoldType")
-        --[[if (self:IsRunning() && !self:GetNWBool("CurrentlyReloading") && self:GetNWFloat("NextPrimaryAttack")<CurTime() && !self.DidLowerAnim && !self:GetNWBool("Lowered")) then
-		hold = self:GetNWString("IdleType")
-		self:Lower(true)
-        elseif (self:GetNWBool("Raised") && self.DidLowerAnim) then
-		self:Lower(false)
-		self.DidLowerAnim=false
-	end
-	if (!self:GetNWBool("Raised")) then
-		hold = self:GetNWString("IdleType")
-	end]]--
 	self:SetHoldType(hold)
-	if (self:Clip1()<1 && !self.EmptyAnims && ((!self:GetNWBool("FiringPin")) && !self:GetNWBool("CurrentlyReloading"))) then
-		self:SetNWBool("Sight",false)
-		if (self.InsAnims) then
-			if (!self:GetNWBool("Lowered")) then
-				self:SetNWFloat("NextIdle",0)
-				if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
-					self:SendWeaponAnim(self.LowerAnimEmpty)
-				else
-					self:SendWeaponAnim(self.LowerAnim)
-				end
-				self:SetNWBool("Lowered",true)
-			end
-		end
-	else
-		self:SetNWBool("Lowered",false)
-	end
 	if (self:GetNWBool("Burst")==0 && self.Burst>0 && !self.Owner:KeyDown(IN_ATTACK)) then
 		self:SetNWBool("Burst",self.Burst)
 	end
