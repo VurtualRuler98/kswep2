@@ -332,7 +332,7 @@ function SWEP:Reload()
 		self.ReloadMessage=CurTime()+2
 		self.ReloadWeight=self:Clip1()
 	else
-		if (!self:CanReload()) then return end)
+		if (!self:CanReload()) then return end
 		self:ReloadAct()
 	end
 end
