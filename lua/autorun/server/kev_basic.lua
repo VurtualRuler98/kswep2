@@ -1,5 +1,3 @@
-CreateConVar("kswep_slow",0)
-CreateConVar("kswep_phys",1)
 util.AddNetworkString("kswep_magazines")
 util.AddNetworkString("kswep_chamberammo")
 util.AddNetworkString("kswep_rearm")
