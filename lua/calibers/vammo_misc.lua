@@ -32,6 +32,22 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity = 2733 --24 in barrel
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_762x51_m80",DMG_BULLET,0,0,80,10,5})
+	local tbl = {}
+	tbl.vestpenetration=25
+	tbl.powermin=2
+	tbl.powermax=3
+	tbl.helmetpenetration=2
+	tbl.armordamagemult=2
+	tbl.name = "vammo_762x51_sub"
+	tbl.printname = "7.62x51mm NATO Subsonic"
+	tbl.caliber = "vammo_762x51"
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.damagescale = 1
+	tbl.recoil = 2
+	tbl.velocity = 990 --24 in barrel
+	AddAmmodata(tbl)
+	game.AddAmmoType({name="vammo_762x51_sub",DMG_BULLET,0,0,80,10,5})
 	
 	local tbl = {}
 	tbl.vestpenetration=25
