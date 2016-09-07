@@ -506,6 +506,7 @@ end
 function SWEP:FinishReloadSingle()
 	self.ChainReload=false
 	if (#self.Magazines==0) then
+	self:ServeNWBool("CurrentlyReloading",false)
 	if (self.StartReloadAnim) then
 		self:NextBolt(CurTime(),ACT_VM_IDLE,self.EndReloadAnim)
 	end
