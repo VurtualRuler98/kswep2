@@ -900,7 +900,20 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel)
 		endpos = travel,
 		mask = MASK_SHOT
 		})
+	local pen2=0
+	if (tr.HitWorld) then
+		local btr = util.TraceLine( {
+			filter = self.Owner,
+			start = hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10),
+			endpos = hitpos,
+			mask = MASK_SHOT
+		})
+		pen2=self:MaterialPenetration(btr.MatType)
+	end
 	local penetration=self:MaterialPenetration(mat)
+	if (pen2>penetration && penetration!=0) then
+		penetration=pen2
+	end
 	if (penetration>0) then
 		local basespeed=vurtual_ammodata[shot.bullet.AmmoType].velocity --standard velocity of bullet
 		local wallcost=basespeed/vurtual_ammodata[shot.bullet.AmmoType].wallbang --how much speed is required to penetrate one unit of dirt
