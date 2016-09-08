@@ -865,12 +865,6 @@ function SWEP:FlyBullet(shot)
 		mask = MASK_SHOT
 		})
 	if (tr.Hit && !tr.AllSolid) then
-		if (false) then
-		local ono=ents.Create("item_healthvial")
-		ono:SetPos(shot.pos)
-		ono:Spawn()
-		ono:GetPhysicsObject():EnableMotion(false)
-		end
 		shot.bullet.Src=shot.pos
 		self.Owner:FireBullets(shot.bullet)
 	
@@ -920,7 +914,8 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex)
 		if ((tr.HitNonWorld && IsValid(tr.Entity)) || (tr.SurfaceProps!=0 && tr.HitTexture=="**studio**" && util.GetSurfacePropName(tr.SurfaceProps)!="default")) then barrier=4 end --works ok since it'll "step" through the object
 		local speed=shot.speed-(wallcost*barrier*penetration)
 		if (tex=="**empty**" || tex=="**displacement**") then speed=0 end
-		if (speed>0) then
+		if (speed>0 && !tr.AllSolid) then
+
 			local fakebullet=table.Copy(shot.bullet)
 			fakebullet.Damage = 0
 			fakebullet.Dir=Vector()
@@ -933,7 +928,13 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex)
 		return speed,hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10)--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
 	else return 0,travel  end
 end
-
+	--impact tseter
+		--[[if (SERVER) then
+		local ono=ents.Create("item_healthvial")
+		ono:SetPos(hitpos+(travel*tr.DistanceLeftSolid))
+		ono:Spawn()
+		ono:GetPhysicsObject():EnableMotion(false)
+		end]] 
 
 function SWEP:MaterialPenetration(mat)
 	local penetration = 0
