@@ -687,14 +687,16 @@ end
 function SWEP:LowerDo(lower,anim,anim2,canfire)
 	if (lower) then
 		self:SetNWBool("Sight",false)
-		if (self.InsAnims) then
+		if (self.InsAnims && !self.NoLowerAnim) then
 			self:SendWeaponAnim(anim)
 			--self.DidLowerAnim=true
 			self:SetNextSecondaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+		elseif (self.InsAnims) then
+			self:SendWeaponAnim(ACT_VM_IDLE)
 		end
 	else
 		self:ServeNWBool("Lowered",false)
-		if (self.InsAnims) then
+		if (self.InsAnims) && !self.NoLowerAnim then
 			self.Weapon:SendWeaponAnim(anim2)
 			if (!canfire) then
 				self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
@@ -774,14 +776,6 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	if (self:GetNWBool("Lowered")==true) then
 		ang=ang+Angle(self.HoldAngle,self.HoldAngle*2,0)
 		modpos=modpos+Vector(0,0,self.LoweredOffset)
-	elseif (self:GetNWBool("FiringPin")==false && self.ReloadAnimTime<CurTime())  then
-		self.lowerTime=self.lowerTime or 1
-		self.lowerTime=self.lowerTime-FrameTime()
-		if (self.lowerTime<0) then
-			self.lowerTime=0
-			ang=ang+Angle(self.HoldAngle,self.HoldAngle*0.9,0)
-			modpos=modpos+Vector(0,0,self.LoweredOffset)
-		end
 	elseif (self:GetNWBool("Sight")==true) then
 		ang:RotateAroundAxis(ang:Right(),self.IronSightsAng.x)
 		ang:RotateAroundAxis(ang:Up(),self.IronSightsAng.y)
@@ -790,6 +784,12 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 		modpos=modpos+self.IronSightsPos.y * ang:Forward()
 		modpos=modpos+self.IronSightsPos.z * ang:Up()
 	end
+	end
+	if (self.NoLowerAnim) then
+		if (self:GetNWBool("Lowered")==true) then
+			ang=ang+Angle(self.HoldAngle,self.HoldAngle*2,0)
+			modpos=modpos+Vector(0,0,self.LoweredOffset)
+		end
 	end
 	modpos = modpos - oldPos
 	self.smoothAng=LerpAngle(FrameTime()*30,self.smoothAng,ang)
