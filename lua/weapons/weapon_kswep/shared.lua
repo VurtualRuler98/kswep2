@@ -878,7 +878,7 @@ function SWEP:FlyBullet(shot)
 	
 	if ((!tr.Hit || (!tr.HitSky)) && travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
 		if (tr.Hit) then
-			shot.speed, shot.pos=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel)
+			shot.speed, shot.pos=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture)
 		else
 			shot.pos=travel
 		end
@@ -892,7 +892,7 @@ function SWEP:FlyBullet(shot)
 		return nil
 	end
 end
-function SWEP:CalcPenetration(mat,shot,hitpos,travel)
+function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex)
 	local tr = util.TraceLine( {
 		filter = self.Owner,
 		start = hitpos,
@@ -918,7 +918,9 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel)
 		local barrier=tr.FractionLeftSolid*(hitpos:Distance(travel)) --Amount of wall we're going through
 		if (tr.FractionLeftSolid>0.9) then barrier=hitpos:Distance(travel) end
 		if ((tr.HitNonWorld && IsValid(tr.Entity)) || (tr.SurfaceProps!=0 && tr.HitTexture=="**studio**" && util.GetSurfacePropName(tr.SurfaceProps)!="default")) then barrier=4 end --works ok since it'll "step" through the object
-		if (shot.speed>(wallcost*barrier*penetration)) then
+		local speed=shot.speed-(wallcost*barrier*penetration)
+		if (tex=="**empty**" || tex=="**displacement**") then speed=0 end
+		if (speed>0) then
 			local fakebullet=table.Copy(shot.bullet)
 			fakebullet.Damage = 0
 			fakebullet.Dir=Vector()
@@ -928,7 +930,7 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel)
 			fakebullet.Force =0
 			self.Owner:FireBullets(fakebullet)
 		end
-		return shot.speed-(wallcost*barrier*penetration),hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10)--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
+		return speed,hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10)--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
 	else return 0,travel  end
 end
 
