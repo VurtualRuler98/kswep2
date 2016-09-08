@@ -100,7 +100,7 @@ SWEP.ReloadMessage=0
 SWEP.ReloadWeight=0
 SWEP.InsNoSafetySound=false
 SWEP.RTScope=false
-SWEP.ScopeRes=2048
+SWEP.ScopeRes=512
 SWEP.ScopeMat = nil
 SWEP.MuzzleVelMod = 1
 SWEP.Bullets={}
@@ -729,21 +729,19 @@ end
 function SWEP:PostDrawViewModel()
 	if (!self.RTScope) then return end
 	if (!self:GetNWBool("Sight")) then return end
-	local old
-	old = render.GetRenderTarget()
-	render.SetRenderTarget( self.RenderTarget )
-	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)
-	local viewinfo = {}
-	viewinfo.w = self.ScopeRes
-	viewinfo.h = self.ScopeRes
-	viewinfo.x = 0
-	viewinfo.y = 0
-	viewinfo.drawviewmodel = false
-	viewinfo.drawhud = false
-	viewinfo.fov = self.ScopeFOV
-	render.RenderView(viewinfo)
-	render.SetViewPort(0,0,ScrW(),ScrH())
-	render.SetRenderTarget(old)
+	local oldW, oldH = ScrW(),ScrH()
+	render.PushRenderTarget(self.RenderTarget)
+	local scopeview = {}
+	scopeview.w = oldW
+	scopeview.h = oldH
+	scopeview.x = 0
+	scopeview.y = 0
+	scopeview.drawviewmodel = false
+	scopeview.drawhud = false
+	scopeview.dopostprocess=false
+	scopeview.fov = self.ScopeFOV
+	render.RenderView(scopeview)
+	render.PopRenderTarget()
 end
 --hook.Add("RenderScene","BLARPFIX",BLARPFIX)
 
