@@ -917,17 +917,17 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel)
 		local wallcost=basespeed/vurtual_ammodata[shot.bullet.AmmoType].wallbang --how much speed is required to penetrate one unit of dirt
 		local barrier=tr.FractionLeftSolid*(hitpos:Distance(travel)) --Amount of wall we're going through
 		if (tr.FractionLeftSolid>0.9) then barrier=hitpos:Distance(travel) end
-		if (shot.speed-(wallcost*barrier*penetration)>0) then
+		if ((tr.HitNonWorld && IsValid(tr.Entity)) || (tr.SurfaceProps!=0 && tr.HitTexture=="**studio**" && util.GetSurfacePropName(tr.SurfaceProps)!="default")) then barrier=4 end --works ok since it'll "step" through the object
+		if (shot.speed>(wallcost*barrier*penetration)) then
 			local fakebullet=table.Copy(shot.bullet)
 			fakebullet.Damage = 0
 			fakebullet.Dir=Vector()
 			fakebullet.Dir:Set(shot.bullet.Dir)
 			fakebullet.Src = hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10)
-			fakebullet.Dir:Rotate(Angle(180,180,0))
+			fakebullet.Dir:Rotate(Angle(0,180,0))
 			fakebullet.Force =0
 			self.Owner:FireBullets(fakebullet)
 		end
-		if ((tr.HitNonWorld && IsValid(tr.Entity)) || (tr.SurfaceProps!=0 && util.GetSurfacePropName(tr.SurfaceProps)!="default")) then barrier=4 end --works ok since it'll "step" through the object
 		return shot.speed-(wallcost*barrier*penetration),hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10)--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
 	else return 0,travel  end
 end
