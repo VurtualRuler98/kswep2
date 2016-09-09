@@ -153,6 +153,14 @@ function SWEP:Initialize()
 		self:TakePrimaryAmmo(1)
 		self:SetDeploySpeed(1)
 	end
+	if (self.ManualHands && CLIENT) then
+		self.hands=ClientsideModel(self.ManualHands)
+		self.hands:SetNoDraw(true)
+	end
+	if (self.TestOptic && CLIENT) then
+		self.optic=ClientsideModel(self.TestOptic)
+		self.optic:SetNoDraw(true)
+	end
 end
 function SWEP:PrimaryAttack()
 	if (self:CanPrimaryAttack()) then
@@ -740,9 +748,9 @@ function SWEP:LowerHolster(lower)
 	if (CLIENT) then return end
 	self:LowerDo(lower,anim,anim2,false)
 end
+
 function SWEP:PostDrawViewModel()
-	if (!self.RTScope) then return end
-	if (!self:GetNWBool("Sight")) then return end
+	if (self.RTScope && self:GetNWBool("Sight")) then
 	local oldW, oldH = ScrW(),ScrH()
 	render.PushRenderTarget(self.RenderTarget)
 	local scopeview = {}
@@ -756,6 +764,29 @@ function SWEP:PostDrawViewModel()
 	scopeview.fov = self.ScopeFOV
 	render.RenderView(scopeview)
 	render.PopRenderTarget()
+	end
+	if (self.ManualHands) then
+		self.hands:SetParent(self.Owner:GetViewModel())
+		self.hands:SetPos(self.Owner:GetViewModel():GetPos())
+		self.hands:SetAngles(self.Owner:GetViewModel():GetAngles())
+		self.hands:AddEffects(EF_BONEMERGE)
+		self.hands:DrawModel()
+	end
+	if (self.TestOptic) then
+		self.optic:SetParent(self.Owner:GetViewModel())
+		self.optic:SetPos(self.Owner:GetViewModel():GetPos())
+		self.optic:SetAngles(self.Owner:GetViewModel():GetAngles())
+		self.optic:AddEffects(EF_BONEMERGE)
+		self.optic:DrawModel()
+	end
+end
+function SWEP:OnRemove()
+	if (CLIENT && self.hands) then
+		self.hands:Remove()
+	end
+	if (CLIENT && self.optic) then
+		self.optic:Remove()
+	end
 end
 --hook.Add("RenderScene","BLARPFIX",BLARPFIX)
 
