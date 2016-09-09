@@ -841,6 +841,14 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         bullet.AmmoType = ammo
 	if (bullet.Num==1 && GetConVar("kswep_phys"):GetBool()) then
 		self:FlyBulletStart(bullet)
+	elseif (GetConVar("kswep_phys"):GetBool()) then
+		bullet.Num=1
+		for i=1,num_bullets do
+			local tbl=table.Copy(bullet)
+			tbl.Spread = Vector(0,0,0)
+			tbl.Dir=self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
+			self:FlyBulletStart(tbl)
+		end
 	else
         	self.Owner:FireBullets( bullet )
 	end
