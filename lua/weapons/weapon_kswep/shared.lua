@@ -834,6 +834,14 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 			modpos=modpos+Vector(0,0,self.LoweredOffset)
 		end
 	end
+	if (self.InsNoIronAnim && self:GetNWBool("Sight")) then
+		ang:RotateAroundAxis(ang:Right(),self.IronSightsAng.x)
+		ang:RotateAroundAxis(ang:Up(),self.IronSightsAng.y)
+		ang:RotateAroundAxis(ang:Forward(),self.IronSightsAng.z)
+		modpos=modpos+self.IronSightsPos.x * ang:Right()
+		modpos=modpos+self.IronSightsPos.y * ang:Forward()
+		modpos=modpos+self.IronSightsPos.z * ang:Up()
+	end
 	modpos = modpos - oldPos
 	self.smoothAng=LerpAngle(FrameTime()*30,self.smoothAng,ang)
 	self.smoothPos=LerpVector(FrameTime()*30,self.smoothPos,modpos)
