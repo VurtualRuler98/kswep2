@@ -711,7 +711,6 @@ function SWEP:LowerDo(lower,anim,anim2,canfire)
 		if (self.InsAnims && !self.NoLowerAnim) then
 			self.Weapon:SendWeaponAnim(anim2)
 			if (!canfire) then
-				print("FLEENSTONES?")
 				self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 				self:SetNextSecondaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 			end
