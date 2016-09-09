@@ -107,6 +107,7 @@ SWEP.Bullets={}
 SWEP.MagType=nil
 SWEP.ChamberAmmo={}
 SWEP.IsSecondaryWeapon=false
+SWEP.ReloadDelay=0
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -305,9 +306,15 @@ end
 
 function SWEP:Reload()
 	if (self.ChainReload && !self:GetNWBool("CurrentlyReloading")) then
-		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(self.MidReloadAnim)))
-		self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(self.MidReloadAnim))
-		self:ServeNWBool("CurrentlyReloading",true)
+		local anim=self.MidReloadAnim
+		if (self.MidReloadAnimEmpty && self.DidEmptyReload) then
+			anim=self.MidReloadAnimEmpty
+			self.DidEmptyReload=false
+		end
+		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(anim))+self.ReloadDelay)
+		self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(anim))+self.ReloadDelay
+		self:SetNWFloat("NextIdle",0)
+		self:SetNWBool("CurrentlyReloading",true)
 		return
 	end
 	if (!self:GetNWBool("Raised")) then return end
@@ -408,8 +415,8 @@ function SWEP:ReloadTube()
 		self.Weapon:SendWeaponAnim(self.ReloadAnim)
 	end
 	self.Owner:GetViewModel():SetPlaybackRate(1/reloadspeed)
-	self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed)
-	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed
+	self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed+self.ReloadDelay)
+	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed+self.ReloadDelay
 	self:ServeNWBool("CurrentlyReloading",true)
 		
 end
@@ -518,6 +525,10 @@ function SWEP:FinishReloadSingle()
 	local anim = ACT_VM_IDLE
 	if (self.StartReloadAnim) then
 		anim = self.MidReloadAnim
+		if (self.MidReloadAnimEmpty && !self:GetNWBool("Chambered")) then
+			anim=self.MidReloadAnimEmpty
+			self.DidEmptyReload=true
+		end
 	end
 	self.Weapon:SendWeaponAnim(anim)
 	if (self.StartReloadAnim) then
