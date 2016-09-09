@@ -872,7 +872,8 @@ function SWEP:FlyBullet(shot)
 	
 	if ((!tr.Hit || (!tr.HitSky)) && travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
 		if (tr.Hit) then
-			shot.speed, shot.pos=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture)
+			local armor=0
+			shot.speed, shot.pos=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
 		else
 			shot.pos=travel
 		end
@@ -886,7 +887,7 @@ function SWEP:FlyBullet(shot)
 		return nil
 	end
 end
-function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex)
+function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 	local tr = util.TraceLine( {
 		filter = self.Owner,
 		start = hitpos,
@@ -905,6 +906,12 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex)
 	local penetration=self:MaterialPenetration(mat)
 	if (pen2>penetration && penetration!=0) then
 		penetration=pen2
+	end
+	--kevlar simple fix
+	if (IsValid(ent) && ent:IsPlayer() && ent.ksarmor!=nil) then
+		if (GetConVar("kevlar_enabled"):GetBool()) then
+			penetration=0
+		end
 	end
 	if (penetration>0) then
 		local basespeed=vurtual_ammodata[shot.bullet.AmmoType].velocity --standard velocity of bullet
