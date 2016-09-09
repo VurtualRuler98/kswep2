@@ -701,15 +701,17 @@ function SWEP:LowerDo(lower,anim,anim2,canfire)
 		if (self.InsAnims && !self.NoLowerAnim) then
 			self:SendWeaponAnim(anim)
 			--self.DidLowerAnim=true
-			self:SetNextSecondaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+			local delay=self.LowerTime or CurTime()+self.Owner:GetViewModel():SequenceDuration()
+			self:SetNextSecondaryFire(delay)
 		elseif (self.InsAnims) then
 			self:SendWeaponAnim(ACT_VM_IDLE)
 		end
 	else
 		self:ServeNWBool("Lowered",false)
-		if (self.InsAnims) && !self.NoLowerAnim then
+		if (self.InsAnims && !self.NoLowerAnim) then
 			self.Weapon:SendWeaponAnim(anim2)
 			if (!canfire) then
+				print("FLEENSTONES?")
 				self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 				self:SetNextSecondaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 			end
