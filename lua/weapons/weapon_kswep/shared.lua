@@ -872,11 +872,17 @@ function SWEP:FlyBulletStart(bullet)
 	shot.speed=self.Ammo.velocity*self.MuzzleVelMod
 	shot.ang=bullet.Dir
 	shot.bullet=bullet
+	shot.dist = nil
 	shot.time = CurTime()
 	table.insert(self.Bullets,shot)
 end
 function SWEP:FlyBullet(shot)
-	local travel = shot.pos + (shot.ang*shot.speed*16*FrameTime())
+	local travel
+	if (shot.dist!=nil) then
+		travel=shot.dist
+	else
+		travel = shot.pos + (shot.ang*shot.speed*16*FrameTime())
+	end
 	local tr = util.TraceLine( {
 		filter = self.Owner,
 		start = shot.pos,
@@ -892,13 +898,18 @@ function SWEP:FlyBullet(shot)
 	if ((!tr.Hit || (!tr.HitSky)) && travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
 		if (tr.Hit) then
 			local armor=0
-			shot.speed, shot.pos=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
+			shot.speed, shot.pos, shot.dist=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
 		else
 			shot.pos=travel
+			shot.dist=nil
 		end
-		shot.time=CurTime()+FrameTime()
+			shot.time=CurTime()+FrameTime()
 		if (shot.speed>100) then --TODO: better minimum lethal velocity
+			if (shot.dist!=nil) then
+			return self:FlyBullet(shot)
+			else
 			return shot
+			end
 		else
 			return nil
 		end
@@ -932,6 +943,7 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 			penetration=0
 		end
 	end
+	local dist = nil
 	if (penetration>0) then
 		local basespeed=vurtual_ammodata[shot.bullet.AmmoType].velocity --standard velocity of bullet
 		local wallcost=basespeed/vurtual_ammodata[shot.bullet.AmmoType].wallbang --how much speed is required to penetrate one unit of dirt
@@ -941,7 +953,6 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		local speed=shot.speed-(wallcost*barrier*penetration)
 		if (tex=="**empty**" || tex=="**displacement**") then speed=0 end
 		if (speed>0 && !tr.AllSolid) then
-
 			local fakebullet=table.Copy(shot.bullet)
 			fakebullet.Damage = 0
 			fakebullet.Dir=Vector()
@@ -950,9 +961,10 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 			fakebullet.Dir:Rotate(Angle(0,180,0))
 			fakebullet.Force =0
 			self.Owner:FireBullets(fakebullet)
+			dist = hitpos
 		end
-		return speed,hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10)--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
-	else return 0,travel  end
+		return speed,hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10),dist--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
+	else return 0,travel,dist  end
 end
 	--impact tseter
 		--[[if (SERVER) then
