@@ -108,6 +108,9 @@ SWEP.MagType=nil
 SWEP.ChamberAmmo={}
 SWEP.IsSecondaryWeapon=false
 SWEP.ReloadDelay=0
+SWEP.IronZoom=1
+SWEP.IronZoomMin=120
+SWEP.IronZoomMax=65
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -127,6 +130,9 @@ function SWEP:Initialize()
 	self:SetNWFloat("NextIdle",0)
 	self:SetNWBool("Lowered",false)
 	self:SetNWFloat("NextPrimaryAttack",0)
+	if (self.AltIrons) then
+		self:SetNWBool("AltIrons",false)
+	end
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.Caliber=self.Ammo.caliber
 	self.DefaultMagazines = {}
@@ -591,8 +597,10 @@ end
 
 function SWEP:SecondaryAttack()
 	self:SetNextSecondaryFire(CurTime() + 0.4 )
-	if (self.Owner:KeyDown(IN_USE)) then
+	if (self.Owner:KeyDown(IN_USE) && !self:GetNWBool("Sight")) then
 		self:ToggleZoom()
+	elseif (self.Owner:KeyDown(IN_USE)) then
+		self:SetNWBool("AltIrons",!self:GetNWBool("AltIrons"))
 	else
 		self:ToggleAim()
 	end
@@ -604,6 +612,10 @@ function SWEP:CustomAmmoDisplay()
 	self.AmmoDisplay.Draw=true
 	self.AmmoDisplay.PrimaryClip=self:GetNWInt("MagazineCount")
 	return self.AmmoDisplay
+end
+function SWEP:HUDShouldDraw(name)
+	if (name=="CHudWeaponSelection" && self:GetNWBool("Sight")) then return false end
+	return true
 end
 function SWEP:ToggleZoom()
         --Are we using the sight?
@@ -625,7 +637,29 @@ function SWEP:SwitchFiremode()
 	end
 end
 
-
+function SWEP.DetectScroll(ply,bind,pressed)
+	if (pressed) then
+		local wep=ply:GetActiveWeapon()
+		if (IsValid(wep) && string.find(wep:GetClass(),"weapon_kswep")) then
+			if (bind=="invnext") then
+				net.Start("kswep_scroll")
+				net.WriteBool(false)
+				net.WriteEntity(wep)
+				net.SendToServer()
+				wep.IronZoom=wep.IronZoom+5
+				if (wep.IronZoom>wep.IronZoomMin) then wep.IronZoom=wep.IronZoomMin end
+			elseif (bind=="invprev") then
+				net.Start("kswep_scroll")
+				net.WriteBool(true)
+				net.WriteEntity(wep)
+				net.SendToServer()
+				wep.IronZoom=wep.IronZoom-5
+				if (wep.IronZoom<wep.IronZoomMax) then wep.IronZoom=wep.IronZoomMax end
+			end
+		end
+	end
+end
+hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think()
 	if (self.SingleReload && self:Clip1()!=#self.MagTable) then
 		self:SetClip1(#self.MagTable)
@@ -750,9 +784,20 @@ function SWEP:LowerHolster(lower)
 end
 
 function SWEP:PostDrawViewModel()
-	if (self.RTScope && self:GetNWBool("Sight")) then
+	if (self.TestOptic) then
+		self.optic:SetParent(self.Owner:GetViewModel())
+		self.optic:SetPos(self.Owner:GetViewModel():GetPos())
+		self.optic:SetAngles(self.Owner:GetViewModel():GetAngles())
+		self.optic:AddEffects(EF_BONEMERGE)
+		self.optic:DrawModel()
+	end
+	if (self.RTScope) then
 	local oldW, oldH = ScrW(),ScrH()
+		
 	render.PushRenderTarget(self.RenderTarget)
+	if ((self.AltIrons && self:GetNWBool("AltIrons")) || !self:GetNWBool("Sight")) then
+		render.Clear(0,0,0,255)
+	else
 	local scopeview = {}
 	scopeview.w = oldW
 	scopeview.h = oldH
@@ -763,6 +808,7 @@ function SWEP:PostDrawViewModel()
 	scopeview.dopostprocess=false
 	scopeview.fov = self.ScopeFOV
 	render.RenderView(scopeview)
+	end
 	render.PopRenderTarget()
 	end
 	if (self.ManualHands) then
@@ -771,13 +817,6 @@ function SWEP:PostDrawViewModel()
 		self.hands:SetAngles(self.Owner:GetViewModel():GetAngles())
 		self.hands:AddEffects(EF_BONEMERGE)
 		self.hands:DrawModel()
-	end
-	if (self.TestOptic) then
-		self.optic:SetParent(self.Owner:GetViewModel())
-		self.optic:SetPos(self.Owner:GetViewModel():GetPos())
-		self.optic:SetAngles(self.Owner:GetViewModel():GetAngles())
-		self.optic:AddEffects(EF_BONEMERGE)
-		self.optic:DrawModel()
 	end
 end
 function SWEP:OnRemove()
@@ -815,17 +854,25 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 		modpos=modpos+self.IronSightsPos.z * ang:Up()
 	end
 	]]--
+	local ironpos, ironang
+	if (self.AltIrons && self:GetNWBool("AltIrons")) then
+		ironpos=self.AltIronsPos
+		ironang=self.AltIronsAng
+	else
+		ironpos=self.IronSightsPos
+		ironang=self.IronSightsAng
+	end
 	if (!self.InsAnims) then
 	if (self:GetNWBool("Lowered")==true) then
 		ang=ang+Angle(self.HoldAngle,self.HoldAngle*2,0)
 		modpos=modpos+Vector(0,0,self.LoweredOffset)
 	elseif (self:GetNWBool("Sight")==true) then
-		ang:RotateAroundAxis(ang:Right(),self.IronSightsAng.x)
-		ang:RotateAroundAxis(ang:Up(),self.IronSightsAng.y)
-		ang:RotateAroundAxis(ang:Forward(),self.IronSightsAng.z)
-		modpos=modpos+self.IronSightsPos.x * ang:Right()
-		modpos=modpos+self.IronSightsPos.y * ang:Forward()
-		modpos=modpos+self.IronSightsPos.z * ang:Up()
+		ang:RotateAroundAxis(ang:Right(),ironang.x)
+		ang:RotateAroundAxis(ang:Up(),ironang.y)
+		ang:RotateAroundAxis(ang:Forward(),ironang.z)
+		modpos=modpos+ironpos.x * ang:Right()
+		modpos=modpos+ironpos.y * ang:Forward()
+		modpos=modpos+ironpos.z * ang:Up()
 	end
 	end
 	if (self.NoLowerAnim) then
@@ -835,12 +882,12 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 		end
 	end
 	if (self.InsNoIronAnim && self:GetNWBool("Sight")) then
-		ang:RotateAroundAxis(ang:Right(),self.IronSightsAng.x)
-		ang:RotateAroundAxis(ang:Up(),self.IronSightsAng.y)
-		ang:RotateAroundAxis(ang:Forward(),self.IronSightsAng.z)
-		modpos=modpos+self.IronSightsPos.x * ang:Right()
-		modpos=modpos+self.IronSightsPos.y * ang:Forward()
-		modpos=modpos+self.IronSightsPos.z * ang:Up()
+		ang:RotateAroundAxis(ang:Right(),ironang.x)
+		ang:RotateAroundAxis(ang:Up(),ironang.y)
+		ang:RotateAroundAxis(ang:Forward(),ironang.z)
+		modpos=modpos+ironpos.x * ang:Right()
+		modpos=modpos+ironpos.y * ang:Forward()
+		modpos=modpos+ironpos.z * ang:Up()
 	end
 	modpos = modpos - oldPos
 	self.smoothAng=LerpAngle(FrameTime()*30,self.smoothAng,ang)
@@ -852,10 +899,12 @@ end
 
 function SWEP:TranslateFOV(fov)
         if (self:GetNWBool("sight") && !self.RTScope) then
-                return fov/self.ScopeZoom
+                return (fov/self.ScopeZoom)
+        elseif (self:GetNWBool("sight")) then
+                return self.IronZoom
         else
-                return fov
-        end
+		return fov
+	end
 end
 
 function SWEP:AdjustMouseSensitivity()
@@ -1076,7 +1125,7 @@ function SWEP:ToggleAim()
 				anim=self.IronInAnimEmpty
 				anim2=self.IronAnimEmpty
 			end
-			
+		self.IronZoom=self.Owner:GetFOV()
 			self:SendWeaponAnim(anim)
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
 		end
