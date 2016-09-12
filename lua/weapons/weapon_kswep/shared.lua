@@ -104,6 +104,7 @@ SWEP.ReloadWeight=0
 SWEP.InsNoSafetySound=false
 SWEP.RTScope=false
 SWEP.ScopeRes=512
+SWEP.NPCAttackAnimWait=1
 SWEP.ScopeMat = nil
 SWEP.MuzzleVelMod = 1
 SWEP.Bullets={}
@@ -273,8 +274,10 @@ function SWEP:AttackAnimWait()
 	if (self:GetNWBool("Sight")) then
 		wait=self.WaitShotIron
 	end
-	if (wait) then
+	if (wait && self.Owner:IsPlayer()) then
 		return self.Owner:GetViewModel():SequenceDuration()
+	elseif (self.Owner:IsNPC()) then
+		return self.NPCAttackAnimWait
 	else
 		return 0
 	end
