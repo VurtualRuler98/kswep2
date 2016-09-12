@@ -6,8 +6,12 @@ end
 function AddKswepScope(tbl)
 	kswep_optics[tbl.name]=table.Copy(tbl)
 end
+function AddKswepHands(tbl)
+	kswep_hands[tbl.name]=table.Copy(tbl)
+end
 function SetupKswepOptics()
 	kswep_optics = {}
+	kswep_hands = {}
 	hook.Run("kswepOptics")
 end
 if (kswep_optics==nil) then

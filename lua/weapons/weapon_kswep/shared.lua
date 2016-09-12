@@ -118,6 +118,8 @@ SWEP.IronOffsetPos=Vector()
 SWEP.IronOffsetAng=Vector()
 SWEP.AltIronOffsetPos=Vector()
 SWEP.AltIronOffsetAng=Vector()
+SWEP.Sensitivity=1
+SWEP.MaxSensitivity=1
 SWEP.RTNV=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
@@ -178,6 +180,8 @@ function SWEP:Initialize()
 		self.optic=ClientsideModel(self.CurrentSight)
 		self.optic:SetNoDraw(true)
 	end
+end
+function SWEP:DiscoverModelAnims()
 end
 function SWEP:PrimaryAttack()
 	if (self:CanPrimaryAttack()) then
@@ -296,6 +300,7 @@ end
 SWEP.InitialDraw=true
 function SWEP:Deploy()
 	if (self.InitialDraw) then
+		self:DiscoverModelAnims()
 		self:SetClip1(self.MagSize)
 		self.Weapon:SendWeaponAnim(self.InitialDrawAnim)
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
@@ -329,7 +334,8 @@ function SWEP:Holster(wep)
 	
 end
 function SWEP:InsOptic(name)
-	local scopedata=kswep_optics[name]
+	local scopedata
+	scopedata=kswep_optics[name]
 	self.ScopeMat=scopedata.rtmat
 	self.RTScope=scopedata.rtscope
 	self.IronOffsetPos=scopedata.IronPos
@@ -346,15 +352,31 @@ function SWEP:InsOptic(name)
 		mat = Material(self.ScopeMat)
 		mat:SetTexture("$basetexture",self.RenderTarget)
 	end
-	self.CurrentSight=scopedata.model
+	local scopemodel
+	if (scopedata.model!=nil) then
+		scopemodel=scopedata.model
+	else
+		scopemodel=self.DefaultSight
+	end
+	self.CurrentSight=scopemodel
+	self.MaxSensitivity=scopedata.sensitivity
 	if (CLIENT) then
 		self.optic:Remove()
-		self.optic=ClientsideModel(scopedata.model)
+		self.optic=ClientsideModel(scopemodel)
 		self.optic:SetNoDraw(true)
 	end
 	self.ScopeFOV=scopedata.fov
 end
 
+function SWEP:InsHands(name)
+	local handsdata=kswep_hands[name]
+	self.ManualHands=handsdata.model
+	if (CLIENT) then
+		self.hands:Remove()
+		self.hands=ClientsideModel(handsdata.model)
+		self.hands:SetNoDraw(true)
+	end
+end
 function SWEP:Reload()
 	if (self.ChainReload && !self:GetNWBool("CurrentlyReloading")) then
 		local anim=self.MidReloadAnim
@@ -946,12 +968,23 @@ end
 
 function SWEP:AdjustMouseSensitivity()
         if (self:GetNWBool("sight")==true) then
-                return 1/self.ScopeZoom
-        else
+		local zoomsens=1+((self.MaxSensitivity-1)*((self.IronZoomMin-self.IronZoom)/(self.IronZoomMin-self.IronZoomMax)))
+		return (1/zoomsens)/self.ScopeZoom
+	else
                 return 1
         end
 end
-
+function SWEP:DiscoverAnim(anim)
+	local max=#self:GetSequenceList()
+	local i=0
+	while (i<max) do
+		if (self:GetSequenceInfo(i).activityname==anim) then
+			return self:GetSequenceInfo(i).activity
+		end
+		i=i+1
+	end
+	return nil
+end
 function SWEP:IsRunning()
         if (self.Owner:GetVelocity():Length()>self.Owner:GetWalkSpeed()*1.2) then
                 return true
@@ -1017,6 +1050,7 @@ function SWEP:FlyBullet(shot)
 		})
 	if (tr.Hit && !tr.AllSolid) then
 		shot.bullet.Src=shot.pos
+		shot.bullet.Damage=shot.bullet.Damage*(shot.speed/vurtual_ammodata[shot.bullet.AmmoType].velocity)
 		self.Owner:FireBullets(shot.bullet)
 	
 	end
