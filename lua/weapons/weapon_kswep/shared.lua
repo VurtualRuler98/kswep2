@@ -936,7 +936,7 @@ end
 
 function SWEP:TranslateFOV(fov)
         if (self:GetNWBool("sight") && !self.RTScope && !self.CurrentSight) then
-                return (fov/self.ScopeZoom)
+                return (self.IronZoom/self.ScopeZoom)
         elseif (self:GetNWBool("sight")) then
                 return self.IronZoom
         else
