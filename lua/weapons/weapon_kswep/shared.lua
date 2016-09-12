@@ -69,6 +69,7 @@ SWEP.ScopeZoom = 1
 SWEP.ReloadModLight=1
 SWEP.ReloadModMedium=1.10
 SWEP.ReloadModHeavy=1.20
+SWEP.ScopeName="Default"
 SWEP.ReloadAnim = ACT_VM_RELOAD
 SWEP.ReloadAnimEmpty = ACT_VM_RELOAD
 SWEP.LoweredOffset = 5
@@ -115,7 +116,9 @@ SWEP.IronZoomMin=90
 SWEP.IronZoomMax=65
 SWEP.InsAttachments=false
 SWEP.IronOffsetPos=Vector()
+SWEP.ScopeOffsetPos=Vector()
 SWEP.IronOffsetAng=Vector()
+SWEP.ScopeOffsetAng=Vector()
 SWEP.AltIronOffsetPos=Vector()
 SWEP.AltIronOffsetAng=Vector()
 SWEP.Sensitivity=1
@@ -336,6 +339,7 @@ end
 function SWEP:InsOptic(name)
 	local scopedata
 	scopedata=kswep_optics[name]
+	self.ScopeName=scopedata.name
 	self.ScopeMat=scopedata.rtmat
 	self.RTScope=scopedata.rtscope
 	self.IronOffsetPos=scopedata.IronPos
@@ -914,12 +918,16 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	end
 	]]--
 	local ironpos, ironang
+	local scopepos, scopeang=Vector(),Vector()
+	if (self.ScopeName!="Default") then
+		scopepos,scopeang=self.ScopeOffsetPos, self.ScopeOffsetAng
+	end
 	if (self.AltIrons && self:GetNWBool("AltIrons")) then
-		ironpos=self.IronSightsPos+self.AltIronOffsetPos
-		ironang=self.IronSightsAng+self.AltIronOffsetAng
+		ironpos=self.IronSightsPos+self.AltIronOffsetPos+scopepos
+		ironang=self.IronSightsAng+self.AltIronOffsetAng+scopeang
 	elseif (self.IronSightsPos) then
-		ironpos=self.IronSightsPos+self.IronOffsetPos
-		ironang=self.IronSightsAng+self.IronOffsetAng
+		ironpos=self.IronSightsPos+self.IronOffsetPos+scopepos
+		ironang=self.IronSightsAng+self.IronOffsetAng+scopeang
 	end
 	if (!self.InsAnims) then
 	if (self:GetNWBool("Lowered")==true) then
