@@ -20,7 +20,7 @@ if (SERVER) then
 end
 
 if (CLIENT) then
-	SWEP.PrintName = "css css Glock 17"
+	SWEP.PrintName = "Glock 17"
 	SWEP.Author = "vurtual"
 	SWEP.Slot = 1
 	SWEP.SlotPos = 0
@@ -447,7 +447,7 @@ function SWEP:ReloadMag()
 	self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration(seq)*reloadspeed)
 	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration(seq)*reloadspeed
 	self:SetNWBool("CurrentlyReloading",true)
-	if (SERVER) then
+	if (SERVER && self.Owner:IsPlayer()) then
 		net.Start("kswep_magazines")
 		net.WriteEntity(self)
 		net.WriteTable(self.Magazines)
@@ -469,7 +469,7 @@ net.Receive("kswep_chamberammo",function(len,ply)
 end)
 function SWEP:SetChamberAmmo(ammo)
 	self.ChamberAmmo=table.Copy(ammo)
-	if (SERVER) then
+	if (SERVER && self.Owner:IsPlayer()) then
 	net.Start("kswep_chamberammo")
 	net.WriteEntity(self)
 	if (self.SingleReload) then
@@ -482,6 +482,7 @@ function SWEP:SetChamberAmmo(ammo)
 	end
 end
 function SWEP:ReloadTube()
+	if (self.Owner:IsNPC()) then self:FinishReloadSingle() end
 	if (self:GetNWBool("CurrentlyReloading")==true) then return end
 	if (#self.Magazines<1) then return end
 	if (#self.MagTable>=self.Primary.ClipSize) then return end
@@ -599,6 +600,7 @@ end
 
 function SWEP:FinishReloadSingle()
 	self.ChainReload=false
+	if (self.Owner:IsNPC()) then print("SUBALUWA") end
 	if (#self.Magazines==0) then
 	self:ServeNWBool("CurrentlyReloading",false)
 	if (self.StartReloadAnim) then
@@ -1048,7 +1050,11 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 		for i=1,num_bullets do
 			local tbl=table.Copy(bullet)
 			tbl.Spread = Vector()
-			tbl.Dir=self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
+			if (self.Owner:IsPlayer()) then
+				tbl.Dir=self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
+			else
+				tbl.Dir=self.Owner:GetAimVector()+(0.005*recoil*VectorRand()*aimPenalty)+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
+			end
 			self:FlyBulletStart(tbl)
 		end
 	else
