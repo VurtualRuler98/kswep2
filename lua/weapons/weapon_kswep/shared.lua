@@ -94,7 +94,9 @@ SWEP.StowAnimEmpty=ACT_VM_HOLSTER
 SWEP.LowerAnimEmpty=ACT_VM_DOWN
 SWEP.IronAnimEmpty=ACT_VM_IIDLE
 SWEP.ShootLastAnim=ACT_VM_PRIMARYATTACK
+SWEP.FireAnim=ACT_VM_PRIMARYATTACK
 SWEP.ShootLastIronAnim=ACT_VM_ISHOOT
+SWEP.InitialDrawAnim=ACT_VM_DRAW
 SWEP.DidLowerAnim=false
 SWEP.ReloadMessage=0
 SWEP.ReloadWeight=0
@@ -109,8 +111,14 @@ SWEP.ChamberAmmo={}
 SWEP.IsSecondaryWeapon=false
 SWEP.ReloadDelay=0
 SWEP.IronZoom=1
-SWEP.IronZoomMin=120
+SWEP.IronZoomMin=90
 SWEP.IronZoomMax=65
+SWEP.InsAttachments=false
+SWEP.IronOffsetPos=Vector()
+SWEP.IronOffsetAng=Vector()
+SWEP.AltIronOffsetPos=Vector()
+SWEP.AltIronOffsetAng=Vector()
+SWEP.RTNV=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -136,6 +144,9 @@ function SWEP:Initialize()
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.Caliber=self.Ammo.caliber
 	self.DefaultMagazines = {}
+	if (self.InsAttachments) then
+		self.CurrentSight=self.DefaultSight
+	end
 	if (self.SingleReload) then
 		self.MagTable = {}
 		for i=1,self.MagSize do
@@ -163,8 +174,8 @@ function SWEP:Initialize()
 		self.hands=ClientsideModel(self.ManualHands)
 		self.hands:SetNoDraw(true)
 	end
-	if (self.TestOptic && CLIENT) then
-		self.optic=ClientsideModel(self.TestOptic)
+	if (self.CurrentSight && CLIENT) then
+		self.optic=ClientsideModel(self.CurrentSight)
 		self.optic:SetNoDraw(true)
 	end
 end
@@ -286,10 +297,10 @@ SWEP.InitialDraw=true
 function SWEP:Deploy()
 	if (self.InitialDraw) then
 		self:SetClip1(self.MagSize)
-		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
+		self.Weapon:SendWeaponAnim(self.InitialDrawAnim)
+		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 		self.InitialDraw=false
-	end
-	if (self.DrawOnce) then
+	elseif (self.DrawOnce) then
 		self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
 	else
 		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
@@ -316,6 +327,32 @@ function SWEP:Holster(wep)
 	end]]
 	return true
 	
+end
+function SWEP:InsOptic(name)
+	local scopedata=kswep_optics[name]
+	self.ScopeMat=scopedata.rtmat
+	self.RTScope=scopedata.rtscope
+	self.IronOffsetPos=scopedata.IronPos
+	self.IronOffsetAng=scopedata.IronAng
+	self.AltIrons = scopedata.altirons
+	self.RTNV=scopedata.nv
+	if (scopedata.altirons) then
+		self.AltIronOffsetPos=scopedata.AltIronPos
+		self.AltIronOffsetAng=scopedata.AltIronAng
+	end
+	if (CLIENT && scopedata.rtscope) then
+		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
+		local mat
+		mat = Material(self.ScopeMat)
+		mat:SetTexture("$basetexture",self.RenderTarget)
+	end
+	self.CurrentSight=scopedata.model
+	if (CLIENT) then
+		self.optic:Remove()
+		self.optic=ClientsideModel(scopedata.model)
+		self.optic:SetNoDraw(true)
+	end
+	self.ScopeFOV=scopedata.fov
 end
 
 function SWEP:Reload()
@@ -784,12 +821,19 @@ function SWEP:LowerHolster(lower)
 end
 
 function SWEP:PostDrawViewModel()
-	if (self.TestOptic) then
+	if (self.CurrentSight) then
 		self.optic:SetParent(self.Owner:GetViewModel())
 		self.optic:SetPos(self.Owner:GetViewModel():GetPos())
 		self.optic:SetAngles(self.Owner:GetViewModel():GetAngles())
 		self.optic:AddEffects(EF_BONEMERGE)
 		self.optic:DrawModel()
+	end
+	if (self.ManualHands) then
+		self.hands:SetParent(self.Owner:GetViewModel())
+		self.hands:SetPos(self.Owner:GetViewModel():GetPos())
+		self.hands:SetAngles(self.Owner:GetViewModel():GetAngles())
+		self.hands:AddEffects(EF_BONEMERGE)
+		self.hands:DrawModel()
 	end
 	if (self.RTScope) then
 	local oldW, oldH = ScrW(),ScrH()
@@ -811,13 +855,6 @@ function SWEP:PostDrawViewModel()
 	end
 	render.PopRenderTarget()
 	end
-	if (self.ManualHands) then
-		self.hands:SetParent(self.Owner:GetViewModel())
-		self.hands:SetPos(self.Owner:GetViewModel():GetPos())
-		self.hands:SetAngles(self.Owner:GetViewModel():GetAngles())
-		self.hands:AddEffects(EF_BONEMERGE)
-		self.hands:DrawModel()
-	end
 end
 function SWEP:OnRemove()
 	if (CLIENT && self.hands) then
@@ -833,7 +870,7 @@ end
 function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	local modPos = oldPos
 	self.smoothAng=self.smoothAng or ang
-	self.smoothPos=self.smoothPos or Vector(0,0,0)
+	self.smoothPos=self.smoothPos or Vector()
 	modpos=oldPos+Vector(0,self:GetNWFloat("CurRecoil")*0.01,0)
 	ang=oldAng+Angle(self:GetNWFloat("CurRecoil")*-0.05,0,0)
 	--[[if (self:GetNWBool("Chambered")==false || self:GetNWBool("Lowered")==true) then
@@ -856,11 +893,11 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	]]--
 	local ironpos, ironang
 	if (self.AltIrons && self:GetNWBool("AltIrons")) then
-		ironpos=self.AltIronsPos
-		ironang=self.AltIronsAng
-	else
-		ironpos=self.IronSightsPos
-		ironang=self.IronSightsAng
+		ironpos=self.IronSightsPos+self.AltIronOffsetPos
+		ironang=self.IronSightsAng+self.AltIronOffsetAng
+	elseif (self.IronSightsPos) then
+		ironpos=self.IronSightsPos+self.IronOffsetPos
+		ironang=self.IronSightsAng+self.IronOffsetAng
 	end
 	if (!self.InsAnims) then
 	if (self:GetNWBool("Lowered")==true) then
@@ -898,7 +935,7 @@ end
 
 
 function SWEP:TranslateFOV(fov)
-        if (self:GetNWBool("sight") && !self.RTScope) then
+        if (self:GetNWBool("sight") && !self.RTScope && !self.CurrentSight) then
                 return (fov/self.ScopeZoom)
         elseif (self:GetNWBool("sight")) then
                 return self.IronZoom
@@ -945,7 +982,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 		bullet.Num=1
 		for i=1,num_bullets do
 			local tbl=table.Copy(bullet)
-			tbl.Spread = Vector(0,0,0)
+			tbl.Spread = Vector()
 			tbl.Dir=self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
 			self:FlyBulletStart(tbl)
 		end
@@ -1082,7 +1119,7 @@ function SWEP:ShootEffects()
 		end
 		self.Weapon:SendWeaponAnim(anim) 
 	else
-		local anim=ACT_VM_PRIMARYATTACK
+		local anim=self.FireAnim
 		if (!self:GetNWBool("Chambered")) then
 		anim=self.ShootLastAnim
 		end

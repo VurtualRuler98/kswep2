@@ -3,6 +3,8 @@ util.AddNetworkString("kswep_chamberammo")
 util.AddNetworkString("kswep_rearm")
 util.AddNetworkString("kswep_rearm_cl")
 util.AddNetworkString("kswep_scroll")
+util.AddNetworkString("kswep_optic")
+util.AddNetworkString("kswep_opticbox")
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 end
