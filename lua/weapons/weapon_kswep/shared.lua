@@ -146,6 +146,14 @@ function SWEP:Initialize()
 	if (self.AltIrons) then
 		self:SetNWBool("AltIrons",false)
 	end
+	if (self.Owner:IsNPC()) then
+		local weapon=self
+		hook.Add("Think","KswepThink"..tostring(self),function()
+			if (IsValid(weapon) && weapon.Owner:IsValid() && weapon.Owner:IsNPC()) then
+				weapon:Think()
+			end
+		end)
+	end
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.Caliber=self.Ammo.caliber
 	self.DefaultMagazines = {}
@@ -188,7 +196,7 @@ function SWEP:DiscoverModelAnims()
 end
 function SWEP:PrimaryAttack()
 	if (self:CanPrimaryAttack()) then
-	if (self.Owner:KeyDown(IN_USE) && !self:GetNWBool("FiremodeSelected") && !self:GetNWBool("Lowered")) then
+	if (self.Owner:IsPlayer() && self.Owner:KeyDown(IN_USE) && !self:GetNWBool("FiremodeSelected") && !self:GetNWBool("Lowered")) then
 		self:SwitchFiremode()
 		self:SetNWBool("FiremodeSelected",true)
 		if (SERVER) then
@@ -254,7 +262,9 @@ function SWEP:NormalFire()
 		self:NextBolt(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim,animbolt)
 		bolttime = self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(animbolt))
 	else
+		if (self.Owner:IsPlayer()) then
 		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
+		end
 	end
 	self:SetNextAttack(CurTime()+self.Primary.Delay+bolttime+self:AttackAnimWait())
 end
@@ -395,7 +405,7 @@ function SWEP:Reload()
 		return
 	end
 	if (!self:GetNWBool("Raised")) then return end
-	if (self.Owner:KeyDown(IN_USE)) then
+	if (self.Owner:IsPlayer() && self.Owner:KeyDown(IN_USE)) then
 		self.ReloadMessage=CurTime()+2
 		self.ReloadWeight=self:Clip1()
 	else
@@ -783,12 +793,16 @@ function SWEP:Think()
 			end
 		end
 	end
-	local hold=self:GetNWString("HoldType")
-	self:SetHoldType(hold)
-	if (self:GetNWBool("Burst")==0 && self.Burst>0 && !self.Owner:KeyDown(IN_ATTACK)) then
+	if (self.Owner:IsPlayer()) then
+		local hold=self:GetNWString("HoldType")
+		self:SetWeaponHoldType(hold)
+	else
+		self:SetWeaponHoldType("ar2")
+	end
+	if (self:GetNWBool("Burst")==0 && self.Burst>0 && (self.Owner:IsNPC() || !self.Owner:KeyDown(IN_ATTACK))) then
 		self:SetNWBool("Burst",self.Burst)
 	end
-	if (self:GetNWBool("FiremodeSelected") && !self.Owner:KeyDown(IN_ATTACK)) then
+	if (self:GetNWBool("FiremodeSelected") && (self.Owner:IsNPC() || !self.Owner:KeyDown(IN_ATTACK))) then
 		self.LastBurst=self.Burst
 		self:ServeNWBool("FiremodeSelected",false)
 	end
@@ -797,8 +811,10 @@ function SWEP:Think()
 	else
 		self.Primary.Automatic=self.Auto
 	end
+	if (self.Owner:IsPlayer()) then
 	self.WeaponSway=self.WeaponSway or self.Owner:GetAimVector()
 	self.WeaponSway=Lerp(FrameTime()*30,self.WeaponSway,self.Owner:GetAimVector())
+	end
 end
 function SWEP:LowerDo(lower,anim,anim2,canfire)
 	if (lower) then
@@ -888,6 +904,9 @@ function SWEP:OnRemove()
 	end
 	if (CLIENT && self.optic) then
 		self.optic:Remove()
+	end
+	if (self.Owner:IsNPC()) then
+		hook.Remove("Think","KswepThink"..tostring(self))
 	end
 end
 --hook.Add("RenderScene","BLARPFIX",BLARPFIX)
@@ -994,6 +1013,7 @@ function SWEP:DiscoverAnim(anim)
 	return nil
 end
 function SWEP:IsRunning()
+	if (!self.Owner:IsPlayer()) then return false end
         if (self.Owner:GetVelocity():Length()>self.Owner:GetWalkSpeed()*1.2) then
                 return true
         else
@@ -1011,7 +1031,11 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         local bullet = {}
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()                      -- Source
-        bullet.Dir              = self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))                  -- Dir of bullet +(0.01*Vector(0,0,recoil))
+	if (self.Owner:IsPlayer()) then
+		bullet.Dir              = self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))                  -- Dir of bullet +(0.01*Vector(0,0,recoil))
+	else
+		bullet.Dir		= self.Owner:GetAimVector()+(0.005*recoil*VectorRand()*AimPenalty)
+	end
         bullet.Spread   = Vector( aimcone, aimcone, 0 )         -- Aim Cone
         bullet.Tracer   = 0                                                                     -- Show a tracer on every x bullets 
         bullet.Force    = 1                                                                     -- Amount of force to give to phys objects
@@ -1062,7 +1086,6 @@ function SWEP:FlyBullet(shot)
 		self.Owner:FireBullets(shot.bullet)
 	
 	end
-	
 	if ((!tr.Hit || (!tr.HitSky)) && travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
 		if (tr.Hit) then
 			local armor=0
@@ -1071,11 +1094,13 @@ function SWEP:FlyBullet(shot)
 			shot.pos=travel
 			shot.dist=nil
 		end
+
 			shot.time=CurTime()+FrameTime()
 		if (shot.speed>100) then --TODO: better minimum lethal velocity
 			if (shot.dist!=nil) then
 			return self:FlyBullet(shot)
 			else
+			sound.Play("Bullets.DefaultNearMiss",shot.pos)
 			return shot
 			end
 		else
@@ -1168,7 +1193,9 @@ function SWEP:ShootEffects()
 		self.Weapon:SendWeaponAnim(anim) 
 	end
 	self.Owner:MuzzleFlash()
+	if (self.Owner:IsPlayer()) then
 	self.Owner:SetAnimation(PLAYER_ATTACK1)
+	end
 end
 
 function SWEP:Recoil(recoil)
