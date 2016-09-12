@@ -195,6 +195,9 @@ function SWEP:Initialize()
 end
 function SWEP:DiscoverModelAnims()
 end
+function SWEP:OnDrop()
+	self:Remove()
+end
 function SWEP:PrimaryAttack()
 	if (self:CanPrimaryAttack()) then
 	if (self.Owner:IsPlayer() && self.Owner:KeyDown(IN_USE) && !self:GetNWBool("FiremodeSelected") && !self:GetNWBool("Lowered")) then
