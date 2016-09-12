@@ -299,9 +299,14 @@ function SWEP:ShotgunFire()
 end
 function SWEP:TakePrimaryAmmo(num)
 		if (self.SingleReload) then
-			self:SetChamberAmmo(vurtual_ammodata[self.MagTable[#self.MagTable].caliber])
-			table.remove(self.MagTable)
-			self.Weapon:SetClip1(#self.MagTable)
+			if (self.Owner:IsPlayer()) then
+				self:SetChamberAmmo(vurtual_ammodata[self.MagTable[#self.MagTable].caliber])
+				table.remove(self.MagTable)
+				self.Weapon:SetClip1(#self.MagTable)
+			else
+				self:SetChamberAmmo(vurtual_ammodata[self.MagTable[#self.MagTable].caliber])
+				self:SetClip1(self:Clip1()-num)
+			end
 		else
 			if (self.ChamberAmmo.name!=self.Ammo.name) then
 				self.ChamberAmmo=table.Copy(self.Ammo)
@@ -736,7 +741,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 end
 hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think()
-	if (self.SingleReload && self:Clip1()!=#self.MagTable) then
+	if (self.Owner:IsPlayer() && self.SingleReload && self:Clip1()!=#self.MagTable) then
 		self:SetClip1(#self.MagTable)
 	end
 	if (SERVER) then
