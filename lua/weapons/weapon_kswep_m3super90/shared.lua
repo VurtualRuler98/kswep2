@@ -22,7 +22,7 @@ if (SERVER) then
 end
 
 if (CLIENT) then
-	SWEP.PrintName = "M3 Super 90"
+	SWEP.PrintName = "css M3 Super 90"
 	SWEP.Author = "vurtual"
 	SWEP.Slot = 3
 	SWEP.SlotPos = 0
