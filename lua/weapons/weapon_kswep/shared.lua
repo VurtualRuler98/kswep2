@@ -158,7 +158,7 @@ function SWEP:Initialize()
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.Caliber=self.Ammo.caliber
 	self.DefaultMagazines = {}
-	if (self.InsAttachments) then
+	if (self.InsAttachments && self.DefaultSight) then
 		self.CurrentSight=self.DefaultSight
 	end
 	if (self.SingleReload) then
@@ -806,12 +806,8 @@ function SWEP:Think()
 			end
 		end
 	end
-	if (self.Owner:IsPlayer()) then
-		local hold=self:GetNWString("HoldType")
-		self:SetWeaponHoldType(hold)
-	else
-		self:SetWeaponHoldType("ar2")
-	end
+	local hold=self:GetNWString("HoldType")
+	self:SetWeaponHoldType(hold)
 	if (self:GetNWBool("Burst")==0 && self.Burst>0 && (self.Owner:IsNPC() || !self.Owner:KeyDown(IN_ATTACK))) then
 		self:SetNWBool("Burst",self.Burst)
 	end
@@ -929,8 +925,8 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	local modPos = oldPos
 	self.smoothAng=self.smoothAng or ang
 	self.smoothPos=self.smoothPos or Vector()
-	modpos=oldPos+Vector(self:GetNWFloat("CurRecoil")*-0.05,0,0)
-	ang=oldAng+Angle(self:GetNWFloat("CurRecoil")*-0.1,0,0)
+	modpos=oldPos
+	ang=oldAng+Angle(self:GetNWFloat("CurRecoil")*-0.2,0,0)
 	--[[if (self:GetNWBool("Chambered")==false || self:GetNWBool("Lowered")==true) then
 		if (self:GetNWBool("Lowered")==true) then self.lowerTime=0 end
 		self.lowerTime=self.lowerTime or 1
