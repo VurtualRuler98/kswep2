@@ -893,7 +893,7 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	local modPos = oldPos
 	self.smoothAng=self.smoothAng or ang
 	self.smoothPos=self.smoothPos or Vector()
-	modpos=oldPos+Vector(self:GetNWFloat("CurRecoil")*-0.1,0,0)
+	modpos=oldPos+Vector(self:GetNWFloat("CurRecoil")*-0.05,0,0)
 	ang=oldAng+Angle(self:GetNWFloat("CurRecoil")*-0.1,0,0)
 	--[[if (self:GetNWBool("Chambered")==false || self:GetNWBool("Lowered")==true) then
 		if (self:GetNWBool("Lowered")==true) then self.lowerTime=0 end
