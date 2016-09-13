@@ -1,6 +1,6 @@
 ENT.Type = "Anim"
-ENT.Base = "sent_vurt_supplybox"
-ENT.PrintName		= "Magazine box"
+ENT.Base = "base_gmodentity"
+ENT.PrintName		= "Supply box"
 ENT.Author			= "VurtualRuler98"
 ENT.Contact			= "steam"
 ENT.Purpose			= "Getting more ammo!"

@@ -1,5 +1,5 @@
 ENT.Type = "Anim"
-ENT.Base = "base_gmodentity"
+ENT.Base = "sent_vurt_supplybox"
 ENT.PrintName		= "Optic box"
 ENT.Author			= "VurtualRuler98"
 ENT.Contact			= "steam"

@@ -490,7 +490,7 @@ function SWEP:SendWeaponAnimIdles(anim,idle)
 	self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),idle)
 end
 function SWEP:ReloadMag(force)
-	if (!self:CanReload() || force) then return end
+	if (!self:CanReload() && !force) then return end
 	if (self:GetNWBool("CurrentlyReloading")==true) then return end
 	self:SetNWBool("Lowered",false)
 	self:SetNWFloat("NextIdle",0)
@@ -635,7 +635,6 @@ end
 function SWEP:FinishReload()
 	self:ServeNWBool("CurrentlyReloading",false)
 	self:ServeNWBool("FiringPin",true)
-	print(self:Clip1())
 	table.insert(self.Magazines,{caliber=self.Ammo.name,num = self:Clip1()})
 	table.SortByMember(self.Magazines,"num",true)
 	local mag=table.GetLastValue(self.Magazines)
@@ -645,8 +644,6 @@ function SWEP:FinishReload()
 	if (self.Magazines[1].num==0) then
 		table.remove(self.Magazines,1)
 	end
-	print(self.Ammo.name)
-	PrintTable(self.Magazines)
 	self.ReloadWeight=self:Clip1()
 	if (self:GetNWBool("Chambered")==false && self.OpenBolt==false && self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
@@ -690,7 +687,6 @@ end
 
 function SWEP:FinishReloadSingle()
 	self.ChainReload=false
-	if (self.Owner:IsNPC()) then print("SUBALUWA") end
 	if (#self.Magazines==0) then
 	self:ServeNWBool("CurrentlyReloading",false)
 	if (self.StartReloadAnim) then
@@ -884,8 +880,8 @@ function SWEP:Think()
 		self:Lower(true)
 		self.DidLowerAnim=true
 		self.LowerType = "wall"
-	elseif (!wlblk && !self:IsRunning() && self.DidLowerAnim) then
-		self:Lower(false)
+	elseif (!wlblk && !self:IsRunning() && self.LowerType=="wall" && self.DidLowerAnim) then
+		self:LowerWall(false)
 		self.DidLowerAnim=false
 		self.LowerType = nil
 	end
@@ -898,6 +894,9 @@ function SWEP:Think()
 		self:LowerRun(false)
 		self.DidLowerAnim=false
 		self.LowerType=nil
+	end
+	if (self.DidLowerAnim==false && self.ManualLower==false) then
+		self:SetNWBool("Lowered",false)
 	end
 		
 	if (self.HolsterAfter<CurTime() && self.Holstering!=nil) then
@@ -974,6 +973,22 @@ function SWEP:Lower(lower)
 	end
 	self:LowerDo(lower,anim,anim2,true)
 end
+function SWEP:LowerWall(lower)
+	self:SetNWBool("Lowered",!lower)
+	local anim=self.LowerAnim
+	local anim2=ACT_VM_IDLE
+	if (!self:GetNWBool("Raised")) then
+		anim2=self.LowerAnim
+	end
+	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
+		anim=self.LowerAnimEmpty
+		anim2=self.IdleAnimEmpty
+		if (!self:GetNWBool("Raised")) then
+			anim2=self.LowerAnim
+		end
+	end
+	self:LowerDo(lower,anim,anim2,true)
+end
 function SWEP:LowerRun(lower)
 	self:SetNWBool("Lowered",lower)
 	local anim=self.RunAnim
@@ -984,8 +999,8 @@ function SWEP:LowerRun(lower)
 	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
 		anim=self.RunAnimEmpty
 		anim2=self.IdleAnimEmpty
-		if (!self:GetNWBool("Raised")) then
-			anim2=self.LowerAnimEmpty
+		if (!self:getnwbool("raised")) then
+			anim2=self.loweranimempty
 		end
 	end
 	self:LowerDo(lower,anim,anim2,true)
@@ -1025,14 +1040,14 @@ function SWEP:PostDrawViewModel()
 	end
 	if (self.RTScope) then
 	local oldW, oldH = ScrW(),ScrH()
-		
+	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
 	render.PushRenderTarget(self.RenderTarget)
 	if ((self.AltIrons && self:GetNWBool("AltIrons")) || !self:GetNWBool("Sight")) then
 		render.Clear(0,0,0,255)
 	else
 	local scopeview = {}
-	scopeview.w = oldW
-	scopeview.h = oldH
+	scopeview.w = self.ScopeRes
+	scopeview.h = self.ScopeRes
 	scopeview.x = 0
 	scopeview.y = 0
 	scopeview.drawviewmodel = false
@@ -1042,6 +1057,7 @@ function SWEP:PostDrawViewModel()
 	render.RenderView(scopeview)
 	end
 	render.PopRenderTarget()
+	render.SetViewPort(0,0,oldW,oldH)
 	end
 end
 function SWEP:OnRemove()

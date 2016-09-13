@@ -6,6 +6,8 @@ util.AddNetworkString("kswep_scroll")
 util.AddNetworkString("kswep_optic")
 util.AddNetworkString("kswep_opticbox")
 util.AddNetworkString("kswep_suppress")
+util.AddNetworkString("kswep_supplybox")
+util.AddNetworkString("kswep_attach")
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 end
@@ -25,6 +27,16 @@ end
 if (vurtual_ammotypes==nil) then
 	SetupAmmoTypes()
 end
+function KswepAttach(len,pl)
+	if (!IsValid(pl) || !pl:IsPlayer()) then return end
+	local attachment=net.ReadString()
+	local wep=pl:GetActiveWeapon()
+	if (!wep:IsValid() || !string.find(wep:GetClass(),"weapon_kswep")) then return end
+	if (attachment=="suppressor" && wep.Suppressable) then
+		wep:InsSuppress(!wep.Suppressed)
+	end
+end
+net.Receive("kswep_attach",KswepAttach)
 function RearmMags(len,pl)
 	if (IsValid(pl) && pl:IsPlayer()) then
 		local caliber=net.ReadString()
