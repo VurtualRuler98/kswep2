@@ -222,8 +222,8 @@ function SWEP:Initialize()
 		self.optic=ClientsideModel(self.CurrentSight)
 		self.optic:SetNoDraw(true)
 	end
-	if (CLIENT && self.Owner:IsPlayer()) then
-		self:AddMergePart("hands",self.Owner.KswepInsHands)
+	if (CLIENT && self.InsAttachments) then
+		self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 	end
 end
 function SWEP:DiscoverModelAnims()
@@ -470,7 +470,7 @@ function SWEP:InsSuppress(sup)
 end
 net.Receive("kswep_sethands",function()
 	local self=net.ReadEntity()
-	self:AddMergePart("hands",self.Owner.KswepInsHands)
+	self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 end)
 function SWEP:AddMergePart(key,model)
 	if (self.MergeParts[key]!=nil && self.MergeParts[key]:GetModel()==model) then return end
