@@ -75,6 +75,7 @@ SWEP.ReloadAnimEmpty = ACT_VM_RELOAD
 SWEP.LoweredOffset = 5
 SWEP.DrawOnce=true
 SWEP.InsAnims=false
+SWEP.Holstering=nil
 SWEP.SafetyAnim=ACT_VM_UNDEPLOY
 SWEP.IronSafetyAnim=ACT_VM_IFIREMODE
 SWEP.IronFireAnim=ACT_VM_ISHOOT
@@ -125,6 +126,9 @@ SWEP.AltIronOffsetAng=Vector()
 SWEP.Sensitivity=1
 SWEP.MaxSensitivity=1
 SWEP.RTNV=false
+SWEP.HolsterAfter=0
+SWEP.ScopeFOVMin=nil
+SWEP.ScopeFOVMax=nil
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -146,6 +150,10 @@ function SWEP:Initialize()
 	self:SetNWFloat("NextPrimaryAttack",0)
 	if (self.AltIrons) then
 		self:SetNWBool("AltIrons",false)
+	end
+	if (self.RunAnim==nil) then
+		self.RunAnim=self.LowerAnim
+		self.RunAnimEmpty=self.LowerAnimEmpty
 	end
 	if (self.Owner:IsNPC()) then
 		local weapon=self
@@ -323,14 +331,14 @@ function SWEP:TakePrimaryAmmo(num)
 end
 SWEP.InitialDraw=true
 function SWEP:Deploy()
+	self:SetNWBool("Raised",true)
+	self:SetNWFloat("CurRecoil",self.MaxRecoil)
 	if (self.InitialDraw) then
 		self:DiscoverModelAnims()
 		self:SetClip1(self.MagSize)
 		self.Weapon:SendWeaponAnim(self.InitialDrawAnim)
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 		self.InitialDraw=false
-	elseif (self.DrawOnce) then
-		self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
 	else
 		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
@@ -346,15 +354,25 @@ function SWEP:Deploy()
 end
 
 function SWEP:Holster(wep)
-	if (!IsFirstTimePredicted()) then return end--[[
-	if (self:GetNWBool("Raised")==false && self:GetNWBool("Sight")==false) then
+	if (!IsFirstTimePredicted()) then return end
+	if (self.Holstering!=nil && self.HolsterAfter==0) then
 		return true
 	else
-		self:ServeNWBool("Raised",false)
+		local holsterpenalty=0
+		if (self.Owner.ksarmor) then
+			if (self.Owner.ksarmor==2) then
+				holsterpenalty=0.4
+			elseif (self.Owner.ksarmor==1) then
+				holsterpenalty=0.2
+			end
+		end
+		self.Holstering=wep
+		local delay=0.4 or self.Owner:GetViewModel():SequenceDuration(self:SelectWeightedSequence(self.StowAnim))
+		self.HolsterAfter=CurTime()+delay+holsterpenalty
+		self:LowerHolster(true)
 		self:SetNWBool("Sight",false)
 		return false
-	end]]
-	return true
+	end
 	
 end
 function SWEP:InsOptic(name)
@@ -391,6 +409,9 @@ function SWEP:InsOptic(name)
 		self.optic:SetNoDraw(true)
 	end
 	self.ScopeFOV=scopedata.fov
+	self.ScopeFOVMin=scopedata.fovmin
+	self.ScopeFOVMax=scopedata.fovmax
+	self.ScopeFOVSteps=scopedata.fovsteps
 end
 
 function SWEP:InsHands(name)
@@ -649,6 +670,8 @@ function SWEP:FinishReloadSingle()
 end
 
 function SWEP:CanPrimaryAttack()
+	if ( !self.Owner:OnGround()) then return false end
+	if ( !self:GetNWBool("Raised")) then return false end
 	if ( CLIENT && self.NextPrimaryAttack>CurTime()) then return false end
 	if ( self:GetNWFloat("NextPrimaryAttack")>CurTime()) then return false  end
 	if ( self:GetNWBool("FiremodeSelected") ) then
@@ -700,18 +723,18 @@ function SWEP:CustomAmmoDisplay()
 	return self.AmmoDisplay
 end
 function SWEP:HUDShouldDraw(name)
-	if (name=="CHudWeaponSelection" && self:GetNWBool("Sight")) then return false end
+	if (name=="CHudWeaponSelection" && (self:GetNWBool("Sight") || self.Holstering!=nil)) then return false end
 	return true
 end
 function SWEP:ToggleZoom()
         --Are we using the sight?
         if (self:GetNWBool("Raised")==true) then
                 --Stop using sight
-		self:SetNWBool("Lowered",false)
-                self:LowerHolster(true)
+		self:SetNWBool("Sight",false)
+                self:Lower(true)
         else
                 --Start using sight
-                self:LowerHolster(false)
+                self:Lower(false)
         end
 end
 function SWEP:SwitchFiremode()
@@ -728,25 +751,31 @@ function SWEP.DetectScroll(ply,bind,pressed)
 		local wep=ply:GetActiveWeapon()
 		if (IsValid(wep) && string.find(wep:GetClass(),"weapon_kswep")) then
 			if (bind=="invnext") then
-				net.Start("kswep_scroll")
-				net.WriteBool(false)
-				net.WriteEntity(wep)
-				net.SendToServer()
-				wep.IronZoom=wep.IronZoom+5
-				if (wep.IronZoom>wep.IronZoomMin) then wep.IronZoom=wep.IronZoomMin end
+				if (wep.Owner:KeyDown(IN_USE) && wep.ScopeFOVMin!=nil) then
+					wep.ScopeFOV=wep.ScopeFOV+((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
+					if (wep.ScopeFOV>wep.ScopeFOVMax) then wep.ScopeFOV=wep.ScopeFOVMax end
+				else
+					wep.IronZoom=wep.IronZoom+5
+					if (wep.IronZoom>wep.IronZoomMin) then wep.IronZoom=wep.IronZoomMin end
+				end
 			elseif (bind=="invprev") then
-				net.Start("kswep_scroll")
-				net.WriteBool(true)
-				net.WriteEntity(wep)
-				net.SendToServer()
-				wep.IronZoom=wep.IronZoom-5
-				if (wep.IronZoom<wep.IronZoomMax) then wep.IronZoom=wep.IronZoomMax end
+				if (wep.Owner:KeyDown(IN_USE) && wep.ScopeFOVMin!=nil) then
+					wep.ScopeFOV=wep.ScopeFOV-((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
+					if (wep.ScopeFOV<wep.ScopeFOVMin) then wep.ScopeFOV=wep.ScopeFOVMin end
+				else
+					wep.IronZoom=wep.IronZoom-5
+					if (wep.IronZoom<wep.IronZoomMax) then wep.IronZoom=wep.IronZoomMax end
+				end
 			end
 		end
 	end
 end
 hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think()
+
+	if (!self.Owner:OnGround()) then
+		self:SetNWFloat("CurRecoil",self.MaxRecoil)
+	end
 	if (self.Owner:IsPlayer() && self.SingleReload && self:Clip1()!=#self.MagTable) then
 		self:SetClip1(#self.MagTable)
 	end
@@ -786,12 +815,22 @@ function SWEP:Think()
 			self:SetNWFloat("CurRecoil",0)
 		end
 	end
-	if (self:IsRunning() && !self.DidLowerAnim && self:GetNWBool("Raised") && self:GetNWFloat("NextIdle")==0 && !self:GetNWBool("CurrentlyReloading")) then
-		self:Lower(true)
+	if (self:IsRunning() && self.Owner:OnGround() && !self.DidLowerAnim && self:GetNWFloat("NextIdle")==0 && !self:GetNWBool("CurrentlyReloading")) then
+		if (self.Owner:OnGround()) then
+			self:LowerRun(true)
+		end
 		self.DidLowerAnim=true
-	elseif (self:GetNWBool("Raised") && !self:IsRunning() && self:GetNWFloat("NextIdle")==0 && self.DidLowerAnim) && !self:GetNWBool("CurrentlyReloading") then
-		self:Lower(false)
+	elseif (!self:IsRunning() && self:GetNWFloat("NextIdle")==0 && self.DidLowerAnim) && !self:GetNWBool("CurrentlyReloading") then
+		self:SetNWFloat("CurRecoil",self.MaxRecoil)
+		self:LowerRun(false)
 		self.DidLowerAnim=false
+	end
+	if (self.HolsterAfter<CurTime() && self.Holstering!=nil) then
+		self.HolsterAfter=0
+		if (SERVER) then
+			self.Owner:SelectWeapon(self.Holstering:GetClass())
+		end
+		self.Holstering=nil
 	end
 	if (self:GetNWFloat("NextIdle")!=0 && self:GetNWFloat("NextIdle")<CurTime()) then
 		if (SERVER) then
@@ -807,6 +846,9 @@ function SWEP:Think()
 		end
 	end
 	local hold=self:GetNWString("HoldType")
+	if (self:GetNWBool("Lowered") || !self:GetNWBool("Raised")) then
+		hold=self:GetNWString("IdleType")
+	end
 	self:SetWeaponHoldType(hold)
 	if (self:GetNWBool("Burst")==0 && self.Burst>0 && (self.Owner:IsNPC() || !self.Owner:KeyDown(IN_ATTACK))) then
 		self:SetNWBool("Burst",self.Burst)
@@ -831,13 +873,12 @@ function SWEP:LowerDo(lower,anim,anim2,canfire)
 		if (self.InsAnims && !self.NoLowerAnim) then
 			self:SendWeaponAnim(anim)
 			--self.DidLowerAnim=true
-			local delay=self.LowerTime or CurTime()+self.Owner:GetViewModel():SequenceDuration()
-			self:SetNextSecondaryFire(delay)
+			local delay=self.Owner:GetViewModel():SequenceDuration()
+			self:SetNextSecondaryFire(CurTime()+delay)
 		elseif (self.InsAnims) then
 			self:SendWeaponAnim(ACT_VM_IDLE)
 		end
 	else
-		self:ServeNWBool("Lowered",false)
 		if (self.InsAnims && !self.NoLowerAnim) then
 			self.Weapon:SendWeaponAnim(anim2)
 			if (!canfire) then
@@ -849,8 +890,7 @@ function SWEP:LowerDo(lower,anim,anim2,canfire)
 	end
 end
 function SWEP:Lower(lower)
-	if (!self:GetNWBool("Raised")) then return end
-	self:SetNWBool("Lowered",lower)
+	self:SetNWBool("Raised",!lower)
 	local anim=self.LowerAnim
 	local anim2=ACT_VM_IDLE
 	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
@@ -859,8 +899,23 @@ function SWEP:Lower(lower)
 	end
 	self:LowerDo(lower,anim,anim2,true)
 end
+function SWEP:LowerRun(lower)
+	self:SetNWBool("Lowered",lower)
+	local anim=self.RunAnim
+	local anim2=ACT_VM_IDLE
+	if (!self:GetNWBool("Raised")) then
+		anim2=self.LowerAnim
+	end
+	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
+		anim=self.RunAnimEmpty
+		anim2=self.IdleAnimEmpty
+		if (!self:GetNWBool("Raised")) then
+			anim2=self.LowerAnimEmpty
+		end
+	end
+	self:LowerDo(lower,anim,anim2,true)
+end
 function SWEP:LowerHolster(lower)
-	self:SetNWBool("Raised",!lower)
 	local anim=self.StowAnim
 	local anim2=self.UnstowAnim
 	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
@@ -926,7 +981,11 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	self.smoothAng=self.smoothAng or ang
 	self.smoothPos=self.smoothPos or Vector()
 	modpos=oldPos
-	ang=oldAng+Angle(self:GetNWFloat("CurRecoil")*-0.2,0,0)
+	if (self:GetNWBool("Sight")) then
+		ang=oldAng+Angle(self:GetNWFloat("CurRecoil")*-0.2,0,0)
+	else
+		ang=oldAng
+	end
 	--[[if (self:GetNWBool("Chambered")==false || self:GetNWBool("Lowered")==true) then
 		if (self:GetNWBool("Lowered")==true) then self.lowerTime=0 end
 		self.lowerTime=self.lowerTime or 1
