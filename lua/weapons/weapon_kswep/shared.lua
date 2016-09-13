@@ -999,8 +999,8 @@ function SWEP:LowerRun(lower)
 	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
 		anim=self.RunAnimEmpty
 		anim2=self.IdleAnimEmpty
-		if (!self:getnwbool("raised")) then
-			anim2=self.loweranimempty
+		if (!self:GetNWBool("raised")) then
+			anim2=self.LowerAnimEmpty
 		end
 	end
 	self:LowerDo(lower,anim,anim2,true)
