@@ -30,7 +30,7 @@ function ENT:Use( activator, caller )
 	if ( activator:IsPlayer() )  then
 		local wep=activator:GetActiveWeapon()
 		if (wep:IsValid() && string.find(wep:GetClass(),"weapon_kswep")) then
-			if (wep.DefaultSight) then
+			if (wep.DefaultSight || wep.NoDefaultSightModel) then
 				net.Start("kswep_opticbox")
 				net.WriteEntity(wep)
 				net.Send(activator)

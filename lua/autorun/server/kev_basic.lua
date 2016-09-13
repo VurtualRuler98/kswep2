@@ -50,6 +50,12 @@ function RearmMags(len,pl)
 				for i=1,magcount do
 					table.insert(tbl,{caliber=caliber,num=magsize})
 				end
+				if (wep.MagType) then
+					table.insert(tbl,{caliber=caliber,num=magsize})
+					wep:SetClip1(0)
+					wep:ReloadAct()
+				end
+				
 			end
 		end
 	end

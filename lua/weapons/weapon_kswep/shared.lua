@@ -78,6 +78,7 @@ SWEP.InsAnims=false
 SWEP.Holstering=nil
 SWEP.Suppressable=false
 SWEP.SuppressorModel=nil
+SWEP.NoDefaultSightModel=false
 SWEP.Suppressed=false
 SWEP.Primary.SupSound = nil
 SWEP.MuzzleVelModSup = 1
@@ -419,11 +420,17 @@ function SWEP:InsOptic(name)
 		scopemodel=scopedata.model
 	else
 		scopemodel=self.DefaultSight
+		if (self.DefaultSight==nil && self.optic) then
+			self.optic:Remove()
+			self.optic=nil
+		end
 	end
 	self.CurrentSight=scopemodel
 	self.MaxSensitivity=scopedata.sensitivity
-	if (CLIENT) then
-		self.optic:Remove()
+	if (CLIENT && self.CurrentSight!=nil) then
+		if(self.optic) then
+			self.optic:Remove()
+		end
 		self.optic=ClientsideModel(scopemodel)
 		self.optic:SetNoDraw(true)
 	end
@@ -469,7 +476,7 @@ function SWEP:Reload()
 		self.ReloadWeight=self:Clip1()
 	else
 		if (!self:CanReload()) then return end
-		self:ReloadAct()
+		self:ReloadAct(false)
 	end
 end
 function SWEP:CanReload()
@@ -482,8 +489,8 @@ function SWEP:SendWeaponAnimIdles(anim,idle)
 	self:SendWeaponAnim(anim)
 	self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),idle)
 end
-function SWEP:ReloadMag()
-	if (!self:CanReload()) then return end
+function SWEP:ReloadMag(force)
+	if (!self:CanReload() || force) then return end
 	if (self:GetNWBool("CurrentlyReloading")==true) then return end
 	self:SetNWBool("Lowered",false)
 	self:SetNWFloat("NextIdle",0)
@@ -509,12 +516,14 @@ function SWEP:ReloadMag()
 	if (SERVER && self.Owner:IsPlayer()) then
 		net.Start("kswep_magazines")
 		net.WriteEntity(self)
+		net.WriteTable(self.Ammo)
 		net.WriteTable(self.Magazines)
 		net.Send(self.Owner)
 	end
 end
 net.Receive("kswep_magazines",function(len,ply)
 	local self=net.ReadEntity()
+	self.Ammo=net.ReadTable()
 	self.Magazines=net.ReadTable()
 end)
 net.Receive("kswep_suppress",function(len,ply)
@@ -626,6 +635,7 @@ end
 function SWEP:FinishReload()
 	self:ServeNWBool("CurrentlyReloading",false)
 	self:ServeNWBool("FiringPin",true)
+	print(self:Clip1())
 	table.insert(self.Magazines,{caliber=self.Ammo.name,num = self:Clip1()})
 	table.SortByMember(self.Magazines,"num",true)
 	local mag=table.GetLastValue(self.Magazines)
@@ -635,6 +645,8 @@ function SWEP:FinishReload()
 	if (self.Magazines[1].num==0) then
 		table.remove(self.Magazines,1)
 	end
+	print(self.Ammo.name)
+	PrintTable(self.Magazines)
 	self.ReloadWeight=self:Clip1()
 	if (self:GetNWBool("Chambered")==false && self.OpenBolt==false && self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
@@ -646,6 +658,13 @@ function SWEP:FinishReload()
 	self.ReloadAnimTime=0
 	self.ReloadMessage=CurTime()+2
 	self:SendWeaponAnim(ACT_VM_IDLE)
+	if (SERVER && self.Owner:IsPlayer()) then
+		net.Start("kswep_magazines")
+		net.WriteEntity(self)
+		net.WriteTable(self.Ammo)
+		net.WriteTable(self.Magazines)
+		net.Send(self.Owner)
+	end
 	self:ServeNWInt("MagazineCount",#self.Magazines)
 end
 function SWEP:ServeNWInt(var,int)
@@ -983,7 +1002,7 @@ function SWEP:LowerHolster(lower)
 end
 
 function SWEP:PostDrawViewModel()
-	if (self.CurrentSight) then
+	if (self.CurrentSight!=nil) then
 		self.optic:SetParent(self.Owner:GetViewModel())
 		self.optic:SetPos(self.Owner:GetViewModel():GetPos())
 		self.optic:SetAngles(self.Owner:GetViewModel():GetAngles())
