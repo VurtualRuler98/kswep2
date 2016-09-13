@@ -19,3 +19,4 @@ if (kswep_optics==nil) then
 end
 CreateConVar("kswep_slow",0,FCVAR_REPLICATED )
 CreateConVar("kswep_phys",1,FCVAR_REPLICATED )
+CreateConVar("kswep_max_flighttime",10,FCVAR_REPLICATED )

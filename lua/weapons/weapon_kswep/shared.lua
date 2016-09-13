@@ -895,7 +895,7 @@ function SWEP:Think()
 		self.DidLowerAnim=false
 		self.LowerType=nil
 	end
-	if (self.DidLowerAnim==false && self.ManualLower==false) then
+	if (self.DidLowerAnim==false && self:GetNWBool("Raised")) then
 		self:SetNWBool("Lowered",false)
 	end
 		
@@ -1250,9 +1250,11 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 	self:Recoil(self.Ammo.recoil*self.RecoilMassModifier*aimPenalty*recsup)
 end
 function SWEP:FlyBulletStart(bullet)
+	
 	local supmod=1
 	if (self.Suppressed) then supmod=self.MuzzleVelModSup end
 	local shot = {}
+	shot.ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 	shot.pos=bullet.Src
 	shot.speed=self.Ammo.velocity*self.MuzzleVelMod*supmod
 	shot.ang=bullet.Dir
@@ -1262,6 +1264,7 @@ function SWEP:FlyBulletStart(bullet)
 	table.insert(self.Bullets,shot)
 end
 function SWEP:FlyBullet(shot)
+	shot.ticks=shot.ticks-1
 	local travel
 	if (shot.dist!=nil) then
 		travel=shot.dist
@@ -1274,7 +1277,7 @@ function SWEP:FlyBullet(shot)
 		endpos = travel,
 		mask = MASK_SHOT
 		})
-	if (tr.Hit && !tr.AllSolid) then
+	if ((tr.Hit ||  shot.ticks<1) && !tr.AllSolid) then
 		shot.bullet.Src=shot.pos
 		shot.bullet.Damage=shot.bullet.Damage*(shot.speed/vurtual_ammodata[shot.bullet.AmmoType].velocity)
 		self.Owner:FireBullets(shot.bullet)
@@ -1290,7 +1293,7 @@ function SWEP:FlyBullet(shot)
 		end
 
 			shot.time=CurTime()+FrameTime()
-		if (shot.speed>100) then --TODO: better minimum lethal velocity
+		if (shot.speed>100 && shot.ticks>0) then --TODO: better minimum lethal velocity
 			if (shot.dist!=nil) then
 			return self:FlyBullet(shot)
 			else
