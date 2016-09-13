@@ -5,6 +5,7 @@ util.AddNetworkString("kswep_rearm_cl")
 util.AddNetworkString("kswep_scroll")
 util.AddNetworkString("kswep_optic")
 util.AddNetworkString("kswep_opticbox")
+util.AddNetworkString("kswep_suppress")
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 end

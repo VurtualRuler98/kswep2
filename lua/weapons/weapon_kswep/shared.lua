@@ -76,6 +76,16 @@ SWEP.LoweredOffset = 5
 SWEP.DrawOnce=true
 SWEP.InsAnims=false
 SWEP.Holstering=nil
+SWEP.Suppressable=false
+SWEP.SuppressorModel=nil
+SWEP.Suppressed=false
+SWEP.Primary.SupSound = nil
+SWEP.MuzzleVelModSup = 1
+SWEP.SpreadModSup = 0
+SWEP.RecoilModSup = 1
+SWEP.Length=0
+SWEP.LengthSup=0
+SWEP.LowerType=nil
 SWEP.SafetyAnim=ACT_VM_UNDEPLOY
 SWEP.IronSafetyAnim=ACT_VM_IFIREMODE
 SWEP.IronFireAnim=ACT_VM_ISHOOT
@@ -108,6 +118,7 @@ SWEP.ScopeRes=512
 SWEP.NPCAttackAnimWait=1
 SWEP.ScopeMat = nil
 SWEP.MuzzleVelMod = 1
+SWEP.MuzzleVelModSup = 1
 SWEP.Bullets={}
 SWEP.MagType=nil
 SWEP.ChamberAmmo={}
@@ -246,12 +257,20 @@ end
 function SWEP:NormalFire()
 	if (self:IsRunning() || self:GetNWBool("Raised")==false) then return end
 	if (!self:TryPrimaryAttack() ) then return end
-	self.Weapon:EmitSound(self.Primary.Sound)
+	local snd=self.Primary.Sound
+	if (self.Suppressed) then
+		snd=self.Primary.SoundSup
+	end
+	self.Weapon:EmitSound(snd)
 	local ammo = self.Ammo
 	if (!self.OpenBolt) then
 		ammo = self.ChamberAmmo
 	end
-	self:ShootBullet(self.Primary.Damage*ammo.damagescale, ammo.projectiles, ammo.spreadscale*self.Primary.Spread,ammo.name)
+	local spreadsup = 0
+	if (self.Suppressed) then
+		spreadsup = self.SpreadModSup
+	end
+	self:ShootBullet(self.Primary.Damage*ammo.damagescale, ammo.projectiles, ammo.spreadscale*(self.Primary.Spread+spreadsup),ammo.name)
 	if (self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
 	else
@@ -423,6 +442,14 @@ function SWEP:InsHands(name)
 		self.hands:SetNoDraw(true)
 	end
 end
+function SWEP:InsSuppress(sup)
+	if (!self.Suppressable) then return end
+	self.Suppressed=sup
+	net.Start("kswep_suppress")
+	net.WriteEntity(self)
+	net.WriteBool(sup)
+	net.Send(self.Owner)
+end
 function SWEP:Reload()
 	if (self.ChainReload && !self:GetNWBool("CurrentlyReloading")) then
 		local anim=self.MidReloadAnim
@@ -489,6 +516,18 @@ end
 net.Receive("kswep_magazines",function(len,ply)
 	local self=net.ReadEntity()
 	self.Magazines=net.ReadTable()
+end)
+net.Receive("kswep_suppress",function(len,ply)
+	local self=net.ReadEntity()
+	local sup=net.ReadBool()
+	self.Suppressed=sup
+	if (sup) then
+		self.suppressor=ClientsideModel(self.SuppressorModel)
+		self.suppressor:SetNoDraw(true)
+	else
+		self.suppressor:Remove()
+		self.suppressor=nil
+	end
 end)
 net.Receive("kswep_chamberammo",function(len,ply)
 	self=net.ReadEntity()
@@ -820,16 +859,28 @@ function SWEP:Think()
 			self:SetNWFloat("CurRecoil",0)
 		end
 	end
-	if (self:IsRunning() && self.Owner:OnGround() && !self.DidLowerAnim && self:GetNWFloat("NextIdle")==0 && !self:GetNWBool("CurrentlyReloading")) then
-		if (self.Owner:OnGround()) then
-			self:LowerRun(true)
-		end
+	local wlblk = self:IsWallBlocked()
+	if (wlblk && !self:IsRunning() && !self.DidLowerAnim && self:GetNWFloat("NextIdle")==0 && !self:GetNWBool("CurrentlyReloading")) then
+		self:SetNWBool("Sight",false)
+		self:Lower(true)
 		self.DidLowerAnim=true
-	elseif (!self:IsRunning() && self:GetNWFloat("NextIdle")==0 && self.DidLowerAnim) && !self:GetNWBool("CurrentlyReloading") then
+		self.LowerType = "wall"
+	elseif (!wlblk && !self:IsRunning() && self.DidLowerAnim) then
+		self:Lower(false)
+		self.DidLowerAnim=false
+		self.LowerType = nil
+	end
+	if (self:IsRunning() && self.Owner:OnGround() && (!self.DidLowerAnim || self.LowerType=="wall") && self:GetNWFloat("NextIdle")==0 && !self:GetNWBool("CurrentlyReloading")) then
+		self:LowerRun(true)
+		self.DidLowerAnim=true
+		self.LowerType="run"
+	elseif (!self:IsRunning() && (!wlblk || self.LowerType!="wall") && self:GetNWFloat("NextIdle")==0 && self.DidLowerAnim && !self:GetNWBool("CurrentlyReloading")) then
 		self:SetNWFloat("CurRecoil",self.MaxRecoil)
 		self:LowerRun(false)
 		self.DidLowerAnim=false
+		self.LowerType=nil
 	end
+		
 	if (self.HolsterAfter<CurTime() && self.Holstering!=nil) then
 		self.HolsterAfter=0
 		if (SERVER) then
@@ -945,6 +996,13 @@ function SWEP:PostDrawViewModel()
 		self.hands:SetAngles(self.Owner:GetViewModel():GetAngles())
 		self.hands:AddEffects(EF_BONEMERGE)
 		self.hands:DrawModel()
+	end
+	if (self.suppressor!=nil) then
+		self.suppressor:SetParent(self.Owner:GetViewModel())
+		self.suppressor:SetPos(self.Owner:GetViewModel():GetPos())
+		self.suppressor:SetAngles(self.Owner:GetViewModel():GetAngles())
+		self.suppressor:AddEffects(EF_BONEMERGE)
+		self.suppressor:DrawModel()
 	end
 	if (self.RTScope) then
 	local oldW, oldH = ScrW(),ScrH()
@@ -1094,6 +1152,24 @@ function SWEP:IsRunning()
         end
 end
 
+function SWEP:IsWallBlocked()
+	if (!self.Owner:IsPlayer()) then return false end
+	local length = self.Length
+	if (self.Suppressed) then
+		length = length+self.LengthSup
+	end
+	local tr = util.TraceLine( {
+		filter = self.Owner,
+		start = self.Owner:GetShootPos(),
+		endpos = self.Owner:GetShootPos()+(self.Owner:GetAimVector()*length),
+		mask = MASK_SOLID
+		})
+        if (tr.Hit) then
+                return true
+        else
+                return false
+        end
+end
 
 function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 	local aimPenalty=1
@@ -1132,12 +1208,18 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         	self.Owner:FireBullets( bullet )
 	end
         self:ShootEffects()
-	self:Recoil(self.Ammo.recoil*self.RecoilMassModifier*aimPenalty)
+	local recsup = 1
+	if (self.Suppressed) then
+		recsup = self.RecoilModSup
+	end
+	self:Recoil(self.Ammo.recoil*self.RecoilMassModifier*aimPenalty*recsup)
 end
 function SWEP:FlyBulletStart(bullet)
+	local supmod=1
+	if (self.Suppressed) then supmod=self.MuzzleVelModSup end
 	local shot = {}
 	shot.pos=bullet.Src
-	shot.speed=self.Ammo.velocity*self.MuzzleVelMod
+	shot.speed=self.Ammo.velocity*self.MuzzleVelMod*supmod
 	shot.ang=bullet.Dir
 	shot.bullet=bullet
 	shot.dist = nil
