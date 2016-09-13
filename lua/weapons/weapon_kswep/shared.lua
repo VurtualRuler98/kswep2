@@ -705,8 +705,11 @@ end
 
 
 function SWEP:SecondaryAttack()
-	self:SetNextSecondaryFire(CurTime() + 0.4 )
-	if (self.Owner:KeyDown(IN_USE) && !self:GetNWBool("Sight")) then
+	if (self:GetNWBool("CurrentlyReloading")) then return end
+	if (!self.Owner:KeyDown(IN_USE) || self:GetNWBool("Sight")) then
+		self:SetNextSecondaryFire(CurTime() + 0.4 )
+	end
+	if ((self.Owner:KeyDown(IN_USE)) && !self:GetNWBool("Sight")) then
 		self:ToggleZoom()
 	elseif (self.Owner:KeyDown(IN_USE)) then
 		self:SetNWBool("AltIrons",!self:GetNWBool("AltIrons"))
