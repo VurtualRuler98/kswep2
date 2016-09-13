@@ -877,7 +877,7 @@ function SWEP:Think()
 	local wlblk = self:IsWallBlocked()
 	if (wlblk && !self:IsRunning() && !self.DidLowerAnim && self:GetNWFloat("NextIdle")==0 && !self:GetNWBool("CurrentlyReloading")) then
 		self:SetNWBool("Sight",false)
-		self:Lower(true)
+		self:LowerWall(true)
 		self.DidLowerAnim=true
 		self.LowerType = "wall"
 	elseif (!wlblk && !self:IsRunning() && self.LowerType=="wall" && self.DidLowerAnim) then
