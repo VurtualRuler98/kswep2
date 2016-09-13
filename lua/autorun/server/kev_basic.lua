@@ -8,6 +8,8 @@ util.AddNetworkString("kswep_opticbox")
 util.AddNetworkString("kswep_suppress")
 util.AddNetworkString("kswep_supplybox")
 util.AddNetworkString("kswep_attach")
+util.AddNetworkString("kswep_addmergepart")
+util.AddNetworkString("kswep_sethands")
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 end
