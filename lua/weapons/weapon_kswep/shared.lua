@@ -218,6 +218,10 @@ function SWEP:Initialize()
 		self.opticmount=ClientsideModel(self.OpticMountModel)
 		self.opticmount:SetNoDraw(true)
 	end
+	if (self.NotOpticMountModel && CLIENT) then
+		self.notopticmount=ClientsideModel(self.NotOpticMountModel)
+		self.notopticmount:SetNoDraw(true)
+	end
 	if (self.CurrentSight && CLIENT) then
 		self.optic=ClientsideModel(self.CurrentSight)
 		self.optic:SetNoDraw(true)
@@ -1052,6 +1056,9 @@ function SWEP:PostDrawViewModel()
 	end
 	if (self.opticmount!=nil && self.CurrentSight!=self.DefaultSight) then
 		self:AttachModel(self.opticmount)
+	end
+	if (self.notopticmount!=nil && self.CurrentSight==self.DefaultSight) then
+		self:AttachModel(self.notopticmount)
 	end
 	if (self.RTScope) then
 	local oldW, oldH = ScrW(),ScrH()
