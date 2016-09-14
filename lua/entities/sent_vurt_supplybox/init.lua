@@ -75,6 +75,7 @@ function ENT:UseOpticBox(activator,caller)
 		if (wep:IsValid() && string.find(wep:GetClass(),"weapon_kswep")) then
 			if (wep.DefaultSight || wep.NoDefaultSightModel) then
 				net.Start("kswep_opticbox")
+				net.WriteEntity(self)
 				net.WriteEntity(wep)
 				net.Send(activator)
 			end
