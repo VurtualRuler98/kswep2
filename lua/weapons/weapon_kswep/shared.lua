@@ -554,11 +554,11 @@ net.Receive("kswep_suppress",function(len,ply)
 	local sup=net.ReadBool()
 	self.Suppressed=sup
 	if (sup) then
-		self.suppressor=ClientsideModel(self.SuppressorModel)
-		self.suppressor:SetNoDraw(true)
+		self.MergeParts.suppressor=ClientsideModel(self.SuppressorModel)
+		self.MergeParts.suppressor:SetNoDraw(true)
 	else
-		self.suppressor:Remove()
-		self.suppressor=nil
+		self.MergeParts.suppressor:Remove()
+		self.MergeParts.suppressor=nil
 	end
 end)
 net.Receive("kswep_chamberammo",function(len,ply)
