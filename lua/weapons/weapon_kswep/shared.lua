@@ -111,6 +111,7 @@ SWEP.FireAnim=ACT_VM_PRIMARYATTACK
 SWEP.ShootLastIronAnim=ACT_VM_ISHOOT
 SWEP.InitialDrawAnim=ACT_VM_DRAW
 SWEP.DidLowerAnim=false
+SWEP.MergeAttachments = nil
 SWEP.ReloadMessage=0
 SWEP.ReloadWeight=0
 SWEP.InsNoSafetySound=false
@@ -175,6 +176,15 @@ function SWEP:Initialize()
 			end
 		end)
 	end
+	if (CLIENT) then
+		self.MergeParts={}
+		if (self.MergeAttachments!=nil) then
+			for k,v in pairs(self.MergeAttachments) do
+				self.MergeParts[k]=ClientsideModel(v)
+				self.MergeParts[k]:SetNoDraw(true)
+			end
+		end
+	end
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.Caliber=self.Ammo.caliber
 	self.DefaultMagazines = {}
@@ -204,13 +214,16 @@ function SWEP:Initialize()
 		self:TakePrimaryAmmo(1)
 		self:SetDeploySpeed(1)
 	end
-	if (self.ManualHands && CLIENT) then
-		self.hands=ClientsideModel(self.ManualHands)
-		self.hands:SetNoDraw(true)
+	if (self.OpticMountModel && CLIENT) then
+		self.opticmount=ClientsideModel(self.OpticMountModel)
+		self.opticmount:SetNoDraw(true)
 	end
 	if (self.CurrentSight && CLIENT) then
 		self.optic=ClientsideModel(self.CurrentSight)
 		self.optic:SetNoDraw(true)
+	end
+	if (CLIENT && self.InsAttachments) then
+		self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 	end
 end
 function SWEP:DiscoverModelAnims()
@@ -360,6 +373,11 @@ function SWEP:Deploy()
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 		self.InitialDraw=false
 	else
+		if (SERVER) then
+			net.Start("kswep_sethands")
+			net.WriteEntity(self)
+			net.Send(self.Owner)
+		end
 		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),ACT_VM_IDLE)
@@ -441,13 +459,6 @@ function SWEP:InsOptic(name)
 end
 
 function SWEP:InsHands(name)
-	local handsdata=kswep_hands[name]
-	self.ManualHands=handsdata.model
-	if (CLIENT) then
-		self.hands:Remove()
-		self.hands=ClientsideModel(handsdata.model)
-		self.hands:SetNoDraw(true)
-	end
 end
 function SWEP:InsSuppress(sup)
 	if (!self.Suppressable) then return end
@@ -456,6 +467,18 @@ function SWEP:InsSuppress(sup)
 	net.WriteEntity(self)
 	net.WriteBool(sup)
 	net.Send(self.Owner)
+end
+net.Receive("kswep_sethands",function()
+	local self=net.ReadEntity()
+	self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
+end)
+function SWEP:AddMergePart(key,model)
+	if (self.MergeParts[key]!=nil && self.MergeParts[key]:GetModel()==model) then return end
+	if (self.MergeParts[key]!=nil) then
+		self.MergeParts[key]:Remove()
+	end
+	self.MergeParts[key]=ClientsideModel(model)
+	self.MergeParts[key]:SetNoDraw(true)
 end
 function SWEP:Reload()
 	if (self.ChainReload && !self:GetNWBool("CurrentlyReloading")) then
@@ -1024,19 +1047,11 @@ function SWEP:PostDrawViewModel()
 		self.optic:AddEffects(EF_BONEMERGE)
 		self.optic:DrawModel()
 	end
-	if (self.ManualHands) then
-		self.hands:SetParent(self.Owner:GetViewModel())
-		self.hands:SetPos(self.Owner:GetViewModel():GetPos())
-		self.hands:SetAngles(self.Owner:GetViewModel():GetAngles())
-		self.hands:AddEffects(EF_BONEMERGE)
-		self.hands:DrawModel()
+	for k,v in pairs(self.MergeParts) do
+		self:AttachModel(v)
 	end
-	if (self.suppressor!=nil) then
-		self.suppressor:SetParent(self.Owner:GetViewModel())
-		self.suppressor:SetPos(self.Owner:GetViewModel():GetPos())
-		self.suppressor:SetAngles(self.Owner:GetViewModel():GetAngles())
-		self.suppressor:AddEffects(EF_BONEMERGE)
-		self.suppressor:DrawModel()
+	if (self.opticmount!=nil && self.CurrentSight!=self.DefaultSight) then
+		self:AttachModel(self.opticmount)
 	end
 	if (self.RTScope) then
 	local oldW, oldH = ScrW(),ScrH()
@@ -1060,12 +1075,21 @@ function SWEP:PostDrawViewModel()
 	render.SetViewPort(0,0,oldW,oldH)
 	end
 end
+function SWEP:AttachModel(model)
+	model:SetParent(self.Owner:GetViewModel())
+	model:SetPos(self.Owner:GetViewModel():GetPos())
+	model:SetAngles(self.Owner:GetViewModel():GetAngles())
+	model:AddEffects(EF_BONEMERGE)
+	model:DrawModel()
+end
 function SWEP:OnRemove()
-	if (CLIENT && self.hands) then
-		self.hands:Remove()
-	end
 	if (CLIENT && self.optic) then
 		self.optic:Remove()
+	end
+	if (CLIENT) then
+		for k,v in pairs(self.MergeParts) do
+			v:Remove()
+		end
 	end
 	if (self.Owner:IsNPC()) then
 		hook.Remove("Think","KswepThink"..tostring(self))
