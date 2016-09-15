@@ -142,6 +142,8 @@ SWEP.RTNV=false
 SWEP.HolsterAfter=0
 SWEP.ScopeFOVMin=nil
 SWEP.ScopeFOVMax=nil
+SWEP.Flashlight=false
+SWEP.CanFlashlight=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -368,6 +370,9 @@ function SWEP:TakePrimaryAmmo(num)
 end
 SWEP.InitialDraw=true
 function SWEP:Deploy()
+	if (self.Owner:FlashlightIsOn() && SERVER && self.CanFlashlight) then
+		self.Owner:Flashlight(false)
+	end
 	self:SetNWBool("Raised",true)
 	self:SetNWFloat("CurRecoil",self.MaxRecoil)
 	if (self.InitialDraw) then
@@ -396,6 +401,11 @@ function SWEP:Deploy()
 end
 
 function SWEP:Holster(wep)
+	if (CLIENT && self.dlight) then
+		self.dlight:Remove()
+		self.dlight2:Remove()
+		self.Flashlight=false
+	end
 	if (!IsFirstTimePredicted()) then return end
 	if (self.Holstering!=nil && self.HolsterAfter==0) then
 		return true
@@ -857,12 +867,48 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (wep.IronZoom<wep.IronZoomMax) then wep.IronZoom=wep.IronZoomMax end
 				end
 			end
+			if (bind=="impulse 100" && wep.CanFlashlight) then
+				if (wep.Flashlight) then
+					wep.Flashlight=false
+					wep.dlight:Remove()
+					wep.dlight2:Remove()
+				else
+					wep.Flashlight=true
+				end
+				net.Start("kswep_flashlight")
+				net.WriteBool(wep.Flashlight)
+				net.SendToServer()
+				return true
+			end
 		end
 	end
 end
 hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think()
-
+	if (CLIENT) then
+		if (!IsValid(self.dlight) && self.Flashlight) then 
+			self.dlight = ProjectedTexture()
+			self.dlight2 = ProjectedTexture()
+		end
+		local vm=self.Owner:GetViewModel()
+		local att=vm:GetAttachment(vm:LookupAttachment("laser"))
+		if (self.dlight && self.Flashlight && att) then
+			self.dlight:SetTexture("effects/flashlight001")
+			self.dlight:SetPos(att.Pos)
+			self.dlight:SetAngles(att.Ang)
+			self.dlight:SetFOV(30)
+			self.dlight:SetBrightness(2.5)	
+			self.dlight:SetFarZ(2048)
+			self.dlight:Update()
+			self.dlight2:SetFarZ(4096)
+			self.dlight2:SetFOV(10)
+			self.dlight2:SetBrightness(40)
+			self.dlight2:SetTexture("effects/flashlight/soft")
+			self.dlight2:SetPos(att.Pos)
+			self.dlight2:SetAngles(att.Ang)
+			self.dlight2:Update()
+		end
+	end
 	if (!self.Owner:OnGround()) then
 		self:SetNWFloat("CurRecoil",self.MaxRecoil)
 	end
@@ -1094,8 +1140,18 @@ function SWEP:AttachModel(model)
 	model:DrawModel()
 end
 function SWEP:OnRemove()
+	if (CLIENT && self.dlight) then
+		self.dlight:Remove()
+		self.dlight2:Remove()
+	end
 	if (CLIENT && self.optic) then
 		self.optic:Remove()
+	end
+	if (CLIENT && self.opticmount) then
+		self.opticmount:Remove()
+	end
+	if (CLIENT && self.notopticmount) then
+		self.opticmount:Remove()
 	end
 	if (CLIENT) then
 		for k,v in pairs(self.MergeParts) do
@@ -1424,7 +1480,9 @@ function SWEP:ShootEffects()
 		end
 		self.Weapon:SendWeaponAnim(anim) 
 	end
-	self.Owner:MuzzleFlash()
+	if (!self.Suppressed) then 
+		self.Owner:MuzzleFlash()
+	end
 	if (self.Owner:IsPlayer()) then
 	self.Owner:SetAnimation(PLAYER_ATTACK1)
 	end

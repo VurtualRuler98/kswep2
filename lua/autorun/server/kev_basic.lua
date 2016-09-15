@@ -10,6 +10,18 @@ util.AddNetworkString("kswep_supplybox")
 util.AddNetworkString("kswep_attach")
 util.AddNetworkString("kswep_addmergepart")
 util.AddNetworkString("kswep_sethands")
+util.AddNetworkString("kswep_flashlight")
+util.AddNetworkString("kswep_flashlight_cl")
+net.Receive("kswep_flashlight",function(len,pl)
+	if (!IsValid(pl) || !pl:IsPlayer()) then return end
+	local wep=pl:GetActiveWeapon()
+	if (!IsValid(wep) || !string.find(wep:GetClass(),"weapon_kswep")) then return end
+	if (!wep.CanFlashlight || !wep.HasFlashlight) then return end
+	net.Start("kswep_flashlight_cl")
+	net.WriteEntity(wep)
+	net.WriteBool(net.ReadBool())
+	net.SendOmit(pl)
+end)
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 end
