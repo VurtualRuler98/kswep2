@@ -144,6 +144,7 @@ SWEP.ScopeFOVMin=nil
 SWEP.ScopeFOVMax=nil
 SWEP.Flashlight=false
 SWEP.CanFlashlight=false
+SWEP.HasFlashlight=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -478,13 +479,22 @@ end
 
 function SWEP:InsHands(name)
 end
-function SWEP:InsSuppress(sup)
-	if (!self.Suppressable) then return end
-	self.Suppressed=sup
-	net.Start("kswep_suppress")
-	net.WriteEntity(self)
-	net.WriteBool(sup)
-	net.Send(self.Owner)
+function SWEP:AddAttachment(item,attach)
+	if (item=="flashlight" && self.CanFlashlight) then
+		self.HasFlashlight=attach
+		if (self.Owner:FlashlightIsOn()) then
+		self.Owner:Flashlight(false)
+		end
+	elseif (item=="suppressor" && self.Suppressable) then
+		self.Suppressed=attach
+	else
+		return
+	end
+		net.Start("kswep_attach_cl")
+		net.WriteEntity(self)
+		net.WriteString(item)
+		net.WriteBool(attach)
+		net.Send(self.Owner)
 end
 net.Receive("kswep_sethands",function()
 	local self=net.ReadEntity()
@@ -577,6 +587,32 @@ net.Receive("kswep_suppress",function(len,ply)
 	else
 		self.MergeParts.suppressor:Remove()
 		self.MergeParts.suppressor=nil
+	end
+end)
+net.Receive("kswep_attach_cl",function(len,ply)
+	local self=net.ReadEntity()
+	local item=net.ReadString()
+	local attach=net.ReadBool()
+	if (item=="suppressor") then
+		self.Suppressed=attach
+		if (attach) then
+			self.MergeParts.suppressor=ClientsideModel(self.SuppressorModel)
+			self.MergeParts.suppressor:SetNoDraw(true)
+		else
+			self.MergeParts.suppressor:Remove()
+			self.MergeParts.suppressor=nil
+		end
+	end
+	if (item=="flashlight") then
+		self.HasFlashlight=attach
+		if (attach) then
+			self.MergeParts.flashlight=ClientsideModel(self.FlashlightModel)
+			self.MergeParts.flashlight:SetNoDraw(true)
+		else
+			self:EnableFlashlight(false)
+			self.MergeParts.flashlight:Remove()
+			self.MergeParts.flashlight=nil
+		end
 	end
 end)
 net.Receive("kswep_chamberammo",function(len,ply)
@@ -867,7 +903,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (wep.IronZoom<wep.IronZoomMax) then wep.IronZoom=wep.IronZoomMax end
 				end
 			end
-			if (bind=="impulse 100" && wep.CanFlashlight) then
+			if (bind=="impulse 100" && wep.HasFlashlight) then
 				if (wep.Flashlight) then
 					wep:EnableFlashlight(false)
 				else
@@ -879,8 +915,9 @@ function SWEP.DetectScroll(ply,bind,pressed)
 	end
 end
 function SWEP:EnableFlashlight(enable)
-	if (SERVER || !self.CanFlashlight) then return end
+	if (SERVER) then return end
 	self.Flashlight=enable
+	if (!self.HasFlashlight) then self.Flashlight=false end
 	if (self.Flashlight==false && self.dlight!=nil) then
 		self.dlight:Remove()
 		self.dlight2:Remove()

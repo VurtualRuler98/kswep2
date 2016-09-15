@@ -5,9 +5,9 @@ util.AddNetworkString("kswep_rearm_cl")
 util.AddNetworkString("kswep_scroll")
 util.AddNetworkString("kswep_optic")
 util.AddNetworkString("kswep_opticbox")
-util.AddNetworkString("kswep_suppress")
 util.AddNetworkString("kswep_supplybox")
 util.AddNetworkString("kswep_attach")
+util.AddNetworkString("kswep_attach_cl")
 util.AddNetworkString("kswep_addmergepart")
 util.AddNetworkString("kswep_sethands")
 util.AddNetworkString("kswep_flashlight")
@@ -47,7 +47,10 @@ function KswepAttach(len,pl)
 	local wep=pl:GetActiveWeapon()
 	if (!wep:IsValid() || !string.find(wep:GetClass(),"weapon_kswep")) then return end
 	if (attachment=="suppressor" && wep.Suppressable) then
-		wep:InsSuppress(!wep.Suppressed)
+		wep:AddAttachment("suppressor",!wep.Suppressed)
+	end
+	if (attachment=="flashlight" && wep.CanFlashlight) then
+		wep:AddAttachment("flashlight",!wep.HasFlashlight)
 	end
 end
 net.Receive("kswep_attach",KswepAttach)
