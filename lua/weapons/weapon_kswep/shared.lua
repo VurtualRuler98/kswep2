@@ -408,7 +408,11 @@ function SWEP:Holster(wep)
 				holsterpenalty=0.2
 			end
 		end
-		self.Holstering=wep
+		if (IsValid(wep)) then
+			self.Holstering=wep
+		else
+			self.Holstering=self
+		end
 		local delay=0.4 or self.Owner:GetViewModel():SequenceDuration(self:SelectWeightedSequence(self.StowAnim))
 		self.HolsterAfter=CurTime()+delay+holsterpenalty
 		self:LowerHolster(true)
