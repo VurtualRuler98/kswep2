@@ -9,19 +9,24 @@ net.Receive("kswep_flashlight_cl",function(len)
 		kswep_client_lights[wep:EntIndex()]=wep
 	else
 		kswep_client_lights[wep:EntIndex()]=nil
+		if (IsValid(wep.dlight)) then
+			wep.dlight:Remove()
+			wep.dlight2:Remove()
+		end
 	end
 end)
 
 function KSwepRenderClientLights()
+	print("yolf")
 	if (kswep_client_lights!=nil) then
 	for k,v in pairs(kswep_client_lights) do
 		if (IsValid(v)) then
-		if (!IsValid(wep.dlight) && light) then
+		if (!IsValid(wep.dlight)) then
 			wep.dlight = ProjectedTexture()
 			wep.dlight2 = ProjectedTexture()
 		end
 		local att=wep:GetAttachment(wep:LookupAttachment("muzzle"))
-		if (wep.dlight && light && att) then
+		if (wep.dlight && att) then
 			self.dlight:SetTexture("effects/flashlight001")
 			self.dlight:SetPos(att.Pos)
 			self.dlight:SetAngles(att.Ang)
@@ -36,10 +41,6 @@ function KSwepRenderClientLights()
 			self.dlight2:SetPos(att.Pos)
 			self.dlight2:SetAngles(att.Ang)
 			self.dlight2:Update()
-		end
-		if (IsValid(wep.dlight) && !light) then
-			wep.dlight:Remove()
-			wep.dlight2:Remove()
 		end
 		end
 	end
