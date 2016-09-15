@@ -404,7 +404,7 @@ function SWEP:Holster(wep)
 	if (CLIENT && self.dlight) then
 		self.dlight:Remove()
 		self.dlight2:Remove()
-		self.Flashlight=false
+		self:EnableFlashlight(false)
 	end
 	if (!IsFirstTimePredicted()) then return end
 	if (self.Holstering!=nil && self.HolsterAfter==0) then
@@ -869,19 +869,25 @@ function SWEP.DetectScroll(ply,bind,pressed)
 			end
 			if (bind=="impulse 100" && wep.CanFlashlight) then
 				if (wep.Flashlight) then
-					wep.Flashlight=false
-					wep.dlight:Remove()
-					wep.dlight2:Remove()
+					wep:EnableFlashlight(false)
 				else
-					wep.Flashlight=true
+					wep:EnableFlashlight(true)
 				end
-				net.Start("kswep_flashlight")
-				net.WriteBool(wep.Flashlight)
-				net.SendToServer()
 				return true
 			end
 		end
 	end
+end
+function SWEP:EnableFlashlight(enable)
+	if (SERVER || !self.CanFlashlight) then return end
+	self.Flashlight=enable
+	if (self.Flaslight==false && self.dlight!=nil) then
+		self.dlight:Remove()
+		self.dlight2:Remove()
+	end
+	net.Start("kswep_flashlight")
+	net.WriteBool(self.Flashlight)
+	net.SendToServer()
 end
 hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think()
@@ -1140,10 +1146,7 @@ function SWEP:AttachModel(model)
 	model:DrawModel()
 end
 function SWEP:OnRemove()
-	if (CLIENT && self.dlight) then
-		self.dlight:Remove()
-		self.dlight2:Remove()
-	end
+	self:EnableFlashlight(false)
 	if (CLIENT && self.optic) then
 		self.optic:Remove()
 	end
