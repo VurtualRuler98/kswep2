@@ -145,6 +145,9 @@ SWEP.ScopeFOVMax=nil
 SWEP.Flashlight=false
 SWEP.CanFlashlight=false
 SWEP.HasFlashlight=false
+SWEP.Collimator=false
+SWEP.CollimatorTex=nil
+SWEP.CollimatorSize=0.5
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -446,12 +449,19 @@ function SWEP:InsOptic(name)
 		self.AltIronOffsetPos=scopedata.AltIronPos
 		self.AltIronOffsetAng=scopedata.AltIronAng
 	end
+	if (scopedata.altirons_default) then
+		self.AltIronOffsetPos=scopedata.IronSightsPos
+		self.AltIronOffsetAng=scopedata.IronSightsAng
+	end
 	if (CLIENT && scopedata.rtscope) then
 		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
 		local mat
 		mat = Material(self.ScopeMat)
 		mat:SetTexture("$basetexture",self.RenderTarget)
 	end
+	self.Collimator=scopedata.collimator
+	self.CollimatorTex=scopedata.coltex
+	self.CollimatorSize=scopedata.colsize
 	local scopemodel
 	if (scopedata.model!=nil) then
 		scopemodel=scopedata.model
@@ -1174,6 +1184,15 @@ function SWEP:PostDrawViewModel()
 	render.PopRenderTarget()
 	render.SetViewPort(0,0,oldW,oldH)
 	end
+	if (self.Collimator && self:GetNWBool("Sight")) then
+		local mat=Material(self.CollimatorTex)
+		render.SetMaterial(mat)
+		local ang = self.Owner:GetAimVector():Angle()
+		ang:RotateAroundAxis(Vector(1,1,1),180)
+		ang=ang:Up()
+		local pos=self.Owner:GetShootPos()+(self.Owner:GetAimVector()*4)
+		render.DrawSprite(pos,self.CollimatorSize,self.CollimatorSize,Color(255,255,255,255))
+	end
 end
 function SWEP:AttachModel(model)
 	model:SetParent(self.Owner:GetViewModel())
@@ -1206,10 +1225,9 @@ end
 
 --TODO: this code is kind of ugly
 function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
-	local modPos = oldPos
 	self.smoothAng=self.smoothAng or ang
 	self.smoothPos=self.smoothPos or Vector()
-	modpos=oldPos
+	local modpos=oldPos
 	if (self:GetNWBool("Sight")) then
 		ang=oldAng+Angle(self:GetNWFloat("CurRecoil")*-0.2,0,0)
 	else
@@ -1275,7 +1293,8 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	modpos = modpos - oldPos
 	self.smoothAng=LerpAngle(FrameTime()*30,self.smoothAng,ang)
 	self.smoothPos=LerpVector(FrameTime()*30,self.smoothPos,modpos)
-	return modPos+self.smoothPos,self.smoothAng
+	self.VMModAng=self.smoothAng
+	return oldPos+self.smoothPos,oldAng
 end
 
 
