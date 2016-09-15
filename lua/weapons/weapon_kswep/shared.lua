@@ -881,7 +881,7 @@ end
 function SWEP:EnableFlashlight(enable)
 	if (SERVER || !self.CanFlashlight) then return end
 	self.Flashlight=enable
-	if (self.Flaslight==false && self.dlight!=nil) then
+	if (self.Flashlight==false && self.dlight!=nil) then
 		self.dlight:Remove()
 		self.dlight2:Remove()
 	end
