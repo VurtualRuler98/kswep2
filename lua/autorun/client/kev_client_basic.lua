@@ -17,7 +17,6 @@ net.Receive("kswep_flashlight_cl",function(len)
 end)
 
 function KSwepRenderClientLights()
-	print("yolf")
 	if (kswep_client_lights!=nil) then
 	for k,v in pairs(kswep_client_lights) do
 		if (IsValid(v)) then
@@ -46,7 +45,6 @@ function KSwepRenderClientLights()
 	end
 	end
 end
-print("nolf")
 hook.Add("Think","kswep_client_lights",KSwepRenderClientLights)
 net.Receive("kevlar_ammo", function()
 	vurtual_ammodata=net.ReadTable()
