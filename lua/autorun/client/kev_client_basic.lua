@@ -46,7 +46,8 @@ function KSwepRenderClientLights()
 	end
 	end
 end
-hook.Add(Think,"kswep_client_lights",KSwepRenderClientLights)
+print("nolf")
+hook.Add("Think","kswep_client_lights",KSwepRenderClientLights)
 net.Receive("kevlar_ammo", function()
 	vurtual_ammodata=net.ReadTable()
 end )
