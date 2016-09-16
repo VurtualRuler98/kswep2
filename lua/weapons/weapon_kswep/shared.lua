@@ -963,7 +963,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 	end
 end
 function SWEP:EnableFlashlight(enable)
-	if (SERVER || !self.HasFlashlight) then return end
+	if (SERVER) then return end
 	self.Flashlight=enable
 	if (!self.HasFlashlight) then self.Flashlight=false end
 	if (self.Flashlight==false && self.dlight!=nil) then
