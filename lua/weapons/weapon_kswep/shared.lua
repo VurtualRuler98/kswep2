@@ -1425,7 +1425,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 			local tbl=table.Copy(bullet)
 			tbl.Spread = Vector()
 			if (self.Owner:IsPlayer()) then
-				tbl.Dir=self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
+				tbl.Dir=self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+Vector(math.Rand(-aimcone,aimcone),0,math.Rand(-aimcone,aimcone))
 			else
 				tbl.Dir=self.Owner:GetAimVector()+(0.005*recoil*VectorRand()*aimPenalty)+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
 			end
