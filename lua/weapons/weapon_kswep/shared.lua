@@ -374,7 +374,7 @@ function SWEP:TakePrimaryAmmo(num)
 end
 SWEP.InitialDraw=true
 function SWEP:Deploy()
-	if (self.Owner:FlashlightIsOn() && SERVER && self.CanFlashlight) then
+	if (self.Owner:FlashlightIsOn() && SERVER && (self.HasFlashlight || self.HasLaser)) then
 		self.Owner:Flashlight(false)
 	end
 	self:SetNWBool("Raised",true)
@@ -405,10 +405,15 @@ function SWEP:Deploy()
 end
 
 function SWEP:Holster(wep)
-	if (CLIENT && self.dlight) then
+	if (CLIENT && self.Flashlight) then
 		self.dlight:Remove()
 		self.dlight2:Remove()
 		self:EnableFlashlight(false)
+	end
+	if (CLIENT && self.Laser) then
+		self.dlight:Remove()
+		self.dlight2:Remove()
+		self:EnableLaser(false)
 	end
 	if (!IsFirstTimePredicted()) then return end
 	if (self.Holstering!=nil && self.HolsterAfter==0) then
@@ -486,10 +491,24 @@ end
 function SWEP:InsHands(name)
 end
 function SWEP:AddAttachment(item,attach)
+	local removeitem=nil
 	if (item=="flashlight" && self.CanFlashlight) then
 		self.HasFlashlight=attach
 		if (self.Owner:FlashlightIsOn()) then
 		self.Owner:Flashlight(false)
+		end
+		if (self.HasLaser) then
+			self.HasLaser=false
+			removeitem="laser"
+		end
+	elseif (item=="laser" && self.CanFlashlight) then
+		self.HasLaser=attach
+		if (self.Owner:FlashlightIsOn()) then
+		self.Owner:Flashlight(false)
+		end
+		if (self.HasFlashlight) then
+			self.HasFlashlight=false
+			removeitem="flashlight"
 		end
 	elseif (item=="suppressor" && self.Suppressable) then
 		self.Suppressed=attach
@@ -501,6 +520,13 @@ function SWEP:AddAttachment(item,attach)
 		net.WriteString(item)
 		net.WriteBool(attach)
 		net.Send(self.Owner)
+	if (removeitem!=nil) then
+		net.Start("kswep_attach_cl")
+		net.WriteEntity(self)
+		net.WriteString(removeitem)
+		net.WriteBool(false)
+		net.Send(self.Owner)
+	end
 end
 net.Receive("kswep_sethands",function()
 	local self=net.ReadEntity()
@@ -618,6 +644,17 @@ net.Receive("kswep_attach_cl",function(len,ply)
 			self:EnableFlashlight(false)
 			self.MergeParts.flashlight:Remove()
 			self.MergeParts.flashlight=nil
+		end
+	end
+	if (item=="laser") then
+		self.HasLaser=attach
+		if (attach) then
+			self.MergeParts.laser=ClientsideModel(self.LaserModel)
+			self.MergeParts.laser:SetNoDraw(true)
+		else
+			self:EnableLaser(false)
+			self.MergeParts.laser:Remove()
+			self.MergeParts.laser=nil
 		end
 	end
 end)
@@ -909,11 +946,16 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (wep.IronZoom<wep.IronZoomMax) then wep.IronZoom=wep.IronZoomMax end
 				end
 			end
-			if (bind=="impulse 100" && wep.HasFlashlight) then
+			if (bind=="impulse 100" && (wep.HasFlashlight || wep.HasLaser)) then
 				if (wep.Flashlight) then
 					wep:EnableFlashlight(false)
 				else
 					wep:EnableFlashlight(true)
+				end
+				if (wep.Laser) then
+					wep:EnableLaser(false)
+				else
+					wep:EnableLaser(true)
 				end
 				return true
 			end
@@ -921,7 +963,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 	end
 end
 function SWEP:EnableFlashlight(enable)
-	if (SERVER) then return end
+	if (SERVER || !self.HasFlashlight) then return end
 	self.Flashlight=enable
 	if (!self.HasFlashlight) then self.Flashlight=false end
 	if (self.Flashlight==false && self.dlight!=nil) then
@@ -931,6 +973,15 @@ function SWEP:EnableFlashlight(enable)
 	net.Start("kswep_flashlight")
 	net.WriteBool(self.Flashlight)
 	net.SendToServer()
+end
+function SWEP:EnableLaser(enable)
+	if (SERVER || !self.HasLaser) then return end
+	self.Laser=enable
+	if (!self.HasLaser) then self.Laser=false end
+	if (self.Laser==false && self.dlight!=nil) then
+		self.dlight:Remove()
+		self.dlight2:Remove()
+	end
 end
 hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think()
@@ -955,6 +1006,28 @@ function SWEP:Think()
 			self.dlight2:SetTexture("effects/flashlight/soft")
 			self.dlight2:SetPos(att.Pos)
 			self.dlight2:SetAngles(att.Ang)
+			self.dlight2:Update()
+		end
+		if (!IsValid(self.dlight) && self.Laser) then 
+			self.dlight = ProjectedTexture()
+			self.dlight2 = ProjectedTexture()
+		end
+		if (self.dlight && self.Laser && att) then
+			self.dlight:SetTexture("effects/flashlight/soft")
+			self.dlight:SetPos(att.Pos)
+			self.dlight:SetAngles(att.Ang)
+			self.dlight:SetFOV(0.25)
+			self.dlight:SetBrightness(120)
+			self.dlight:SetColor(Color(255,0,0,255))
+			self.dlight:SetFarZ(8192)
+			self.dlight:Update()
+			self.dlight2:SetTexture("sprites/redglow1")
+			self.dlight2:SetPos(att.Pos)
+			self.dlight2:SetAngles(att.Ang)
+			self.dlight2:SetFOV(1)
+			self.dlight2:SetBrightness(120)
+			self.dlight2:SetColor(Color(255,0,0,255))
+			self.dlight2:SetFarZ(64)
 			self.dlight2:Update()
 		end
 	end
@@ -1183,9 +1256,6 @@ function SWEP:PostDrawViewModel()
 	if (self.Collimator && self:GetNWBool("Sight")) then
 		local mat=Material(self.CollimatorTex)
 		render.SetMaterial(mat)
-		local ang = self.Owner:GetAimVector():Angle()
-		ang:RotateAroundAxis(Vector(1,1,1),180)
-		ang=ang:Up()
 		local pos=self.Owner:GetShootPos()+(self.Owner:GetAimVector()*4)
 		render.DrawSprite(pos,self.CollimatorSize,self.CollimatorSize,Color(255,255,255,255))
 	end
@@ -1199,6 +1269,7 @@ function SWEP:AttachModel(model)
 end
 function SWEP:OnRemove()
 	self:EnableFlashlight(false)
+	self:EnableLaser(false)
 	if (CLIENT && self.optic) then
 		self.optic:Remove()
 	end
