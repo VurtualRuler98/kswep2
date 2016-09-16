@@ -56,6 +56,9 @@ function KswepAttach(len,pl)
 	if (attachment=="flashlight" && wep.CanFlashlight) then
 		wep:AddAttachment("flashlight",!wep.HasFlashlight)
 	end
+	if (attachment=="laser" && wep.CanFlashlight) then
+		wep:AddAttachment("laser",!wep.HasLaser)
+	end
 end
 net.Receive("kswep_attach",KswepAttach)
 function RearmMags(len,pl)
