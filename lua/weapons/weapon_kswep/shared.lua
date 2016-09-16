@@ -398,8 +398,8 @@ function SWEP:Deploy()
 	
 	self:ServeNWBool("Raised",true)
 	if (GetConVar("kswep_slow"):GetBool()) then
-		self.Owner:SetRunSpeed(250)
-		self.Owner:SetWalkSpeed(175)
+		self.Owner:SetRunSpeed(300)
+		self.Owner:SetWalkSpeed(200)
 	end
 	self:ServeNWBool("Lowered",false)
 end
