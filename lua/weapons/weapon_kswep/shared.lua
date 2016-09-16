@@ -148,6 +148,10 @@ SWEP.HasFlashlight=false
 SWEP.Collimator=false
 SWEP.CollimatorTex=nil
 SWEP.CollimatorSize=0.5
+SWEP.DefaultMinZero=100
+SWEP.DefaultMaxZero=100
+SWEP.DefaultZeroStep=0
+SWEP.DefaultZero=100
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -167,6 +171,10 @@ function SWEP:Initialize()
 	self:SetNWFloat("NextIdle",0)
 	self:SetNWBool("Lowered",false)
 	self:SetNWFloat("NextPrimaryAttack",0)
+	self.Zero=self.DefaultZero
+	self.ZeroStep=self.DefaultZeroStep
+	self.MaxZero=self.DefaultMaxZero
+	self.MinZero=self.DefaultMinZero
 	if (self.AltIrons) then
 		self:SetNWBool("AltIrons",false)
 	end
@@ -443,6 +451,12 @@ end
 function SWEP:InsOptic(name)
 	local scopedata
 	scopedata=kswep_optics[name]
+	if (CLIENT) then
+		net.Start("kswep_scopesetup")
+		net.WriteEntity(self)	
+		net.WriteString(name)
+		net.SendToServer()
+	end
 	self.ScopeName=scopedata.name
 	self.ScopeMat=scopedata.rtmat
 	self.RTScope=scopedata.rtscope
@@ -465,9 +479,17 @@ function SWEP:InsOptic(name)
 	self.CollimatorSize=scopedata.colsize
 	local scopemodel
 	if (scopedata.model!=nil) then
+		self.MaxZero=scopedata.maxzero
+		self.Zero=scopedata.zero
+		self.MinZero=scopedata.minzero
+		self.ZeroStep=scopedata.zerostep
 		scopemodel=scopedata.model
 	else
 		scopemodel=self.DefaultSight
+		self.Zero=self.DefaultZero
+		self.ZeroStep=self.DefaultZeroStep
+		self.MaxZero=self.DefaultMaxZero
+		self.MinZero=self.DefaultMinZero
 		if (self.DefaultSight==nil && self.optic) then
 			self.optic:Remove()
 			self.optic=nil
@@ -541,6 +563,7 @@ function SWEP:AddMergePart(key,model)
 	self.MergeParts[key]:SetNoDraw(true)
 end
 function SWEP:Reload()
+	if (self:GetNWBool("Sight")) then return end
 	if (self.ChainReload && !self:GetNWBool("CurrentlyReloading")) then
 		local anim=self.MidReloadAnim
 		if (self.MidReloadAnimEmpty && self.DidEmptyReload) then
@@ -714,7 +737,7 @@ function SWEP:DrawHUD()
 	if (self.SingleReload) then
 		ammo =self.ChamberAmmo
 	end
-	draw.DrawText(self:FiremodeName() .. "  " .. ammo.printname,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
+	draw.DrawText(self:FiremodeName() .. " ".. self.Zero .."m".." " .. ammo.printname,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
 	if (self.ReloadMessage > CurTime()) then
 		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
 	end
@@ -929,18 +952,33 @@ function SWEP.DetectScroll(ply,bind,pressed)
 	if (pressed) then
 		local wep=ply:GetActiveWeapon()
 		if (IsValid(wep) && string.find(wep:GetClass(),"weapon_kswep")) then
-			if (bind=="invnext") then
+			if (bind=="invnext" && wep:GetNWBool("Sight")) then
 				if (wep.Owner:KeyDown(IN_USE) && wep.ScopeFOVMin!=nil) then
 					wep.ScopeFOV=wep.ScopeFOV+((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
 					if (wep.ScopeFOV>wep.ScopeFOVMax) then wep.ScopeFOV=wep.ScopeFOVMax end
+				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
+					wep.Zero=wep.Zero-wep.ZeroStep
+					if (wep.Zero<wep.MinZero) then wep.Zero=wep.MinZero end
+					net.Start("kswep_zero")
+					net.WriteEntity(wep)
+					net.WriteInt(wep.Zero,16)
+					net.SendToServer()
 				else
 					wep.IronZoom=wep.IronZoom+5
 					if (wep.IronZoom>wep.IronZoomMin) then wep.IronZoom=wep.IronZoomMin end
 				end
-			elseif (bind=="invprev") then
+			elseif (bind=="invprev" && wep:GetNWBool("Sight")) then
 				if (wep.Owner:KeyDown(IN_USE) && wep.ScopeFOVMin!=nil) then
 					wep.ScopeFOV=wep.ScopeFOV-((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
 					if (wep.ScopeFOV<wep.ScopeFOVMin) then wep.ScopeFOV=wep.ScopeFOVMin end
+				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
+					wep.Zero=wep.Zero+wep.ZeroStep
+					net.WriteEntity(wep)
+					if (wep.Zero>wep.MaxZero) then wep.Zero=wep.MaxZero end
+					net.Start("kswep_zero")
+					net.WriteEntity(wep)
+					net.WriteInt(wep.Zero,16)
+					net.SendToServer()
 				else
 					wep.IronZoom=wep.IronZoom-5
 					if (wep.IronZoom<wep.IronZoomMax) then wep.IronZoom=wep.IronZoomMax end
@@ -1442,17 +1480,21 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 	self:Recoil(self.Ammo.recoil*self.RecoilMassModifier*aimPenalty*recsup)
 end
 function SWEP:FlyBulletStart(bullet)
-	
 	local supmod=1
 	if (self.Suppressed) then supmod=self.MuzzleVelModSup end
+	local zerotime=((self.Zero*39.3701)/(self.Ammo.velocity*self.MuzzleVelMod*supmod*16))/FrameTime() --amount of frames it will take to fly the distance
+	local drop=(386*(FrameTime())^2)*(zerotime^2)
+	local dropadj=math.deg(math.atan(drop/(self.Zero*39.3701)))
 	local shot = {}
 	shot.ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 	shot.pos=bullet.Src
 	shot.speed=self.Ammo.velocity*self.MuzzleVelMod*supmod
-	shot.ang=bullet.Dir
+	shot.ang=bullet.Dir-Vector(0,0,dropadj):GetNormal()
 	shot.bullet=bullet
 	shot.dist = nil
+	shot.drop = 0
 	shot.time = CurTime()
+	shot.gravity=0
 	table.insert(self.Bullets,shot)
 end
 function SWEP:FlyBullet(shot)
@@ -1480,7 +1522,10 @@ function SWEP:FlyBullet(shot)
 			local armor=0
 			shot.speed, shot.pos, shot.dist=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
 		else
-			shot.pos=travel
+			--386 inches per second also thanks justarandomgeek
+			shot.gravity=shot.gravity+(386*(FrameTime()^2))
+			shot.drop=shot.drop+shot.gravity
+			shot.pos=travel-Vector(0,0,shot.gravity)
 			shot.dist=nil
 		end
 
