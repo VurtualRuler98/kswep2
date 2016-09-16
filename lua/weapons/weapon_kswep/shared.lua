@@ -1096,7 +1096,7 @@ function SWEP:Think()
 		hold=self:GetNWString("IdleType")
 	end
 	if (self:GetHoldType()!=hold) then
-		self:SetWeaponHoldType(hold)
+		self:SetHoldType(hold)
 	end
 	if (self:GetNWBool("Burst")==0 && self.Burst>0 && (self.Owner:IsNPC() || !self.Owner:KeyDown(IN_ATTACK))) then
 		self:SetNWBool("Burst",self.Burst)
