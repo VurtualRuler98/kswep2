@@ -449,10 +449,6 @@ function SWEP:InsOptic(name)
 		self.AltIronOffsetPos=scopedata.AltIronPos
 		self.AltIronOffsetAng=scopedata.AltIronAng
 	end
-	if (scopedata.altirons_default) then
-		self.AltIronOffsetPos=scopedata.IronSightsPos
-		self.AltIronOffsetAng=scopedata.IronSightsAng
-	end
 	if (CLIENT && scopedata.rtscope) then
 		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
 		local mat
@@ -1294,7 +1290,7 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	self.smoothAng=LerpAngle(FrameTime()*30,self.smoothAng,ang)
 	self.smoothPos=LerpVector(FrameTime()*30,self.smoothPos,modpos)
 	self.VMModAng=self.smoothAng
-	return oldPos+self.smoothPos,oldAng
+	return oldPos+self.smoothPos,ang
 end
 
 
