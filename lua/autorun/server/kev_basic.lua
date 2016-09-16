@@ -17,6 +17,10 @@ net.Receive("kswep_flashlight",function(len,pl)
 	local wep=pl:GetActiveWeapon()
 	local lighton=net.ReadBool()
 	local isflashlight=net.ReadBool()
+	local lightent=net.ReadEntity()
+	if (lightent) then
+		lightent.Flashlight=lighton
+	end
 	if (!IsValid(wep) || !string.find(wep:GetClass(),"weapon_kswep")) then return end
 	if (isflashlight &&(!wep.CanFlashlight || !wep.HasFlashlight)) then return end
 	if (!isflashlight &&(!wep.CanFlashlight || !wep.HasLaser)) then return end
