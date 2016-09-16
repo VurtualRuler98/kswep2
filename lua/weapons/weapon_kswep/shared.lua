@@ -976,7 +976,7 @@ function SWEP:EnableFlashlight(enable)
 	net.SendToServer()
 end
 function SWEP:EnableLaser(enable)
-	if (SERVER || !self.HasLaser) then return end
+	if (SERVER) then return end
 	self.Laser=enable
 	if (!self.HasLaser) then self.Laser=false end
 	if (self.Laser==false && self.dlight!=nil) then
