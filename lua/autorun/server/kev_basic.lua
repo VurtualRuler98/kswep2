@@ -15,11 +15,15 @@ util.AddNetworkString("kswep_flashlight_cl")
 net.Receive("kswep_flashlight",function(len,pl)
 	if (!IsValid(pl) || !pl:IsPlayer()) then return end
 	local wep=pl:GetActiveWeapon()
+	local lighton=net.ReadBool()
+	local isflashlight=net.ReadBool()
 	if (!IsValid(wep) || !string.find(wep:GetClass(),"weapon_kswep")) then return end
-	if (!wep.CanFlashlight || !wep.HasFlashlight) then return end
+	if (isflashlight &&(!wep.CanFlashlight || !wep.HasFlashlight)) then return end
+	if (!isflashlight &&(!wep.CanFlashlight || !wep.HasLaser)) then return end
 	net.Start("kswep_flashlight_cl")
 	net.WriteEntity(wep)
-	net.WriteBool(net.ReadBool())
+	net.WriteBool(lighton)
+	net.WriteBool(isflashlight)
 	net.SendOmit(pl)
 end)
 function AddAmmodata(tbl)

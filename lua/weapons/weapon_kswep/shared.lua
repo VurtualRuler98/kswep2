@@ -972,6 +972,7 @@ function SWEP:EnableFlashlight(enable)
 	end
 	net.Start("kswep_flashlight")
 	net.WriteBool(self.Flashlight)
+	net.WriteBool(true)
 	net.SendToServer()
 end
 function SWEP:EnableLaser(enable)
@@ -982,6 +983,10 @@ function SWEP:EnableLaser(enable)
 		self.dlight:Remove()
 		self.dlight2:Remove()
 	end
+	net.Start("kswep_flashlight")
+	net.WriteBool(self.Flashlight)
+	net.WriteBool(false) --actually a laser, not a flashlight
+	net.SendToServer()
 end
 hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think()
@@ -992,43 +997,11 @@ function SWEP:Think()
 		end
 		local vm=self.Owner:GetViewModel()
 		local att=vm:GetAttachment(vm:LookupAttachment("laser"))
-		if (self.dlight && self.Flashlight && att) then
-			self.dlight:SetTexture("effects/flashlight001")
-			self.dlight:SetPos(att.Pos)
-			self.dlight:SetAngles(att.Ang)
-			self.dlight:SetFOV(30)
-			self.dlight:SetBrightness(2.5)	
-			self.dlight:SetFarZ(2048)
-			self.dlight:Update()
-			self.dlight2:SetFarZ(4096)
-			self.dlight2:SetFOV(10)
-			self.dlight2:SetBrightness(40)
-			self.dlight2:SetTexture("effects/flashlight/soft")
-			self.dlight2:SetPos(att.Pos)
-			self.dlight2:SetAngles(att.Ang)
-			self.dlight2:Update()
+		if (self.Flashlight && att) then
+			KswepDrawLight(self,att)
 		end
-		if (!IsValid(self.dlight) && self.Laser) then 
-			self.dlight = ProjectedTexture()
-			self.dlight2 = ProjectedTexture()
-		end
-		if (self.dlight && self.Laser && att) then
-			self.dlight:SetTexture("effects/flashlight/soft")
-			self.dlight:SetPos(att.Pos)
-			self.dlight:SetAngles(att.Ang)
-			self.dlight:SetFOV(0.25)
-			self.dlight:SetBrightness(120)
-			self.dlight:SetColor(Color(255,0,0,255))
-			self.dlight:SetFarZ(8192)
-			self.dlight:Update()
-			self.dlight2:SetTexture("sprites/redglow1")
-			self.dlight2:SetPos(att.Pos)
-			self.dlight2:SetAngles(att.Ang)
-			self.dlight2:SetFOV(1)
-			self.dlight2:SetBrightness(120)
-			self.dlight2:SetColor(Color(255,0,0,255))
-			self.dlight2:SetFarZ(64)
-			self.dlight2:Update()
+		if (self.Laser && att) then
+			KswepDrawLaser(self,att)
 		end
 	end
 	if (!self.Owner:OnGround()) then
