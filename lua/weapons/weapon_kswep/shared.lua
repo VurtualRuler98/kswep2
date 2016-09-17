@@ -161,6 +161,7 @@ SWEP.UseDelayForBolt=false
 SWEP.WaitShot=false
 SWEP.WaitShotIron=false
 SWEP.HasRanger=false
+SWEP.RangerTrace=nil
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -810,7 +811,7 @@ function SWEP:DrawHUD()
 		local oldW,oldH=ScrW(),ScrH()
 		render.PushRenderTarget(self.RenderTarget)
 		render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)
-		local tr=self.Owner:GetEyeTrace()
+		local tr=self.RangerTrace
 		local dist=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
 		local rangetext=""
 		if (tr.Hit && !tr.HitSky) then
@@ -1112,7 +1113,11 @@ function SWEP:RangeFind()
 		net.SendToServer()
 	end
 	if (SERVER) then
-		local tr=self.Owner:GetEyeTrace()
+		local tr=util.TraceLine({
+			start=self.Owner:GetShootPos(),
+			endpos=self.Owner:GetShootPos()+self.Owner:GetAimVector()*78742,
+			filter=self.Owner,
+		} )
 		local dist=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
 		if (tr.Hit && !tr.HitSky) then
 			self.Owner:PrintMessage(HUD_PRINTCENTER,dist .. "m")
@@ -1136,6 +1141,13 @@ function SWEP:EnableLaser(enable)
 end
 hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think()
+	if (CLIENT && (self.Ranger || self.RTRanger || self.SuperScope)) then
+		self.RangerTrace=util.TraceLine({
+			start=self.Owner:GetShootPos(),
+			endpos=self.Owner:GetShootPos()+self.Owner:GetAimVector()*78742,
+			filter=self.Owner,
+		} )
+	end
 	if (CLIENT) then
 		if (!self:GetNWBool("Sight") && self.superlight) then
 			self.superlight:Remove()
@@ -1520,8 +1532,13 @@ end
 
 function SWEP:AdjustMouseSensitivity()
         if (self:GetNWBool("sight")==true) then
-		local zoomsens=1+((self.MaxSensitivity-1)*((self.IronZoomMin-self.IronZoom)/(self.IronZoomMin-self.IronZoomMax)))
-		return (1/zoomsens)/self.ScopeZoom
+		local ironsens=1+((self.IronZoomMin-self.IronZoom)/(self.IronZoomMin-self.IronZoomMax))
+		local scopesens=1
+		if (self.ScopeFOVMin!=nil) then
+			scopesens=((self.MaxSensitivity-1)*(-1*(self.ScopeFOV-self.ScopeFOVMax)/(self.ScopeFOVMax-self.ScopeFOVMin)))
+		end
+		scopesens=1+(scopesens)*((self.IronZoomMin-self.IronZoom)/(self.IronZoomMin-self.IronZoomMax))
+		return (1/ironsens)/scopesens/self.ScopeZoom
 	else
                 return 1
         end
@@ -1615,7 +1632,16 @@ function SWEP:FlyBulletStart(bullet)
 		zero=self.BattlesightZero
 	end
 	if (zero==-1337) then
-		local tr=self.Owner:GetEyeTrace()
+		local tr
+		if (CLIENT) then 
+			tr=self.RangerTrace
+		else
+			tr=util.TraceLine({
+				start=self.Owner:GetShootPos(),
+				endpos=self.Owner:GetShootPos()+self.Owner:GetAimVector()*78742,
+				filter=self.Owner,
+			} )
+		end
 		zero=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
 	end
 		
