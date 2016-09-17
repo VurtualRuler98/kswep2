@@ -116,7 +116,11 @@ SWEP.ReloadMessage=0
 SWEP.ReloadWeight=0
 SWEP.InsNoSafetySound=false
 SWEP.RTScope=false
+SWEP.RTRanger=false
+SWEP.RTRangerX=0
+SWEP.RTRangerY=0
 SWEP.ScopeRes=512
+SWEP.SuperScope=false
 SWEP.NPCAttackAnimWait=1
 SWEP.ScopeMat = nil
 SWEP.MuzzleVelMod = 1
@@ -156,6 +160,7 @@ SWEP.DefaultBattlesightZero=100
 SWEP.UseDelayForBolt=false
 SWEP.WaitShot=false
 SWEP.WaitShotIron=false
+SWEP.HasRanger=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -422,6 +427,9 @@ function SWEP:Deploy()
 end
 
 function SWEP:Holster(wep)
+	if (CLIENT && self.superlight) then
+			self.superlight:Remove()
+	end
 	if (CLIENT && self.Flashlight) then
 		self.dlight:Remove()
 		self.dlight2:Remove()
@@ -469,6 +477,10 @@ function SWEP:InsOptic(name)
 	self.ScopeName=scopedata.name
 	self.ScopeMat=scopedata.rtmat
 	self.RTScope=scopedata.rtscope
+	self.RTRanger=scopedata.rtranger
+	self.RTRangerX=scopedata.rtrangerx
+	self.RTRangerY=scopedata.rtrangery
+	self.SuperScope=scopedata.super
 	self.IronOffsetPos=scopedata.IronPos
 	self.IronOffsetAng=scopedata.IronAng
 	self.AltIrons = scopedata.altirons
@@ -524,7 +536,7 @@ end
 function SWEP:InsHands(name)
 end
 function SWEP:AddAttachment(item,attach)
-	local removeitem=nil
+	local removeitem={}
 	if (item=="flashlight" && self.CanFlashlight) then
 		self.HasFlashlight=attach
 		if (self.Owner:FlashlightIsOn()) then
@@ -532,7 +544,11 @@ function SWEP:AddAttachment(item,attach)
 		end
 		if (self.HasLaser) then
 			self.HasLaser=false
-			removeitem="laser"
+			table.insert(removeitem,"laser")
+		end
+		if (self.HasRanger) then
+			self.HasRanger=false
+			table.insert(removeitem,"ranger")
 		end
 	elseif (item=="laser" && self.CanFlashlight) then
 		self.HasLaser=attach
@@ -541,7 +557,24 @@ function SWEP:AddAttachment(item,attach)
 		end
 		if (self.HasFlashlight) then
 			self.HasFlashlight=false
-			removeitem="flashlight"
+			table.insert(removeitem,"flashlight")
+		end
+		if (self.HasRanger) then
+			self.HasRanger=false
+			table.insert(removeitem,"ranger")
+		end
+	elseif (item=="ranger" && self.CanFlashlight) then
+		self.HasRanger=attach
+		if (self.Owner:FlashlightIsOn()) then
+		self.Owner:Flashlight(false)
+		end
+		if (self.HasFlashlight) then
+			self.HasFlashlight=false
+			table.insert(removeitem,"flashlight")
+		end
+		if (self.HasLaser) then
+			self.HasLaser=false
+			table.insert(removeitem,"laser")
 		end
 	elseif (item=="suppressor" && self.Suppressable) then
 		self.Suppressed=attach
@@ -553,12 +586,14 @@ function SWEP:AddAttachment(item,attach)
 		net.WriteString(item)
 		net.WriteBool(attach)
 		net.Send(self.Owner)
-	if (removeitem!=nil) then
-		net.Start("kswep_attach_cl")
-		net.WriteEntity(self)
-		net.WriteString(removeitem)
-		net.WriteBool(false)
-		net.Send(self.Owner)
+	if (#removeitem>0) then
+		for k,v in pairs(removeitem) do
+			net.Start("kswep_attach_cl")
+			net.WriteEntity(self)
+			net.WriteString(v)
+			net.WriteBool(false)
+			net.Send(self.Owner)
+		end
 	end
 end
 net.Receive("kswep_sethands",function()
@@ -691,6 +726,17 @@ net.Receive("kswep_attach_cl",function(len,ply)
 			self.MergeParts.laser=nil
 		end
 	end
+	if (item=="ranger") then
+		self.HasRanger=attach
+		if (attach) then
+			self.MergeParts.ranger=ClientsideModel(self.LaserModel)
+			self.MergeParts.ranger:SetNoDraw(true)
+		else
+			self:EnableLaser(false)
+			self.MergeParts.ranger:Remove()
+			self.MergeParts.ranger=nil
+		end
+	end
 end)
 net.Receive("kswep_chamberammo",function(len,ply)
 	self=net.ReadEntity()
@@ -749,12 +795,34 @@ function SWEP:DrawHUD()
 	if (zero==0) then
 		zero=self.BattlesightZero
 	end
+	if (zero==-1337) then
+		zero="AUTO "
+	end
 	if (self.SingleReload && !self.OpenBolt) then
 		ammo =self.ChamberAmmo
 	end
 	draw.DrawText(self:FiremodeName() .. " ".. zero .."m".." " .. ammo.printname,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
 	if (self.ReloadMessage > CurTime()) then
 		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
+	end
+	if (self.RTRanger && self:GetNWBool("Sight")) then
+		local oldW,oldH=ScrW(),ScrH()
+		render.PushRenderTarget(self.RenderTarget)
+		render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)
+		local tr=self.Owner:GetEyeTrace()
+		local dist=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
+		local rangetext=""
+		if (tr.Hit && !tr.HitSky) then
+			rangetext=dist .. "m"
+		else
+			rangetext="---m"
+		end
+		surface.SetFont("KSwepRanger")
+		surface.SetTextColor(255,0,0,255)
+		surface.SetTextPos((oldW*0.5)+(self.ScopeRes*0.01*self.RTRangerX),(oldH*0.5)+(self.ScopeRes*0.01*self.RTRangerY))
+		surface.DrawText(rangetext)
+		render.SetViewPort(0,0,oldW,oldH)
+		render.PopRenderTarget()
 	end
 end 
 function SWEP:MagWeight(reloadweight,magsize)
@@ -999,16 +1067,23 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (wep.IronZoom<wep.IronZoomMax) then wep.IronZoom=wep.IronZoomMax end
 				end
 			end
-			if (bind=="impulse 100" && (wep.HasFlashlight || wep.HasLaser)) then
-				if (wep.Flashlight) then
-					wep:EnableFlashlight(false)
-				else
-					wep:EnableFlashlight(true)
+			if (bind=="impulse 100" && (wep.HasFlashlight || wep.HasLaser || wep.HasRanger)) then
+				if (wep.HasFlashlight) then
+					if (wep.Flashlight) then
+						wep:EnableFlashlight(false)
+					else
+						wep:EnableFlashlight(true)
+					end
 				end
-				if (wep.Laser) then
-					wep:EnableLaser(false)
-				else
-					wep:EnableLaser(true)
+				if (wep.HasLaser) then
+					if (wep.Laser) then
+						wep:EnableLaser(false)
+					else
+						wep:EnableLaser(true)
+					end
+				end
+				if (wep.HasRanger) then
+					wep:RangeFind()
 				end
 				return true
 			end
@@ -1028,6 +1103,23 @@ function SWEP:EnableFlashlight(enable)
 	net.WriteBool(true)
 	net.SendToServer()
 end
+function SWEP:RangeFind()
+	if (!self.HasRanger) then return end
+	if (CLIENT) then
+		net.Start("kswep_weaponrange")
+		net.WriteEntity(self)
+		net.SendToServer()
+	end
+	if (SERVER) then
+		local tr=self.Owner:GetEyeTrace()
+		local dist=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
+		if (tr.Hit && !tr.HitSky) then
+			self.Owner:PrintMessage(HUD_PRINTCENTER,dist .. "m")
+		else
+			self.Owner:PrintMessage(HUD_PRINTCENTER,"---m")
+		end
+	end
+end
 function SWEP:EnableLaser(enable)
 	if (SERVER) then return end
 	self.Laser=enable
@@ -1044,9 +1136,8 @@ end
 hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think()
 	if (CLIENT) then
-		if (!IsValid(self.dlight) && self.Flashlight) then 
-			self.dlight = ProjectedTexture()
-			self.dlight2 = ProjectedTexture()
+		if (!self:GetNWBool("Sight") && self.superlight) then
+			self.superlight:Remove()
 		end
 		local vm=self.Owner:GetViewModel()
 		local att=vm:GetAttachment(vm:LookupAttachment("laser"))
@@ -1282,6 +1373,21 @@ function SWEP:PostDrawViewModel()
 	scopeview.fov = self.ScopeFOV
 	render.RenderView(scopeview)
 	end
+	if (self.SuperScope && self:GetNWBool("Sight")) then
+		if (!IsValid(self.superlight)) then
+			self.superlight=ProjectedTexture()
+		end
+		if (self.superlight) then
+			self.superlight:SetTexture("effects/flashlight/hard")
+			self.superlight:SetPos(self.Owner:GetShootPos()+self.Owner:GetAimVector()*4)
+			self.superlight:SetAngles(self.Owner:GetAimVector():Angle())
+			self.superlight:SetFOV(15)
+			self.superlight:SetBrightness(1)
+			self.superlight:SetFarZ(31500)
+			self.superlight:SetColor(Color(0,255,0,255))
+			self.superlight:Update()
+		end
+	end
 	render.PopRenderTarget()
 	render.SetViewPort(0,0,oldW,oldH)
 	end
@@ -1302,6 +1408,9 @@ end
 function SWEP:OnRemove()
 	self:EnableFlashlight(false)
 	self:EnableLaser(false)
+	if (CLIENT && self.superlight) then
+			self.superlight:Remove()
+	end
 	if (CLIENT && self.optic) then
 		self.optic:Remove()
 	end
@@ -1504,6 +1613,11 @@ function SWEP:FlyBulletStart(bullet)
 	if (zero==0) then
 		zero=self.BattlesightZero
 	end
+	if (zero==-1337) then
+		local tr=self.Owner:GetEyeTrace()
+		zero=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
+	end
+		
 	if (self.Suppressed) then supmod=self.MuzzleVelModSup end
 	local zerotime=math.floor(((zero*39.3701)/(self.Ammo.velocity*self.MuzzleVelMod*supmod*16))/FrameTime()) --amount of frames it will take to fly the distance
 	local drop=0.5*(386*(FrameTime()^2))*(zerotime^2)
