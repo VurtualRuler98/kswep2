@@ -152,6 +152,7 @@ SWEP.DefaultMinZero=100
 SWEP.DefaultMaxZero=100
 SWEP.DefaultZeroStep=0
 SWEP.DefaultZero=100
+SWEP.DefaultBattlesightZero=100
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -175,6 +176,7 @@ function SWEP:Initialize()
 	self.ZeroStep=self.DefaultZeroStep
 	self.MaxZero=self.DefaultMaxZero
 	self.MinZero=self.DefaultMinZero
+	self.BattlesightZero=self.DefaultBattlesightZero
 	if (self.AltIrons) then
 		self:SetNWBool("AltIrons",false)
 	end
@@ -483,6 +485,7 @@ function SWEP:InsOptic(name)
 		self.Zero=scopedata.zero
 		self.MinZero=scopedata.minzero
 		self.ZeroStep=scopedata.zerostep
+		self.BattlesightZero=scopedata.bszero
 		scopemodel=scopedata.model
 	else
 		scopemodel=self.DefaultSight
@@ -490,6 +493,7 @@ function SWEP:InsOptic(name)
 		self.ZeroStep=self.DefaultZeroStep
 		self.MaxZero=self.DefaultMaxZero
 		self.MinZero=self.DefaultMinZero
+		self.BattlesightZero=self.DefaultBattlesightZero
 		if (self.DefaultSight==nil && self.optic) then
 			self.optic:Remove()
 			self.optic=nil
@@ -734,10 +738,14 @@ end
 
 function SWEP:DrawHUD()
 	local ammo = self.Ammo
+	local zero=self.Zero
+	if (zero==0) then
+		zero=self.BattlesightZero
+	end
 	if (self.SingleReload) then
 		ammo =self.ChamberAmmo
 	end
-	draw.DrawText(self:FiremodeName() .. " ".. self.Zero .."m".." " .. ammo.printname,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
+	draw.DrawText(self:FiremodeName() .. " ".. zero .."m".." " .. ammo.printname,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
 	if (self.ReloadMessage > CurTime()) then
 		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
 	end
@@ -1481,17 +1489,19 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 end
 function SWEP:FlyBulletStart(bullet)
 	local supmod=1
+	local zero=self.Zero
+	if (zero==0) then
+		zero=self.BattlesightZero
+	end
 	if (self.Suppressed) then supmod=self.MuzzleVelModSup end
-	local zerotime=((self.Zero*39.3701)/(self.Ammo.velocity*self.MuzzleVelMod*supmod*16))/FrameTime() --amount of frames it will take to fly the distance
-	local drop=(386*(FrameTime())^2)*(zerotime^2)
-	local dropadj=math.deg(math.atan(drop/(self.Zero*39.3701)))
-	print(dropadj)
+	local zerotime=math.floor(((zero*39.3701)/(self.Ammo.velocity*self.MuzzleVelMod*supmod*16))/FrameTime()) --amount of frames it will take to fly the distance
+	local drop=0.5*(386*(FrameTime()^2))*(zerotime^2)
+	local dropadj=math.atan(drop/(zero*39.3701))
 	local shot = {}
 	shot.ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 	shot.pos=bullet.Src
 	shot.speed=self.Ammo.velocity*self.MuzzleVelMod*supmod
-	shot.ang=bullet.Dir
-	shot.ang:Rotate(Angle(0,0,dropadj))
+	shot.ang=bullet.Dir+Vector(0,0,math.sin(dropadj))
 	shot.bullet=bullet
 	shot.dist = nil
 	shot.time = CurTime()
@@ -1504,7 +1514,7 @@ function SWEP:FlyBullet(shot)
 	if (shot.dist!=nil) then
 		travel=shot.dist
 	else
-		travel = shot.pos + (shot.ang*shot.speed*16*FrameTime())
+		travel = shot.pos + (shot.ang*shot.speed*16*FrameTime())-Vector(0,0,shot.gravity)
 	end
 	local tr = util.TraceLine( {
 		filter = self.Owner,
@@ -1514,6 +1524,7 @@ function SWEP:FlyBullet(shot)
 		})
 	if ((tr.Hit ||  shot.ticks<1) && !tr.AllSolid) then
 		shot.bullet.Src=shot.pos
+		--self.Owner:SetPos(tr.HitPos)
 		shot.bullet.Damage=shot.bullet.Damage*(shot.speed/vurtual_ammodata[shot.bullet.AmmoType].velocity)
 		self.Owner:FireBullets(shot.bullet)
 	
@@ -1525,7 +1536,7 @@ function SWEP:FlyBullet(shot)
 		else
 			--386 inches per second also thanks justarandomgeek
 			shot.gravity=shot.gravity+(386*(FrameTime()^2))
-			shot.pos=travel-Vector(0,0,shot.gravity)
+			shot.pos=travel
 			shot.dist=nil
 		end
 			shot.time=CurTime()+FrameTime()
