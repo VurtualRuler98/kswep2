@@ -14,6 +14,7 @@ util.AddNetworkString("kswep_flashlight")
 util.AddNetworkString("kswep_flashlight_cl")
 util.AddNetworkString("kswep_zero")
 util.AddNetworkString("kswep_scopesetup")
+util.AddNetworkString("kswep_weaponrange")
 net.Receive("kswep_flashlight",function(len,pl)
 	if (!IsValid(pl) || !pl:IsPlayer()) then return end
 	local wep=pl:GetActiveWeapon()
@@ -39,11 +40,17 @@ local files,directories= file.Find("lua/calibers/*.lua","GAME")
 net.Receive("kswep_zero",function(len,pl)
 	local wep=net.ReadEntity()
 	local zero=net.ReadInt(16)
-	if (!IsValid(wep)) then print("INVALID") return end
+	if (!IsValid(wep)) then return end
 	if (wep.Owner!=pl) then return end
 	wep.Zero=zero
 	if (wep.Zero>wep.MaxZero) then wep.Zero=wep.MaxZero end
 	if (wep.Zero<wep.MinZero) then wep.Zero=wep.MinZero end
+end)
+net.Receive("kswep_weaponrange",function(len,pl)
+	local wep=net.ReadEntity()
+	if (!IsValid(wep)) then return end
+	if (wep.Owner!=pl) then return end
+	wep:RangeFind()
 end)
 net.Receive("kswep_scopesetup",function(len,pl)
 	local wep=net.ReadEntity()
@@ -79,6 +86,9 @@ function KswepAttach(len,pl)
 	end
 	if (attachment=="laser" && wep.CanFlashlight) then
 		wep:AddAttachment("laser",!wep.HasLaser)
+	end
+	if (attachment=="ranger" && wep.CanFlashlight) then
+		wep:AddAttachment("ranger",!wep.HasLaser)
 	end
 end
 net.Receive("kswep_attach",KswepAttach)

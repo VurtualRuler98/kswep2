@@ -94,3 +94,8 @@ hook.Add("Think","kswep_client_lights",KSwepRenderClientLights)
 net.Receive("kevlar_ammo", function()
 	vurtual_ammodata=net.ReadTable()
 end )
+surface.CreateFont("KSwepRanger",{
+	font = "Roboto",
+	extended=false,
+	size=72
+})

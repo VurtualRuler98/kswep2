@@ -795,13 +795,14 @@ function SWEP:DrawHUD()
 	if (zero==0) then
 		zero=self.BattlesightZero
 	end
+	local zerostring=zero.."m"
 	if (zero==-1337) then
-		zero="AUTO "
+		zerostring="<RANGER>"
 	end
 	if (self.SingleReload && !self.OpenBolt) then
 		ammo =self.ChamberAmmo
 	end
-	draw.DrawText(self:FiremodeName() .. " ".. zero .."m".." " .. ammo.printname,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
+	draw.DrawText(self:FiremodeName() .. " ".. zerostring .." " .. ammo.printname,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
 	if (self.ReloadMessage > CurTime()) then
 		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
 	end
