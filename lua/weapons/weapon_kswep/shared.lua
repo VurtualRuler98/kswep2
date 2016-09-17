@@ -1485,14 +1485,15 @@ function SWEP:FlyBulletStart(bullet)
 	local zerotime=((self.Zero*39.3701)/(self.Ammo.velocity*self.MuzzleVelMod*supmod*16))/FrameTime() --amount of frames it will take to fly the distance
 	local drop=(386*(FrameTime())^2)*(zerotime^2)
 	local dropadj=math.deg(math.atan(drop/(self.Zero*39.3701)))
+	print(dropadj)
 	local shot = {}
 	shot.ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 	shot.pos=bullet.Src
 	shot.speed=self.Ammo.velocity*self.MuzzleVelMod*supmod
-	shot.ang=bullet.Dir-Vector(0,0,dropadj):GetNormal()
+	shot.ang=bullet.Dir
+	shot.ang:Rotate(Angle(0,0,dropadj))
 	shot.bullet=bullet
 	shot.dist = nil
-	shot.drop = 0
 	shot.time = CurTime()
 	shot.gravity=0
 	table.insert(self.Bullets,shot)
@@ -1524,11 +1525,9 @@ function SWEP:FlyBullet(shot)
 		else
 			--386 inches per second also thanks justarandomgeek
 			shot.gravity=shot.gravity+(386*(FrameTime()^2))
-			shot.drop=shot.drop+shot.gravity
 			shot.pos=travel-Vector(0,0,shot.gravity)
 			shot.dist=nil
 		end
-
 			shot.time=CurTime()+FrameTime()
 		if (shot.speed>100 && shot.ticks>0) then --TODO: better minimum lethal velocity
 			if (shot.dist!=nil) then

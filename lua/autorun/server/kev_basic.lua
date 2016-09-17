@@ -12,6 +12,8 @@ util.AddNetworkString("kswep_addmergepart")
 util.AddNetworkString("kswep_sethands")
 util.AddNetworkString("kswep_flashlight")
 util.AddNetworkString("kswep_flashlight_cl")
+util.AddNetworkString("kswep_zero")
+util.AddNetworkString("kswep_scopesetup")
 net.Receive("kswep_flashlight",function(len,pl)
 	if (!IsValid(pl) || !pl:IsPlayer()) then return end
 	local wep=pl:GetActiveWeapon()
@@ -34,6 +36,21 @@ function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 end
 local files,directories= file.Find("lua/calibers/*.lua","GAME")
+net.Receive("kswep_zero",function(len,pl)
+	local wep=net.ReadEntity()
+	local zero=net.ReadInt(16)
+	if (!IsValid(wep)) then print("INVALID") return end
+	if (wep.Owner!=pl) then return end
+	wep.Zero=zero
+	if (wep.Zero>wep.MaxZero) then wep.Zero=wep.MaxZero end
+	if (wep.Zero<wep.MinZero) then wep.Zero=wep.MinZero end
+end)
+net.Receive("kswep_scopesetup",function(len,pl)
+	local wep=net.ReadEntity()
+	local scope=net.ReadString()
+	if (wep.Owner!=pl) then return end
+	wep:InsOptic(scope)
+end)
 for k,v in pairs(files) do
 	include ("calibers/"..v)
 end
