@@ -153,6 +153,9 @@ SWEP.DefaultMaxZero=100
 SWEP.DefaultZeroStep=0
 SWEP.DefaultZero=100
 SWEP.DefaultBattlesightZero=100
+SWEP.UseDelayForBolt=false
+SWEP.WaitShot=false
+SWEP.WaitShotIron=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -324,7 +327,11 @@ function SWEP:NormalFire()
 	end
 	local bolttime = 0
 	if (animbolt) then
-		self:NextBolt(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim,animbolt)
+		if (self.UseDelayForBolt) then
+			self:NextBolt(CurTime()+self.Primary.Delay,anim,animbolt)
+		else
+			self:NextBolt(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim,animbolt)
+		end
 		bolttime = self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(animbolt))
 	else
 		if (self.Owner:IsPlayer()) then
@@ -742,7 +749,7 @@ function SWEP:DrawHUD()
 	if (zero==0) then
 		zero=self.BattlesightZero
 	end
-	if (self.SingleReload) then
+	if (self.SingleReload && !self.OpenBolt) then
 		ammo =self.ChamberAmmo
 	end
 	draw.DrawText(self:FiremodeName() .. " ".. zero .."m".." " .. ammo.printname,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
@@ -792,7 +799,7 @@ function SWEP:FinishReload()
 	self:SetClip1(mag.num)
 	self.Ammo=vurtual_ammodata[mag.caliber]
 	table.remove(self.Magazines)
-	if (self.Magazines[1].num==0) then
+	if (#self.Magazines>0 && self.Magazines[1].num==0) then
 		table.remove(self.Magazines,1)
 	end
 	self.ReloadWeight=self:Clip1()
@@ -1043,6 +1050,10 @@ function SWEP:Think()
 		end
 		local vm=self.Owner:GetViewModel()
 		local att=vm:GetAttachment(vm:LookupAttachment("laser"))
+			if (self:GetNWBool("Sight")) then
+				att.Pos=self.Owner:GetShootPos()+self.Owner:GetAimVector()*self.Length
+				att.Ang=self.Owner:GetAimVector():Angle()
+			end
 		if (self.Flashlight && att) then
 			KswepDrawLight(self,att)
 		end
