@@ -1580,7 +1580,7 @@ function SWEP:SetAnim(anim,act)
 	net.Start("kswep_discoveranim")
 	net.WriteEntity(self)
 	net.WriteString(anim)
-	net.WriteInt(self:GetSequenceInfo(i).activity,16)
+	net.WriteInt(act,16)
 	net.Send(self.Owner)
 end
 function SWEP:DiscoverAnim(anim)
