@@ -106,6 +106,10 @@ function RearmMags(len,pl)
 				if (wep.SingleReload) then
 					magsize=1
 					magtype=wep.Caliber
+					magcount=magcount+wep.MagSize
+					if (!wep.OpenBolt) then
+						magcount=magcount+1
+					end
 				end
 				
 				if (wep.IsSecondaryWeapon) then
@@ -121,7 +125,15 @@ function RearmMags(len,pl)
 				if (wep.MagType) then
 					table.insert(tbl,{caliber=caliber,num=magsize})
 					wep:SetClip1(0)
+					wep:SetNWBool("Chambered",false)
 					wep:ReloadAct(true)
+				end
+				if (wep.SingleReload) then
+					wep.MagTable={}
+					net.Start("kswep_magtable")
+					net.WriteEntity(wep)
+					net.WriteTable(wep.MagTable)
+					net.Send(wep.Owner)
 				end
 				
 			end
