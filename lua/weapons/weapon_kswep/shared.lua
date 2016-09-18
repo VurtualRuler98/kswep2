@@ -300,7 +300,7 @@ function SWEP:NextIdle(idle,anim)
 	self.Anims.NextIdleAnim=anim
 end
 function SWEP:NormalFire()
-	if (self:IsRunning() || self:GetNWBool("Raised")==false) then return end
+	if (self:IsRunning() || self:GetNWBool("Raised")==false || self:IsWallBlocked()) then return end
 	if (!self:TryPrimaryAttack() ) then return end
 	local snd=self.Primary.Sound
 	if (self.Suppressed) then
@@ -322,9 +322,9 @@ function SWEP:NormalFire()
 		self:ServeNWBool("Chambered",false)
 	end
 	local anim=ACT_VM_IDLE
-	local animbolt = self.BoltAnim
+	local animbolt = self.Anims.BoltAnim
 	if (self:GetNWBool("Sight")) then
-		animbolt = self.BoltAnimIron
+		animbolt = self.Anims.BoltAnimIron
 		if (self:GetNWBool("Chambered")) then
 			anim=self.Anims.IronAnim
 		else
