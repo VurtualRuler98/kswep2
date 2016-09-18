@@ -1173,8 +1173,8 @@ function SWEP:Think()
 		end
 		local vm=self.Owner:GetViewModel()
 		local att=vm:GetAttachment(vm:LookupAttachment("laser"))
-			if (self:GetNWBool("Sight")) then
-				att.Pos=self.Owner:GetShootPos()+self.Owner:GetAimVector()*self.Length
+			if (self:GetNWBool("Sight") && self.HasLaser) then
+				att.Pos=self.Owner:GetShootPos()+self.Owner:GetAimVector()*(self.Length+4)
 				att.Ang=self.Owner:GetAimVector():Angle()
 			end
 		if (self.Flashlight && att) then
