@@ -70,6 +70,7 @@ SWEP.ReloadModLight=1
 SWEP.ReloadModMedium=1.10
 SWEP.ReloadModHeavy=1.20
 SWEP.ScopeName="Default"
+SWEP.Anim={}
 SWEP.Anim.ReloadAnim = ACT_VM_RELOAD
 SWEP.Anim.ReloadAnimEmpty = ACT_VM_RELOAD
 SWEP.LoweredOffset = 5
