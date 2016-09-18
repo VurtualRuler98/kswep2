@@ -96,13 +96,13 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.printname = "7.62x54mm Piercing Tranq."
 	tbl.caliber = "vammo_762x54t"
 	tbl.projectiles = 1
-	tbl.spreadscale = 2
+	tbl.spreadscale = 5
 	tbl.damagescale = 1
 	tbl.recoil = 0.5
-	tbl.wallbang = 2
+	tbl.wallbang = 4
 	tbl.velocity = 1000
-	AddAmmodata(tbl)
-	game.AddAmmoType({name="vammo_762x54t_p",DMG_BULLET,0,0,80,10,5})
+	--AddAmmodata(tbl)
+	--game.AddAmmoType({name="vammo_762x54t_p",DMG_BULLET,0,0,80,10,5})
 	local tbl = {}
 	tbl.vestpenetration=40
 	tbl.powermin=5
