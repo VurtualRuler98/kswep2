@@ -380,6 +380,9 @@ end
 net.Receive("kswep_magtable",function(len)
 	local self=net.ReadEntity()
 	self.MagTable=net.ReadTable()
+	if (self.OpenBolt && #self.MagTable>0) then 
+		self.Ammo=vurtual_ammodata[self.MagTable[#self.MagTable].caliber]
+	end
 end)
 function SWEP:TakePrimaryAmmo(num)
 		if (self.SingleReload) then
