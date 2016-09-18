@@ -1580,10 +1580,10 @@ function SWEP:AdjustMouseSensitivity()
 end
 function SWEP:DiscoverAnim(anim)
 	local max=#self:GetSequenceList()
-	PrintTable(self:GetSequenceList())
 	local i=0
 	while (i<max) do
 		if (self:GetSequenceInfo(i).activityname==anim) then
+			print(self:GetSequenceInfo(i))
 			return self:GetSequenceInfo(i).activity
 		end
 		i=i+1
