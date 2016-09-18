@@ -162,6 +162,7 @@ SWEP.WaitShot=false
 SWEP.WaitShotIron=false
 SWEP.HasRanger=false
 SWEP.RangerTrace=nil
+SWEP.DiscoveredAnims=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -420,11 +421,12 @@ function SWEP:Deploy()
 	end
 	self:SetNWBool("Raised",true)
 	self:SetNWFloat("CurRecoil",self.MaxRecoil)
-	if (self.InitialDraw) then
+	if (self.InitialDraw) then--[[
 		self:DiscoverModelAnims()
 		net.Start("kswep_discoveranim")
 		net.WriteEntity(self)
 		net.Send(self.Owner)
+		]]--
 		self:SetClip1(self.MagSize)
 		self.Weapon:SendWeaponAnim(self.InitialDrawAnim)
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
@@ -1168,6 +1170,10 @@ function SWEP:EnableLaser(enable)
 end
 hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think()
+	if (self.DiscoveredAnims==false) then
+		self.DiscoveredAnims=true
+		self:DiscoverModelAnims()
+	end
 	if (CLIENT && (self.Ranger || self.RTRanger || self.SuperScope)) then
 		self.RangerTrace=util.TraceLine({
 			start=self.Owner:GetShootPos(),
