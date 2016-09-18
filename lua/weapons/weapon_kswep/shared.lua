@@ -1575,16 +1575,19 @@ net.Receive("kswep_discoveranim",function(len)
 	local act=net.ReadInt(16)
 	self.Anims[anim]=act
 end)
+function SWEP:SetAnim(anim,act)
+	self.Anims[anim]=act
+	net.Start("kswep_discoveranim")
+	net.WriteEntity(self)
+	net.WriteString(anim)
+	net.WriteInt(self:GetSequenceInfo(i).activity,16)
+	net.Send(self.Owner)
+end
 function SWEP:DiscoverAnim(anim)
 	local max=#self:GetSequenceList()
 	local i=0
 	while (i<max) do
 		if (self:GetSequenceInfo(i).activityname==anim) then
-			net.Start("kswep_discoveranim")
-			net.WriteEntity(self)
-			net.WriteString(anim)
-			net.WriteInt(self:GetSequenceInfo(i).activity,16)
-			net.Send(self.Owner)
 			return self:GetSequenceInfo(i).activity
 		end
 		i=i+1
