@@ -1582,10 +1582,10 @@ function SWEP:DiscoverAnim(anim)
 	local max=#self:GetSequenceList()
 	local i=0
 	while (i<max) do
-		if (self:GetSequenceInfo(i).activityname==anim) then
-			PrintTable(self:GetSequenceInfo(i))
+		if (self.Owner:GetViewModel():GetSequenceInfo(i).activityname==anim) then
+			PrintTable(self.Owner:GetViewModel():GetSequenceInfo(i))
 			print(anim)
-			return self:GetSequenceInfo(i).activity
+			return self.Owner:GetViewModel():GetSequenceInfo(i).activity
 		end
 		i=i+1
 	end
