@@ -1069,7 +1069,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (wep.IronZoom>wep.IronZoomMin) then wep.IronZoom=wep.IronZoomMin end
 				end
 			elseif (bind=="invprev" && wep:GetNWBool("Sight")) then
-				if (wep.Owner:KeyDown(IN_USE) && wep.ScopeFOVMin!=nil) then
+				if (wep.Owner:KeyDown(IN_USE) && wep.ScopeFOVSteps!=nil) then
 					wep.ScopeFOV=wep.ScopeFOV-((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
 					if (wep.ScopeFOV<wep.ScopeFOVMin) then wep.ScopeFOV=wep.ScopeFOVMin end
 				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
