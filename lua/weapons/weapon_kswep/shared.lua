@@ -259,6 +259,7 @@ function SWEP:DiscoverModelAnims()
 end
 net.Receive("kswep_discoveranim",function(len)
 	local self=net.ReadEntity()
+	print(self)
 	self:DiscoverModelAnims()
 end)
 function SWEP:OnDrop()
