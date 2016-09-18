@@ -377,12 +377,22 @@ function SWEP:ShotgunFire()
 		self:NormalFire()
 	end
 end
+net.Receive("kswep_magtable",function(len)
+	local self=net.ReadEntity()
+	self.MagTable=net.ReadTable()
+end)
 function SWEP:TakePrimaryAmmo(num)
 		if (self.SingleReload) then
 			if (self.Owner:IsPlayer()) then
 				self:SetChamberAmmo(vurtual_ammodata[self.MagTable[#self.MagTable].caliber])
 				table.remove(self.MagTable)
 				self.Weapon:SetClip1(#self.MagTable)
+				if (SERVER) then
+					net.Start("kswep_magtable")
+					net.WriteEntity(self)
+					net.WriteTable(self.MagTable)
+					net.Send(self.Owner)
+				end
 			else
 				self:SetChamberAmmo(vurtual_ammodata[self.MagTable[#self.MagTable].caliber])
 				self:SetClip1(self:Clip1()-num)
@@ -949,6 +959,12 @@ function SWEP:FinishReloadSingle()
 		self:TakePrimaryAmmo(1)
 		self:SetNWBool("Chambered",true)
 	end
+	if (SERVER && self.Owner:IsPlayer()) then
+		net.Start("kswep_magtable")
+		net.WriteEntity(self)
+		net.WriteTable(self.MagTable)
+		net.Send(self.Owner)
+	end
 end
 
 function SWEP:CanPrimaryAttack()
@@ -1038,7 +1054,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 		local wep=ply:GetActiveWeapon()
 		if (IsValid(wep) && string.find(wep:GetClass(),"weapon_kswep")) then
 			if (bind=="invnext" && wep:GetNWBool("Sight")) then
-				if (wep.Owner:KeyDown(IN_USE) && wep.ScopeFOVMin!=nil) then
+				if (wep.Owner:KeyDown(IN_USE) && wep.ScopeFOVSteps!=nil) then
 					wep.ScopeFOV=wep.ScopeFOV+((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
 					if (wep.ScopeFOV>wep.ScopeFOVMax) then wep.ScopeFOV=wep.ScopeFOVMax end
 				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
@@ -1532,13 +1548,14 @@ end
 
 function SWEP:AdjustMouseSensitivity()
         if (self:GetNWBool("sight")==true) then
-		local ironsens=1+((self.IronZoomMin-self.IronZoom)/(self.IronZoomMin-self.IronZoomMax))
 		local scopesens=1
-		if (self.ScopeFOVMin!=nil) then
+		if (self.ScopeFOVSteps!=nil) then
 			scopesens=((self.MaxSensitivity-1)*(-1*(self.ScopeFOV-self.ScopeFOVMax)/(self.ScopeFOVMax-self.ScopeFOVMin)))
+		elseif (self.ScopeFOV!=nil) then
+			scopesens=self.MaxSensitivity
 		end
 		scopesens=1+(scopesens)*((self.IronZoomMin-self.IronZoom)/(self.IronZoomMin-self.IronZoomMax))
-		return (1/ironsens)/scopesens/self.ScopeZoom
+		return 1/scopesens/self.ScopeZoom
 	else
                 return 1
         end
@@ -1616,7 +1633,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 			self:FlyBulletStart(tbl)
 		end
 	else
-        	self.Owner:FireBullets( bullet )
+        	self:FireShot( bullet )
 	end
         self:ShootEffects()
 	local recsup = 1
@@ -1678,7 +1695,7 @@ function SWEP:FlyBullet(shot)
 		shot.bullet.Src=shot.pos
 		--self.Owner:SetPos(tr.HitPos)
 		shot.bullet.Damage=shot.bullet.Damage*(shot.speed/vurtual_ammodata[shot.bullet.AmmoType].velocity)
-		self.Owner:FireBullets(shot.bullet)
+		self:FireShot(shot.bullet)
 	
 	end
 	if ((!tr.Hit || (!tr.HitSky)) && travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
@@ -1749,7 +1766,7 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 			fakebullet.Src = hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10)
 			fakebullet.Dir:Rotate(Angle(0,180,0))
 			fakebullet.Force =0
-			self.Owner:FireBullets(fakebullet)
+			self:FireShot(fakebullet)
 			dist = hitpos
 		end
 		return speed,hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10),dist--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
@@ -1763,6 +1780,9 @@ end
 		ono:GetPhysicsObject():EnableMotion(false)
 		end]] 
 
+function SWEP:FireShot(bullet)
+	self.Owner:FireBullets(bullet)
+end
 function SWEP:MaterialPenetration(mat)
 	local penetration = 0
 	if (mat==MAT_WOOD || mat==MAT_PLASTIC || mat==MAT_GRATE || mat==MAT_GLASS || mat==MAT_TILE) then
