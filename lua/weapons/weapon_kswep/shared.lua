@@ -70,8 +70,8 @@ SWEP.ReloadModLight=1
 SWEP.ReloadModMedium=1.10
 SWEP.ReloadModHeavy=1.20
 SWEP.ScopeName="Default"
-SWEP.ReloadAnim = ACT_VM_RELOAD
-SWEP.ReloadAnimEmpty = ACT_VM_RELOAD
+SWEP.Anim.ReloadAnim = ACT_VM_RELOAD
+SWEP.Anim.ReloadAnimEmpty = ACT_VM_RELOAD
 SWEP.LoweredOffset = 5
 SWEP.DrawOnce=true
 SWEP.InsAnims=false
@@ -87,29 +87,29 @@ SWEP.RecoilModSup = 1
 SWEP.Length=0
 SWEP.LengthSup=0
 SWEP.LowerType=nil
-SWEP.SafetyAnim=ACT_VM_UNDEPLOY
-SWEP.IronSafetyAnim=ACT_VM_IFIREMODE
-SWEP.IronFireAnim=ACT_VM_ISHOOT
-SWEP.LowerAnim=ACT_VM_DOWN
-SWEP.IronInAnim=ACT_VM_IIN
-SWEP.IronOutAnim=ACT_VM_IOUT
-SWEP.IronAnim=ACT_VM_IIDLE
-SWEP.IronShootAnim=ACT_VM_ISHOOT
-SWEP.StowAnim=ACT_VM_HOLSTER
-SWEP.UnstowAnim=ACT_VM_DRAW
-SWEP.NextIdleAnim=ACT_VM_IDLE
+SWEP.Anim.SafetyAnim=ACT_VM_UNDEPLOY
+SWEP.Anim.IronSafetyAnim=ACT_VM_IFIREMODE
+SWEP.Anim.IronFireAnim=ACT_VM_ISHOOT
+SWEP.Anim.LowerAnim=ACT_VM_DOWN
+SWEP.Anim.IronInAnim=ACT_VM_IIN
+SWEP.Anim.IronOutAnim=ACT_VM_IOUT
+SWEP.Anim.IronAnim=ACT_VM_IIDLE
+SWEP.Anim.IronShootAnim=ACT_VM_ISHOOT
+SWEP.Anim.StowAnim=ACT_VM_HOLSTER
+SWEP.Anim.UnstowAnim=ACT_VM_DRAW
+SWEP.Anim.NextIdleAnim=ACT_VM_IDLE
 SWEP.EmptyAnims=false
-SWEP.IdleAnimEmpty=ACT_VM_IDLE
-SWEP.IronInAnimEmpty=ACT_VM_IIN
-SWEP.IronOutAnimEmpty=ACT_VM_IOUT
-SWEP.UnstowAnimEmpty=ACT_VM_DRAW
-SWEP.StowAnimEmpty=ACT_VM_HOLSTER
-SWEP.LowerAnimEmpty=ACT_VM_DOWN
-SWEP.IronAnimEmpty=ACT_VM_IIDLE
-SWEP.ShootLastAnim=ACT_VM_PRIMARYATTACK
-SWEP.FireAnim=ACT_VM_PRIMARYATTACK
-SWEP.ShootLastIronAnim=ACT_VM_ISHOOT
-SWEP.InitialDrawAnim=ACT_VM_DRAW
+SWEP.Anim.IdleAnimEmpty=ACT_VM_IDLE
+SWEP.Anim.IronInAnimEmpty=ACT_VM_IIN
+SWEP.Anim.IronOutAnimEmpty=ACT_VM_IOUT
+SWEP.Anim.UnstowAnimEmpty=ACT_VM_DRAW
+SWEP.Anim.StowAnimEmpty=ACT_VM_HOLSTER
+SWEP.Anim.LowerAnimEmpty=ACT_VM_DOWN
+SWEP.Anim.IronAnimEmpty=ACT_VM_IIDLE
+SWEP.Anim.ShootLastAnim=ACT_VM_PRIMARYATTACK
+SWEP.Anim.FireAnim=ACT_VM_PRIMARYATTACK
+SWEP.Anim.ShootLastIronAnim=ACT_VM_ISHOOT
+SWEP.Anim.InitialDrawAnim=ACT_VM_DRAW
 SWEP.DidLowerAnim=false
 SWEP.MergeAttachments = nil
 SWEP.ReloadMessage=0
@@ -190,9 +190,9 @@ function SWEP:Initialize()
 	if (self.AltIrons) then
 		self:SetNWBool("AltIrons",false)
 	end
-	if (self.RunAnim==nil) then
-		self.RunAnim=self.LowerAnim
-		self.RunAnimEmpty=self.LowerAnimEmpty
+	if (self.Anims.RunAnim==nil) then
+		self.Anims.RunAnim=self.Anims.LowerAnim
+		self.Anims.RunAnimEmpty=self.Anims.LowerAnimEmpty
 	end
 	if (self.Owner:IsNPC()) then
 		local weapon=self
@@ -258,11 +258,6 @@ function SWEP:Initialize()
 end
 function SWEP:DiscoverModelAnims()
 end
-net.Receive("kswep_discoveranim",function(len)
-	local self=net.ReadEntity()
-	print(self)
-	self:DiscoverModelAnims()
-end)
 function SWEP:OnDrop()
 	self:Remove()
 end
@@ -273,12 +268,12 @@ function SWEP:PrimaryAttack()
 		self:SetNWBool("FiremodeSelected",true)
 		if (SERVER) then
 		end
-		if (self.SafetyAnim) then
-			local anim = self.SafetyAnim
+		if (self.Anim.SafetyAnim) then
+			local anim = self.Anim.SafetyAnim
 			local anim2=ACT_VM_IDLE
 			if (self:GetNWBool("Sight")) then 
-				anim = self.IronSafetyAnim
-				anim2 =self.IronAnim
+				anim = self.Anim.IronSafetyAnim
+				anim2 =self.Anim.IronAnim
 			end
 			self:SendWeaponAnim(anim)
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
@@ -297,11 +292,11 @@ end
 function SWEP:NextBolt(idle,anim,bolt)
 	self:SetNWFloat("NextIdle",idle)
 	self.NextBoltAnim=bolt
-	self.NextIdleAnim=anim
+	self.Anims.NextIdleAnim=anim
 end
 function SWEP:NextIdle(idle,anim)
 	self:ServeNWFloat("NextIdle",idle)
-	self.NextIdleAnim=anim
+	self.Anims.NextIdleAnim=anim
 end
 function SWEP:NormalFire()
 	if (self:IsRunning() || self:GetNWBool("Raised")==false) then return end
@@ -330,12 +325,12 @@ function SWEP:NormalFire()
 	if (self:GetNWBool("Sight")) then
 		animbolt = self.BoltAnimIron
 		if (self:GetNWBool("Chambered")) then
-			anim=self.IronAnim
+			anim=self.Anim.IronAnim
 		else
-			anim=self.IronAnimEmpty
+			anim=self.Anim.IronAnimEmpty
 		end
 	elseif (!self:GetNWBool("Chambered")) then
-		anim=self.IdleAnimEmpty
+		anim=self.Anims.IdleAnimEmpty
 	end
 	local bolttime = 0
 	if (animbolt) then
@@ -370,7 +365,7 @@ function SWEP:ShotgunFire()
 	if (!self:GetNWBool("Chambered")) then
 		local anim=ACT_VM_IDLE
 		if (self:GetNWBool("Sight")) then
-			anim=self.IronAnim
+			anim=self.Anim.IronAnim
 		end
 		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
 		self:SetNextAttack(CurTime()+self.Primary.Delay)
@@ -421,14 +416,10 @@ function SWEP:Deploy()
 	end
 	self:SetNWBool("Raised",true)
 	self:SetNWFloat("CurRecoil",self.MaxRecoil)
-	if (self.InitialDraw) then--[[
+	if (self.InitialDraw) then
 		self:DiscoverModelAnims()
-		net.Start("kswep_discoveranim")
-		net.WriteEntity(self)
-		net.Send(self.Owner)
-		]]--
 		self:SetClip1(self.MagSize)
-		self.Weapon:SendWeaponAnim(self.InitialDrawAnim)
+		self.Weapon:SendWeaponAnim(self.Anim.InitialDrawAnim)
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 		self.InitialDraw=false
 	else
@@ -481,7 +472,7 @@ function SWEP:Holster(wep)
 		else
 			self.Holstering=self
 		end
-		local delay=0.4 or self.Owner:GetViewModel():SequenceDuration(self:SelectWeightedSequence(self.StowAnim))
+		local delay=0.4 or self.Owner:GetViewModel():SequenceDuration(self:SelectWeightedSequence(self.Anim.StowAnim))
 		self.HolsterAfter=CurTime()+delay+holsterpenalty
 		self:LowerHolster(true)
 		self:SetNWBool("Sight",false)
@@ -635,9 +626,9 @@ end
 function SWEP:Reload()
 	if (self:GetNWBool("Sight")) then return end
 	if (self.ChainReload && !self:GetNWBool("CurrentlyReloading")) then
-		local anim=self.MidReloadAnim
-		if (self.MidReloadAnimEmpty && self.DidEmptyReload) then
-			anim=self.MidReloadAnimEmpty
+		local anim=self.Anims.MidReloadAnim
+		if (self.Anims.MidReloadAnimEmpty && self.DidEmptyReload) then
+			anim=self.Anims.MidReloadAnimEmpty
 			self.DidEmptyReload=false
 		end
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(anim))+self.ReloadDelay)
@@ -800,9 +791,9 @@ function SWEP:ReloadTube()
 		end
 	end
 	self:SetNWBool("Sight",false)
-	if (self.StartReloadAnim) then
+	if (self.Anims.StartReloadAnim) then
 		reloadspeed=1
-		self.Weapon:SendWeaponAnim(self.StartReloadAnim)
+		self.Weapon:SendWeaponAnim(self.Anims.StartReloadAnim)
 	else
 		self.Weapon:SendWeaponAnim(self.ReloadAnim)
 	end
@@ -940,8 +931,8 @@ function SWEP:FinishReloadSingle()
 	self.ChainReload=false
 	if (#self.Magazines==0) then
 	self:ServeNWBool("CurrentlyReloading",false)
-	if (self.StartReloadAnim) then
-		self:NextBolt(CurTime(),ACT_VM_IDLE,self.EndReloadAnim)
+	if (self.Anims.StartReloadAnim) then
+		self:NextBolt(CurTime(),ACT_VM_IDLE,self.Anims.EndReloadAnim)
 	end
 	return
 	end
@@ -949,20 +940,20 @@ function SWEP:FinishReloadSingle()
 	table.insert(self.MagTable,mag)
 	table.remove(self.Magazines)
 	local anim = ACT_VM_IDLE
-	if (self.StartReloadAnim) then
-		anim = self.MidReloadAnim
-		if (self.MidReloadAnimEmpty && !self:GetNWBool("Chambered")) then
-			anim=self.MidReloadAnimEmpty
+	if (self.Anims.StartReloadAnim) then
+		anim = self.Anims.MidReloadAnim
+		if (self.Anims.MidReloadAnimEmpty && !self:GetNWBool("Chambered")) then
+			anim=self.Anims.MidReloadAnimEmpty
 			self.DidEmptyReload=true
 		end
 	end
 	self.Weapon:SendWeaponAnim(anim)
-	if (self.StartReloadAnim) then
+	if (self.Anims.StartReloadAnim) then
 		if (self.Owner:KeyDown(IN_RELOAD) && #self.MagTable<self.Primary.ClipSize) then
 			self.ChainReload=true
 			self:SetNWFloat("NextIdle",0)
 		else
-			self:NextBolt(CurTime()+self.Owner:GetViewModel():SequenceDuration()+0.05,ACT_VM_IDLE,self.EndReloadAnim)
+			self:NextBolt(CurTime()+self.Owner:GetViewModel():SequenceDuration()+0.05,ACT_VM_IDLE,self.Anims.EndReloadAnim)
 		end
 	end
 	self:ServeNWBool("CurrentlyReloading",false)
@@ -1170,11 +1161,6 @@ function SWEP:EnableLaser(enable)
 end
 hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think()
-	if (self.DiscoveredAnims==false) then
-		self.DiscoveredAnims=true
-		print(self.Owner:GetViewModel())
-		self:DiscoverModelAnims()
-	end
 	if (CLIENT && (self.Ranger || self.RTRanger || self.SuperScope)) then
 		self.RangerTrace=util.TraceLine({
 			start=self.Owner:GetShootPos(),
@@ -1278,10 +1264,10 @@ function SWEP:Think()
 			if (self.NextBoltAnim) then
 				self:SendWeaponAnim(self.NextBoltAnim)
 				self.NextBoltAnim=nil
-				self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.NextIdleAnim)
+				self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.Anim.NextIdleAnim)
 				self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 			else
-				self:SendWeaponAnim(self.NextIdleAnim)
+				self:SendWeaponAnim(self.Anim.NextIdleAnim)
 				self:ServeNWFloat("NextIdle",0)
 			end
 		end
@@ -1334,52 +1320,52 @@ function SWEP:LowerDo(lower,anim,anim2,canfire)
 end
 function SWEP:Lower(lower)
 	self:SetNWBool("Raised",!lower)
-	local anim=self.LowerAnim
+	local anim=self.Anims.LowerAnim
 	local anim2=ACT_VM_IDLE
 	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
-		anim=self.LowerAnimEmpty
-		anim2=self.IdleAnimEmpty
+		anim=self.Anims.LowerAnimEmpty
+		anim2=self.Anims.IdleAnimEmpty
 	end
 	self:LowerDo(lower,anim,anim2,true)
 end
 function SWEP:LowerWall(lower)
 	self:SetNWBool("Lowered",!lower)
-	local anim=self.LowerAnim
+	local anim=self.Anims.LowerAnim
 	local anim2=ACT_VM_IDLE
 	if (!self:GetNWBool("Raised")) then
-		anim2=self.LowerAnim
+		anim2=self.Anims.LowerAnim
 	end
 	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
-		anim=self.LowerAnimEmpty
-		anim2=self.IdleAnimEmpty
+		anim=self.Anims.LowerAnimEmpty
+		anim2=self.Anims.IdleAnimEmpty
 		if (!self:GetNWBool("Raised")) then
-			anim2=self.LowerAnim
+			anim2=self.Anims.LowerAnim
 		end
 	end
 	self:LowerDo(lower,anim,anim2,true)
 end
 function SWEP:LowerRun(lower)
 	self:SetNWBool("Lowered",lower)
-	local anim=self.RunAnim
+	local anim=self.Anims.RunAnim
 	local anim2=ACT_VM_IDLE
 	if (!self:GetNWBool("Raised")) then
-		anim2=self.LowerAnim
+		anim2=self.Anims.LowerAnim
 	end
 	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
-		anim=self.RunAnimEmpty
-		anim2=self.IdleAnimEmpty
+		anim=self.Anims.RunAnimEmpty
+		anim2=self.Anims.IdleAnimEmpty
 		if (!self:GetNWBool("raised")) then
-			anim2=self.LowerAnimEmpty
+			anim2=self.Anims.LowerAnimEmpty
 		end
 	end
 	self:LowerDo(lower,anim,anim2,true)
 end
 function SWEP:LowerHolster(lower)
-	local anim=self.StowAnim
-	local anim2=self.UnstowAnim
+	local anim=self.Anim.StowAnim
+	local anim2=self.Anim.UnstowAnim
 	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
-		anim=self.StowAnimEmpty
-		anim2=self.UnstowAnimEmpty
+		anim=self.Anim.StowAnimEmpty
+		anim2=self.Anim.UnstowAnimEmpty
 	end
 	if (CLIENT) then return end
 	self:LowerDo(lower,anim,anim2,false)
@@ -1578,19 +1564,32 @@ function SWEP:AdjustMouseSensitivity()
                 return 1
         end
 end
+net.Receive("kswep_discoveranim",function(len)
+	local self=net.ReadEntity()
+	local anim=net.ReadString()
+	local act=net.ReadInt(16)
+	self:AddAnim(anim,act)
+end)
+function SWEP:AddAnim(anim,act)
+	self.Anims[anim]=act
+end
 function SWEP:DiscoverAnim(anim)
 	local max=#self:GetSequenceList()
 	local i=0
 	while (i<max) do
-		if (self.Owner:GetViewModel():GetSequenceInfo(i).activityname==anim) then
-			PrintTable(self.Owner:GetViewModel():GetSequenceInfo(i))
-			print(anim)
-			return self.Owner:GetViewModel():GetSequenceInfo(i).activity
+		if (self:GetSequenceInfo(i).activityname==anim) then
+			net.Start("kswep_discoveranim")
+			net.WriteEntity(self)
+			net.WriteString(anim)
+			net.WriteInt(self:GetSequenceInfo(i).activity)
+			net.Send(self.Owner)
+			return self:GetSequenceInfo(i).activity
 		end
 		i=i+1
 	end
 	return nil
 end
+function SWEP:SendModelAnims(
 function SWEP:IsRunning()
 	if (!self.Owner:IsPlayer()) then return false end
         if (self.Owner:GetVelocity():Length()>self.Owner:GetWalkSpeed()*1.2) then
@@ -1816,15 +1815,15 @@ function SWEP:MaterialPenetration(mat)
 end
 function SWEP:ShootEffects()
 	if (self.InsAnims && self:GetNWBool("Sight")) then
-		local anim=self.IronShootAnim
+		local anim=self.Anims.IronShootAnim
 		if (!self:GetNWBool("Chambered")) then
-		anim=self.ShootLastIronAnim
+		anim=self.Anim.ShootLastIronAnim
 		end
 		self.Weapon:SendWeaponAnim(anim) 
 	else
-		local anim=self.FireAnim
+		local anim=self.Anims.ShootAnim
 		if (!self:GetNWBool("Chambered")) then
-		anim=self.ShootLastAnim
+		anim=self.Anim.ShootLastAnim
 		end
 		self.Weapon:SendWeaponAnim(anim) 
 	end
@@ -1850,11 +1849,11 @@ function SWEP:ToggleAim()
                 --Stop using sight
 		self:ServeNWBool("Sight",false)
 		if (self.InsAnims) then
-			local anim=self.IronOutAnim
+			local anim=self.Anim.IronOutAnim
 			local anim2=ACT_VM_IDLE
 			if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
-				anim=self.IronOutAnimEmpty
-				anim2=self.IdleAnimEmpty
+				anim=self.Anim.IronOutAnimEmpty
+				anim2=self.Anims.IdleAnimEmpty
 			end
 			self:SendWeaponAnim(anim)
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
@@ -1863,11 +1862,11 @@ function SWEP:ToggleAim()
                 --Start using sight
                 self:ServeNWBool("Sight",true)
 		if (self.InsAnims) then
-			local anim=self.IronInAnim
-			local anim2=self.IronAnim
+			local anim=self.Anim.IronInAnim
+			local anim2=self.Anim.IronAnim
 			if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
-				anim=self.IronInAnimEmpty
-				anim2=self.IronAnimEmpty
+				anim=self.Anim.IronInAnimEmpty
+				anim2=self.Anim.IronAnimEmpty
 			end
 		self.IronZoom=self.Owner:GetFOV()
 			self:SendWeaponAnim(anim)
