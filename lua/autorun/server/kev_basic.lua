@@ -16,6 +16,7 @@ util.AddNetworkString("kswep_zero")
 util.AddNetworkString("kswep_scopesetup")
 util.AddNetworkString("kswep_weaponrange")
 util.AddNetworkString("kswep_magtable")
+util.AddNetworkString("kswep_discoveranim")
 net.Receive("kswep_flashlight",function(len,pl)
 	if (!IsValid(pl) || !pl:IsPlayer()) then return end
 	local wep=pl:GetActiveWeapon()

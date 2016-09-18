@@ -257,6 +257,10 @@ function SWEP:Initialize()
 end
 function SWEP:DiscoverModelAnims()
 end
+net.Receive("kswep_discoveranim",function(len)
+	local self=net.ReadEntity()
+	self:DiscoverModelAnims()
+end
 function SWEP:OnDrop()
 	self:Remove()
 end
@@ -417,6 +421,9 @@ function SWEP:Deploy()
 	self:SetNWFloat("CurRecoil",self.MaxRecoil)
 	if (self.InitialDraw) then
 		self:DiscoverModelAnims()
+		net.Start("kswep_discoveranim")
+		net.WriteEntity(self)
+		net.Send(self.Owner)
 		self:SetClip1(self.MagSize)
 		self.Weapon:SendWeaponAnim(self.InitialDrawAnim)
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
