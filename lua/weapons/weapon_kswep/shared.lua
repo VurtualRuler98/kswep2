@@ -260,7 +260,7 @@ end
 net.Receive("kswep_discoveranim",function(len)
 	local self=net.ReadEntity()
 	self:DiscoverModelAnims()
-end
+end)
 function SWEP:OnDrop()
 	self:Remove()
 end
