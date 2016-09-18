@@ -1589,7 +1589,6 @@ function SWEP:DiscoverAnim(anim)
 	end
 	return nil
 end
-function SWEP:SendModelAnims(
 function SWEP:IsRunning()
 	if (!self.Owner:IsPlayer()) then return false end
         if (self.Owner:GetVelocity():Length()>self.Owner:GetWalkSpeed()*1.2) then
