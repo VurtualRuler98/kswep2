@@ -1172,6 +1172,7 @@ hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think()
 	if (self.DiscoveredAnims==false) then
 		self.DiscoveredAnims=true
+		print(self.Owner:GetViewModel())
 		self:DiscoverModelAnims()
 	end
 	if (CLIENT && (self.Ranger || self.RTRanger || self.SuperScope)) then
