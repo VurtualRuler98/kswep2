@@ -38,7 +38,7 @@ function ENT:UseBox( activator, caller )
 				canmag=true
 			end
 			local canoptic=false
-			if (wep.DefaultSight || wep.NoDefaultSightModel) then
+			if ((wep.DefaultSight || wep.NoDefaultSightModel) && !wep.NoOpticMounting) then
 				canoptic=true
 			end
 			if (canmag || canoptic) then

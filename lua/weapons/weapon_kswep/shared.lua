@@ -1425,6 +1425,10 @@ function SWEP:PostDrawViewModel()
 	scopeview.dopostprocess=false
 	scopeview.fov = self.ScopeFOV
 	render.RenderView(scopeview)
+	if (self.ScopeOverlayMat) then
+		render.SetMaterial(Material(self.ScopeOverlayMat))
+		render.DrawScreenQuadEx(0,0,self.ScopeRes,self.ScopeRes)
+	end
 	end
 	if (self.SuperScope && self:GetNWBool("Sight")) then
 		if (!IsValid(self.superlight)) then
