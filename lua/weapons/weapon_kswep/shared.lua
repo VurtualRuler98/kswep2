@@ -309,6 +309,9 @@ function SWEP:NormalFire()
 		snd=self.Primary.SoundSup
 	end
 	self.Weapon:EmitSound(snd)
+	if (self:Clip1()==1 && self.OpenBolt && self.Primary.SoundPing) then
+		self.Weapon:EmitSound(self.Primary.SoundPing)
+	end
 	local ammo = self.Ammo
 	if (!self.OpenBolt) then
 		ammo = self.ChamberAmmo
@@ -1832,13 +1835,13 @@ end
 function SWEP:ShootEffects()
 	if (self.InsAnims && self:GetNWBool("Sight")) then
 		local anim=self.Anims.IronShootAnim
-		if (!self:GetNWBool("Chambered")) then
+		if (!self:GetNWBool("Chambered") || (self.OpenBolt && self:Clip1()==1)) then
 		anim=self.Anims.ShootLastIronAnim
 		end
 		self.Weapon:SendWeaponAnim(anim) 
 	else
 		local anim=self.Anims.ShootAnim
-		if (!self:GetNWBool("Chambered")) then
+		if (!self:GetNWBool("Chambered") || (self.OpenBolt && self:Clip1()==1)) then
 		anim=self.Anims.ShootLastAnim
 		end
 		self.Weapon:SendWeaponAnim(anim) 
