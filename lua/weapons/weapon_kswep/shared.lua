@@ -164,6 +164,7 @@ SWEP.WaitShotIron=false
 SWEP.HasRanger=false
 SWEP.RangerTrace=nil
 SWEP.DiscoveredAnims=false
+SWEP.SingleReloadFiringPin=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -223,6 +224,7 @@ function SWEP:Initialize()
 		for i=1,self.MagSize do
 			table.insert(self.MagTable,{caliber=self.Ammo.name,num=1})
 		end
+		self:SetNWInt("MagRounds",#self.MagTable)
 		self.MagType=self.Caliber
 	end
 	self.Magazines = {}
@@ -389,10 +391,13 @@ end)
 function SWEP:TakePrimaryAmmo(num)
 		if (self.SingleReload) then
 			if (self.Owner:IsPlayer()) then
-				self:SetChamberAmmo(vurtual_ammodata[self.MagTable[#self.MagTable].caliber])
-				table.remove(self.MagTable)
+				if (#self.MagTable>0) then
+					self:SetChamberAmmo(vurtual_ammodata[self.MagTable[#self.MagTable].caliber])
+					table.remove(self.MagTable)
+				end
 				self.Weapon:SetClip1(#self.MagTable)
 				if (SERVER) then
+					self:SetNWInt("MagRounds",#self.MagTable)
 					net.Start("kswep_magtable")
 					net.WriteEntity(self)
 					net.WriteTable(self.MagTable)
@@ -937,9 +942,12 @@ function SWEP:FinishReloadSingle()
 	end
 	return
 	end
-	local mag=table.GetLastValue(self.Magazines)
-	table.insert(self.MagTable,mag)
-	table.remove(self.Magazines)
+	if (SERVER) then
+		local mag=table.GetLastValue(self.Magazines)
+		table.insert(self.MagTable,mag)
+		table.remove(self.Magazines)
+		self:SetNWInt("MagRounds",#self.MagTable)
+	end
 	local anim = ACT_VM_IDLE
 	if (self.Anims.StartReloadAnim) then
 		anim = self.Anims.MidReloadAnim
@@ -963,6 +971,10 @@ function SWEP:FinishReloadSingle()
 	if (self.SingleReloadChambers && !self:GetNWBool("Chambered")) then
 		self:TakePrimaryAmmo(1)
 		self:SetNWBool("Chambered",true)
+		self:SetNWBool("FiringPin",true)
+	end
+	if (self.SingleReloadFiringPin) then
+		self:SetNWBool("FiringPin",true)
 	end
 	if (SERVER && self.Owner:IsPlayer()) then
 		net.Start("kswep_magtable")
@@ -1193,8 +1205,8 @@ function SWEP:Think()
 	if (!self.Owner:OnGround()) then
 		self:SetNWFloat("CurRecoil",self.MaxRecoil)
 	end
-	if (self.Owner:IsPlayer() && self.SingleReload && self:Clip1()!=#self.MagTable) then
-		self:SetClip1(#self.MagTable)
+	if (self.Owner:IsPlayer() && self.SingleReload && self:Clip1()!=self:GetNWInt("MagRounds")) then
+		self:SetClip1(self:GetNWInt("MagRounds"))
 	end
 	if (SERVER) then
 		local plmags=self.Owner.KPrimaryMags
