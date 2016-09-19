@@ -330,12 +330,12 @@ function SWEP:NormalFire()
 	local animbolt = self.Anims.BoltAnim
 	if (self:GetNWBool("Sight")) then
 		animbolt = self.Anims.BoltAnimIron
-		if (self:GetNWBool("Chambered")) then
+		if (self:GetNWBool("Chambered") || (self.OpenBolt && self:Clip1()<1)) then
 			anim=self.Anims.IronAnim
 		else
 			anim=self.Anims.IronAnimEmpty
 		end
-	elseif (!self:GetNWBool("Chambered")) then
+	elseif (!self:GetNWBool("Chambered") || (self.OpenBolt && self:Clip1()<1)) then
 		anim=self.Anims.IdleAnimEmpty
 	end
 	local bolttime = 0
@@ -1342,7 +1342,7 @@ function SWEP:Lower(lower)
 	self:SetNWBool("Raised",!lower)
 	local anim=self.Anims.LowerAnim
 	local anim2=ACT_VM_IDLE
-	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
+	if ((self.OpenBolt && self:Clip1()<1) || (!self:GetNWBool("Chambered")) && self.EmptyAnims) then	
 		anim=self.Anims.LowerAnimEmpty
 		anim2=self.Anims.IdleAnimEmpty
 	end
@@ -1371,7 +1371,7 @@ function SWEP:LowerRun(lower)
 	if (!self:GetNWBool("Raised")) then
 		anim2=self.Anims.LowerAnim
 	end
-	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
+	if ((self.OpenBolt && self:Clip1()<1) || (!self:GetNWBool("Chambered")) && self.EmptyAnims) then	
 		anim=self.Anims.RunAnimEmpty
 		anim2=self.Anims.IdleAnimEmpty
 		if (!self:GetNWBool("raised")) then
@@ -1383,7 +1383,7 @@ end
 function SWEP:LowerHolster(lower)
 	local anim=self.Anims.StowAnim
 	local anim2=self.Anims.UnstowAnim
-	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
+	if ((self.OpenBolt && self:Clip1()<1) || (!self:GetNWBool("Chambered")) && self.EmptyAnims) then	
 		anim=self.Anims.StowAnimEmpty
 		anim2=self.Anims.UnstowAnimEmpty
 	end
