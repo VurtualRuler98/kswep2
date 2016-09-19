@@ -87,6 +87,23 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_3006_ball",DMG_BULLET,0,0,80,10,5})
 	local tbl = {}
+	tbl.vestpenetration=35
+	tbl.powermin=7
+	tbl.powermax=7
+	tbl.helmetpenetration=2
+	tbl.armordamagemult=2
+	tbl.name = "vammo_3006_ap"
+	tbl.printname = ".30-06 M2 AP"
+	tbl.caliber = "vammo_3006"
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.damagescale = 1
+	tbl.recoil = 4.5
+	tbl.wallbang = 10
+	tbl.velocity = 2715
+	AddAmmodata(tbl)
+	game.AddAmmoType({name="vammo_3006_ap",DMG_BULLET,0,0,80,10,5})
+	local tbl = {}
 	tbl.vestpenetration=25
 	tbl.powermin=7
 	tbl.powermax=7
