@@ -75,6 +75,23 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.powermax=7
 	tbl.helmetpenetration=2
 	tbl.armordamagemult=2
+	tbl.name = "vammo_3006_ball"
+	tbl.printname = ".30-06 M2 ball"
+	tbl.caliber = "vammo_3006"
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.damagescale = 1
+	tbl.recoil = 4.5
+	tbl.wallbang = 4
+	tbl.velocity = 2800
+	AddAmmodata(tbl)
+	game.AddAmmoType({name="vammo_3006_ball",DMG_BULLET,0,0,80,10,5})
+	local tbl = {}
+	tbl.vestpenetration=25
+	tbl.powermin=7
+	tbl.powermax=7
+	tbl.helmetpenetration=2
+	tbl.armordamagemult=2
 	tbl.name = "vammo_762x54t"
 	tbl.printname = "7.62x54mm Tranq."
 	tbl.caliber = "vammo_762x54t"
@@ -156,6 +173,24 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity =	1300 --115gr fmj
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_9x19_FMJ",DMG_BULLET,0,0,80,10,5})
+
+	local tbl = {}
+	tbl.vestpenetration=15
+	tbl.powermin=3
+	tbl.powermax=4
+	tbl.helmetpenetration=0
+	tbl.armordamagemult=1
+	tbl.name = "vammo_30car_FMJ"
+	tbl.printname = ".30 Carbine FMJ"
+	tbl.caliber = "vammo_30car"
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.damagescale = 1
+	tbl.wallbang = 5
+	tbl.recoil = 0.7
+	tbl.velocity =	1990 --110gr FMJ
+	AddAmmodata(tbl)
+	game.AddAmmoType({name="vammo_30car_FMJ",DMG_BULLET,0,0,80,10,5})
 	
 	local tbl = {}
 	tbl.vestpenetration=15
