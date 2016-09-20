@@ -190,7 +190,23 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity =	1300 --115gr fmj
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_9x19_FMJ",DMG_BULLET,0,0,80,10,5})
-
+	local tbl = {}
+	tbl.vestpenetration=0
+	tbl.powermin=0
+	tbl.powermax=0
+	tbl.helmetpenetration=0
+	tbl.armordamagemult=0
+	tbl.name = "vammo_9x19t"
+	tbl.printname = "9x19mm Tranq."
+	tbl.caliber = "vammo_9x19t"
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.damagescale = 1
+	tbl.wallbang = 0
+	tbl.recoil = 0.8
+	tbl.velocity =	1000 --tranq
+	AddAmmodata(tbl)
+	game.AddAmmoType({name="vammo_9x19t",DMG_BULLET,0,0,80,10,5})
 	local tbl = {}
 	tbl.vestpenetration=15
 	tbl.powermin=3

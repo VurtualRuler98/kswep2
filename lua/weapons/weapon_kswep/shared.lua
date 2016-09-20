@@ -204,6 +204,7 @@ function SWEP:Initialize()
 			end
 		end)
 	end
+	self:SetHoldType(self.HoldType)
 	if (CLIENT) then
 		self.MergeParts={}
 		if (self.MergeAttachments!=nil) then
@@ -255,7 +256,7 @@ function SWEP:Initialize()
 		self.optic=ClientsideModel(self.CurrentSight)
 		self.optic:SetNoDraw(true)
 	end
-	if (CLIENT && self.InsAttachments) then
+	if (CLIENT && self.InsAttachments && self.Owner:IsPlayer()) then
 		self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 	end
 end
@@ -339,7 +340,7 @@ function SWEP:NormalFire()
 		anim=self.Anims.IdleAnimEmpty
 	end
 	local bolttime = 0
-	if (animbolt) then
+	if (animbolt && ((self.OpenBolt && self:Clip1()>0) || (!self.OpenBolt && self:GetNWBool("Chambered")))) then
 		if (self.UseDelayForBolt) then
 			self:NextBolt(CurTime()+self.Primary.Delay,anim,animbolt)
 		else
@@ -888,6 +889,9 @@ function SWEP:FinishReload()
 	self:ServeNWBool("FiringPin",true)
 	table.insert(self.Magazines,{caliber=self.Ammo.name,num = self:Clip1()})
 	table.SortByMember(self.Magazines,"num",true)
+	if (self.Anims.EndEmptyReloadAnim && ((!self.OpenBolt && !self:GetNWBool("Chambered")) || (self.OpenBolt && self:Clip1()<1) )) then
+		self:NextBolt(CurTime(),ACT_VM_IDLE,self.Anims.EndEmptyReloadAnim)
+	end
 	local mag=table.GetLastValue(self.Magazines)
 	self:SetClip1(mag.num)
 	self.Ammo=vurtual_ammodata[mag.caliber]
@@ -1176,7 +1180,10 @@ function SWEP:EnableLaser(enable)
 	net.SendToServer()
 end
 hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
+function SWEP:Think2()
+end
 function SWEP:Think()
+	self:Think2()
 	if (SERVER && !self.DiscoveredAnims) then
 		self:DiscoverModelAnims()
 		self.DiscoveredAnims=true
@@ -1188,7 +1195,7 @@ function SWEP:Think()
 			filter=self.Owner,
 		} )
 	end
-	if (CLIENT) then
+	if (CLIENT && self.Owner:IsPlayer()) then
 		if (!self:GetNWBool("Sight") && self.superlight) then
 			self.superlight:Remove()
 		end
@@ -1226,7 +1233,6 @@ function SWEP:Think()
 			self:ServeNWInt("MagazineCount",#self.Magazines)
 		end
 	end
-	if (IsFirstTimePredicted()) then
 	for k,v in pairs(self.Bullets) do
 		if (v.time<CurTime()) then
 			self.Bullets[k]=self:FlyBullet(v)
@@ -1239,7 +1245,6 @@ function SWEP:Think()
 			self:FinishReload()
 		end
 		end
-	end
 	if (self:GetNWFloat("CurRecoil")>0) then
 		--self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")-(FrameTime()*self.RecoilControl))
 		self:SetNWFloat("CurRecoil",Lerp(FrameTime()*self.RecoilControl/2,self:GetNWFloat("CurRecoil"),0))
@@ -1280,23 +1285,21 @@ function SWEP:Think()
 		self.Holstering=nil
 	end
 	if (self:GetNWFloat("NextIdle")!=0 && self:GetNWFloat("NextIdle")<CurTime()) then
-		if (SERVER) then
-			if (self.NextBoltAnim) then
-				self:SendWeaponAnim(self.NextBoltAnim)
-				self.NextBoltAnim=nil
-				self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.Anims.NextIdleAnim)
-				self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
-			else
-				self:SendWeaponAnim(self.Anims.NextIdleAnim)
-				self:ServeNWFloat("NextIdle",0)
-			end
+		if (self.NextBoltAnim) then
+			self:SendWeaponAnim(self.NextBoltAnim)
+			self.NextBoltAnim=nil
+			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.Anims.NextIdleAnim)
+			self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+		else
+			self:SendWeaponAnim(self.Anims.NextIdleAnim)
+			self:ServeNWFloat("NextIdle",0)
 		end
 	end
 	local hold=self:GetNWString("HoldType")
 	if (self:GetNWBool("Lowered") || !self:GetNWBool("Raised")) then
 		hold=self:GetNWString("IdleType")
 	end
-	if (self:GetHoldType()!=hold) then
+	if (self:GetHoldType()!=hold && self.Owner:IsPlayer()) then
 		self:SetHoldType(hold)
 	end
 	if (self:GetNWBool("Burst")==0 && self.Burst>0 && (self.Owner:IsNPC() || !self.Owner:KeyDown(IN_ATTACK))) then
@@ -1597,10 +1600,12 @@ end)
 function SWEP:SetAnim(anim,act)
 	self.Anims[anim]=act
 	net.Start("kswep_discoveranim")
-	net.WriteEntity(self)
-	net.WriteString(anim)
-	net.WriteInt(act,16)
-	net.Send(self.Owner)
+	if (self.Owner:IsPlayer()) then
+		net.WriteEntity(self)
+		net.WriteString(anim)
+		net.WriteInt(act,16)
+		net.Send(self.Owner)
+	end
 end
 function SWEP:DiscoverAnim(anim)
 	local max=#self:GetSequenceList()
