@@ -20,7 +20,7 @@ function TOOL:LeftClick(trace)
 		--straight up pulled from sandbox code
 		local fixpos=trace.HitPos-(trace.HitNormal*512)
 		fixpos=ent:NearestPoint(fixpos)
-		fixpos=tr.HitPos+fixpos
+		fixpos=trace.HitPos+fixpos
 		ent:SetPos(fixpos)
 		--ok done
 		ent:SetNWBool("GiveAmmo",self:GetClientNumber("give_ammo")==1)
@@ -31,7 +31,7 @@ function TOOL:LeftClick(trace)
 		undo.Create("KSWEP Supplies")
 		undo.AddEntity(ent)
 		undo.SetPlayer(self:GetOwner())
-		undo.Finish()
+		undo.Finish("KSWEP Supplies")
 		end
 		if (CLIENT) then return true end
 	end
