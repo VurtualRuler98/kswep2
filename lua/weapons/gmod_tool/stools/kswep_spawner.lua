@@ -36,13 +36,15 @@ function TOOL:LeftClick(trace)
 		end
 		if (CLIENT) then return true end
 	end
-	if (tr.HitEntity && IsValid(tr.Entity) tr.Entity:GetClass()=="sent_vurt_supplybox") then
-		local ent=tr.Entity
-		ent:SetNWBool("GiveAmmo",self:GetClientNumber("give_ammo")==1)
-		ent:SetNWBool("GiveLights",self:GetClientNumber("give_lights")==1)
-		ent:SetNWBool("GiveOptics",self:GetClientNumber("give_optics")==1)
-		ent:SetNWBool("GiveSuppressors",self:GetClientNumber("give_suppressors")==1)
-		ent:SetNWBool("GunRack",self:GetClientNumber("gunrack")==1)
+	if (trace.HitEntity && IsValid(trace.Entity) trace.Entity:GetClass()=="sent_vurt_supplybox") then
+		if (SERVER) then
+			local ent=trace.Entity
+			ent:SetNWBool("GiveAmmo",self:GetClientNumber("give_ammo")==1)
+			ent:SetNWBool("GiveLights",self:GetClientNumber("give_lights")==1)
+			ent:SetNWBool("GiveOptics",self:GetClientNumber("give_optics")==1)
+			ent:SetNWBool("GiveSuppressors",self:GetClientNumber("give_suppressors")==1)
+			ent:SetNWBool("GunRack",self:GetClientNumber("gunrack")==1)
+		end
 		if (CLIENT) then return true end
 	end
 end
