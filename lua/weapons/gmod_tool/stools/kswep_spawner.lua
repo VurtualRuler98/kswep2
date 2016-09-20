@@ -36,7 +36,7 @@ function TOOL:LeftClick(trace)
 		end
 		if (CLIENT) then return true end
 	end
-	if (trace.HitNonWorld && IsValid(trace.Entity) trace.Entity:GetClass()=="sent_vurt_supplybox") then
+	if (trace.HitNonWorld && IsValid(trace.Entity) && trace.Entity:GetClass()=="sent_vurt_supplybox") then
 		if (SERVER) then
 			local ent=trace.Entity
 			ent:SetNWBool("GiveAmmo",self:GetClientNumber("give_ammo")==1)
