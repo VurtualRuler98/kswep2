@@ -10,12 +10,15 @@ function ENT:SpawnFunction(ply, tr)
 	local ent = ents.Create("sent_vurt_supplybox")
 	ent:SetPos(tr.HitPos + Vector(0, 0, 15))
 	ent:Spawn()
-
 	return ent
 end
 
 function ENT:Initialize()
 	self.Entity:SetModel( "models/items/item_item_crate.mdl")
+	self:SetNWBool("GiveAmmo",true)
+	self:SetNWBool("GiveSuppressors",true)
+	self:SetNWBool("GiveOptics",true)
+	self:SetNWBool("GiveLights",true)
 	self.Entity:PhysicsInit( SOLID_VPHYSICS)
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )

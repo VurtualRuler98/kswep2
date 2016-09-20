@@ -55,7 +55,7 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 		ammoframe:SetSize(menuwidth,menuheight)
 		ammoframe:SetTitle("THIS IS AMMO!")
 		ammoframe:MakePopup()
-	if (canmag) then
+	if (canmag && self:GetNWBool("GiveAmmo")) then
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(20,40)
@@ -66,7 +66,7 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				ammoframe:Close()
 			end
 	end
-	if (canoptic) then
+	if (canoptic && self:GetNWBool("GiveOptics")) then
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(20,80)
@@ -77,7 +77,7 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				ammoframe:Close()
 			end
 	end
-	if (wep.Suppressable) then
+	if (wep.Suppressable && self:GetNWBool("GiveSuppressors")) then
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(20,120)
@@ -90,7 +90,7 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 			ammoframe:Close()
 			end
 	end
-	if (wep.CanFlashlight) then
+	if (wep.CanFlashlight && self:GetNWBool("GiveLights")) then
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(20,160)
@@ -103,7 +103,7 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 			ammoframe:Close()
 			end
 	end
-	if (wep.CanFlashlight) then
+	if (wep.CanFlashlight && self:GetNWBool("GiveLights")) then
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(80,160)
@@ -116,7 +116,7 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 			ammoframe:Close()
 			end
 	end
-	if (wep.CanFlashlight) then
+	if (wep.CanFlashlight && self:GetNWBool("GiveLights")) then
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(140,160)
