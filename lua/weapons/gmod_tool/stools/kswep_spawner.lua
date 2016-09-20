@@ -79,6 +79,6 @@ list.Set("KswepBoxModels","models/props_c17/display_cooler01a.mdl",{})
 list.Set("KswepBoxModels","models/props_wasteland/controlroom_storagecloset001a.mdl",{})
 list.Set("KswepBoxModels","models/Items/BoxSRounds.mdl",{})
 list.Set("KswepBoxModels","models/Items/BoxMRounds.mdl",{})
-list.Set("KswepBoxModels","models/props/CS_militia/footlocker01_open.mdl".{})
-list.Set("KswepBoxModels","models/props/CS_militia/footlocker01_closed.mdl".{})
+list.Set("KswepBoxModels","models/props/CS_militia/footlocker01_open.mdl",{})
+list.Set("KswepBoxModels","models/props/CS_militia/footlocker01_closed.mdl",{})
 	
