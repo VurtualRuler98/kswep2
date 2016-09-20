@@ -13,7 +13,7 @@ function TOOL:LeftClick(trace)
 		local ent=ents.Create("sent_vurt_supplybox")
 		ent:SetPos(trace.HitPos+Vector(0,0,1+self:GetClientNumber("offset")))
 		ent:Spawn()
-		if (util.IsValidProp(self:GetClientInfo("model"))) then
+		if (util.IsValidModel(self:GetClientInfo("model"))) then
 			ent:SetModel(self:GetClientInfo("model","models/Items/item_item_crate.mdl"))
 			ent:PhysicsInit(SOLID_VPHYSICS)
 		end
