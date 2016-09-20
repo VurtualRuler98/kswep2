@@ -13,8 +13,10 @@ function TOOL:LeftClick(trace)
 		local ent=ents.Create("sent_vurt_supplybox")
 		ent:SetPos(trace.HitPos+Vector(0,0,1+self:GetClientNumber("offset")))
 		ent:Spawn()
-		ent:SetModel(self:GetClientInfo("model","models/Items/item_item_crate.mdl"))
-		ent:PhysicsInit(SOLID_VPHYSICS)
+		if (util.IsValidProp(self:GetClientInfo("model"))) then
+			ent:SetModel(self:GetClientInfo("model","models/Items/item_item_crate.mdl"))
+			ent:PhysicsInit(SOLID_VPHYSICS)
+		end
 		--straight up pulled from sandbox code
 		local fixpos=trace.HitPos-(trace.HitNormal*512)
 		fixpos=ent:NearestPoint(fixpos)
