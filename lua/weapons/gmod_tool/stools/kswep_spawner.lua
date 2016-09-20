@@ -5,6 +5,7 @@ TOOL.ClientConVar["give_ammo"] = "1"
 TOOL.ClientConVar["give_lights"] = "1"
 TOOL.ClientConVar["give_optics"] = "1"
 TOOL.ClientConVar["give_suppressors"] = "1"
+TOOL.ClientConVar["gunrack"] = "1"
 TOOL.ClientConVar["offset"]=0
 function TOOL:LeftClick(trace)
 	if (trace.HitWorld) then
@@ -18,6 +19,7 @@ function TOOL:LeftClick(trace)
 		ent:SetNWBool("GiveLights",self:GetClientNumber("give_lights")==1)
 		ent:SetNWBool("GiveOptics",self:GetClientNumber("give_optics")==1)
 		ent:SetNWBool("GiveSuppressors",self:GetClientNumber("give_suppressors")==1)
+		ent:SetNWBool("GunRack",self:GetClientNumber("gunrack")==1)
 		undo.Create("KSWEP Supplies")
 		undo.AddEntity(ent)
 		undo.SetPlayer(self:GetOwner())
@@ -43,6 +45,10 @@ function TOOL.BuildCPanel(panel)
 	panel:AddControl("CheckBox",{
 		Label="Give Suppressors",
 		Command="kswep_spawner_give_suppressors"
+	})
+	panel:AddControl("CheckBox",{
+		Label="Gun Rack",
+		Command="kswep_spawner_gunrack"
 	})
 	panel:AddControl("PropSelect",{
 		Label="Model",

@@ -17,10 +17,59 @@ net.Receive("kswep_supplybox",function()
 		local mags=net.ReadTable()
 		local canmag=net.ReadBool()
 		local canoptic=net.ReadBool()
+		box.GunList=net.ReadTable()
 		box:ClUseBox(wep,mags,canmag,canoptic)
+end)
+net.Receive("kswep_gunrack",function()
+	local box=net.ReadEntity()
+	box.GunList=net.ReadTable()
+	box:ClGunRack()
 end)
 
 
+function ENT:ClGunRack()
+	local menuwidth=200
+	local menuheight=300
+	local wep=LocalPlayer():GetActiveWeapon()
+	local box=self
+	local ammoframe = vgui.Create("DFrame")
+		ammoframe:SetPos((ScrW()/2)-(menuwidth/2),(ScrH()/2)-(menuheight/2))
+		ammoframe:SetSize(menuwidth,menuheight)
+		ammoframe:SetTitle("THIS IS AMMO!")
+		ammoframe:MakePopup()
+	local scrollmenu = vgui.Create("DListView")
+		scrollmenu:SetParent(ammoframe)
+		scrollmenu:SetPos(16,64)
+		scrollmenu:SetSize(menuwidth-32,menuheight-96)
+		scrollmenu:AddColumn("Guns")
+		for k,v in pairs(self.GunList) do
+			scrollmenu:AddLine(v)
+		end
+	if (wep:IsValid()) then
+		local dbutton=vgui.Create("DButton")
+			dbutton:SetParent(ammoframe)
+			dbutton:SetPos(16,32)
+			dbutton:SetSize(menuwidth-32,32)
+			dbutton:SetText("Rack Gun")
+			dbutton.DoClick = function()
+				if (wep:IsValid()) then 
+				net.Start("kswep_putguninrack")
+				net.WriteEntity(wep)
+				net.WriteEntity(self)
+				net.SendToServer()
+				end
+				ammoframe:Close()
+			end
+		end
+		function scrollmenu:OnClickLine(line,selected,self)
+			net.Start("kswep_takegunfromrack")
+			net.WriteString(line:GetValue(1))
+			net.WriteEntity(box)
+			net.SendToServer()
+			ammoframe:Close()
+		end
+
+end 
 function ENT:ClUseMagBox(wep,mags)
 	local menuwidth=200
 	local menuheight=200
@@ -30,7 +79,7 @@ function ENT:ClUseMagBox(wep,mags)
 		ammoframe:SetTitle("THIS IS AMMO!")
 		ammoframe:MakePopup()
 	local scrollmenu = vgui.Create("DListView",ammoframe)
-		scrollmenu:SetPos((ScrW()/2)-(menuwidth/2)+16,(ScrH()/2)-(menuheight/2)+32)
+		scrollmenu:SetPos(16,32)
 		scrollmenu:SetSize(menuwidth-32,menuheight-32)
 		scrollmenu:AddColumn("ammo")
 		for k,v in pairs(vurtual_ammodata) do
@@ -44,12 +93,11 @@ function ENT:ClUseMagBox(wep,mags)
 			net.SendToServer()
 			ammoframe:Close()
 		end
-		scrollmenu:MakePopup()
 
 end 
 function ENT:ClUseBox(wep,mags,canmag,canoptic)
 	local menuwidth=200
-	local menuheight=200
+	local menuheight=300
 	local ammoframe = vgui.Create("DFrame")
 		ammoframe:SetPos((ScrW()/2)-(menuwidth/2),(ScrH()/2)-(menuheight/2))
 		ammoframe:SetSize(menuwidth,menuheight)
@@ -129,6 +177,17 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 			ammoframe:Close()
 			end
 	end
+	if (self:GetNWBool("GunRack")) then
+		local dbutton=vgui.Create("DButton")
+			dbutton:SetParent(ammoframe)
+			dbutton:SetPos(20,200)
+			dbutton:SetSize(180,40)
+			dbutton:SetText("Gun Rack")
+			dbutton.DoClick = function()
+				self:ClGunRack()
+				ammoframe:Close()
+			end
+	end
 end 
 net.Receive("kswep_opticbox", function()
 	local box=net.ReadEntity()
@@ -144,7 +203,7 @@ function ENT:ClUseOpticBox(wep)
 		ammoframe:SetTitle("Optics")
 		ammoframe:MakePopup()
 	local scrollmenu = vgui.Create("DListView",ammoframe)
-		scrollmenu:SetPos((ScrW()/2)-(menuwidth/2)+16,(ScrH()/2)-(menuheight/2)+32)
+		scrollmenu:SetPos(16,32)
 		scrollmenu:SetSize(menuwidth-32,menuheight-32)
 		scrollmenu:AddColumn("ammo")
 		for k,v in pairs(kswep_optics) do
@@ -154,6 +213,5 @@ function ENT:ClUseOpticBox(wep)
 			wep:InsOptic(line:GetValue(1))
 			ammoframe:Close()
 		end
-		scrollmenu:MakePopup()
 
 end 

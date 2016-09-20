@@ -19,6 +19,7 @@ function ENT:Initialize()
 	self:SetNWBool("GiveSuppressors",true)
 	self:SetNWBool("GiveOptics",true)
 	self:SetNWBool("GiveLights",true)
+	self:SetNWBool("GunRack",true)
 	self.Entity:PhysicsInit( SOLID_VPHYSICS)
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )
@@ -33,7 +34,7 @@ function ENT:Use(activator,caller)
 	self:UseBox(activator,caller)
 end
 function ENT:UseBox( activator, caller )
-	if ( activator:IsPlayer() )  then
+	if (IsValid(activator) &&  activator:IsPlayer() )  then
 		local wep=activator:GetActiveWeapon()
 		if (wep:IsValid() && string.find(wep:GetClass(),"weapon_kswep")) then
 			local canmag=false
@@ -51,9 +52,14 @@ function ENT:UseBox( activator, caller )
 				net.WriteTable(vurtual_ammodata)
 				net.WriteBool(canmag)
 				net.WriteBool(canoptic)
+				net.WriteTable(self.GunList)
 				net.Send(activator)
 			end
-			
+		elseif (self:GetNWBool("GunRack")) then
+			net.Start("kswep_gunrack")
+			net.WriteEntity(self)
+			net.WriteTable(self.GunList)
+			net.Send(activator)
 		end
 	end
 end
@@ -88,5 +94,12 @@ function ENT:UseOpticBox(activator,caller)
 end
 function ENT:Think()
 end
-
-
+function ENT:HasGun(wep)
+	return table.HasValue(self.GunList,wep)
+end
+function ENT:RackGun(wep)
+	table.insert(self.GunList,wep)
+end
+function ENT:RemoveGun(wep)
+	table.RemoveByValue(self.GunList,wep)
+end

@@ -17,6 +17,10 @@ util.AddNetworkString("kswep_scopesetup")
 util.AddNetworkString("kswep_weaponrange")
 util.AddNetworkString("kswep_magtable")
 util.AddNetworkString("kswep_discoveranim")
+util.AddNetworkString("kswep_gunrack")
+util.AddNetworkString("kswep_putguninrack")
+util.AddNetworkString("kswep_updaterack")
+util.AddNetworkString("kswep_takegunfromrack")
 net.Receive("kswep_flashlight",function(len,pl)
 	if (!IsValid(pl) || !pl:IsPlayer()) then return end
 	local wep=pl:GetActiveWeapon()
@@ -34,6 +38,25 @@ net.Receive("kswep_flashlight",function(len,pl)
 	net.WriteBool(lighton)
 	net.WriteBool(isflashlight)
 	net.SendOmit(pl)
+end)
+net.Receive("kswep_putguninrack",function(len,pl)
+	if (!IsValid(pl) || !pl:IsPlayer()) then return end
+	local wep=net.ReadEntity()
+	local box=net.ReadEntity()
+	if (!IsValid(box) || box:GetClass()!="sent_vurt_supplybox" || !box:GetNWBool("GunRack")) then return end
+	if (!IsValid(wep) || wep.Owner!=pl ) then return end
+	box:RackGun(wep:GetClass())
+	wep:Remove()
+end)
+net.Receive("kswep_takegunfromrack",function(len,pl)
+	if (!IsValid(pl) || !pl:IsPlayer()) then return end
+	local wep=net.ReadString()
+	local box=net.ReadEntity()
+	if (!IsValid(box) || box:GetClass()!="sent_vurt_supplybox" || !box:GetNWBool("GunRack")) then return end
+	if (pl:HasWeapon(wep)) then return end
+	if (!box:HasGun(wep)) then return end
+	box:RemoveGun(wep)
+	pl:Give(wep)
 end)
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
