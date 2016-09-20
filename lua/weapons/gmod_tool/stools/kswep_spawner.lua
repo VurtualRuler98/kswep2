@@ -36,6 +36,15 @@ function TOOL:LeftClick(trace)
 		end
 		if (CLIENT) then return true end
 	end
+	if (tr.HitEntity && IsValid(tr.Entity) tr.Entity:GetClass()=="sent_vurt_supplybox") then
+		local ent=tr.Entity
+		ent:SetNWBool("GiveAmmo",self:GetClientNumber("give_ammo")==1)
+		ent:SetNWBool("GiveLights",self:GetClientNumber("give_lights")==1)
+		ent:SetNWBool("GiveOptics",self:GetClientNumber("give_optics")==1)
+		ent:SetNWBool("GiveSuppressors",self:GetClientNumber("give_suppressors")==1)
+		ent:SetNWBool("GunRack",self:GetClientNumber("gunrack")==1)
+		if (CLIENT) then return true end
+	end
 end
 function TOOL.BuildCPanel(panel)
 	panel:AddControl("Header",{Text="KSWEP supply spawner", Description="Create customized supply boxes."})
