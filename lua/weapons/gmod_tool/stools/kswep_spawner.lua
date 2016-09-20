@@ -20,7 +20,8 @@ function TOOL:LeftClick(trace)
 		--straight up pulled from sandbox code
 		local fixpos=trace.HitPos-(trace.HitNormal*512)
 		fixpos=ent:NearestPoint(fixpos)
-		fixpos=ent:GetPos()+fixpos
+		fixpos=ent:GetPos()-fixpos
+		fixpos=trace.HitPos+fixpos
 		ent:SetPos(fixpos)
 		--ok done
 		ent:SetNWBool("GiveAmmo",self:GetClientNumber("give_ammo")==1)
