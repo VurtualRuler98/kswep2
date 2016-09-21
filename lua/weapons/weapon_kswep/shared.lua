@@ -1449,7 +1449,7 @@ function SWEP:PostDrawViewModel()
 				aperture=aperture+render.ReadPixel(i*16,j*16)
 			end
 		end
-		aperture=(aperture/65536)/(texperture/65536)
+		aperture=(aperture)/(texperture)
 		aperture=aperture^2
 		local tab = {
 			[ "$pp_colour_addr" ] = aperture,
