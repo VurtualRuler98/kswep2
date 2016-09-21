@@ -1464,12 +1464,12 @@ function SWEP:PostDrawViewModel()
 		}
 		local mat=Material("pp/colour")
 		mat:SetTexture("$fbtexture",self.RenderTarget)
-		render.UpdateScreenEffectTexture()
 		for k,v in pairs(tab) do
 			mat:SetFloat(k,v)
 		end
 		render.SetMaterial(mat)
 		render.DrawScreenQuad()
+		mat:SetTexture("$fbtexture",render.GetScreenEffectTexture())
 		--TOO BAD SCOPEMAT TIME
 	end
 	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
