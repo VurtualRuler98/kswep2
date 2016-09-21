@@ -1442,10 +1442,6 @@ function SWEP:PostDrawViewModel()
 	render.RenderView(scopeview)
 	if (self.SuperScope) then
 		--DON'T LET ME COLOMOD PROPERLY WILL YOU
-		local aperturepos=LocalPlayer():GetEyeTrace().HitPos
-		local aperturenormal=LocalPlayer():EyeAngles():Forward()
-		--local aperture=render.ComputeLighting(aperturepos,aperturenormal).x+render.ComputeDynamicLighting(aperturepos,aperturenormal).x
-		--local aperture=render.GetLightColor(aperturepos).x
 		local aperture=0
 		render.CapturePixels()
 		for j=0,self.ScopeRes/16 do
@@ -1455,7 +1451,6 @@ function SWEP:PostDrawViewModel()
 		end
 		aperture=(aperture/65536)/(texperture/65536)
 		aperture=aperture^2
-		--aperture=(aperture^2)
 		local tab = {
 			[ "$pp_colour_addr" ] = aperture,
 			[ "$pp_colour_addg" ] = 0.2+aperture,
