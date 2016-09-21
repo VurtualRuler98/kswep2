@@ -113,7 +113,7 @@ function KswepAttach(len,pl)
 		wep:AddAttachment("laser",!wep.HasLaser)
 	end
 	if (attachment=="ranger" && wep.CanFlashlight) then
-		wep:AddAttachment("ranger",!wep.HasLaser)
+		wep:AddAttachment("ranger",!wep.HasRanger)
 	end
 end
 net.Receive("kswep_attach",KswepAttach)
