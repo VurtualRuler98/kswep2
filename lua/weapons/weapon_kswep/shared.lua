@@ -1428,6 +1428,41 @@ function SWEP:PostDrawViewModel()
 	scopeview.dopostprocess=false
 	scopeview.fov = self.ScopeFOV
 	render.RenderView(scopeview)
+	if (self.SuperScope) then
+		--DON'T LET ME COLOMOD PROPERLY WILL YOU
+		local aperturepos=LocalPlayer():GetEyeTrace().HitPos
+		local aperturenormal=LocalPlayer():EyeAngles():Forward()
+		--local aperture=render.ComputeLighting(aperturepos,aperturenormal).x+render.ComputeDynamicLighting(aperturepos,aperturenormal).x
+		--local aperture=render.GetLightColor(aperturepos).x
+		local aperture=0
+		render.CapturePixels()
+		for i=0,self.ScopeRes do
+			aperture=aperture+render.ReadPixel(i,256)
+		end
+		aperture=aperture/(self.ScopeRes*255)
+		print(aperture)
+		local tab = {
+			[ "$pp_colour_addr" ] = aperture,
+			[ "$pp_colour_addg" ] = 0.2+aperture,
+			[ "$pp_colour_addb" ] = aperture,
+			[ "$pp_colour_brightness" ] = 0,
+			[ "$pp_colour_contrast" ] =1,
+			[ "$pp_colour_colour" ] = 0,
+			[ "$pp_colour_mulr" ] = 0,
+			[ "$pp_colour_mulg" ] = 1,
+			[ "$pp_colour_mulb" ] = 0,
+		}
+		local mat=Material("pp/colour")
+		mat:SetTexture("$fbtexture",self.RenderTarget)
+		render.UpdateScreenEffectTexture()
+		for k,v in pairs(tab) do
+			mat:SetFloat(k,v)
+		end
+		render.SetMaterial(mat)
+		render.DrawScreenQuad()
+		--TOO BAD SCOPEMAT TIME
+	end
+	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
 	if (self.ScopeOverlayMat) then
 		render.SetMaterial(Material(self.ScopeOverlayMat))
 		render.DrawScreenQuadEx(0,0,self.ScopeRes,self.ScopeRes)
@@ -1442,11 +1477,12 @@ function SWEP:PostDrawViewModel()
 			self.superlight:SetPos(self.Owner:GetShootPos()+self.Owner:GetAimVector()*4)
 			self.superlight:SetAngles(self.Owner:GetAimVector():Angle())
 			self.superlight:SetFOV(15)
-			self.superlight:SetBrightness(1)
+			self.superlight:SetBrightness(0.05)
 			self.superlight:SetFarZ(31500)
 			self.superlight:SetColor(Color(0,255,0,255))
 			self.superlight:Update()
 		end
+
 	end
 	render.PopRenderTarget()
 	render.SetViewPort(0,0,oldW,oldH)
