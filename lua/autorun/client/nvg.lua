@@ -1,36 +1,32 @@
-function KSwepNVG()
+function KSwepNVG()--[[
 	local res=32
 	kswep_nvg_brightness=kswep_nvg_brightness or 0
 	if (!LocalPlayer():HasWeapon("kswep_nvg") || !LocalPlayer():GetWeapon("kswep_nvg"):GetNWBool("Active")) then
 		return
 	end
-	local tgt=GetRenderTarget("kswep_nvg",res,res,false)
+
 	local oldw,oldh=ScrW(),ScrH()
-	render.PushRenderTarget(tgt)
-	render.SetViewPort(0,0,res,res)
+	local aperture=0
+	render.CapturePixels()
+	for j=0,ScrH()/res do
+		for i=0,ScrW()/res do
+			aperture=aperture+render.ReadPixel(i*res,j*res)
+		end
+	end
+	local texperture=0
 	render.SetLightingMode(1)
 	render.RenderView()
 	render.CapturePixels()
-	local texperture=0
-	for j=0,res do
-		for i=0,res do
-			texperture=texperture+render.ReadPixel(i,j)
+	for j=0,ScrH()/res do
+		for i=0,ScrW()/res do
+			texperture=texperture+render.ReadPixel(i*res,j*res)
 		end
 	end
 	render.SetLightingMode(0)
-	render.RenderView()
-	render.CapturePixels()
-	local aperture=0
-	for j=0,res do
-		for i=0,res do
-			aperture=aperture+render.ReadPixel(i,j)
-		end
-	end
-	render.SetViewPort(0,0,oldw,oldh)
-	render.PopRenderTarget()
 	aperture=aperture/texperture
 	aperture=aperture^2
 	kswep_nvg_brightness=aperture
+	]]--
 end
 hook.Add("PreRender","KSwepNVG",KSwepNVG)
 function KSwepNVGEffects()
@@ -38,9 +34,10 @@ function KSwepNVGEffects()
 		if (IsValid(kswep_nv_superlight)) then kswep_nv_superlight:Remove() end
 		return
 	end
-	local aperture=kswep_nvg_brightness or 0
-	if (aperture<0) then aperture=0 end
-	aperture=aperture*0.75
+	--local aperture=kswep_nvg_brightness or 0
+	--if (aperture<0) then aperture=0 end
+	--aperture=aperture*0.75
+	local aperture=0
 	local tab = {
 		[ "$pp_colour_addr" ] = aperture,
 		[ "$pp_colour_addg" ] = 0.2+aperture,
@@ -54,6 +51,7 @@ function KSwepNVGEffects()
 	}
 	local mat=Material("pp/colour")
 	--mat:SetTexture("$fbtexture",render.GetScreenEffectTexture())
+	DrawBloom(0.5,100,4,4,1,1,10,1,1)
 	DrawColorModify(tab)
 	if (!IsValid(kswep_nv_superlight)) then
 		kswep_nv_superlight=ProjectedTexture()
