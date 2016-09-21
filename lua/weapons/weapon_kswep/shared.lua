@@ -153,6 +153,7 @@ SWEP.HasFlashlight=false
 SWEP.Collimator=false
 SWEP.CollimatorTex=nil
 SWEP.CollimatorSize=0.5
+SWEP.CollimatorGlare=1
 SWEP.DefaultMinZero=100
 SWEP.DefaultMaxZero=100
 SWEP.DefaultZeroStep=0
@@ -523,6 +524,7 @@ function SWEP:InsOptic(name)
 	self.Collimator=scopedata.collimator
 	self.CollimatorTex=scopedata.coltex
 	self.CollimatorSize=scopedata.colsize
+	self.CollimatorGlare=scopedata.colglare
 	local scopemodel
 	if (scopedata.model!=nil) then
 		self.MaxZero=scopedata.maxzero
@@ -1498,9 +1500,14 @@ function SWEP:PostDrawViewModel()
 	render.SetViewPort(0,0,oldW,oldH)
 	end
 	if (self.Collimator && self:GetNWBool("Sight")) then
+		local pos=self.Owner:GetShootPos()+(self.Owner:GetAimVector()*4)
+		local glare=self.CollimatorGlare*64
+		if (LocalPlayer():HasWeapon("kswep_nvg") && LocalPlayer():GetWeapon("kswep_nvg"):GetNWBool("Active")) then
+			render.SetMaterial(Material("sprites/light_glow02_add"))
+			render.DrawSprite(pos,self.CollimatorSize*4,self.CollimatorSize*4,Color(glare,glare,glare))
+		end
 		local mat=Material(self.CollimatorTex)
 		render.SetMaterial(mat)
-		local pos=self.Owner:GetShootPos()+(self.Owner:GetAimVector()*4)
 		render.DrawSprite(pos,self.CollimatorSize,self.CollimatorSize,Color(255,255,255,255))
 	end
 end

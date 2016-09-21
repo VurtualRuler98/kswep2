@@ -28,7 +28,7 @@ function KSwepNVG()--[[
 	kswep_nvg_brightness=aperture
 	]]--
 end
-hook.Add("PreRender","KSwepNVG",KSwepNVG)
+--hook.Add("PreRender","KSwepNVG",KSwepNVG)
 function KSwepNVGEffects()
 	if (!LocalPlayer():HasWeapon("kswep_nvg") || !LocalPlayer():GetWeapon("kswep_nvg"):GetNWBool("Active")) then
 		if (IsValid(kswep_nv_superlight)) then kswep_nv_superlight:Remove() end
@@ -37,22 +37,22 @@ function KSwepNVGEffects()
 	--local aperture=kswep_nvg_brightness or 0
 	--if (aperture<0) then aperture=0 end
 	--aperture=aperture*0.75
-	local aperture=0
+	local aperture=render.GetLightColor(EyePos()).x*2
 	local tab = {
-		[ "$pp_colour_addr" ] = aperture,
-		[ "$pp_colour_addg" ] = 0.2+aperture,
-		[ "$pp_colour_addb" ] = aperture,
+		[ "$pp_colour_addr" ] = 0,
+		[ "$pp_colour_addg" ] = 0,
+		[ "$pp_colour_addb" ] = 0,
 		[ "$pp_colour_brightness" ] = 0,
-		[ "$pp_colour_contrast" ] =1,
+		[ "$pp_colour_contrast" ] =0.5+aperture,
 		[ "$pp_colour_colour" ] = 0,
 		[ "$pp_colour_mulr" ] = 0,
-		[ "$pp_colour_mulg" ] = 1,
+		[ "$pp_colour_mulg" ] = 0,
 		[ "$pp_colour_mulb" ] = 0,
 	}
 	local mat=Material("pp/colour")
 	--mat:SetTexture("$fbtexture",render.GetScreenEffectTexture())
-	DrawBloom(0.5,100,4,4,1,1,10,1,1)
 	DrawColorModify(tab)
+	DrawBloom(0,4,1,0.5,0.5,1,0.5,1,0.5)
 	if (!IsValid(kswep_nv_superlight)) then
 		kswep_nv_superlight=ProjectedTexture()
 	end
