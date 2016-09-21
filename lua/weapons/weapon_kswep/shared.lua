@@ -1418,6 +1418,7 @@ function SWEP:PostDrawViewModel()
 	if ((self.AltIrons && self:GetNWBool("AltIrons")) || !self:GetNWBool("Sight")) then
 		render.Clear(0,0,0,255)
 	else
+	local texperture=0
 	local scopeview = {}
 	scopeview.w = self.ScopeRes
 	scopeview.h = self.ScopeRes
@@ -1427,6 +1428,17 @@ function SWEP:PostDrawViewModel()
 	scopeview.drawhud = false
 	scopeview.dopostprocess=false
 	scopeview.fov = self.ScopeFOV
+	if (self.SuperScope) then
+		render.SetLightingMode(1)
+		render.RenderView(scopeview)
+		render.CapturePixels()
+		for j=0,self.ScopeRes/16 do
+			for i=0,self.ScopeRes/16 do
+				texperture=texperture+render.ReadPixel(i*16,j*16)
+			end
+		end
+		render.SetLightingMode(0)
+	end
 	render.RenderView(scopeview)
 	if (self.SuperScope) then
 		--DON'T LET ME COLOMOD PROPERLY WILL YOU
@@ -1436,11 +1448,14 @@ function SWEP:PostDrawViewModel()
 		--local aperture=render.GetLightColor(aperturepos).x
 		local aperture=0
 		render.CapturePixels()
-		for i=0,self.ScopeRes do
-			aperture=aperture+render.ReadPixel(i,256)
+		for j=0,self.ScopeRes/16 do
+			for i=0,self.ScopeRes/16 do
+				aperture=aperture+render.ReadPixel(i*16,j*16)
+			end
 		end
-		aperture=aperture/(self.ScopeRes*255)
-		print(aperture)
+		aperture=(aperture/65536)/(texperture/65536)
+		aperture=aperture^2
+		--aperture=(aperture^2)
 		local tab = {
 			[ "$pp_colour_addr" ] = aperture,
 			[ "$pp_colour_addg" ] = 0.2+aperture,
