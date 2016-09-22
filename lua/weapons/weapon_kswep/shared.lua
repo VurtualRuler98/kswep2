@@ -759,7 +759,6 @@ net.Receive("kswep_attach_cl",function(len,ply)
 			self.MergeParts.ranger=ClientsideModel(self.LaserModel)
 			self.MergeParts.ranger:SetNoDraw(true)
 		else
-			self:EnableLaser(false)
 			self.MergeParts.ranger:Remove()
 			self.MergeParts.ranger=nil
 		end
