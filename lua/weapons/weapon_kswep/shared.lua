@@ -81,6 +81,7 @@ SWEP.Suppressable=false
 SWEP.SuppressorModel=nil
 SWEP.NoDefaultSightModel=false
 SWEP.Suppressed=false
+SWEP.IntegralSuppressed=false
 SWEP.Primary.SupSound = nil
 SWEP.MuzzleVelModSup = 1
 SWEP.SpreadModSup = 0
@@ -1907,7 +1908,7 @@ function SWEP:ShootEffects()
 		end
 		self.Weapon:SendWeaponAnim(anim) 
 	end
-	if (!self.Suppressed) then 
+	if (!self.Suppressed && !self.IntegralSuppressed) then 
 		self.Owner:MuzzleFlash()
 	end
 	if (self.Owner:IsPlayer()) then
