@@ -34,16 +34,20 @@ function KSwepNVGEffects()
 		if (IsValid(kswep_nv_superlight)) then kswep_nv_superlight:Remove() end
 		return
 	end
-	--local aperture=kswep_nvg_brightness or 0
+	kswep_nvg_brightness=kswep_nvg_brightness or 0
 	--if (aperture<0) then aperture=0 end
 	--aperture=aperture*0.75
-	local aperture=render.GetLightColor(EyePos()).x*2
+	local aperture=math.max(render.ComputeLighting(EyePos(),EyeAngles():Forward()).x,render.ComputeDynamicLighting(EyePos(),EyeAngles():Forward()).x)
+	aperture=aperture^2
+	if (aperture>2) then aperture=2 end
+	kswep_nvg_brightness=Lerp(0.02,kswep_nvg_brightness,aperture)
+	aperture=math.max(kswep_nvg_brightness,aperture)
 	local tab = {
 		[ "$pp_colour_addr" ] = 0,
 		[ "$pp_colour_addg" ] = 0,
 		[ "$pp_colour_addb" ] = 0,
 		[ "$pp_colour_brightness" ] = 0,
-		[ "$pp_colour_contrast" ] =0.5+aperture,
+		[ "$pp_colour_contrast" ] =0.5+(1-aperture)*0.2,
 		[ "$pp_colour_colour" ] = 0,
 		[ "$pp_colour_mulr" ] = 0,
 		[ "$pp_colour_mulg" ] = 0,
@@ -52,13 +56,13 @@ function KSwepNVGEffects()
 	local mat=Material("pp/colour")
 	--mat:SetTexture("$fbtexture",render.GetScreenEffectTexture())
 	DrawColorModify(tab)
-	DrawBloom(0,4,1,0.5,0.5,1,0.5,1,0.5)
+	DrawBloom(0,4-aperture,1,0.5,0.5,1,0.5,1,0.5)
 	if (!IsValid(kswep_nv_superlight)) then
 		kswep_nv_superlight=ProjectedTexture()
 	end
 	if (kswep_nv_superlight) then
 		kswep_nv_superlight:SetTexture("effects/flashlight/hard")
-		kswep_nv_superlight:SetPos(LocalPlayer():GetShootPos()+LocalPlayer():GetAimVector()*4)
+		kswep_nv_superlight:SetPos(LocalPlayer():GetShootPos()+LocalPlayer():GetAimVector()*10)
 		kswep_nv_superlight:SetAngles(LocalPlayer():GetAimVector():Angle())
 		kswep_nv_superlight:SetFOV(170)
 		kswep_nv_superlight:SetBrightness(0.05)
