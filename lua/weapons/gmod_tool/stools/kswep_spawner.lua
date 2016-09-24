@@ -85,7 +85,7 @@ function TOOL.BuildCPanel(panel)
 	})
 end
 local function AddBoxModel(model)
-	if (util.IsValidModel(model)) then
+	if (file.Exists(model,"GAME")) then
 		list.Set("KswepBoxModels",model,{})
 	end
 end
