@@ -5,6 +5,7 @@ TOOL.ClientConVar["give_ammo"] = "1"
 TOOL.ClientConVar["give_lights"] = "1"
 TOOL.ClientConVar["give_optics"] = "1"
 TOOL.ClientConVar["give_suppressors"] = "1"
+TOOL.ClientConVar["give_armor"] = "1"
 TOOL.ClientConVar["gunrack"] = "1"
 TOOL.ClientConVar["offset"]=0
 function TOOL:LeftClick(trace)
@@ -29,6 +30,7 @@ function TOOL:LeftClick(trace)
 		ent:SetNWBool("GiveOptics",self:GetClientNumber("give_optics")==1)
 		ent:SetNWBool("GiveSuppressors",self:GetClientNumber("give_suppressors")==1)
 		ent:SetNWBool("GunRack",self:GetClientNumber("gunrack")==1)
+		ent:SetNWBool("GiveArmor",self:GetClientNumber("give_armor")==1)
 		undo.Create("KSWEP Supplies")
 		undo.AddEntity(ent)
 		undo.SetPlayer(self:GetOwner())
@@ -44,6 +46,7 @@ function TOOL:LeftClick(trace)
 			ent:SetNWBool("GiveOptics",self:GetClientNumber("give_optics")==1)
 			ent:SetNWBool("GiveSuppressors",self:GetClientNumber("give_suppressors")==1)
 			ent:SetNWBool("GunRack",self:GetClientNumber("gunrack")==1)
+			ent:SetNWBool("GiveArmor",self:GetClientNumber("give_armor")==1)
 		end
 		if (CLIENT) then return true end
 	end
@@ -69,6 +72,10 @@ function TOOL.BuildCPanel(panel)
 	panel:AddControl("CheckBox",{
 		Label="Gun Rack",
 		Command="kswep_spawner_gunrack"
+	})
+	panel:AddControl("CheckBox",{
+		Label="Give Armor",
+		Command="kswep_spawner_give_armor"
 	})
 	panel:AddControl("PropSelect",{
 		Label="Model",
