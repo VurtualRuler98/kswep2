@@ -1,6 +1,7 @@
 include('shared.lua')
 
 AddCSLuaFile("cl_init.lua")
+AddCSLuaFile("vestbox.lua")
 AddCSLuaFile("shared.lua")
 include('shared.lua')
 
@@ -22,6 +23,7 @@ function ENT:Initialize()
 	self:SetNWBool("GiveOptics",true)
 	self:SetNWBool("GiveLights",true)
 	self:SetNWBool("GunRack",true)
+	self:SetNWBool("GiveArmor",true)
 	self.Entity:PhysicsInit( SOLID_VPHYSICS)
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )

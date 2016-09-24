@@ -1,5 +1,5 @@
 include('shared.lua')
-
+include('vestbox.lua')
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
 	self.Entity:DrawModel()
@@ -23,7 +23,7 @@ end)
 net.Receive("kswep_gunrack",function()
 	local box=net.ReadEntity()
 	box.GunList=net.ReadTable()
-	box:ClGunRack()
+	box:ClUseBox(nil,nil,nil,nil)
 end)
 
 
@@ -125,66 +125,83 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				ammoframe:Close()
 			end
 	end
-	if (wep.Suppressable && self:GetNWBool("GiveSuppressors")) then
-		local dbutton=vgui.Create("DButton")
-			dbutton:SetParent(ammoframe)
-			dbutton:SetPos(20,120)
-			dbutton:SetSize(180,40)
-			dbutton:SetText("Suppressor")
-			dbutton.DoClick = function()
-			net.Start("kswep_attach")
-			net.WriteString("suppressor")
-			net.SendToServer()
-			ammoframe:Close()
-			end
-	end
-	if (wep.CanFlashlight && self:GetNWBool("GiveLights")) then
-		local dbutton=vgui.Create("DButton")
-			dbutton:SetParent(ammoframe)
-			dbutton:SetPos(20,160)
-			dbutton:SetSize(60,40)
-			dbutton:SetText("Light")
-			dbutton.DoClick = function()
-			net.Start("kswep_attach")
-			net.WriteString("flashlight")
-			net.SendToServer()
-			ammoframe:Close()
-			end
-	end
-	if (wep.CanFlashlight && self:GetNWBool("GiveLights")) then
-		local dbutton=vgui.Create("DButton")
-			dbutton:SetParent(ammoframe)
-			dbutton:SetPos(80,160)
-			dbutton:SetSize(60,40)
-			dbutton:SetText("Laser")
-			dbutton.DoClick = function()
-			net.Start("kswep_attach")
-			net.WriteString("laser")
-			net.SendToServer()
-			ammoframe:Close()
-			end
-	end
-	if (wep.CanFlashlight && self:GetNWBool("GiveLights")) then
-		local dbutton=vgui.Create("DButton")
-			dbutton:SetParent(ammoframe)
-			dbutton:SetPos(140,160)
-			dbutton:SetSize(60,40)
-			dbutton:SetText("Rangefinder")
-			dbutton.DoClick = function()
-			net.Start("kswep_attach")
-			net.WriteString("ranger")
-			net.SendToServer()
-			ammoframe:Close()
-			end
+	if (wep!=nil) then
+		if (wep.Suppressable && self:GetNWBool("GiveSuppressors")) then
+			local dbutton=vgui.Create("DButton")
+				dbutton:SetParent(ammoframe)
+				dbutton:SetPos(20,120)
+				dbutton:SetSize(180,40)
+				dbutton:SetText("Suppressor")
+				dbutton.DoClick = function()
+				net.Start("kswep_attach")
+				net.WriteString("suppressor")
+				net.SendToServer()
+				ammoframe:Close()
+				end
+		end
+		if (wep.CanFlashlight && self:GetNWBool("GiveLights")) then
+			local dbutton=vgui.Create("DButton")
+				dbutton:SetParent(ammoframe)
+				dbutton:SetPos(20,160)
+				dbutton:SetSize(60,40)
+				dbutton:SetText("Light")
+				dbutton.DoClick = function()
+				net.Start("kswep_attach")
+				net.WriteString("flashlight")
+				net.SendToServer()
+				ammoframe:Close()
+				end
+		end
+		if (wep.CanFlashlight && self:GetNWBool("GiveLights")) then
+			local dbutton=vgui.Create("DButton")
+				dbutton:SetParent(ammoframe)
+				dbutton:SetPos(80,160)
+				dbutton:SetSize(60,40)
+				dbutton:SetText("Laser")
+				dbutton.DoClick = function()
+				net.Start("kswep_attach")
+				net.WriteString("laser")
+				net.SendToServer()
+				ammoframe:Close()
+				end
+		end
+		if (wep.CanFlashlight && self:GetNWBool("GiveLights")) then
+			local dbutton=vgui.Create("DButton")
+				dbutton:SetParent(ammoframe)
+				dbutton:SetPos(140,160)
+				dbutton:SetSize(60,40)
+				dbutton:SetText("Rangefinder")
+				dbutton.DoClick = function()
+				net.Start("kswep_attach")
+				net.WriteString("ranger")
+				net.SendToServer()
+				ammoframe:Close()
+				end
+		end
 	end
 	if (self:GetNWBool("GunRack")) then
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(20,200)
-			dbutton:SetSize(180,40)
+			if (self:GetNWBool("GiveArmor")) then
+				dbutton:SetSize(90,40)
+			else
+				dbutton:SetSize(180,40)
+			end
 			dbutton:SetText("Gun Rack")
 			dbutton.DoClick = function()
 				self:ClGunRack()
+				ammoframe:Close()
+			end
+	end
+	if (self:GetNWBool("GiveArmor") && ConVarExists("kevlar_enabled")) then
+		local dbutton=vgui.Create("DButton")
+			dbutton:SetParent(ammoframe)
+			dbutton:SetPos(110,200)
+			dbutton:SetSize(90,40)
+			dbutton:SetText("Body Armor")
+			dbutton.DoClick = function()
+				self:ClKSimpleBox()
 				ammoframe:Close()
 			end
 	end
