@@ -14,7 +14,9 @@ function ENT:SpawnFunction(ply, tr)
 end
 
 function ENT:Initialize()
-	self.Entity:SetModel( "models/items/item_item_crate.mdl")
+	if (self.Entity:GetModel()=="models/error.mdl") then
+		self.Entity:SetModel( "models/items/item_item_crate.mdl")
+	end
 	self:SetNWBool("GiveAmmo",true)
 	self:SetNWBool("GiveSuppressors",true)
 	self:SetNWBool("GiveOptics",true)
