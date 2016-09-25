@@ -58,10 +58,6 @@ net.Receive("kswep_takegunfromrack",function(len,pl)
 	box:RemoveGun(wep)
 	pl:Give(wep)
 end)
-function AddAmmodata(tbl)
-	vurtual_ammodata[tbl.name]=table.Copy(tbl)
-end
-local files,directories= file.Find("lua/calibers/*.lua","GAME")
 net.Receive("kswep_zero",function(len,pl)
 	local wep=net.ReadEntity()
 	local zero=net.ReadInt(16)
@@ -83,21 +79,7 @@ net.Receive("kswep_scopesetup",function(len,pl)
 	if (wep.Owner!=pl) then return end
 	wep:InsOptic(scope)
 end)
-for k,v in pairs(files) do
-	include ("calibers/"..v)
-end
 util.AddNetworkString("kevlar_ammo")
-function SetupAmmoTypes()
-	vurtual_ammodata = {}
-	hook.Run("VurtualAmmotypes")
-	vurtual_ammotypes = {"ar2",null,"pistol","smg1","357",null,"shotgun"}
-	local customammotypes=game.BuildAmmoTypes()
-	for k,v in pairs(customammotypes) do table.insert(vurtual_ammotypes,k+25,v.name) end
-end
-
-if (vurtual_ammotypes==nil) then
-	SetupAmmoTypes()
-end
 function KswepAttach(len,pl)
 	if (!IsValid(pl) || !pl:IsPlayer()) then return end
 	local attachment=net.ReadString()

@@ -8,6 +8,11 @@ TOOL.ClientConVar["give_suppressors"] = "1"
 TOOL.ClientConVar["give_armor"] = "1"
 TOOL.ClientConVar["gunrack"] = "1"
 TOOL.ClientConVar["offset"]=0
+TOOL.ClientConVar["ammo_type"]="vammo_rifle"
+if (CLIENT) then
+language.Add("Tool.kswep_spawner.name","KSwep Spawner Tool")
+language.Add("Tool.kswep_spawner.desc","Left click spawns a customized box with the settings and model, right click spawns a single-type ammocan with the model.")
+end
 function TOOL:LeftClick(trace)
 	if (trace.HitWorld) then
 		if (SERVER) then
@@ -51,8 +56,41 @@ function TOOL:LeftClick(trace)
 		if (CLIENT) then return true end
 	end
 end
+function TOOL:RightClick(trace)
+	if (trace.HitWorld) then
+		if (SERVER) then
+		local ent=ents.Create("sent_vurt_ammo")
+		ent:SetPos(trace.HitPos+Vector(0,0,1+self:GetClientNumber("offset")))
+		ent:Spawn()
+		if (util.IsValidModel(self:GetClientInfo("model","models/Items/item_item_crate.mdl"))) then
+			ent:SetModel(self:GetClientInfo("model","models/Items/item_item_crate.mdl"))
+			ent:PhysicsInit(SOLID_VPHYSICS)
+		end
+		--straight up pulled from sandbox code
+		local fixpos=trace.HitPos-(trace.HitNormal*512)
+		fixpos=ent:NearestPoint(fixpos)
+		fixpos=ent:GetPos()-fixpos
+		fixpos=trace.HitPos+fixpos
+		ent:SetPos(fixpos)
+		--ok done
+		ent:SetNWBool("Ammo",self:GetClientInfo("ammo_type","vammo_rifle"))
+		undo.Create("KSWEP Ammo")
+		undo.AddEntity(ent)
+		undo.SetPlayer(self:GetOwner())
+		undo.Finish("KSWEP Ammo")
+		end
+		if (CLIENT) then return true end
+	end
+	if (trace.HitNonWorld && IsValid(trace.Entity) && trace.Entity:GetClass()=="sent_vurt_ammo") then
+		if (SERVER) then
+			local ent=trace.Entity
+			ent:SetNWBool("Ammo",self:GetClientInfo("ammo_type","vammo_rifle"))
+		end
+		if (CLIENT) then return true end
+	end
+end
 function TOOL.BuildCPanel(panel)
-	panel:AddControl("Header",{Text="KSWEP supply spawner", Description="Create customized supply boxes."})
+	panel:AddControl("Header",{Text="KSWEP supply spawner", Description="LEFT CLICK: Create customized supply boxes."})
 	panel:AddControl("CheckBox",{
 		Label="Give ammo",
 		Command="kswep_spawner_give_ammo"
@@ -83,51 +121,83 @@ function TOOL.BuildCPanel(panel)
 		Height=4,
 		Models=list.Get("KswepBoxModels")
 	})
+	panel:AddControl("Header",{Text="KSWEP ammo spawner", Description="RIGHT CLICK: Create boxes of a single ammotype"})
+	panel:AddControl("ListBox",{Height=256,Options=list.Get("KSwepSpawnerAmmo")})
 end
-local function AddBoxModel(model)
+for k,v in pairs(vurtual_ammodata) do
+	if (v.printname!=nil) then
+		list.Set("KSwepSpawnerAmmo",v.printname,{kswep_spawner_ammo_type=k})
+	end
+end
+local kspawnerboxmodels = {
+--CSS
+"models/props/CS_militia/footlocker01_open.mdl",
+"models/props/CS_militia/footlocker01_closed.mdl",
+"models/props/CS_militia/gun_cabinet.mdl",
+--TF2
+"models/props_gameplay/resupply_locker.mdl",
+--DODS
+"models/props_crates/static_crate_40.mdl",
+"models/props_crates/tnt_dump.mdl",
+"models/props_crates/supply_crate01.mdl",
+"models/props_crates/supply_crate02.mdl",
+"models/props_crates/supply_crate03.mdl",
+--L4D2
+"models/props_waterfront/suitcase_open.mdl",
+"models/w_models/weapons/w_eq_explosive_ammopack.mdl",
+"models/w_models/weapons/w_eq_incendiary_ammopack.mdl",
+"models/props_unique/airport/luggage2.mdl",
+"models/props_collectables/backpack.mdl",
+"models/props_fairgrounds/anvil_case_64.mdl",
+"models/props_vehicles/hmmwv_supply.mdl",
+"models/props/terror/ammo_stack.mdl",
+"models/props_unique/spawn_apartment/coffeeammo.mdl",
+"models/props_interiors/gun_cabinet.mdl",
+"models/props_unique/guncabinet01_main.mdl",
+--Half-Life
+"models/Items/item_item_crate.mdl",
+"models/props_c17/suitcase_passenger_physics.mdl",
+"models/weapons/w_package.mdl",
+"models/items/item_beacon_crate.mdl", --ep2
+"models/props_junk/wood_crate001a.mdl",
+"models/mp/crate.mdl", --HLDMS
+"models/Items/BoxSRounds.mdl",
+"models/Items/BoxMRounds.mdl",
+"models/props_wasteland/controlroom_storagecloset001a.mdl",
+"models/props_interiors/VendingMachineSoda01a.mdl",
+"models/props_interiors/VendingMachineSoda01a_door.mdl",
+"models/props_c17/display_cooler01a.mdl",
+"models/items/ammocrate_smg2.mdl",
+
+--Portal 2
+"models/br_debris/deb_dave_crate.mdl",
+"models/br_debris/deb_dave_crate_broken_body_01.mdl",
+--CSGO
+"models/props_bank/bank_sign_no_guns.mdl",
+"models/props/coop_cementplant/coop_military_crate/coop_military_crate.mdl",
+"models/props/crates/military_case_02.mdl",
+"models/props/crates/military_cargo_case.mdl",
+--misc
+"models/props/chest/chest.mdl", --PVK2?
+--Insurgency mod
+"models/generic/ammocrate3.mdl",
+"models/props/toolbox.mdl",
+"models/karam/footlocker_ievel.mdl",
+"models/furniture/school_locker.mdl",
+"models/furniture/school_lockers_5.mdl",
+--Insurgency standalone
+"models/static_military/prop_military_crate_a.mdl",
+"models/static_props/pallet_caches_01.mdl",
+"models/static_props/wcache_crate_02.mdl",
+"models/static_props/prop_market_weaponcage_single.mdl",
+"models/static_props/prop_market_weaponcage_double.mdl",
+"models/static_props/prop_market_weaponcage_double.mdl",
+"models/static_props/wcache_ins_01.mdl",
+"models/static_props/wcache_sec_01.mdl",
+"models/static_props/weapon_cache_01.mdl"
+}
+for k,model in pairs(kspawnerboxmodels) do
 	if (file.Exists(model,"GAME")) then
 		list.Set("KswepBoxModels",model,{})
 	end
 end
-		
-AddBoxModel("models/Items/item_item_crate.mdl")
-AddBoxModel("models/props_interiors/gun_cabinet.mdl")
-AddBoxModel("models/props_unique/guncabinet01_main.mdl")
-AddBoxModel("models/items/ammocrate_smg2.mdl")
-AddBoxModel("models/props/terror/ammo_stack.mdl")
-AddBoxModel("models/props_unique/spawn_apartment/coffeeammo.mdl")
-AddBoxModel("models/generic/ammocrate3.mdl")
-AddBoxModel("models/props_interiors/VendingMachineSoda01a.mdl")
-AddBoxModel("models/props_interiors/VendingMachineSoda01a_door.mdl")
-AddBoxModel("models/props_c17/display_cooler01a.mdl")
-AddBoxModel("models/props_wasteland/controlroom_storagecloset001a.mdl")
-AddBoxModel("models/Items/BoxSRounds.mdl")
-AddBoxModel("models/Items/BoxMRounds.mdl")
-AddBoxModel("models/props/CS_militia/footlocker01_open.mdl")
-AddBoxModel("models/props/CS_militia/footlocker01_closed.mdl")
-AddBoxModel("models/props/CS_militia/gun_cabinet.mdl")
-AddBoxModel("models/props_gameplay/resupply_locker.mdl")
-AddBoxModel("models/props_crates/supply_crate01.mdl")
-AddBoxModel("models/props_crates/supply_crate02.mdl")
-AddBoxModel("models/props_crates/supply_crate03.mdl")
-AddBoxModel("models/props_fairgrounds/anvil_case_64.mdl")
-AddBoxModel("models/props_vehicles/hmmwv_supply.mdl")
-AddBoxModel("models/props_crates/tnt_dump.mdl")
-AddBoxModel("models/props_collectables/backpack.mdl")
-AddBoxModel("models/w_models/weapons/w_eq_explosive_ammopack.mdl")
-AddBoxModel("models/w_models/weapons/w_eq_incendiary_ammopack.mdl")
-AddBoxModel("models/weapons/w_package.mdl")
-AddBoxModel("models/props_crates/static_crate_40.mdl")
-AddBoxModel("models/props_bank/bank_sign_no_guns.mdl")
-AddBoxModel("models/props_unique/airport/luggage2.mdl")
-AddBoxModel("models/props_c17/suitcase_passenger_physics.mdl")
-AddBoxModel("models/props/crates/military_case_02.mdl")
-AddBoxModel("models/props/crates/military_cargo_case.mdl")
-AddBoxModel("models/props_waterfront/suitcase_open.mdl")
-AddBoxModel("models/props/chest/chest.mdl")
-AddBoxModel("models/br_debris/deb_dave_crate.mdl")
-AddBoxModel("models/br_debris/deb_dave_crate_broken_body_01.mdl")
-AddBoxModel("models/mp/crate.mdl")
-AddBoxModel("models/props/coop_cementplant/coop_military_crate/coop_military_crate.mdl")
-AddBoxModel("models/items/item_beacon_crate.mdl")
-AddBoxModel("models/props_junk/wood_crate001a.mdl")

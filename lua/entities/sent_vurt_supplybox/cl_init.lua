@@ -4,13 +4,6 @@ function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
 	self.Entity:DrawModel()
 end
-net.Receive("kswep_rearm",function()
-	local box=net.ReadEntity()
-	local wep=net.ReadEntity()
-	local mags=net.ReadTable()
-	box:ClUseMagBox(wep,mags)
-
-end)
 net.Receive("kswep_supplybox",function()
 		local box=net.ReadEntity()
 		local wep=net.ReadEntity()

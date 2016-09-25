@@ -1,3 +1,6 @@
+if (SERVER) then
+	AddCSLuaFile()
+end
 hook.Add("VurtualAmmotypes","vammo_misc", function()
 	local tbl = {}
 	tbl.vestpenetration=25
