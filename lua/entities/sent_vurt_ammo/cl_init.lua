@@ -12,6 +12,7 @@ net.Receive("kswep_rearm",function()
 end)
 function ENT:ClUseMagBox(wep,mags)
 	local v=vurtual_ammodata[self:GetNWString("Ammo")]
+	if (v.caliber==wep.Caliber) then
 	local menuwidth=256
 	local menuheight=64
 	local ammoframe = vgui.Create("DFrame")
@@ -19,7 +20,6 @@ function ENT:ClUseMagBox(wep,mags)
 		ammoframe:SetSize(menuwidth,menuheight)
 		ammoframe:SetTitle(v.printname)
 		ammoframe:MakePopup()
-	if (v.caliber==wep.Caliber) then
 	local button = vgui.Create("DButton",ammoframe)
 		button:SetPos(8,32)
 		button:SetSize(menuwidth-16,24)

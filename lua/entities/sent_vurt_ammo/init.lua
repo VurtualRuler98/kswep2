@@ -23,7 +23,7 @@ function ENT:Initialize()
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )
 	self.Entity:SetUseType(SIMPLE_USE)
-
+	self.Entity:SetOverlayText(vurtual_ammodata[self:GetNWBool("Ammo")].printname)
 	local phys = self.Entity:GetPhysicsObject()
 	if (phys:IsValid()) then
 		phys:Wake()
@@ -43,6 +43,4 @@ function ENT:Use(activator,caller)
 			
 		end
 	end
-end
-function ENT:Think()
 end

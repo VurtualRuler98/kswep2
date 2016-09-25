@@ -74,6 +74,7 @@ function TOOL:RightClick(trace)
 		ent:SetPos(fixpos)
 		--ok done
 		ent:SetNWBool("Ammo",self:GetClientInfo("ammo_type","vammo_rifle"))
+		ent:SetOverlayText(vurtual_ammodata[self:GetClientInfo("ammo_type","vammo_rifle")].printname)
 		undo.Create("KSWEP Ammo")
 		undo.AddEntity(ent)
 		undo.SetPlayer(self:GetOwner())
