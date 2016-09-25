@@ -1111,7 +1111,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (wep.IronZoom<wep.IronZoomMax) then wep.IronZoom=wep.IronZoomMax end
 				end
 			end
-			if (bind=="impulse 100" && (wep.HasFlashlight || wep.HasLaser || wep.HasRanger)) then
+			if (bind=="impulse 100" && (!GetConVar("mp_flashlight"):GetBool() || !wep.Owner:KeyDown(IN_USE)) && (wep.HasFlashlight || wep.HasLaser || wep.HasRanger)) then
 				if (wep.HasFlashlight) then
 					if (wep.Flashlight) then
 						wep:EnableFlashlight(false)
