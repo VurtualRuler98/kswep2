@@ -1862,8 +1862,13 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		if (((tr.HitNonWorld && IsValid(tr.Entity)) || (tr.SurfaceProps!=0 && tr.HitTexture=="**studio**" && util.GetSurfacePropName(tr.SurfaceProps)!="default")) && !tr.Entity:IsPlayer() && !tr.Entity:IsNPC()) then 
 		hitprop=true
 		local ent=tr.Entity
-		propexit=util.IntersectRayWithOBB(travel,hitpos-travel,ent:LocalToWorld(ent:OBBCenter()),ent:GetAngles(),ent:OBBMins(),ent:OBBMaxs())
-		barrier=tr.Entity:NearestPoint(hitpos):Distance(propexit)
+		propexitobb=util.IntersectRayWithOBB(travel,hitpos-travel,ent:LocalToWorld(ent:OBBCenter()),ent:GetAngles(),ent:OBBMins(),ent:OBBMaxs())
+		propexit=util.TraceLine({
+			start=propexitobb,
+			endpos=hitpos,
+			mask=MASK_SHOT
+			}).HitPos
+		barrier=hitpos:Distance(propexit)
 		--local physpenetration=self:PhysMaterialPenetration(tr.Entity:GetPhysicsObject():GetMaterial())
 		--if (physpenetration!=0) then penetration=physpenetration end
 		end
