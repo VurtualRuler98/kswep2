@@ -1864,8 +1864,8 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		local ent=tr.Entity
 		propexit=util.IntersectRayWithOBB(travel,hitpos-travel,ent:LocalToWorld(ent:OBBCenter()),ent:GetAngles(),ent:OBBMins(),ent:OBBMaxs())
 		barrier=tr.Entity:NearestPoint(hitpos):Distance(propexit)
-		local physpenetration=self:PhysMaterialPenetration(ent:GetPhysicsObject():GetMaterial())
-		if (physpenetration!=0) then penetration=physpenetration end
+		--local physpenetration=self:PhysMaterialPenetration(tr.Entity:GetPhysicsObject():GetMaterial())
+		--if (physpenetration!=0) then penetration=physpenetration end
 		end
 		local speed=shot.speed-(wallcost*barrier*penetration)
 		if (tex=="**empty**" || tex=="**displacement**") then speed=0 end
@@ -1911,6 +1911,9 @@ function SWEP:MaterialPenetration(mat)
 end
 function SWEP:PhysMaterialPenetration(mat)
 	local penetration=0
+	if (mat=="dirt") then
+		penetration=0.1 --hopefully it's a couch!
+	end
 	if (mat=="metal_barrel" || mat=="metalvehicle") then
 		penetration=0.5
 	end
