@@ -1831,6 +1831,7 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		mask = MASK_SHOT
 		})
 	local pen2=0
+	if (tr.HitWorld) then
 	local btr = util.TraceLine( {
 		filter = self.Owner,
 		start = hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10),
@@ -1838,7 +1839,7 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		mask = MASK_SHOT
 	})
 	pen2=self:MaterialPenetration(btr.MatType)
-		
+	end	
 	local penetration=self:MaterialPenetration(mat)
 	if (pen2>penetration && penetration!=0) then
 		penetration=pen2
@@ -1851,11 +1852,21 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 	end
 	local dist = nil
 	if (penetration>0) then
+		local propexit
 		local basespeed=vurtual_ammodata[shot.bullet.AmmoType].velocity --standard velocity of bullet
 		local wallcost=basespeed/vurtual_ammodata[shot.bullet.AmmoType].wallbang --how much speed is required to penetrate one unit of dirt
 		local barrier=tr.FractionLeftSolid*(hitpos:Distance(travel)) --Amount of wall we're going through
 		if (tr.FractionLeftSolid>0.9) then barrier=hitpos:Distance(travel) end
-		if ((tr.HitNonWorld && IsValid(tr.Entity)) || (tr.SurfaceProps!=0 && tr.HitTexture=="**studio**" && util.GetSurfacePropName(tr.SurfaceProps)!="default")) then barrier=4 end --works ok since it'll "step" through the object
+		local hitprop=false
+		
+		if (((tr.HitNonWorld && IsValid(tr.Entity)) || (tr.SurfaceProps!=0 && tr.HitTexture=="**studio**" && util.GetSurfacePropName(tr.SurfaceProps)!="default")) && !tr.Entity:IsPlayer() && !tr.Entity:IsNPC()) then 
+		hitprop=true
+		local ent=tr.Entity
+		propexit=util.IntersectRayWithOBB(travel,hitpos-travel,ent:LocalToWorld(ent:OBBCenter()),ent:GetAngles(),ent:OBBMins(),ent:OBBMaxs())
+		barrier=tr.Entity:NearestPoint(hitpos):Distance(propexit)
+		local physpenetration=self:PhysMaterialPenetration(ent:GetPhysicsObject():GetMaterial())
+		if (physpenetration!=0) then penetration=physpenetration end
+		end
 		local speed=shot.speed-(wallcost*barrier*penetration)
 		if (tex=="**empty**" || tex=="**displacement**") then speed=0 end
 		if (speed>0 && !tr.AllSolid) then
@@ -1867,9 +1878,13 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 			fakebullet.Dir:Rotate(Angle(0,180,0))
 			fakebullet.Force =0
 			self:FireShot(fakebullet)
-			dist = hitpos
+			dist=travel
 		end
-		return speed,hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10),dist--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
+		local traveladj=(travel*tr.DistanceLeftSolid)+(tr.Normal*10)
+		if (hitprop) then 
+			traveladj=propexit+(tr.Normal*10)
+		end
+		return speed,traveladj,dist--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
 	else return 0,travel,dist  end
 end
 	--impact tseter
@@ -1891,6 +1906,13 @@ function SWEP:MaterialPenetration(mat)
 		penetration = 1
 	elseif (mat==MAT_METAL ) then
 		penetration = 2
+	end
+	return penetration
+end
+function SWEP:PhysMaterialPenetration(mat)
+	local penetration=0
+	if (mat=="metal_barrel" || mat=="metalvehicle") then
+		penetration=0.5
 	end
 	return penetration
 end
