@@ -195,7 +195,14 @@ local kspawnerboxmodels = {
 "models/static_props/prop_market_weaponcage_double.mdl",
 "models/static_props/wcache_ins_01.mdl",
 "models/static_props/wcache_sec_01.mdl",
-"models/static_props/weapon_cache_01.mdl"
+"models/static_props/weapon_cache_01.mdl",
+--ZONA Stalker models
+"models/z-o-m-b-i-e/st/shkaf/st_seif_02.mdl",
+"models/z-o-m-b-i-e/st/shkaf/st_seif_03.mdl",
+"models/z-o-m-b-i-e/st_item_box_01.mdl",
+"models/maver1k_xvii/stalker/props/box/expl_dinamit.mdl",
+"models/z-o-m-b-i-e/st/armory_room/st_weapons_schit_01.mdl",
+"models/z-o-m-b-i-e/st/armory_room/st_weapons_schit_02.mdl"
 }
 for k,model in pairs(kspawnerboxmodels) do
 	if (file.Exists(model,"GAME")) then
