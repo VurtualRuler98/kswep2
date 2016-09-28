@@ -33,6 +33,7 @@ function ENT:Initialize()
 	if (phys:IsValid()) then
 		phys:Wake()
 	end
+	self.GunList={}
 end
 function ENT:Use(activator,caller)
 	self:UseBox(activator,caller)

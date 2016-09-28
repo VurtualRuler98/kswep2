@@ -9,4 +9,3 @@ ENT.Category	= "Vurtual's base"
 
 ENT.Spawnable = true
 ENT.AdminSpawnable = true
-ENT.GunList={}
