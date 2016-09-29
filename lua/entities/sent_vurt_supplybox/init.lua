@@ -3,7 +3,6 @@ include('shared.lua')
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("vestbox.lua")
 AddCSLuaFile("shared.lua")
-include('shared.lua')
 
 function ENT:SpawnFunction(ply, tr)
 	if (!tr.HitWorld) then return end
@@ -23,6 +22,7 @@ function ENT:Initialize()
 		self:SetNWBool("GiveLights",true)
 		self:SetNWBool("GunRack",true)
 		self:SetNWBool("GiveArmor",true)
+		self:SetNWBool("Suitcase",false)
 	end
 	self.Entity:PhysicsInit( SOLID_VPHYSICS)
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )

@@ -198,6 +198,19 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				ammoframe:Close()
 			end
 	end
+	if (self:GetNWBool("Suitcase")) then
+		local dbutton=vgui.Create("DButton")
+			dbutton:SetParent(ammoframe)
+			dbutton:SetPos(20,240)
+			dbutton:SetSize(180,40)
+			dbutton:SetText("Take Suitcase")
+			dbutton.DoClick = function()
+				net.Start("kswep_takesuitcase")
+				net.WriteEntity(self)
+				net.SendToServer()
+				ammoframe:Close()
+			end
+	end
 end 
 net.Receive("kswep_opticbox", function()
 	local box=net.ReadEntity()
