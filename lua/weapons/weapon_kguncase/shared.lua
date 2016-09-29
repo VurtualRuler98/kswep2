@@ -14,8 +14,11 @@ SWEP.WorldModel = "models/weapons/w_suitcase_passenger.mdl"
 SWEP.Flashlight=false
 SWEP.Primary.Delay=0.5
 SWEP.Primary.DefaultClip=-1
-SWEP.Primary.Clipsize=-1
+SWEP.Primary.ClipSize=-1
 SWEP.Primary.Ammo="none"
+SWEP.Secondary.Ammo="none"
+SWEP.Secondary.ClipSize=-1
+SWEP.Secondary.DefaultAmmo=-1
 function SWEP:Initialize()
 	self:SetColor(Color(0,0,0,0))
 	self:SetHoldType("normal")
