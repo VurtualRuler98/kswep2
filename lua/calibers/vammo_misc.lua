@@ -245,6 +245,23 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity = 1030 --makarov
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_9x18_FMJ",DMG_BULLET,0,0,80,10,5})
+	local tbl = {}
+	tbl.vestpenetration=10
+	tbl.powermin=2
+	tbl.powermax=3
+	tbl.helmetpenetration=0
+	tbl.armordamagemult=1
+	tbl.name = "vammo_9x17_FMJ"
+	tbl.printname = "9x17mm FMJ"
+	tbl.caliber = "vammo_9x17"
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.damagescale = 1
+	tbl.wallbang = 4
+	tbl.recoil = 1
+	tbl.velocity = 840 --PPK
+	AddAmmodata(tbl)
+	game.AddAmmoType({name="vammo_9x17_FMJ",DMG_BULLET,0,0,80,10,5})
 
 	local tbl = {}
 	tbl.vestpenetration=15
