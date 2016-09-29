@@ -103,7 +103,9 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 			dbutton:SetSize(180,40)
 			dbutton:SetText("Ammo")
 			dbutton.DoClick = function()
-				self:ClUseMagBox(wep,mags)
+				if (LocalPlayer():GetActiveWeapon()==wep) then
+					self:ClUseMagBox(wep,mags)
+				end
 				ammoframe:Close()
 			end
 	end
@@ -114,7 +116,9 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 			dbutton:SetSize(180,40)
 			dbutton:SetText("Optics")
 			dbutton.DoClick = function()
-				self:ClUseOpticBox(wep)
+				if (LocalPlayer():GetActiveWeapon()==wep) then
+					self:ClUseOpticBox(wep)
+				end
 				ammoframe:Close()
 			end
 	end
@@ -126,9 +130,11 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				dbutton:SetSize(180,40)
 				dbutton:SetText("Suppressor")
 				dbutton.DoClick = function()
-				net.Start("kswep_attach")
-				net.WriteString("suppressor")
-				net.SendToServer()
+				if (LocalPlayer():GetActiveWeapon()==wep) then
+					net.Start("kswep_attach")
+					net.WriteString("suppressor")
+					net.SendToServer()
+				end
 				ammoframe:Close()
 				end
 		end
@@ -139,9 +145,11 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				dbutton:SetSize(60,40)
 				dbutton:SetText("Light")
 				dbutton.DoClick = function()
-				net.Start("kswep_attach")
-				net.WriteString("flashlight")
-				net.SendToServer()
+				if (LocalPlayer():GetActiveWeapon()==wep) then
+					net.Start("kswep_attach")
+					net.WriteString("flashlight")
+					net.SendToServer()
+				end
 				ammoframe:Close()
 				end
 		end
@@ -152,9 +160,11 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				dbutton:SetSize(60,40)
 				dbutton:SetText("Laser")
 				dbutton.DoClick = function()
-				net.Start("kswep_attach")
-				net.WriteString("laser")
-				net.SendToServer()
+				if (LocalPlayer():GetActiveWeapon()==wep) then
+					net.Start("kswep_attach")
+					net.WriteString("laser")
+					net.SendToServer()
+				end
 				ammoframe:Close()
 				end
 		end
@@ -165,9 +175,11 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				dbutton:SetSize(60,40)
 				dbutton:SetText("Rangefinder")
 				dbutton.DoClick = function()
-				net.Start("kswep_attach")
-				net.WriteString("ranger")
-				net.SendToServer()
+				if (LocalPlayer():GetActiveWeapon()==wep) then
+					net.Start("kswep_attach")
+					net.WriteString("ranger")
+					net.SendToServer()
+				end
 				ammoframe:Close()
 				end
 		end
