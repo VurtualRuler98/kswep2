@@ -7,7 +7,7 @@ TOOL.ClientConVar["give_optics"] = "1"
 TOOL.ClientConVar["give_suppressors"] = "1"
 TOOL.ClientConVar["give_armor"] = "1"
 TOOL.ClientConVar["gunrack"] = "1"
-TOOL.ClientConVar["offset"]=0
+TOOL.ClientConVar["portable"]="0"
 TOOL.ClientConVar["ammo_type"]="vammo_rifle"
 if (CLIENT) then
 language.Add("Tool.kswep_spawner.name","KSwep Spawner Tool")
@@ -36,6 +36,7 @@ function TOOL:LeftClick(trace)
 		ent:SetNWBool("GiveSuppressors",self:GetClientNumber("give_suppressors")==1)
 		ent:SetNWBool("GunRack",self:GetClientNumber("gunrack")==1)
 		ent:SetNWBool("GiveArmor",self:GetClientNumber("give_armor")==1)
+		ent:SetNWBool("Suitcase",self:GetClientNumber("portable")==1)
 		undo.Create("KSWEP Supplies")
 		undo.AddEntity(ent)
 		undo.SetPlayer(self:GetOwner())
@@ -115,6 +116,10 @@ function TOOL.BuildCPanel(panel)
 	panel:AddControl("CheckBox",{
 		Label="Give Armor",
 		Command="kswep_spawner_give_armor"
+	})
+	panel:AddControl("CheckBox",{
+		Label="Portable Suitcase",
+		Command="kswep_spawner_portable"
 	})
 	panel:AddControl("PropSelect",{
 		Label="Model",
