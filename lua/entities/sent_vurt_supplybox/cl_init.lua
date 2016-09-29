@@ -83,6 +83,7 @@ function ENT:ClUseMagBox(wep,mags)
 		function scrollmenu:OnClickLine(line,selected)
 			net.Start("kswep_rearm_cl")
 			net.WriteString(line:GetValue(1))
+			net.WriteEntity(wep)
 			net.SendToServer()
 			ammoframe:Close()
 		end
