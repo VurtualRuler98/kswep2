@@ -34,6 +34,7 @@ function SWEP:PrimaryAttack()
 		fixpos=tr.HitPos+fixpos
 		box:SetPos(fixpos)
 		box:SetModel(self.BoxModel)
+		box:PhysicsInit(SOLID_VPHYSICS)
 		box:SetNWBool("GiveAmmo",self.GiveAmmo)
 		box:SetNWBool("GiveSuppressors",self.GiveSuppressors)
 		box:SetNWBool("GiveOptics",self.GiveOptics)
