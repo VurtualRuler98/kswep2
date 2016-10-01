@@ -52,6 +52,7 @@ net.Receive("kswep_takesuitcase",function(len,pl)
 		wep.GiveArmor=box:GetNWBool("GiveArmor")
 		wep.GunList=box.GunList
 		wep.BoxModel=box:GetModel()
+		wep.Type="GunCase"
 		box:Remove()
 	end
 end)
@@ -118,7 +119,8 @@ net.Receive("kswep_attach",KswepAttach)
 function RearmMags(len,pl)
 	if (IsValid(pl) && pl:IsPlayer()) then
 		local caliber=net.ReadString()
-		local wep=pl:GetActiveWeapon()
+		local wep=net.ReadEntity()
+		if (wep!=pl:GetActiveWeapon()) then return end
 		if (wep:IsValid() && string.find(wep:GetClass(),"weapon_kswep")) then
 			if (wep.MagType || wep.SingleReload) then
 				local magcount=wep.MaxMags
