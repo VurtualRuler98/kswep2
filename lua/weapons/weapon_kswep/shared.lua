@@ -261,6 +261,7 @@ function SWEP:Initialize()
 	if (CLIENT && self.InsAttachments && self.Owner:IsPlayer()) then
 		self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 	end
+	self.Anims=self.Anims or {}
 end
 function SWEP:DiscoverModelAnims()
 end
