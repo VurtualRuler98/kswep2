@@ -261,7 +261,6 @@ function SWEP:Initialize()
 	if (CLIENT && self.InsAttachments && self.Owner:IsPlayer()) then
 		self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 	end
-	self.Anims=self.Anims or {}
 end
 function SWEP:DiscoverModelAnims()
 end
@@ -1649,6 +1648,7 @@ net.Receive("kswep_discoveranim",function(len)
 	local self=net.ReadEntity()
 	local anim=net.ReadString()
 	local act=net.ReadInt(16)
+	self.Anims=self.Anims or {}
 	self.Anims[anim]=act
 end)
 function SWEP:SetAnim(anim,act)
