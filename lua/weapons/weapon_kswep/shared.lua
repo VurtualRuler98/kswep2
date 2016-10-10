@@ -112,6 +112,8 @@ SWEP.Anims.ShootLastAnim=ACT_VM_PRIMARYATTACK
 SWEP.Anims.ShootAnim=ACT_VM_PRIMARYATTACK
 SWEP.Anims.ShootLastIronAnim=ACT_VM_ISHOOT
 SWEP.Anims.InitialDrawAnim=ACT_VM_DRAW
+SWEP.Anims.CrawlAnim=ACT_VM_CRAWL
+SWEP.Anims.CrawlAnimEmpty=ACT_VM_CRAWL_EMPTY
 SWEP.DidLowerAnim=false
 SWEP.MergeAttachments = nil
 SWEP.ReloadMessage=0
@@ -167,6 +169,8 @@ SWEP.HasRanger=false
 SWEP.RangerTrace=nil
 SWEP.DiscoveredAnims=false
 SWEP.SingleReloadFiringPin=false
+SWEP.PenaltyStand=0.5
+SWEP.PenaltyKneel=0.2
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -1376,9 +1380,15 @@ function SWEP:LowerRun(lower)
 	if (!self:GetNWBool("Raised")) then
 		anim2=self.Anims.LowerAnim
 	end
+	if (ConVarExists("prone_bindkey_enabled") && self.Owner:IsProne()) then
+		anim=self.Anims.CrawlAnim
+	end
 	if ((self.OpenBolt && self:Clip1()<1) || (!self:GetNWBool("Chambered")) && self.EmptyAnims) then	
 		anim=self.Anims.RunAnimEmpty
 		anim2=self.Anims.IdleAnimEmpty
+		if (ConVarExists("prone_bindkey_enabled") && self.Owner:IsProne()) then
+			anim=self.Anims.CrawlAnimEmpty
+		end
 		if (!self:GetNWBool("raised")) then
 			anim2=self.Anims.LowerAnimEmpty
 		end
@@ -1673,8 +1683,12 @@ function SWEP:DiscoverAnim(anim)
 	return nil
 end
 function SWEP:IsRunning()
+	local runspeed=self.Owner:GetWalkSpeed()*1.2
+	if (ConVarExists("prone_bindkey_enabled") && self.Owner:IsProne()) then
+		runspeed=5
+	end
 	if (!self.Owner:IsPlayer()) then return false end
-        if (self.Owner:GetVelocity():Length()>self.Owner:GetWalkSpeed()*1.2) then
+        if (self.Owner:GetVelocity():Length()>runspeed) then
                 return true
         else
                 return false
@@ -1705,7 +1719,30 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 	if (!self:GetNWBool("Sight")) then
 		aimPenalty=1.5
 	end
+	if (ConVarExists("prone_bindkey_enabled") && !self.Owner:IsProne()) then
+		if (self.Owner:Crouching()) then
+			aimPenalty=aimPenalty+self.PenaltyKneel
+		else
+			aimPenalty=aimPenalty+self.PenaltyStand
+		end
+	elseif (!ConVarExists("prone_bindkey_enabled")) then
+		if (!self.Owner:Crouching()) then
+			aimPenalty=aimPenalty+self.PenaltyStand
+		end
+	end
+	
 	local recoil = self:GetNWFloat("CurRecoil")
+	if (ConVarExists("prone_bindkey_enabled") && !self.Owner:IsProne()) then
+		if (self.Owner:Crouching()) then
+			recoil=recoil*1.25
+		else
+			recoil=recoil*1.5
+		end
+	elseif (!ConVarExists("prone_bindkey_enabled")) then
+		if (!self.Owner:Crouching()) then
+			recoil=recoil*1.5
+		end
+	end
         local bullet = {}
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()                      -- Source
@@ -1835,7 +1872,7 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 	if (tr.HitWorld) then
 	local btr = util.TraceLine( {
 		filter = self.Owner,
-		start = hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10),
+		start = hitpos+(travel*tr.FractionLeftSolid)+(tr.Normal*10),
 		endpos = hitpos,
 		mask = MASK_SHOT
 	})
@@ -1880,13 +1917,13 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 			fakebullet.Damage = 0
 			fakebullet.Dir=Vector()
 			fakebullet.Dir:Set(shot.bullet.Dir)
-			fakebullet.Src = hitpos+(travel*tr.DistanceLeftSolid)+(tr.Normal*10)
+			fakebullet.Src = hitpos+(travel*tr.FractionLeftSolid)+(tr.Normal*10)
 			fakebullet.Dir:Rotate(Angle(0,180,0))
 			fakebullet.Force =0
 			self:FireShot(fakebullet)
 			dist=travel
 		end
-		local traveladj=(travel*tr.DistanceLeftSolid)+(tr.Normal*10)
+		local traveladj=(travel*tr.FractionLeftSolid)+(tr.Normal*10)
 		if (hitprop) then 
 			traveladj=propexit+(tr.Normal*10)
 		end
@@ -1896,7 +1933,7 @@ end
 	--impact tseter
 		--[[if (SERVER) then
 		local ono=ents.Create("item_healthvial")
-		ono:SetPos(hitpos+(travel*tr.DistanceLeftSolid))
+		ono:SetPos(hitpos+(travel*tr.FractionLeftSolid))
 		ono:Spawn()
 		ono:GetPhysicsObject():EnableMotion(false)
 		end]] 
