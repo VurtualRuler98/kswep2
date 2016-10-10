@@ -265,6 +265,7 @@ function SWEP:Initialize()
 	if (CLIENT && self.InsAttachments && self.Owner:IsPlayer()) then
 		self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 	end
+	self.CurrentMagSize=self.MagSize
 end
 function SWEP:DiscoverModelAnims()
 end
@@ -893,13 +894,14 @@ end
 function SWEP:FinishReload()
 	self:ServeNWBool("CurrentlyReloading",false)
 	self:ServeNWBool("FiringPin",true)
-	table.insert(self.Magazines,{caliber=self.Ammo.name,num = self:Clip1()})
+	table.insert(self.Magazines,{caliber=self.Ammo.name,num = self:Clip1(),max=self.CurrentMagSize})
 	table.SortByMember(self.Magazines,"num",true)
 	if (self.Anims.EndEmptyReloadAnim && ((!self.OpenBolt && !self:GetNWBool("Chambered")) || (self.OpenBolt && self:Clip1()<1) )) then
 		self:NextBolt(CurTime(),ACT_VM_IDLE,self.Anims.EndEmptyReloadAnim)
 	end
 	local mag=table.GetLastValue(self.Magazines)
 	self:SetClip1(mag.num)
+	self.CurrentMagSize=mag.max
 	self.Ammo=vurtual_ammodata[mag.caliber]
 	table.remove(self.Magazines)
 	if (#self.Magazines>0 && self.Magazines[1].num==0) then
