@@ -169,8 +169,10 @@ SWEP.HasRanger=false
 SWEP.RangerTrace=nil
 SWEP.DiscoveredAnims=false
 SWEP.SingleReloadFiringPin=false
-SWEP.PenaltyStand=0.5
-SWEP.PenaltyKneel=0.2
+SWEP.PenaltyStand=0.2
+SWEP.PenaltyKneel=0.1
+SWEP.PenaltyProne=0.05
+SWEP.RestingCached=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -190,6 +192,7 @@ function SWEP:Initialize()
 	self:SetNWFloat("NextIdle",0)
 	self:SetNWBool("Lowered",false)
 	self:SetNWFloat("NextPrimaryAttack",0)
+	self:SetNWBool("Bipod",false)
 	self.Zero=self.DefaultZero
 	self.ZeroStep=self.DefaultZeroStep
 	self.MaxZero=self.DefaultMaxZero
@@ -1196,6 +1199,9 @@ function SWEP:Think()
 		self:DiscoverModelAnims()
 		self.DiscoveredAnims=true
 	end
+	if (CLIENT) then
+		self.RestingCached=self:IsResting()
+	end
 	if (CLIENT && (self.Ranger || self.RTRanger || self.SuperScope)) then
 		self.RangerTrace=util.TraceLine({
 			start=self.Owner:GetShootPos(),
@@ -1433,11 +1439,13 @@ function SWEP:PostDrawViewModel()
 		render.Clear(0,0,0,255)
 	else
 	local texperture=0
+	self.AimShake=self.AimShake or Angle()
 	local scopeview = {}
 	scopeview.w = self.ScopeRes
 	scopeview.h = self.ScopeRes
 	scopeview.x = 0
 	scopeview.y = 0
+	scopeview.angles=EyeAngles()+self.AimShake*0.2
 	scopeview.drawviewmodel = false
 	scopeview.drawhud = false
 	scopeview.dopostprocess=false
@@ -1560,9 +1568,33 @@ end
 function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	self.smoothAng=self.smoothAng or ang
 	self.smoothPos=self.smoothPos or Vector()
+	self.AimShake=self.AimShake or Angle()
+	self.LastShake=self.LastShake or Angle()
+	self.ShakeTimer=self.ShakeTimer or 0
 	local modpos=oldPos
+	local aimShake=0.05
+	if (self.RestingCached) then
+		aimShake=0.01
+	else
+	if (ConVarExists("prone_bindkey_enabled") && !self.Owner:IsProne()) then
+		if (self.Owner:Crouching()) then
+			aimShake=0.1
+		else
+			aimShake=0.2
+		end
+	elseif (!ConVarExists("prone_bindkey_enabled")) then
+		if (!self.Owner:Crouching()) then
+			aimShake=1
+		end
+	end
+	end
 	if (self:GetNWBool("Sight")) then
-		ang=oldAng+Angle(self:GetNWFloat("CurRecoil")*-0.2,0,0)
+		self.AimShake=LerpAngle(0.99,self.LastShake,self.AimShake)
+		if (self.ShakeTimer<CurTime()) then
+		self.LastShake=Angle(math.Rand(-aimShake,aimShake),math.Rand(-aimShake,aimShake),math.Rand(-aimShake,aimShake))
+		self.ShakeTimer=CurTime()+math.Rand(0.01,0.1)
+		end
+		ang=oldAng+Angle(self:GetNWFloat("CurRecoil")*-0.2,0,0)+self.AimShake
 	else
 		ang=oldAng
 	end
@@ -1715,22 +1747,49 @@ function SWEP:IsWallBlocked()
                 return false
         end
 end
+function SWEP:IsResting()
+	if (!self.Owner:IsPlayer()) then return false end
+	if (!self:GetNWBool("Bipod")) then return false end
+	local length = self.Length
+	if (self.Suppressed) then
+		length = length+self.LengthSup
+	end
+	local bipodpos=self.Owner:GetAimVector()
+	bipodpos:Rotate(Angle(0,0,-90))
+	bipodpos=bipodpos*25
+	local tr = util.TraceLine( {
+		filter = self.Owner,
+		start = self.Owner:GetShootPos()+bipodpos,
+		endpos = self.Owner:GetShootPos()+(self.Owner:GetAimVector()*length)+bipodpos,
+		mask = MASK_SOLID
+		})
+        if (tr.Hit) then
+		if (SERVER) then print(tr.Entity) end
+                return true
+        else
+                return false
+        end
+end
 
 function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
-	local aimPenalty=1
+	local aimPenalty=0
 	if (!self:GetNWBool("Sight")) then
-		aimPenalty=1.5
+		aimPenalty=1
 	end
-	if (ConVarExists("prone_bindkey_enabled") && !self.Owner:IsProne()) then
-		if (self.Owner:Crouching()) then
+	if (!self:IsResting()) then
+	if (ConVarExists("prone_bindkey_enabled")) then
+		if (self.Owner:IsProne()) then
+			aimPenalty=aimPenalty+self.PenaltyProne
+		elseif (self.Owner:Crouching()) then
 			aimPenalty=aimPenalty+self.PenaltyKneel
 		else
 			aimPenalty=aimPenalty+self.PenaltyStand
 		end
-	elseif (!ConVarExists("prone_bindkey_enabled")) then
+	else
 		if (!self.Owner:Crouching()) then
 			aimPenalty=aimPenalty+self.PenaltyStand
 		end
+	end
 	end
 	
 	local recoil = self:GetNWFloat("CurRecoil")
@@ -1749,9 +1808,9 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()                      -- Source
 	if (self.Owner:IsPlayer()) then
-		bullet.Dir              = self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))                  -- Dir of bullet +(0.01*Vector(0,0,recoil))
+		bullet.Dir              = self.WeaponSway+(0.005*recoil*VectorRand()*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+(0.005*aimPenalty*VectorRand())                  -- Dir of bullet +(0.01*Vector(0,0,recoil))
 	else
-		bullet.Dir		= self.Owner:GetAimVector()+(0.005*recoil*VectorRand()*AimPenalty)
+		bullet.Dir		= self.Owner:GetAimVector()+(0.005*recoil*VectorRand())
 	end
         bullet.Spread   = Vector( aimcone, aimcone, 0 )         -- Aim Cone
         bullet.Tracer   = 0                                                                     -- Show a tracer on every x bullets 
@@ -1766,7 +1825,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 			local tbl=table.Copy(bullet)
 			tbl.Spread = Vector()
 			if (self.Owner:IsPlayer()) then
-				tbl.Dir=self.WeaponSway+(0.005*recoil*VectorRand()*aimPenalty*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+Vector(math.Rand(-aimcone,aimcone),0,math.Rand(-aimcone,aimcone))
+				tbl.Dir=self.WeaponSway+(0.005*recoil*VectorRand()*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+Vector(math.Rand(-aimcone,aimcone),0,math.Rand(-aimcone,aimcone))+(0.005*aimPenalty*VectorRand())
 			else
 				tbl.Dir=self.Owner:GetAimVector()+(0.005*recoil*VectorRand()*aimPenalty)+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
 			end
