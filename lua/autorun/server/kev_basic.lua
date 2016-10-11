@@ -22,6 +22,7 @@ util.AddNetworkString("kswep_putguninrack")
 util.AddNetworkString("kswep_updaterack")
 util.AddNetworkString("kswep_takegunfromrack")
 util.AddNetworkString("kswep_takesuitcase")
+resource.AddFile("materials/kswep/ret_mil.png")
 net.Receive("kswep_flashlight",function(len,pl)
 	if (!IsValid(pl) || !pl:IsPlayer()) then return end
 	local wep=pl:GetActiveWeapon()
@@ -144,10 +145,10 @@ function RearmMags(len,pl)
 				end
 				table.Empty(tbl)
 				for i=1,magcount do
-					table.insert(tbl,{caliber=caliber,num=magsize})
+					table.insert(tbl,{caliber=caliber,num=magsize,max=magsize})
 				end
 				if (wep.MagType) then
-					table.insert(tbl,{caliber=caliber,num=magsize})
+					table.insert(tbl,{caliber=caliber,num=magsize,max=magsize})
 					wep:SetClip1(0)
 					wep:SetNWBool("Chambered",false)
 					wep:ReloadAct(true)

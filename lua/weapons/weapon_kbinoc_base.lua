@@ -18,7 +18,8 @@ SWEP.Secondary.Ammo="none"
 SWEP.Primary.Ammo="none"
 SWEP.Zoomed=false
 SWEP.Magnification=6
-SWEP.Overlay="models/weapons/optics/binocs_overlay_american"
+SWEP.Overlay = nil
+SWEP.Reticle = nil
 SWEP.UseInsHands=false
 SWEP.Tripod=false
 SWEP.IsKBinoc=true
@@ -29,6 +30,8 @@ SWEP.MinMag=nil
 SWEP.MaxMag=nil
 SWEP.MagSteps=0
 SWEP.NoViewModel=false
+SWEP.PixelsPerMil=10
+SWEP.ReticlePixels=512
 function SWEP:Initialize()
 	self:SetColor(Color(0,0,0,0))
 	self:SetHoldType("slam")
@@ -78,8 +81,14 @@ function SWEP:PostDrawViewModel()
 	end
 end
 function SWEP:DrawHUD()
-	if (self.Zoomed) then
+	if (self.Zoomed && self.Overlay!=nil) then
 		DrawMaterialOverlay(self.Overlay,0)
+	end
+	if (self.Zoomed && self.Reticle!=nil) then
+		local scale=(self.ReticlePixels/self.PixelsPerMil)*ScrW()/(self.Owner:GetFOV()*18)
+		surface.SetMaterial(Material(self.Reticle,"noclamp smooth"))
+		surface.SetDrawColor(Color(0,0,0,255))
+		surface.DrawTexturedRectUV((ScrW()-scale)/2,(ScrH()-scale)/2,scale,scale,0,0,1,1)
 	end
 	if (self.Zoomed || self.NoViewModel) then
 		self.Owner:GetViewModel():SetNoDraw(true)
@@ -134,13 +143,14 @@ function SWEP.DetectScroll(ply,bind,pressed)
 				if (wep.Magnification>wep.MaxMag) then
 					wep.Magnification=wep.MaxMag
 				end
+				return true
 			elseif (bind=="invnext") then
 				wep.Magnification=wep.Magnification-adj
 				if (wep.Magnification<wep.MinMag) then
 					wep.Magnification=wep.MinMag
 				end
+				return true
 			end
-			return true
 		end
 	end
 end
