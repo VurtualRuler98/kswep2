@@ -1,5 +1,5 @@
 if (SERVER) then
-	AddCSLuaFile("shared.lua")
+	AddCSLuaFile()
 end
 if (CLIENT) then
 	SWEP.PrintName = "KSwep Rangefinder"
