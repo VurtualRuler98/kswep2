@@ -277,7 +277,7 @@ function SWEP:OnDrop()
 end
 function SWEP:PrimaryAttack()
 	if (self:CanPrimaryAttack()) then
-	if (self.Owner:IsPlayer() && self.Owner:KeyDown(IN_USE) && !self:GetNWBool("FiremodeSelected") && !self:GetNWBool("Lowered")) then
+	if (self.Owner:IsPlayer() && self.Owner:KeyDown(IN_WALK) && !self:GetNWBool("FiremodeSelected") && !self:GetNWBool("Lowered")) then
 		self:SwitchFiremode()
 		self:SetNWBool("FiremodeSelected",true)
 		if (SERVER) then
@@ -659,7 +659,7 @@ function SWEP:Reload()
 		return
 	end
 	if (!self:GetNWBool("Raised")) then return end
-	if (self.Owner:IsPlayer() && self.Owner:KeyDown(IN_USE)) then
+	if (self.Owner:IsPlayer() && self.Owner:KeyDown(IN_WALK)) then
 		self.ReloadMessage=CurTime()+2
 		self.ReloadWeight=self:Clip1()
 	else
@@ -1039,14 +1039,14 @@ end
 
 function SWEP:SecondaryAttack()
 	if (self:GetNWBool("CurrentlyReloading")) then return end
-	if (!self.Owner:KeyDown(IN_USE) || self:GetNWBool("Sight")) then
+	if (!self.Owner:KeyDown(IN_WALK) || self:GetNWBool("Sight")) then
 		self:SetNextSecondaryFire(CurTime() + 0.4 )
 	else
 		self:SetNextSecondaryFire(CurTime()+0.05)
 	end
-	if ((self.Owner:KeyDown(IN_USE)) && !self:GetNWBool("Sight")) then
+	if ((self.Owner:KeyDown(IN_WALK)) && !self:GetNWBool("Sight")) then
 		self:ToggleZoom()
-	elseif (self.Owner:KeyDown(IN_USE)) then
+	elseif (self.Owner:KeyDown(IN_WALK)) then
 		self:SetNWBool("AltIrons",!self:GetNWBool("AltIrons"))
 	else
 		self:ToggleAim()
@@ -1089,7 +1089,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 		local wep=ply:GetActiveWeapon()
 		if (IsValid(wep) && string.find(wep:GetClass(),"weapon_kswep")) then
 			if (bind=="invnext" && wep:GetNWBool("Sight")) then
-				if (wep.Owner:KeyDown(IN_USE) && wep.ScopeFOVSteps!=nil) then
+				if (wep.Owner:KeyDown(IN_WALK) && wep.ScopeFOVSteps!=nil) then
 					wep.ScopeFOV=wep.ScopeFOV+((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
 					if (wep.ScopeFOV>wep.ScopeFOVMax) then wep.ScopeFOV=wep.ScopeFOVMax end
 				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
@@ -1104,7 +1104,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (wep.IronZoom>wep.IronZoomMin) then wep.IronZoom=wep.IronZoomMin end
 				end
 			elseif (bind=="invprev" && wep:GetNWBool("Sight")) then
-				if (wep.Owner:KeyDown(IN_USE) && wep.ScopeFOVSteps!=nil) then
+				if (wep.Owner:KeyDown(IN_WALK) && wep.ScopeFOVSteps!=nil) then
 					wep.ScopeFOV=wep.ScopeFOV-((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
 					if (wep.ScopeFOV<wep.ScopeFOVMin) then wep.ScopeFOV=wep.ScopeFOVMin end
 				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
@@ -1120,7 +1120,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (wep.IronZoom<wep.IronZoomMax) then wep.IronZoom=wep.IronZoomMax end
 				end
 			end
-			if (bind=="impulse 100" && (!GetConVar("mp_flashlight"):GetBool() || !wep.Owner:KeyDown(IN_USE)) && (wep.HasFlashlight || wep.HasLaser || wep.HasRanger)) then
+			if (bind=="impulse 100" && (!GetConVar("mp_flashlight"):GetBool() || !wep.Owner:KeyDown(IN_WALK)) && (wep.HasFlashlight || wep.HasLaser || wep.HasRanger)) then
 				if (wep.HasFlashlight) then
 					if (wep.Flashlight) then
 						wep:EnableFlashlight(false)
