@@ -173,6 +173,9 @@ SWEP.PenaltyStand=0.2
 SWEP.PenaltyKneel=0.1
 SWEP.PenaltyProne=0.05
 SWEP.RestingCached=false
+SWEP.ScopeReticle=false
+SWEP.ScopeReticleOverride=false
+SWEP.ScopeReticleZoom=0
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -511,6 +514,9 @@ function SWEP:InsOptic(name)
 	end
 	self.ScopeName=scopedata.name
 	self.ScopeMat=scopedata.rtmat
+	self.ScopeReticle=scopedata.reticle
+	self.ScopeReticleZoom=scopedata.retzoom
+	self.ScopeReticleOverride=scopedata.retoverride
 	self.RTScope=scopedata.rtscope
 	self.RTRanger=scopedata.rtranger
 	self.RTRangerX=scopedata.rtrangerx
@@ -841,10 +847,11 @@ function SWEP:DrawHUD()
 	if (self.ReloadMessage > CurTime()) then
 		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
 	end
-	if (self.RTRanger && self:GetNWBool("Sight")) then
+	if ((self.RTRanger || self.ScopeReticle) && self:GetNWBool("Sight")) then
 		local oldW,oldH=ScrW(),ScrH()
 		render.PushRenderTarget(self.RenderTarget)
 		render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)
+		if (self.RTRanger) then
 		local tr=self.RangerTrace
 		local dist=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
 		local rangetext=""
@@ -857,6 +864,20 @@ function SWEP:DrawHUD()
 		surface.SetTextColor(255,0,0,255)
 		surface.SetTextPos((oldW*0.5)+(self.ScopeRes*0.01*self.RTRangerX),(oldH*0.5)+(self.ScopeRes*0.01*self.RTRangerY))
 		surface.DrawText(rangetext)
+		end
+		if (self.ScopeReticle!=false) then
+			local pixmil=10
+			local retpix=512
+			local retmag=self.ScopeZoom
+			if (self.ScopeReticleZoom>0) then
+				retmag=self.ScopeReticleZoom
+			end
+			local scale=(retpix/pixmil)*oldW/(retmag*18)
+			surface.SetDrawColor(color_black)
+			surface.SetMaterial(Material(self.ScopeReticle,"noclamp smooth"))
+			scalemod=oldH/oldW
+			surface.DrawTexturedRectUV((oldW-scale)/2,(oldH-scale*scalemod)/2,scale,scale*scalemod,0,0,1,1)
+		end
 		render.SetViewPort(0,0,oldW,oldH)
 		render.PopRenderTarget()
 	end

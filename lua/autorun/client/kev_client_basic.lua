@@ -24,7 +24,6 @@ net.Receive("kswep_flashlight_cl",function(len)
 		end
 	end
 end)
-
 function KSwepRenderClientLights()
 	if (kswep_client_lights!=nil) then
 		for k,v in pairs(kswep_client_lights) do
