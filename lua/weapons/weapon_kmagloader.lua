@@ -99,7 +99,7 @@ function SWEP:GetMags()
 	if (mags!=nil) then
 		local size=0
 		for k,v in pairs(mags) do
-			if (v.num<v.max && v.num>size) then
+			if (v.num<v.max && v.num>=size) then
 				self.PrimaryFill=k
 				size = v.num
 			end
