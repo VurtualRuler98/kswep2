@@ -953,7 +953,7 @@ function SWEP:FinishReload()
 		net.WriteTable(self.Magazines)
 		net.Send(self.Owner)
 	end
-	self:UpdateMagCount()
+	self:UpdateMagazines()
 end
 function SWEP:ServeNWInt(var,int)
 	if (SERVER) then
@@ -1040,7 +1040,7 @@ function SWEP:FinishReloadSingle()
 	end
 	self:ServeNWBool("CurrentlyReloading",false)
 	self.ReloadAnimTime=0
-	self:UpdateMagCount()
+	self:UpdateMagazines()
 	if (self.SingleReloadChambers && !self:GetNWBool("Chambered")) then
 		self:TakePrimaryAmmo(1)
 		self:SetNWBool("Chambered",true)
