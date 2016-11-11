@@ -176,6 +176,7 @@ SWEP.RestingCached=false
 SWEP.ScopeReticle=false
 SWEP.ScopeReticleOverride=false
 SWEP.ScopeReticleZoom=0
+SWEP.ReloadFullClipazineOnly=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -434,6 +435,9 @@ function SWEP:TakePrimaryAmmo(num)
 end
 SWEP.InitialDraw=true
 function SWEP:Deploy()
+	if (SERVER) then
+		self:UpdateMagazines()
+	end
 	if (self.Owner:FlashlightIsOn() && SERVER && (self.HasFlashlight || self.HasLaser)) then
 		self.Owner:Flashlight(false)
 	end
@@ -949,7 +953,7 @@ function SWEP:FinishReload()
 		net.WriteTable(self.Magazines)
 		net.Send(self.Owner)
 	end
-	self:ServeNWInt("MagazineCount",#self.Magazines)
+	self:UpdateMagCount()
 end
 function SWEP:ServeNWInt(var,int)
 	if (SERVER) then
@@ -971,7 +975,37 @@ function SWEP:DoDrawCrosshair()
 	return true
 
 end
-
+function SWEP:UpdateMagazines()
+	if (self.Owner:IsPlayer() && self.SingleReload && self:Clip1()!=self:GetNWInt("MagRounds")) then
+		self:SetClip1(self:GetNWInt("MagRounds"))
+	end
+	if (SERVER) then
+		local plmags=self.Owner.KPrimaryMags
+		local pltype=self.Owner.KPrimaryType
+		if (self.IsSecondaryWeapon) then
+			plmags=self.Owner.KSecondaryMags
+			pltype=self.Owner.KSecondaryType
+		end
+		if (pltype==self.MagType) then
+			self.Magazines=plmags
+		else
+			self.Magazines={}
+		end
+		self:UpdateMagCount()
+	end
+end
+function SWEP:UpdateMagCount()
+	local magcount=#self.Magazines
+	if (self.ReloadFullClipazineOnly) then
+		magcount=0
+		for k,v in pairs(self.Magazines) do
+			if (v.num==v.max) then
+				magcount=magcount+1
+			end
+		end
+	end	
+	self:ServeNWInt("MagazineCount",magcount)
+end
 function SWEP:FinishReloadSingle()
 	self.ChainReload=false
 	if (#self.Magazines==0) then
@@ -1006,7 +1040,7 @@ function SWEP:FinishReloadSingle()
 	end
 	self:ServeNWBool("CurrentlyReloading",false)
 	self.ReloadAnimTime=0
-	self:ServeNWInt("MagazineCount",#self.Magazines)
+	self:UpdateMagCount()
 	if (self.SingleReloadChambers && !self:GetNWBool("Chambered")) then
 		self:TakePrimaryAmmo(1)
 		self:SetNWBool("Chambered",true)
@@ -1250,36 +1284,18 @@ function SWEP:Think()
 	if (!self.Owner:OnGround()) then
 		self:SetNWFloat("CurRecoil",self.MaxRecoil)
 	end
-	if (self.Owner:IsPlayer() && self.SingleReload && self:Clip1()!=self:GetNWInt("MagRounds")) then
-		self:SetClip1(self:GetNWInt("MagRounds"))
-	end
-	if (SERVER) then
-		local plmags=self.Owner.KPrimaryMags
-		local pltype=self.Owner.KPrimaryType
-		if (self.IsSecondaryWeapon) then
-			plmags=self.Owner.KSecondaryMags
-			pltype=self.Owner.KSecondaryType
-		end
-		if (pltype==self.MagType) then
-			self.Magazines=plmags
-			self:ServeNWInt("MagazineCount",#self.Magazines)
-		else
-			self.Magazines={}
-			self:ServeNWInt("MagazineCount",#self.Magazines)
-		end
-	end
 	for k,v in pairs(self.Bullets) do
 		if (v.time<CurTime()) then
 			self.Bullets[k]=self:FlyBullet(v)
 		end
 	end
-		if (self.ReloadAnimTime!=0 && CurTime()>self.ReloadAnimTime && self:GetNWBool("CurrentlyReloading")==true) then
+	if (self.ReloadAnimTime!=0 && CurTime()>self.ReloadAnimTime && self:GetNWBool("CurrentlyReloading")==true) then
 		if (self.SingleReload) then
 			self:FinishReloadSingle()
 		else
 			self:FinishReload()
 		end
-		end
+	end
 	if (self:GetNWFloat("CurRecoil")>0) then
 		--self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")-(FrameTime()*self.RecoilControl))
 		self:SetNWFloat("CurRecoil",Lerp(FrameTime()*self.RecoilControl/2,self:GetNWFloat("CurRecoil"),0))
