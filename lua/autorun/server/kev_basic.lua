@@ -160,6 +160,7 @@ function RearmMags(len,pl)
 					net.WriteTable(wep.MagTable)
 					net.Send(wep.Owner)
 				end
+				wep:UpdateMagazines()
 				
 			end
 		end
