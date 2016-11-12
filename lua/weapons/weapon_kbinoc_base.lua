@@ -85,7 +85,9 @@ function SWEP:DrawHUD()
 		DrawMaterialOverlay(self.Overlay,0)
 	end
 	if (self.Zoomed && self.Reticle!=nil) then
-		local scale=(self.ReticlePixels/self.PixelsPerMil)*ScrW()/(self.Owner:GetFOV()*18)
+		local aspectratio=(ScrW()/ScrH())/(4/3)
+		local scale=self.ReticlePixels*(ScrW()/(self.Owner:GetFOV()*18))/self.PixelsPerMil
+		scale=scale/aspectratio
 		surface.SetMaterial(Material(self.Reticle,"noclamp smooth"))
 		surface.SetDrawColor(Color(0,0,0,255))
 		surface.DrawTexturedRectUV((ScrW()-scale)/2,(ScrH()-scale)/2,scale,scale,0,0,1,1)
