@@ -39,7 +39,7 @@ function SWEP:PositionBox(box,tr)
 end
 function SWEP:PlaceGunCase()
 	local tr=self.Owner:GetEyeTrace()
-	if (!tr.Hit) then return end
+	if (not tr.Hit) then return end
 	if (tr.StartPos:Distance(tr.HitPos)>128) then return end
 	local box=ents.Create("sent_vurt_supplybox")
 	box:SetPos(tr.HitPos+Vector(0,0,1))
@@ -59,7 +59,7 @@ function SWEP:PlaceGunCase()
 end
 function SWEP:PlaceMedicBag()
 	local tr=self.Owner:GetEyeTrace()
-	if (!tr.Hit) then return end
+	if (not tr.Hit) then return end
 	if (tr.StartPos:Distance(tr.HitPos)>128) then return end
 	local box=ents.Create("sent_vurt_medbag")
 	box:SetPos(tr.HitPos+Vector(0,0,1))

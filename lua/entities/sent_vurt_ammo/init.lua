@@ -4,7 +4,7 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 
 function ENT:SpawnFunction(ply, tr)
-	if (!tr.HitWorld) then return end
+	if (not tr.HitWorld) then return end
 
 	local ent = ents.Create("sent_vurt_ammo")
 	ent:SetPos(tr.HitPos + Vector(0, 0, 15))
@@ -30,8 +30,8 @@ end
 function ENT:Use(activator,caller)
 	if ( activator:IsPlayer() )  then
 		local wep=activator:GetActiveWeapon()
-		if (wep:IsValid() && string.find(wep:GetClass(),"weapon_kswep")) then
-			if (wep.MagType || wep.SingleReload) then
+		if (wep:IsValid() and string.find(wep:GetClass(),"weapon_kswep")) then
+			if (wep.MagType or wep.SingleReload) then
 				net.Start("kswep_rearm")
 				net.WriteEntity(self)
 				net.WriteEntity(wep)

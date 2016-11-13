@@ -1,7 +1,7 @@
 function KSwepNVG()--[[
 	local res=32
 	kswep_nvg_brightness=kswep_nvg_brightness or 0
-	if (!LocalPlayer():HasWeapon("kswep_nvg") || !LocalPlayer():GetWeapon("kswep_nvg"):GetNWBool("Active")) then
+	if (not LocalPlayer():HasWeapon("kswep_nvg") or not LocalPlayer():GetWeapon("kswep_nvg"):GetNWBool("Active")) then
 		return
 	end
 
@@ -30,7 +30,7 @@ function KSwepNVG()--[[
 end
 --hook.Add("PreRender","KSwepNVG",KSwepNVG)
 function KSwepNVGEffects()
-	if (!LocalPlayer():HasWeapon("kswep_nvg") || !LocalPlayer():GetWeapon("kswep_nvg"):GetNWBool("Active")) then
+	if (not LocalPlayer():HasWeapon("kswep_nvg") or not LocalPlayer():GetWeapon("kswep_nvg"):GetNWBool("Active")) then
 		if (IsValid(kswep_nv_superlight)) then kswep_nv_superlight:Remove() end
 		return
 	end
@@ -57,7 +57,7 @@ function KSwepNVGEffects()
 	--mat:SetTexture("$fbtexture",render.GetScreenEffectTexture())
 	DrawColorModify(tab)
 	DrawBloom(0,4-aperture,1,0.5,0.5,1,0.5,1,0.5)
-	if (!IsValid(kswep_nv_superlight)) then
+	if (not IsValid(kswep_nv_superlight)) then
 		kswep_nv_superlight=ProjectedTexture()
 	end
 	if (kswep_nv_superlight) then

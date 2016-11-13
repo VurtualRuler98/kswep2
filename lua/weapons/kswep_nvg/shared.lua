@@ -24,7 +24,7 @@ function SWEP:Initialize()
 	self:SetNWBool("Active",false)
 end
 function SWEP:PrimaryAttack()
-	self:SetNWBool("Active",!self:GetNWBool("Active"))
+	self:SetNWBool("Active",not self:GetNWBool("Active"))
 end
 function SWEP:Deploy()
 	self.Owner:DrawViewModel(false)

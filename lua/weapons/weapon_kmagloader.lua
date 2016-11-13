@@ -70,7 +70,7 @@ function SWEP:Reload()
 end
 function SWEP:CustomAmmoDisplay()
 	self.AmmoDisplay=self.AmmoDisplay or {}
-	if (self:GetNWInt("AmmoMode")!=0) then
+	if (self:GetNWInt("AmmoMode")~=0) then
 		self.AmmoDisplay.Draw=true
 	else
 		self.AmmoDisplay.Draw=false
@@ -90,16 +90,16 @@ function SWEP:OnRemove()
 end
 function SWEP:GetMags()
 	local mags=nil
-	if (self:GetNWBool("AmmoMode")==1 && table.Count(self.Owner.KPrimaryMags)>0) then
+	if (self:GetNWBool("AmmoMode")==1 and table.Count(self.Owner.KPrimaryMags)>0) then
 		mags=self.Owner.KPrimaryMags
 	end
-	if (self:GetNWBool("AmmoMode")==2 && table.Count(self.Owner.KSecondaryMags)>0) then
+	if (self:GetNWBool("AmmoMode")==2 and table.Count(self.Owner.KSecondaryMags)>0) then
 		mags=self.Owner.KSecondaryMags
 	end
-	if (mags!=nil) then
+	if (mags~=nil) then
 		local size=0
 		for k,v in pairs(mags) do
-			if (v.num<v.max && v.num>=size) then
+			if (v.num<v.max and v.num>=size) then
 				self.PrimaryFill=k
 				size = v.num
 			end
@@ -110,7 +110,7 @@ function SWEP:GetMags()
 			self:SetNWBool("MagTo",table.GetLastValue(mags).num)
 			self.PrimaryFill=nil
 		end
-		if (size>0 && mags[self.PrimaryFill]!=mags[1]) then
+		if (size>0 and mags[self.PrimaryFill]~=mags[1]) then
 			self:SetNWInt("MagFrom",mags[1].num)
 		else
 			self:SetNWInt("MagFrom",0)

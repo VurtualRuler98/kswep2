@@ -35,7 +35,7 @@ SWEP.ReticlePixels=512
 function SWEP:Initialize()
 	self:SetColor(Color(0,0,0,0))
 	self:SetHoldType("slam")
-	if (CLIENT && self.Owner:IsPlayer() && self.UseInsHands==true) then
+	if (CLIENT and self.Owner:IsPlayer() and self.UseInsHands==true) then
 		self.Hands=ClientsideModel(kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 		self.Hands:SetNoDraw(true)
 	end
@@ -46,8 +46,8 @@ end
 function SWEP:PrimaryAttack()
 end
 function SWEP:SecondaryAttack()
-	if (!IsFirstTimePredicted()) then return end
-	self.Zoomed=!self.Zoomed
+	if (not IsFirstTimePredicted()) then return end
+	self.Zoomed=not self.Zoomed
 	if (self.Zoomed) then
 		self:SetHoldType("camera")
 	else
@@ -74,17 +74,17 @@ function SWEP:CustomAmmoDisplay()
 	return {}
 end
 function SWEP:PostDrawViewModel()
-	if (self.Hands!=nil) then
+	if (self.Hands~=nil) then
 		self.Hands:SetParent(self.Owner:GetViewModel())
 		self.Hands:AddEffects(EF_BONEMERGE)
 		self.Hands:DrawModel()
 	end
 end
 function SWEP:DrawHUD()
-	if (self.Zoomed && self.Overlay!=nil) then
+	if (self.Zoomed and self.Overlay~=nil) then
 		DrawMaterialOverlay(self.Overlay,0)
 	end
-	if (self.Zoomed && self.Reticle!=nil) then
+	if (self.Zoomed and self.Reticle~=nil) then
 		local aspectratio=(ScrW()/ScrH())/(4/3)
 		local scale=self.ReticlePixels*(ScrW()/(self.Owner:GetFOV()*18))/self.PixelsPerMil
 		scale=scale/aspectratio
@@ -92,7 +92,7 @@ function SWEP:DrawHUD()
 		surface.SetDrawColor(Color(0,0,0,255))
 		surface.DrawTexturedRectUV((ScrW()-scale)/2,(ScrH()-scale)/2,scale,scale,0,0,1,1)
 	end
-	if (self.Zoomed || self.NoViewModel) then
+	if (self.Zoomed or self.NoViewModel) then
 		self.Owner:GetViewModel():SetNoDraw(true)
 	else
 		self.Owner:GetViewModel():SetNoDraw(false)
@@ -111,11 +111,11 @@ end
 hook.Add("CalcView","KBinocCalcView",function(ply,pos,angles,fov)
 	if (ply:IsPlayer()) then
 		local wep=ply:GetActiveWeapon()
-		if ( IsValid(wep) && string.find(wep:GetClass(),"weapon_kbinoc") && wep.Zoomed) then
+		if ( IsValid(wep) and string.find(wep:GetClass(),"weapon_kbinoc") and wep.Zoomed) then
 		local view = {}
 		local ang = angles
 		local aimShake=0.05
-		if ((!ConVarExists("prone_bindkey_enabled") && wep.Owner:Crouching()) || wep.Owner:IsProne()) then
+		if ((not ConVarExists("prone_bindkey_enabled") and wep.Owner:Crouching()) or wep.Owner:IsProne()) then
 			if (wep.Tripod) then
 				aimShake=0.01
 			end
@@ -136,9 +136,9 @@ hook.Add("CalcView","KBinocCalcView",function(ply,pos,angles,fov)
 	end
 end)
 function SWEP.DetectScroll(ply,bind,pressed)
-	if (ply:IsPlayer() && pressed) then
+	if (ply:IsPlayer() and pressed) then
 		local wep=ply:GetActiveWeapon()
-		if (IsValid(wep) && string.find(wep:GetClass(),"weapon_kbinoc") && wep.MagSteps!=0 && wep.Zoomed) then
+		if (IsValid(wep) and string.find(wep:GetClass(),"weapon_kbinoc") and wep.MagSteps~=0 and wep.Zoomed) then
 			local adj=((1/wep.MagSteps)*(wep.MaxMag-wep.MinMag))
 			if (bind=="invprev") then
 				wep.Magnification=wep.Magnification+adj

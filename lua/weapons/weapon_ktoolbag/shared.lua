@@ -27,7 +27,7 @@ function SWEP:PrimaryAttack()
 	local givetools=true
 	for k,v in pairs(self.Owner:GetWeapons()) do
 		local class=v:GetClass()
-		if (class=="weapon_physgun" || class=="gmod_tool" || class=="gmod_camera") then
+		if (class=="weapon_physgun" or class=="gmod_tool" or class=="gmod_camera") then
 			table.insert(self.Tools,class)
 			if (SERVER) then
 			v:Remove()

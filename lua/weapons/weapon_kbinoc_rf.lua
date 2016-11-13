@@ -26,7 +26,7 @@ function SWEP:PrimaryAttack()
 			filter=self.Owner,
 		} )
 		local dist=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
-		if (tr.Hit && !tr.HitSky) then
+		if (tr.Hit and not tr.HitSky) then
 			self.Owner:PrintMessage(HUD_PRINTCENTER,dist .. "m")
 		else
 			self.Owner:PrintMessage(HUD_PRINTCENTER,"---m")

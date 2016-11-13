@@ -28,7 +28,7 @@ function ENT:ClGunRack()
 	local ammoframe = vgui.Create("DFrame")
 		ammoframe:SetPos((ScrW()/2)-(menuwidth/2),(ScrH()/2)-(menuheight/2))
 		ammoframe:SetSize(menuwidth,menuheight)
-		ammoframe:SetTitle("THIS IS AMMO!")
+		ammoframe:SetTitle("THIS IS AMMOnot ")
 		ammoframe:MakePopup()
 	local scrollmenu = vgui.Create("DListView")
 		scrollmenu:SetParent(ammoframe)
@@ -69,7 +69,7 @@ function ENT:ClUseMagBox(wep,mags)
 	local ammoframe = vgui.Create("DFrame")
 		ammoframe:SetPos((ScrW()/2)-(menuwidth/2),(ScrH()/2)-(menuheight/2))
 		ammoframe:SetSize(menuwidth,menuheight)
-		ammoframe:SetTitle("THIS IS AMMO!")
+		ammoframe:SetTitle("THIS IS AMMOnot ")
 		ammoframe:MakePopup()
 	local scrollmenu = vgui.Create("DListView",ammoframe)
 		scrollmenu:SetPos(16,32)
@@ -95,9 +95,9 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 	local ammoframe = vgui.Create("DFrame")
 		ammoframe:SetPos((ScrW()/2)-(menuwidth/2),(ScrH()/2)-(menuheight/2))
 		ammoframe:SetSize(menuwidth,menuheight)
-		ammoframe:SetTitle("THIS IS AMMO!")
+		ammoframe:SetTitle("THIS IS AMMOnot ")
 		ammoframe:MakePopup()
-	if (canmag && self:GetNWBool("GiveAmmo")) then
+	if (canmag and self:GetNWBool("GiveAmmo")) then
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(20,40)
@@ -110,7 +110,7 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				ammoframe:Close()
 			end
 	end
-	if (canoptic && self:GetNWBool("GiveOptics")) then
+	if (canoptic and self:GetNWBool("GiveOptics")) then
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(20,80)
@@ -123,8 +123,8 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				ammoframe:Close()
 			end
 	end
-	if (wep!=nil) then
-		if (wep.Suppressable && self:GetNWBool("GiveSuppressors")) then
+	if (wep~=nil) then
+		if (wep.Suppressable and self:GetNWBool("GiveSuppressors")) then
 			local dbutton=vgui.Create("DButton")
 				dbutton:SetParent(ammoframe)
 				dbutton:SetPos(20,120)
@@ -139,7 +139,7 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				ammoframe:Close()
 				end
 		end
-		if (wep.CanFlashlight && self:GetNWBool("GiveLights")) then
+		if (wep.CanFlashlight and self:GetNWBool("GiveLights")) then
 			local dbutton=vgui.Create("DButton")
 				dbutton:SetParent(ammoframe)
 				dbutton:SetPos(20,160)
@@ -154,7 +154,7 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				ammoframe:Close()
 				end
 		end
-		if (wep.CanFlashlight && self:GetNWBool("GiveLights")) then
+		if (wep.CanFlashlight and self:GetNWBool("GiveLights")) then
 			local dbutton=vgui.Create("DButton")
 				dbutton:SetParent(ammoframe)
 				dbutton:SetPos(80,160)
@@ -169,7 +169,7 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				ammoframe:Close()
 				end
 		end
-		if (wep.CanFlashlight && self:GetNWBool("GiveLights")) then
+		if (wep.CanFlashlight and self:GetNWBool("GiveLights")) then
 			local dbutton=vgui.Create("DButton")
 				dbutton:SetParent(ammoframe)
 				dbutton:SetPos(140,160)
@@ -200,7 +200,7 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				ammoframe:Close()
 			end
 	end
-	if (self:GetNWBool("GiveArmor") && ConVarExists("kevlar_enabled")) then
+	if (self:GetNWBool("GiveArmor") and ConVarExists("kevlar_enabled")) then
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(110,200)

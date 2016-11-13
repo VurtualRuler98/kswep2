@@ -34,9 +34,9 @@ SWEP.DrawCrosshair = false
 function SWEP.DetectKey(ply,bind,pressed)
 	if (pressed) then
 		local wep=ply:GetActiveWeapon()
-		if (IsValid(wep) && wep:GetClass()=="weapon_klight") then
+		if (IsValid(wep) and wep:GetClass()=="weapon_klight") then
 			if (bind=="impulse 100") then
-				wep:EnableFlashlight(!wep.Flashlight)
+				wep:EnableFlashlight(not wep.Flashlight)
 				return true
 			end
 		end
@@ -48,7 +48,7 @@ hook.Add("PlayerBindPress","kswep_lightbutton",SWEP.DetectKey)
 function SWEP:EnableFlashlight(enable)
 	if (SERVER) then return end
 	self.Flashlight=enable
-	if (self.Flashlight==false && self.dlight!=nil) then
+	if (self.Flashlight==false and self.dlight~=nil) then
 		self.dlight:Remove()
 		self.dlight2:Remove()
 	end
@@ -75,16 +75,16 @@ function SWEP:Think()
 	if (self.Flashlight) then
 		hold="pistol"
 	end
-	if (self:GetHoldType()!=hold) then
+	if (self:GetHoldType()~=hold) then
 		self:SetHoldType(hold)
 	end
 	if (CLIENT) then
-		if (!IsValid(self.dlight) && self.Flashlight) then
+		if (not IsValid(self.dlight) and self.Flashlight) then
 			self.dlight=ProjectedTexture()
 			self.dlight2=ProjectedTexture()
 		end
 		local att={Pos=self.Owner:GetShootPos(),Ang=self.Owner:EyeAngles()}
-		if (self.Flashlight && att) then
+		if (self.Flashlight and att) then
 			KswepDrawLight(self,att)
 		end
 	end

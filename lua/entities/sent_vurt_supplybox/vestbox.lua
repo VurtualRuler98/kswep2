@@ -23,13 +23,13 @@ function ENT:ClKSimpleBox()
 		function scrollmenu:OnClickLine(line,selected)
 			local choice=line:GetColumnText(1)
 			local choicenum=-1
-			if (choice=="Front" || choice == "Kevlar Vest") then
+			if (choice=="Front" or choice == "Kevlar Vest") then
 				choicenum=0
 			end
-			if (choice=="+Back" || choice == "+Front/Back Plates") then
+			if (choice=="+Back" or choice == "+Front/Back Plates") then
 				choicenum=1
 			end
-			if (choice=="+Sides/Helmet"|| choice == "+Side Plates/Helmet") then
+			if (choice=="+Sides/Helmet"or choice == "+Side Plates/Helmet") then
 				choicenum=2
 			end
 			net.Start("showvestmenu")

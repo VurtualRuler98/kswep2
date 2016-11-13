@@ -22,7 +22,7 @@ function SWEP:TranqShot(bullet)
 		filter=self.Owner,
 		mask=MASK_SHOT
 	})
-	if (IsValid(tr.Entity) && (tr.Entity:IsPlayer() || tr.Entity:IsNPC())) then
+	if (IsValid(tr.Entity) and (tr.Entity:IsPlayer() or tr.Entity:IsNPC())) then
 		if (SERVER) then
 		local dmg
 		if (tr.HitGroup==HITGROUP_CHEST) then
@@ -41,7 +41,7 @@ function SWEP:TranqShot(bullet)
 	end
 end
 function SWEP:TranqSecond(dmg,ent)
-	if (!IsValid(ent)) then return end
+	if (not IsValid(ent)) then return end
 	local d=DamageInfo()
 	d:SetDamageType(DMG_PREVENT_PHYSICS_FORCE)
 	d:SetAttacker(ent)
@@ -50,7 +50,7 @@ function SWEP:TranqSecond(dmg,ent)
 	if (IsValid(ent)) then
 		ent:TakeDamageInfo(d)
 	end
-	if (IsValid(ent) && ent:IsNPC()) then
+	if (IsValid(ent) and ent:IsNPC()) then
 		table.insert(self.TranqTargets,{dmg=dmg,ent=ent,time=CurTime()+1})
 	end
 end

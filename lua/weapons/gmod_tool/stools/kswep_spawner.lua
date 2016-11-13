@@ -44,7 +44,7 @@ function TOOL:LeftClick(trace)
 		end
 		if (CLIENT) then return true end
 	end
-	if (trace.HitNonWorld && IsValid(trace.Entity) && trace.Entity:GetClass()=="sent_vurt_supplybox") then
+	if (trace.HitNonWorld and IsValid(trace.Entity) and trace.Entity:GetClass()=="sent_vurt_supplybox") then
 		if (SERVER) then
 			local ent=trace.Entity
 			ent:SetNWBool("GiveAmmo",self:GetClientNumber("give_ammo")==1)
@@ -83,7 +83,7 @@ function TOOL:RightClick(trace)
 		end
 		if (CLIENT) then return true end
 	end
-	if (trace.HitNonWorld && IsValid(trace.Entity) && trace.Entity:GetClass()=="sent_vurt_ammo") then
+	if (trace.HitNonWorld and IsValid(trace.Entity) and trace.Entity:GetClass()=="sent_vurt_ammo") then
 		if (SERVER) then
 			local ent=trace.Entity
 			ent:SetNWBool("Ammo",self:GetClientInfo("ammo_type","vammo_rifle"))
@@ -131,7 +131,7 @@ function TOOL.BuildCPanel(panel)
 	panel:AddControl("ListBox",{Height=256,Options=list.Get("KSwepSpawnerAmmo")})
 end
 for k,v in pairs(vurtual_ammodata) do
-	if (v.printname!=nil) then
+	if (v.printname~=nil) then
 		list.Set("KSwepSpawnerAmmo",v.printname,{kswep_spawner_ammo_type=k})
 	end
 end

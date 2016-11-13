@@ -2,8 +2,8 @@ net.Receive("kswep_flashlight_cl",function(len)
 	local wep=net.ReadEntity()
 	local lighton=net.ReadBool()
 	local islight=net.ReadBool()
-	if (!IsValid(wep)) then return end
-	if (!IsValid(kswep_client_lights)) then
+	if (not IsValid(wep)) then return end
+	if (not IsValid(kswep_client_lights)) then
 		kswep_client_lights={}
 		kswep_client_lasers={}
 	end
@@ -25,7 +25,7 @@ net.Receive("kswep_flashlight_cl",function(len)
 	end
 end)
 function KSwepRenderClientLights()
-	if (kswep_client_lights!=nil) then
+	if (kswep_client_lights~=nil) then
 		for k,v in pairs(kswep_client_lights) do
 			if (IsValid(v)) then
 				local att=v:GetAttachment(v:LookupAttachment("muzzle"))
@@ -33,7 +33,7 @@ function KSwepRenderClientLights()
 			end
 		end
 	end
-	if (kswep_client_lasers!=nil) then
+	if (kswep_client_lasers~=nil) then
 		for k,v in pairs(kswep_client_lasers) do
 			if (IsValid(v)) then
 				local att=v:GetAttachment(v:LookupAttachment("muzzle"))
@@ -44,11 +44,11 @@ function KSwepRenderClientLights()
 end
 
 function KswepDrawLight(wep,att)
-	if (!IsValid(wep.dlight)) then
+	if (not IsValid(wep.dlight)) then
 		wep.dlight = ProjectedTexture()
 		wep.dlight2 = ProjectedTexture()
 	end
-	if (wep.dlight && att) then
+	if (wep.dlight and att) then
 	wep.dlight:SetTexture("effects/flashlight001")
 	wep.dlight:SetPos(att.Pos)
 	wep.dlight:SetAngles(att.Ang)
@@ -66,11 +66,11 @@ function KswepDrawLight(wep,att)
 	end
 end
 function KswepDrawLaser(wep,att)
-	if (!IsValid(wep.dlight)) then
+	if (not IsValid(wep.dlight)) then
 		wep.dlight = ProjectedTexture()
 		wep.dlight2 = ProjectedTexture()
 	end
-	if (wep.dlight && att) then
+	if (wep.dlight and att) then
 	wep.dlight:SetTexture("effects/flashlight/soft")
 	wep.dlight:SetPos(att.Pos)
 	wep.dlight:SetAngles(att.Ang)
