@@ -1,5 +1,5 @@
 --[[
-Copyright 2015 vurtual 
+Copyright 2016 vurtual 
 VurtualRuler98@gmail.com
 vurtual.org
 
@@ -212,7 +212,7 @@ function SWEP:Initialize()
 	if (self.Owner:IsNPC()) then
 		local weapon=self
 		hook.Add("Think","KswepThink"..tostring(self),function()
-			if (IsValid(weapon) && weapon.Owner:IsValid() && weapon.Owner:IsNPC()) then
+			if (IsValid(weapon) and weapon.Owner:IsValid() and weapon.Owner:IsNPC()) then
 				weapon:Think()
 			end
 		end)
@@ -220,7 +220,7 @@ function SWEP:Initialize()
 	self:SetHoldType(self.HoldType)
 	if (CLIENT) then
 		self.MergeParts={}
-		if (self.MergeAttachments!=nil) then
+		if (self.MergeAttachments~=nil) then
 			for k,v in pairs(self.MergeAttachments) do
 				self.MergeParts[k]=ClientsideModel(v)
 				self.MergeParts[k]:SetNoDraw(true)
@@ -230,7 +230,7 @@ function SWEP:Initialize()
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.Caliber=self.Ammo.caliber
 	self.DefaultMagazines = {}
-	if (self.InsAttachments && self.DefaultSight) then
+	if (self.InsAttachments and self.DefaultSight) then
 		self.CurrentSight=self.DefaultSight
 	end
 	if (self.SingleReload) then
@@ -246,30 +246,30 @@ function SWEP:Initialize()
 	self.Primary.ClipSize = self.MagSize
 
 	self.LastBurst=self.Burst
-	if (CLIENT && self.RTScope) then
+	if (CLIENT and self.RTScope) then
 		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
 		local mat
 		mat = Material(self.ScopeMat)
 		mat:SetTexture("$basetexture",self.RenderTarget)
 	end
-	if (self:GetNWBool("Chambered")==false && self:Clip1()>0 && self.OpenBolt==false) then
+	if (self:GetNWBool("Chambered")==false and self:Clip1()>0 and self.OpenBolt==false) then
 		self:ServeNWBool("Chambered",true)
 		self:TakePrimaryAmmo(1)
 		self:SetDeploySpeed(1)
 	end
-	if (self.OpticMountModel && CLIENT) then
+	if (self.OpticMountModel and CLIENT) then
 		self.opticmount=ClientsideModel(self.OpticMountModel)
 		self.opticmount:SetNoDraw(true)
 	end
-	if (self.NotOpticMountModel && CLIENT) then
+	if (self.NotOpticMountModel and CLIENT) then
 		self.notopticmount=ClientsideModel(self.NotOpticMountModel)
 		self.notopticmount:SetNoDraw(true)
 	end
-	if (self.CurrentSight && CLIENT) then
+	if (self.CurrentSight and CLIENT) then
 		self.optic=ClientsideModel(self.CurrentSight)
 		self.optic:SetNoDraw(true)
 	end
-	if (CLIENT && self.InsAttachments && self.Owner:IsPlayer()) then
+	if (CLIENT and self.InsAttachments and self.Owner:IsPlayer()) then
 		self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 	end
 	self.CurrentMagSize=self.MagSize
@@ -281,7 +281,7 @@ function SWEP:OnDrop()
 end
 function SWEP:PrimaryAttack()
 	if (self:CanPrimaryAttack()) then
-	if (self.Owner:IsPlayer() && self.Owner:KeyDown(IN_WALK) && !self:GetNWBool("FiremodeSelected") && !self:GetNWBool("Lowered")) then
+	if (self.Owner:IsPlayer() and self.Owner:KeyDown(IN_WALK) and not self:GetNWBool("FiremodeSelected") and not self:GetNWBool("Lowered")) then
 		self:SwitchFiremode()
 		self:SetNWBool("FiremodeSelected",true)
 		if (SERVER) then
@@ -317,18 +317,18 @@ function SWEP:NextIdle(idle,anim)
 	self.Anims.NextIdleAnim=anim
 end
 function SWEP:NormalFire()
-	if (self:IsRunning() || self:GetNWBool("Raised")==false || self:IsWallBlocked()) then return end
-	if (!self:TryPrimaryAttack() ) then return end
+	if (self:IsRunning() or self:GetNWBool("Raised")==false or self:IsWallBlocked()) then return end
+	if (not self:TryPrimaryAttack() ) then return end
 	local snd=self.Primary.Sound
 	if (self.Suppressed) then
 		snd=self.Primary.SoundSup
 	end
 	self.Weapon:EmitSound(snd)
-	if (self:Clip1()==1 && self.OpenBolt && self.Primary.SoundPing) then
+	if (self:Clip1()==1 and self.OpenBolt and self.Primary.SoundPing) then
 		self.Weapon:EmitSound(self.Primary.SoundPing)
 	end
 	local ammo = self.Ammo
-	if (!self.OpenBolt) then
+	if (not self.OpenBolt) then
 		ammo = self.ChamberAmmo
 	end
 	local spreadsup = 0
@@ -345,16 +345,16 @@ function SWEP:NormalFire()
 	local animbolt = self.Anims.BoltAnim
 	if (self:GetNWBool("Sight")) then
 		animbolt = self.Anims.BoltAnimIron
-		if (self:GetNWBool("Chambered") || (self.OpenBolt && self:Clip1()<1)) then
+		if (self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()<1)) then
 			anim=self.Anims.IronAnim
 		else
 			anim=self.Anims.IronAnimEmpty
 		end
-	elseif (!self:GetNWBool("Chambered") || (self.OpenBolt && self:Clip1()<1)) then
+	elseif (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()<1)) then
 		anim=self.Anims.IdleAnimEmpty
 	end
 	local bolttime = 0
-	if (animbolt && ((self.OpenBolt && self:Clip1()>0) || (!self.OpenBolt && self:GetNWBool("Chambered")))) then
+	if (animbolt and ((self.OpenBolt and self:Clip1()>0) or (not self.OpenBolt and self:GetNWBool("Chambered")))) then
 		if (self.UseDelayForBolt) then
 			self:NextBolt(CurTime()+self.Primary.Delay,anim,animbolt)
 		else
@@ -373,7 +373,7 @@ function SWEP:AttackAnimWait()
 	if (self:GetNWBool("Sight")) then
 		wait=self.WaitShotIron
 	end
-	if (wait && self.Owner:IsPlayer()) then
+	if (wait and self.Owner:IsPlayer()) then
 		return self.Owner:GetViewModel():SequenceDuration()
 	elseif (self.Owner:IsNPC()) then
 		return self.NPCAttackAnimWait
@@ -382,8 +382,8 @@ function SWEP:AttackAnimWait()
 	end
 end
 function SWEP:ShotgunFire()
-	if (!self:TryPrimaryAttack()) then return end
-	if (!self:GetNWBool("Chambered")) then
+	if (not self:TryPrimaryAttack()) then return end
+	if (not self:GetNWBool("Chambered")) then
 		local anim=ACT_VM_IDLE
 		if (self:GetNWBool("Sight")) then
 			anim=self.Anims.IronAnim
@@ -402,7 +402,7 @@ end
 net.Receive("kswep_magtable",function(len)
 	local self=net.ReadEntity()
 	self.MagTable=net.ReadTable()
-	if (self.OpenBolt && #self.MagTable>0) then 
+	if (self.OpenBolt and #self.MagTable>0) then 
 		self.Ammo=vurtual_ammodata[self.MagTable[#self.MagTable].caliber]
 	end
 end)
@@ -426,7 +426,7 @@ function SWEP:TakePrimaryAmmo(num)
 				self:SetClip1(self:Clip1()-num)
 			end
 		else
-			if (self.ChamberAmmo.name!=self.Ammo.name) then
+			if (self.ChamberAmmo.name~=self.Ammo.name) then
 				self.ChamberAmmo=table.Copy(self.Ammo)
 				
 			end
@@ -438,7 +438,7 @@ function SWEP:Deploy()
 	if (SERVER) then
 		self:UpdateMagazines()
 	end
-	if (self.Owner:FlashlightIsOn() && SERVER && (self.HasFlashlight || self.HasLaser)) then
+	if (self.Owner:FlashlightIsOn() and SERVER and (self.HasFlashlight or self.HasLaser)) then
 		self.Owner:Flashlight(false)
 	end
 	self:SetNWBool("Raised",true)
@@ -469,21 +469,21 @@ function SWEP:Deploy()
 end
 
 function SWEP:Holster(wep)
-	if (CLIENT && self.superlight) then
+	if (CLIENT and self.superlight) then
 			self.superlight:Remove()
 	end
-	if (CLIENT && self.Flashlight) then
+	if (CLIENT and self.Flashlight) then
 		self.dlight:Remove()
 		self.dlight2:Remove()
 		self:EnableFlashlight(false)
 	end
-	if (CLIENT && self.Laser) then
+	if (CLIENT and self.Laser) then
 		self.dlight:Remove()
 		self.dlight2:Remove()
 		self:EnableLaser(false)
 	end
-	if (!IsFirstTimePredicted()) then return end
-	if (self.Holstering!=nil && self.HolsterAfter==0) then
+	if (not IsFirstTimePredicted()) then return end
+	if (self.Holstering~=nil and self.HolsterAfter==0) then
 		return true
 	else
 		local holsterpenalty=0
@@ -534,7 +534,7 @@ function SWEP:InsOptic(name)
 		self.AltIronOffsetPos=scopedata.AltIronPos
 		self.AltIronOffsetAng=scopedata.AltIronAng
 	end
-	if (CLIENT && scopedata.rtscope) then
+	if (CLIENT and scopedata.rtscope) then
 		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
 		local mat
 		mat = Material(self.ScopeMat)
@@ -545,7 +545,7 @@ function SWEP:InsOptic(name)
 	self.CollimatorSize=scopedata.colsize
 	self.CollimatorGlare=scopedata.colglare
 	local scopemodel
-	if (scopedata.model!=nil) then
+	if (scopedata.model~=nil) then
 		self.MaxZero=scopedata.maxzero
 		self.Zero=scopedata.zero
 		self.MinZero=scopedata.minzero
@@ -559,14 +559,14 @@ function SWEP:InsOptic(name)
 		self.MaxZero=self.DefaultMaxZero
 		self.MinZero=self.DefaultMinZero
 		self.BattlesightZero=self.DefaultBattlesightZero
-		if (self.DefaultSight==nil && self.optic) then
+		if (self.DefaultSight==nil and self.optic) then
 			self.optic:Remove()
 			self.optic=nil
 		end
 	end
 	self.CurrentSight=scopemodel
 	self.MaxSensitivity=scopedata.sensitivity
-	if (CLIENT && self.CurrentSight!=nil) then
+	if (CLIENT and self.CurrentSight~=nil) then
 		if(self.optic) then
 			self.optic:Remove()
 		end
@@ -583,7 +583,7 @@ function SWEP:InsHands(name)
 end
 function SWEP:AddAttachment(item,attach)
 	local removeitem={}
-	if (item=="flashlight" && self.CanFlashlight) then
+	if (item=="flashlight" and self.CanFlashlight) then
 		self.HasFlashlight=attach
 		if (self.Owner:FlashlightIsOn()) then
 		self.Owner:Flashlight(false)
@@ -596,7 +596,7 @@ function SWEP:AddAttachment(item,attach)
 			self.HasRanger=false
 			table.insert(removeitem,"ranger")
 		end
-	elseif (item=="laser" && self.CanFlashlight) then
+	elseif (item=="laser" and self.CanFlashlight) then
 		self.HasLaser=attach
 		if (self.Owner:FlashlightIsOn()) then
 		self.Owner:Flashlight(false)
@@ -609,7 +609,7 @@ function SWEP:AddAttachment(item,attach)
 			self.HasRanger=false
 			table.insert(removeitem,"ranger")
 		end
-	elseif (item=="ranger" && self.CanFlashlight) then
+	elseif (item=="ranger" and self.CanFlashlight) then
 		self.HasRanger=attach
 		if (self.Owner:FlashlightIsOn()) then
 		self.Owner:Flashlight(false)
@@ -622,7 +622,7 @@ function SWEP:AddAttachment(item,attach)
 			self.HasLaser=false
 			table.insert(removeitem,"laser")
 		end
-	elseif (item=="suppressor" && self.Suppressable) then
+	elseif (item=="suppressor" and self.Suppressable) then
 		self.Suppressed=attach
 	else
 		return
@@ -647,8 +647,8 @@ net.Receive("kswep_sethands",function()
 	self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 end)
 function SWEP:AddMergePart(key,model)
-	if (self.MergeParts[key]!=nil && self.MergeParts[key]:GetModel()==model) then return end
-	if (self.MergeParts[key]!=nil) then
+	if (self.MergeParts[key]~=nil and self.MergeParts[key]:GetModel()==model) then return end
+	if (self.MergeParts[key]~=nil) then
 		self.MergeParts[key]:Remove()
 	end
 	self.MergeParts[key]=ClientsideModel(model)
@@ -656,9 +656,9 @@ function SWEP:AddMergePart(key,model)
 end
 function SWEP:Reload()
 	if (self:GetNWBool("Sight")) then return end
-	if (self.ChainReload && !self:GetNWBool("CurrentlyReloading")) then
+	if (self.ChainReload and not self:GetNWBool("CurrentlyReloading")) then
 		local anim=self.Anims.MidReloadAnim
-		if (self.Anims.MidReloadAnimEmpty && self.DidEmptyReload) then
+		if (self.Anims.MidReloadAnimEmpty and self.DidEmptyReload) then
 			anim=self.Anims.MidReloadAnimEmpty
 			self.DidEmptyReload=false
 		end
@@ -668,12 +668,12 @@ function SWEP:Reload()
 		self:SetNWBool("CurrentlyReloading",true)
 		return
 	end
-	if (!self:GetNWBool("Raised")) then return end
-	if (self.Owner:IsPlayer() && self.Owner:KeyDown(IN_WALK)) then
+	if (not self:GetNWBool("Raised")) then return end
+	if (self.Owner:IsPlayer() and self.Owner:KeyDown(IN_WALK)) then
 		self.ReloadMessage=CurTime()+2
 		self.ReloadWeight=self:Clip1()
 	else
-		if (!self:CanReload()) then return end
+		if (not self:CanReload()) then return end
 		self:ReloadAct(false)
 	end
 end
@@ -688,7 +688,7 @@ function SWEP:SendWeaponAnimIdles(anim,idle)
 	self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),idle)
 end
 function SWEP:ReloadMag(force)
-	if (!self:CanReload() && !force) then return end
+	if (not self:CanReload() and not force) then return end
 	if (self:GetNWBool("CurrentlyReloading")==true) then return end
 	self:SetNWBool("Lowered",false)
 	self:SetNWFloat("NextIdle",0)
@@ -702,7 +702,7 @@ function SWEP:ReloadMag(force)
 	end
 	self:SetNWBool("Sight",false)
 	local anim=self.Anims.ReloadAnim
-	if (!self:GetNWBool("Chambered") || (self.OpenBolt && self:Clip1()==0)) then
+	if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0)) then
 		anim = self.Anims.ReloadAnimEmpty
 	end
 	self:SendWeaponAnim(anim)
@@ -711,7 +711,7 @@ function SWEP:ReloadMag(force)
 	self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration(seq)*reloadspeed)
 	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration(seq)*reloadspeed
 	self:SetNWBool("CurrentlyReloading",true)
-	if (SERVER && self.Owner:IsPlayer()) then
+	if (SERVER and self.Owner:IsPlayer()) then
 		net.Start("kswep_magazines")
 		net.WriteEntity(self)
 		net.WriteTable(self.Ammo)
@@ -794,7 +794,7 @@ net.Receive("kswep_chamberammo",function(len,ply)
 end)
 function SWEP:SetChamberAmmo(ammo)
 	self.ChamberAmmo=table.Copy(ammo)
-	if (SERVER && self.Owner:IsPlayer()) then
+	if (SERVER and self.Owner:IsPlayer()) then
 	net.Start("kswep_chamberammo")
 	net.WriteEntity(self)
 	if (self.SingleReload) then
@@ -844,14 +844,14 @@ function SWEP:DrawHUD()
 	if (zero==-1337) then
 		zerostring="<RANGER>"
 	end
-	if (self.SingleReload && !self.OpenBolt) then
+	if (self.SingleReload and not self.OpenBolt) then
 		ammo =self.ChamberAmmo
 	end
 	draw.DrawText(self:FiremodeName() .. " ".. zerostring .." " .. ammo.printname,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
 	if (self.ReloadMessage > CurTime()) then
 		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
 	end
-	if ((self.RTRanger || self.ScopeReticle) && self:GetNWBool("Sight")) then
+	if ((self.RTRanger or self.ScopeReticle) and self:GetNWBool("Sight")) then
 		local oldW,oldH=ScrW(),ScrH()
 		render.PushRenderTarget(self.RenderTarget)
 		render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)
@@ -859,7 +859,7 @@ function SWEP:DrawHUD()
 		local tr=self.RangerTrace
 		local dist=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
 		local rangetext=""
-		if (tr.Hit && !tr.HitSky) then
+		if (tr.Hit and not tr.HitSky) then
 			rangetext=dist .. "m"
 		else
 			rangetext="---m"
@@ -869,7 +869,7 @@ function SWEP:DrawHUD()
 		surface.SetTextPos((oldW*0.5)+(self.ScopeRes*0.01*self.RTRangerX),(oldH*0.5)+(self.ScopeRes*0.01*self.RTRangerY))
 		surface.DrawText(rangetext)
 		end
-		if (self.ScopeReticle!=false) then
+		if (self.ScopeReticle~=false) then
 			local pixmil=10
 			local retpix=512
 			local retmag=self.ScopeZoom
@@ -908,7 +908,7 @@ function SWEP:FiremodeName()
 	end
 end
 function SWEP:BurstFire()
-	if (self.LastBurst<1  && CLIENT) then return end
+	if (self.LastBurst<1  and CLIENT) then return end
 	if (self:GetNWInt("Burst")>0) then
 		self:NormalFire()
 		self:SetNWInt("Burst",self:GetNWInt("Burst")-1)
@@ -924,7 +924,7 @@ function SWEP:FinishReload()
 	self:ServeNWBool("FiringPin",true)
 	table.insert(self.Magazines,{caliber=self.Ammo.name,num = self:Clip1(),max=self.CurrentMagSize})
 	table.SortByMember(self.Magazines,"num",true)
-	if (self.Anims.EndEmptyReloadAnim && ((!self.OpenBolt && !self:GetNWBool("Chambered")) || (self.OpenBolt && self:Clip1()<1) )) then
+	if (self.Anims.EndEmptyReloadAnim and ((not self.OpenBolt and not self:GetNWBool("Chambered")) or (self.OpenBolt and self:Clip1()<1) )) then
 		self:NextBolt(CurTime(),ACT_VM_IDLE,self.Anims.EndEmptyReloadAnim)
 	end
 	local mag=table.GetLastValue(self.Magazines)
@@ -932,11 +932,11 @@ function SWEP:FinishReload()
 	self.CurrentMagSize=mag.max
 	self.Ammo=vurtual_ammodata[mag.caliber]
 	table.remove(self.Magazines)
-	if (#self.Magazines>0 && self.Magazines[1].num==0) then
+	if (#self.Magazines>0 and self.Magazines[1].num==0) then
 		table.remove(self.Magazines,1)
 	end
 	self.ReloadWeight=self:Clip1()
-	if (self:GetNWBool("Chambered")==false && self.OpenBolt==false && self:Clip1()>0) then
+	if (self:GetNWBool("Chambered")==false and self.OpenBolt==false and self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
 		self:ServeNWBool("Chambered",true)
 	end
@@ -946,7 +946,7 @@ function SWEP:FinishReload()
 	self.ReloadAnimTime=0
 	self.ReloadMessage=CurTime()+2
 	self:SendWeaponAnim(ACT_VM_IDLE)
-	if (SERVER && self.Owner:IsPlayer()) then
+	if (SERVER and self.Owner:IsPlayer()) then
 		net.Start("kswep_magazines")
 		net.WriteEntity(self)
 		net.WriteTable(self.Ammo)
@@ -971,12 +971,12 @@ function SWEP:ServeNWFloat(var,float)
 	end
 end
 function SWEP:DoDrawCrosshair()
-	--return !self:GetNWBool("Raised")
+	--return not self:GetNWBool("Raised")
 	return true
 
 end
 function SWEP:UpdateMagazines()
-	if (self.Owner:IsPlayer() && self.SingleReload && self:Clip1()!=self:GetNWInt("MagRounds")) then
+	if (self.Owner:IsPlayer() and self.SingleReload and self:Clip1()~=self:GetNWInt("MagRounds")) then
 		self:SetClip1(self:GetNWInt("MagRounds"))
 	end
 	if (SERVER) then
@@ -1024,14 +1024,14 @@ function SWEP:FinishReloadSingle()
 	local anim = ACT_VM_IDLE
 	if (self.Anims.StartReloadAnim) then
 		anim = self.Anims.MidReloadAnim
-		if (self.Anims.MidReloadAnimEmpty && !self:GetNWBool("Chambered")) then
+		if (self.Anims.MidReloadAnimEmpty and not self:GetNWBool("Chambered")) then
 			anim=self.Anims.MidReloadAnimEmpty
 			self.DidEmptyReload=true
 		end
 	end
 	self.Weapon:SendWeaponAnim(anim)
 	if (self.Anims.StartReloadAnim) then
-		if (self.Owner:KeyDown(IN_RELOAD) && #self.MagTable<self.Primary.ClipSize) then
+		if (self.Owner:KeyDown(IN_RELOAD) and #self.MagTable<self.Primary.ClipSize) then
 			self.ChainReload=true
 			self:SetNWFloat("NextIdle",0)
 		else
@@ -1041,7 +1041,7 @@ function SWEP:FinishReloadSingle()
 	self:ServeNWBool("CurrentlyReloading",false)
 	self.ReloadAnimTime=0
 	self:UpdateMagazines()
-	if (self.SingleReloadChambers && !self:GetNWBool("Chambered")) then
+	if (self.SingleReloadChambers and not self:GetNWBool("Chambered")) then
 		self:TakePrimaryAmmo(1)
 		self:SetNWBool("Chambered",true)
 		self:SetNWBool("FiringPin",true)
@@ -1049,7 +1049,7 @@ function SWEP:FinishReloadSingle()
 	if (self.SingleReloadFiringPin) then
 		self:SetNWBool("FiringPin",true)
 	end
-	if (SERVER && self.Owner:IsPlayer()) then
+	if (SERVER and self.Owner:IsPlayer()) then
 		net.Start("kswep_magtable")
 		net.WriteEntity(self)
 		net.WriteTable(self.MagTable)
@@ -1058,9 +1058,9 @@ function SWEP:FinishReloadSingle()
 end
 
 function SWEP:CanPrimaryAttack()
-	if ( !self.Owner:OnGround()) then return false end
-	if ( !self:GetNWBool("Raised")) then return false end
-	if ( CLIENT && self.NextPrimaryAttack>CurTime()) then return false end
+	if ( not self.Owner:OnGround()) then return false end
+	if ( not self:GetNWBool("Raised")) then return false end
+	if ( CLIENT and self.NextPrimaryAttack>CurTime()) then return false end
 	if ( self:GetNWFloat("NextPrimaryAttack")>CurTime()) then return false  end
 	if ( self:GetNWBool("FiremodeSelected") ) then
 		return false
@@ -1068,10 +1068,10 @@ function SWEP:CanPrimaryAttack()
         return true
 end
 function SWEP:TryPrimaryAttack()
-	if (!self:CanPrimaryAttack()) then return false end
-	if ( self.Weapon:Clip1() <= 0 && !self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 && self.OpenBolt==true) then
-		if (self:GetNWBool("FiringPin")==true || self.DoubleAction) then
-			if (!self.HoldOpen) then
+	if (not self:CanPrimaryAttack()) then return false end
+	if ( self.Weapon:Clip1() <= 0 and not self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 and self.OpenBolt==true) then
+		if (self:GetNWBool("FiringPin")==true or self.DoubleAction) then
+			if (not self.HoldOpen) then
 	                	self:EmitSound(self.Primary.SoundEmpty )
 			end
 			self:SetNWBool("FiringPin",false)
@@ -1094,15 +1094,15 @@ end
 
 function SWEP:SecondaryAttack()
 	if (self:GetNWBool("CurrentlyReloading")) then return end
-	if (!self.Owner:KeyDown(IN_WALK) || self:GetNWBool("Sight")) then
+	if (not self.Owner:KeyDown(IN_WALK) or self:GetNWBool("Sight")) then
 		self:SetNextSecondaryFire(CurTime() + 0.4 )
 	else
 		self:SetNextSecondaryFire(CurTime()+0.05)
 	end
-	if ((self.Owner:KeyDown(IN_WALK)) && !self:GetNWBool("Sight")) then
+	if ((self.Owner:KeyDown(IN_WALK)) and not self:GetNWBool("Sight")) then
 		self:ToggleZoom()
 	elseif (self.Owner:KeyDown(IN_WALK)) then
-		self:SetNWBool("AltIrons",!self:GetNWBool("AltIrons"))
+		self:SetNWBool("AltIrons",not self:GetNWBool("AltIrons"))
 	else
 		self:ToggleAim()
 	end
@@ -1116,7 +1116,7 @@ function SWEP:CustomAmmoDisplay()
 	return self.AmmoDisplay
 end
 function SWEP:HUDShouldDraw(name)
-	if (name=="CHudWeaponSelection" && (self:GetNWBool("Sight") || self.Holstering!=nil)) then return false end
+	if (name=="CHudWeaponSelection" and (self:GetNWBool("Sight") or self.Holstering~=nil)) then return false end
 	return true
 end
 function SWEP:ToggleZoom()
@@ -1131,10 +1131,10 @@ function SWEP:ToggleZoom()
         end
 end
 function SWEP:SwitchFiremode()
-	if (!self.SelectFire) then return end
-	self:ServeNWBool("Firemode",!self:GetNWBool("Firemode"))
+	if (not self.SelectFire) then return end
+	self:ServeNWBool("Firemode",not self:GetNWBool("Firemode"))
 	self.Primary.Automatic=self:GetNWBool("Firemode")
-	if (!self.InsAnims || self.InsNoSafetySound) then
+	if (not self.InsAnims or self.InsNoSafetySound) then
 		self.Weapon:EmitSound("weapon_smg1.special1")
 	end
 end
@@ -1142,9 +1142,9 @@ end
 function SWEP.DetectScroll(ply,bind,pressed)
 	if (pressed) then
 		local wep=ply:GetActiveWeapon()
-		if (IsValid(wep) && string.find(wep:GetClass(),"weapon_kswep")) then
-			if (bind=="invnext" && wep:GetNWBool("Sight")) then
-				if (wep.Owner:KeyDown(IN_WALK) && wep.ScopeFOVSteps!=nil) then
+		if (IsValid(wep) and string.find(wep:GetClass(),"weapon_kswep")) then
+			if (bind=="invnext" and wep:GetNWBool("Sight")) then
+				if (wep.Owner:KeyDown(IN_WALK) and wep.ScopeFOVSteps~=nil) then
 					wep.ScopeFOV=wep.ScopeFOV+((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
 					if (wep.ScopeFOV>wep.ScopeFOVMax) then wep.ScopeFOV=wep.ScopeFOVMax end
 				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
@@ -1158,8 +1158,8 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					wep.IronZoom=wep.IronZoom+5
 					if (wep.IronZoom>wep.IronZoomMin) then wep.IronZoom=wep.IronZoomMin end
 				end
-			elseif (bind=="invprev" && wep:GetNWBool("Sight")) then
-				if (wep.Owner:KeyDown(IN_WALK) && wep.ScopeFOVSteps!=nil) then
+			elseif (bind=="invprev" and wep:GetNWBool("Sight")) then
+				if (wep.Owner:KeyDown(IN_WALK) and wep.ScopeFOVSteps~=nil) then
 					wep.ScopeFOV=wep.ScopeFOV-((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
 					if (wep.ScopeFOV<wep.ScopeFOVMin) then wep.ScopeFOV=wep.ScopeFOVMin end
 				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
@@ -1175,7 +1175,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (wep.IronZoom<wep.IronZoomMax) then wep.IronZoom=wep.IronZoomMax end
 				end
 			end
-			if (bind=="impulse 100" && (!GetConVar("mp_flashlight"):GetBool() || !wep.Owner:KeyDown(IN_WALK)) && (wep.HasFlashlight || wep.HasLaser || wep.HasRanger)) then
+			if (bind=="impulse 100" and (not GetConVar("mp_flashlight"):GetBool() or not wep.Owner:KeyDown(IN_WALK)) and (wep.HasFlashlight or wep.HasLaser or wep.HasRanger)) then
 				if (wep.HasFlashlight) then
 					if (wep.Flashlight) then
 						wep:EnableFlashlight(false)
@@ -1201,8 +1201,8 @@ end
 function SWEP:EnableFlashlight(enable)
 	if (SERVER) then return end
 	self.Flashlight=enable
-	if (!self.HasFlashlight) then self.Flashlight=false end
-	if (self.Flashlight==false && self.dlight!=nil) then
+	if (not self.HasFlashlight) then self.Flashlight=false end
+	if (self.Flashlight==false and self.dlight~=nil) then
 		self.dlight:Remove()
 		self.dlight2:Remove()
 	end
@@ -1212,7 +1212,7 @@ function SWEP:EnableFlashlight(enable)
 	net.SendToServer()
 end
 function SWEP:RangeFind()
-	if (!self.HasRanger) then return end
+	if (not self.HasRanger) then return end
 	if (CLIENT) then
 		net.Start("kswep_weaponrange")
 		net.WriteEntity(self)
@@ -1225,7 +1225,7 @@ function SWEP:RangeFind()
 			filter=self.Owner,
 		} )
 		local dist=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
-		if (tr.Hit && !tr.HitSky) then
+		if (tr.Hit and not tr.HitSky) then
 			self.Owner:PrintMessage(HUD_PRINTCENTER,dist .. "m")
 		else
 			self.Owner:PrintMessage(HUD_PRINTCENTER,"---m")
@@ -1235,8 +1235,8 @@ end
 function SWEP:EnableLaser(enable)
 	if (SERVER) then return end
 	self.Laser=enable
-	if (!self.HasLaser) then self.Laser=false end
-	if (self.Laser==false && self.dlight!=nil) then
+	if (not self.HasLaser) then self.Laser=false end
+	if (self.Laser==false and self.dlight~=nil) then
 		self.dlight:Remove()
 		self.dlight2:Remove()
 	end
@@ -1250,38 +1250,38 @@ function SWEP:Think2()
 end
 function SWEP:Think()
 	self:Think2()
-	if (SERVER && !self.DiscoveredAnims) then
+	if (SERVER and not self.DiscoveredAnims) then
 		self:DiscoverModelAnims()
 		self.DiscoveredAnims=true
 	end
 	if (CLIENT) then
 		self.RestingCached=self:IsResting()
 	end
-	if (CLIENT && (self.Ranger || self.RTRanger || self.SuperScope)) then
+	if (CLIENT and (self.Ranger or self.RTRanger or self.SuperScope)) then
 		self.RangerTrace=util.TraceLine({
 			start=self.Owner:GetShootPos(),
 			endpos=self.Owner:GetShootPos()+self.Owner:GetAimVector()*78742,
 			filter=self.Owner,
 		} )
 	end
-	if (CLIENT && self.Owner:IsPlayer()) then
-		if (!self:GetNWBool("Sight") && self.superlight) then
+	if (CLIENT and self.Owner:IsPlayer()) then
+		if (not self:GetNWBool("Sight") and self.superlight) then
 			self.superlight:Remove()
 		end
 		local vm=self.Owner:GetViewModel()
 		local att=vm:GetAttachment(vm:LookupAttachment("laser"))
-			if (self:GetNWBool("Sight") && self.HasLaser) then
+			if (self:GetNWBool("Sight") and self.HasLaser) then
 				att.Pos=self.Owner:GetShootPos()+self.Owner:GetAimVector()*(self.Length+4)
 				att.Ang=self.Owner:GetAimVector():Angle()
 			end
-		if (self.Flashlight && att) then
+		if (self.Flashlight and att) then
 			KswepDrawLight(self,att)
 		end
-		if (self.Laser && att) then
+		if (self.Laser and att) then
 			KswepDrawLaser(self,att)
 		end
 	end
-	if (!self.Owner:OnGround()) then
+	if (not self.Owner:OnGround()) then
 		self:SetNWFloat("CurRecoil",self.MaxRecoil)
 	end
 	for k,v in pairs(self.Bullets) do
@@ -1289,7 +1289,7 @@ function SWEP:Think()
 			self.Bullets[k]=self:FlyBullet(v)
 		end
 	end
-	if (self.ReloadAnimTime!=0 && CurTime()>self.ReloadAnimTime && self:GetNWBool("CurrentlyReloading")==true) then
+	if (self.ReloadAnimTime~=0 and CurTime()>self.ReloadAnimTime and self:GetNWBool("CurrentlyReloading")==true) then
 		if (self.SingleReload) then
 			self:FinishReloadSingle()
 		else
@@ -1304,38 +1304,38 @@ function SWEP:Think()
 		end
 	end
 	local wlblk = self:IsWallBlocked()
-	if (wlblk && !self:IsRunning() && !self.DidLowerAnim && self:GetNWFloat("NextIdle")==0 && !self:GetNWBool("CurrentlyReloading")) then
+	if (wlblk and not self:IsRunning() and not self.DidLowerAnim and self:GetNWFloat("NextIdle")==0 and not self:GetNWBool("CurrentlyReloading")) then
 		self:SetNWBool("Sight",false)
 		self:LowerWall(true)
 		self.DidLowerAnim=true
 		self.LowerType = "wall"
-	elseif (!wlblk && !self:IsRunning() && self.LowerType=="wall" && self.DidLowerAnim) then
+	elseif (not wlblk and not self:IsRunning() and self.LowerType=="wall" and self.DidLowerAnim) then
 		self:LowerWall(false)
 		self.DidLowerAnim=false
 		self.LowerType = nil
 	end
-	if (self:IsRunning() && self.Owner:OnGround() && (!self.DidLowerAnim || self.LowerType=="wall") && self:GetNWFloat("NextIdle")==0 && !self:GetNWBool("CurrentlyReloading")) then
+	if (self:IsRunning() and self.Owner:OnGround() and (not self.DidLowerAnim or self.LowerType=="wall") and self:GetNWFloat("NextIdle")==0 and not self:GetNWBool("CurrentlyReloading")) then
 		self:LowerRun(true)
 		self.DidLowerAnim=true
 		self.LowerType="run"
-	elseif (!self:IsRunning() && (!wlblk || self.LowerType!="wall") && self:GetNWFloat("NextIdle")==0 && self.DidLowerAnim && !self:GetNWBool("CurrentlyReloading")) then
+	elseif (not self:IsRunning() and (not wlblk or self.LowerType~="wall") and self:GetNWFloat("NextIdle")==0 and self.DidLowerAnim and not self:GetNWBool("CurrentlyReloading")) then
 		self:SetNWFloat("CurRecoil",self.MaxRecoil)
 		self:LowerRun(false)
 		self.DidLowerAnim=false
 		self.LowerType=nil
 	end
-	if (self.DidLowerAnim==false && self:GetNWBool("Raised")) then
+	if (self.DidLowerAnim==false and self:GetNWBool("Raised")) then
 		self:SetNWBool("Lowered",false)
 	end
 		
-	if (self.HolsterAfter<CurTime() && self.Holstering!=nil) then
+	if (self.HolsterAfter<CurTime() and self.Holstering~=nil) then
 		self.HolsterAfter=0
 		if (SERVER) then
 			self.Owner:SelectWeapon(self.Holstering:GetClass())
 		end
 		self.Holstering=nil
 	end
-	if (self:GetNWFloat("NextIdle")!=0 && self:GetNWFloat("NextIdle")<CurTime()) then
+	if (self:GetNWFloat("NextIdle")~=0 and self:GetNWFloat("NextIdle")<CurTime()) then
 		if (self.NextBoltAnim) then
 			self:SendWeaponAnim(self.NextBoltAnim)
 			self.NextBoltAnim=nil
@@ -1347,16 +1347,16 @@ function SWEP:Think()
 		end
 	end
 	local hold=self:GetNWString("HoldType")
-	if (self:GetNWBool("Lowered") || !self:GetNWBool("Raised")) then
+	if (self:GetNWBool("Lowered") or not self:GetNWBool("Raised")) then
 		hold=self:GetNWString("IdleType")
 	end
-	if (self:GetHoldType()!=hold && self.Owner:IsPlayer()) then
+	if (self:GetHoldType()~=hold and self.Owner:IsPlayer()) then
 		self:SetHoldType(hold)
 	end
-	if (self:GetNWBool("Burst")==0 && self.Burst>0 && (self.Owner:IsNPC() || !self.Owner:KeyDown(IN_ATTACK))) then
+	if (self:GetNWBool("Burst")==0 and self.Burst>0 and (self.Owner:IsNPC() or not self.Owner:KeyDown(IN_ATTACK))) then
 		self:SetNWBool("Burst",self.Burst)
 	end
-	if (self:GetNWBool("FiremodeSelected") && (self.Owner:IsNPC() || !self.Owner:KeyDown(IN_ATTACK))) then
+	if (self:GetNWBool("FiremodeSelected") and (self.Owner:IsNPC() or not self.Owner:KeyDown(IN_ATTACK))) then
 		self.LastBurst=self.Burst
 		self:ServeNWBool("FiremodeSelected",false)
 	end
@@ -1373,7 +1373,7 @@ end
 function SWEP:LowerDo(lower,anim,anim2,canfire)
 	if (lower) then
 		self:SetNWBool("Sight",false)
-		if (self.InsAnims && !self.NoLowerAnim) then
+		if (self.InsAnims and not self.NoLowerAnim) then
 			self:SendWeaponAnim(anim)
 			--self.DidLowerAnim=true
 			local delay=self.Owner:GetViewModel():SequenceDuration()
@@ -1382,9 +1382,9 @@ function SWEP:LowerDo(lower,anim,anim2,canfire)
 			self:SendWeaponAnim(ACT_VM_IDLE)
 		end
 	else
-		if (self.InsAnims && !self.NoLowerAnim) then
+		if (self.InsAnims and not self.NoLowerAnim) then
 			self.Weapon:SendWeaponAnim(anim2)
-			if (!canfire) then
+			if (not canfire) then
 				self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 				self:SetNextSecondaryFire(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 			end
@@ -1393,26 +1393,26 @@ function SWEP:LowerDo(lower,anim,anim2,canfire)
 	end
 end
 function SWEP:Lower(lower)
-	self:SetNWBool("Raised",!lower)
+	self:SetNWBool("Raised",not lower)
 	local anim=self.Anims.LowerAnim
 	local anim2=ACT_VM_IDLE
-	if ((self.OpenBolt && self:Clip1()<1) || (!self:GetNWBool("Chambered")) && self.EmptyAnims) then	
+	if ((self.OpenBolt and self:Clip1()<1) or (not self:GetNWBool("Chambered")) and self.EmptyAnims) then	
 		anim=self.Anims.LowerAnimEmpty
 		anim2=self.Anims.IdleAnimEmpty
 	end
 	self:LowerDo(lower,anim,anim2,true)
 end
 function SWEP:LowerWall(lower)
-	self:SetNWBool("Lowered",!lower)
+	self:SetNWBool("Lowered",not lower)
 	local anim=self.Anims.LowerAnim
 	local anim2=ACT_VM_IDLE
-	if (!self:GetNWBool("Raised")) then
+	if (not self:GetNWBool("Raised")) then
 		anim2=self.Anims.LowerAnim
 	end
-	if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
+	if (not self:GetNWBool("Chambered") and self.EmptyAnims) then	
 		anim=self.Anims.LowerAnimEmpty
 		anim2=self.Anims.IdleAnimEmpty
-		if (!self:GetNWBool("Raised")) then
+		if (not self:GetNWBool("Raised")) then
 			anim2=self.Anims.LowerAnim
 		end
 	end
@@ -1422,19 +1422,19 @@ function SWEP:LowerRun(lower)
 	self:SetNWBool("Lowered",lower)
 	local anim=self.Anims.RunAnim
 	local anim2=ACT_VM_IDLE
-	if (!self:GetNWBool("Raised")) then
+	if (not self:GetNWBool("Raised")) then
 		anim2=self.Anims.LowerAnim
 	end
-	if (ConVarExists("prone_bindkey_enabled") && self.Owner:IsProne()) then
+	if (ConVarExists("prone_bindkey_enabled") and self.Owner:IsProne()) then
 		anim=self.Anims.CrawlAnim
 	end
-	if ((self.OpenBolt && self:Clip1()<1) || (!self:GetNWBool("Chambered")) && self.EmptyAnims) then	
+	if ((self.OpenBolt and self:Clip1()<1) or (not self:GetNWBool("Chambered")) and self.EmptyAnims) then	
 		anim=self.Anims.RunAnimEmpty
 		anim2=self.Anims.IdleAnimEmpty
-		if (ConVarExists("prone_bindkey_enabled") && self.Owner:IsProne()) then
+		if (ConVarExists("prone_bindkey_enabled") and self.Owner:IsProne()) then
 			anim=self.Anims.CrawlAnimEmpty
 		end
-		if (!self:GetNWBool("raised")) then
+		if (not self:GetNWBool("raised")) then
 			anim2=self.Anims.LowerAnimEmpty
 		end
 	end
@@ -1443,7 +1443,7 @@ end
 function SWEP:LowerHolster(lower)
 	local anim=self.Anims.StowAnim
 	local anim2=self.Anims.UnstowAnim
-	if ((self.OpenBolt && self:Clip1()<1) || (!self:GetNWBool("Chambered")) && self.EmptyAnims) then	
+	if ((self.OpenBolt and self:Clip1()<1) or (not self:GetNWBool("Chambered")) and self.EmptyAnims) then	
 		anim=self.Anims.StowAnimEmpty
 		anim2=self.Anims.UnstowAnimEmpty
 	end
@@ -1452,7 +1452,7 @@ function SWEP:LowerHolster(lower)
 end
 
 function SWEP:PostDrawViewModel()
-	if (self.CurrentSight!=nil) then
+	if (self.CurrentSight~=nil) then
 		self.optic:SetParent(self.Owner:GetViewModel())
 		self.optic:SetPos(self.Owner:GetViewModel():GetPos())
 		self.optic:SetAngles(self.Owner:GetViewModel():GetAngles())
@@ -1462,17 +1462,17 @@ function SWEP:PostDrawViewModel()
 	for k,v in pairs(self.MergeParts) do
 		self:AttachModel(v)
 	end
-	if (self.opticmount!=nil && self.CurrentSight!=self.DefaultSight) then
+	if (self.opticmount~=nil and self.CurrentSight~=self.DefaultSight) then
 		self:AttachModel(self.opticmount)
 	end
-	if (self.notopticmount!=nil && self.CurrentSight==self.DefaultSight) then
+	if (self.notopticmount~=nil and self.CurrentSight==self.DefaultSight) then
 		self:AttachModel(self.notopticmount)
 	end
 	if (self.RTScope) then
 	local oldW, oldH = ScrW(),ScrH()
 	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
 	render.PushRenderTarget(self.RenderTarget)
-	if ((self.AltIrons && self:GetNWBool("AltIrons")) || !self:GetNWBool("Sight")) then
+	if ((self.AltIrons and self:GetNWBool("AltIrons")) or not self:GetNWBool("Sight")) then
 		render.Clear(0,0,0,255)
 	else
 	local texperture=0
@@ -1537,8 +1537,8 @@ function SWEP:PostDrawViewModel()
 		render.DrawScreenQuadEx(0,0,self.ScopeRes,self.ScopeRes)
 	end
 	end
-	if (self.SuperScope && self:GetNWBool("Sight")) then
-		if (!IsValid(self.superlight)) then
+	if (self.SuperScope and self:GetNWBool("Sight")) then
+		if (not IsValid(self.superlight)) then
 			self.superlight=ProjectedTexture()
 		end
 		if (self.superlight) then
@@ -1556,10 +1556,10 @@ function SWEP:PostDrawViewModel()
 	render.PopRenderTarget()
 	render.SetViewPort(0,0,oldW,oldH)
 	end
-	if (self.Collimator && self:GetNWBool("Sight")) then
+	if (self.Collimator and self:GetNWBool("Sight")) then
 		local pos=self.Owner:GetShootPos()+(self.Owner:GetAimVector()*4)
 		local glare=self.CollimatorGlare*64
-		if (LocalPlayer():HasWeapon("kswep_nvg") && LocalPlayer():GetWeapon("kswep_nvg"):GetNWBool("Active")) then
+		if (LocalPlayer():HasWeapon("kswep_nvg") and LocalPlayer():GetWeapon("kswep_nvg"):GetNWBool("Active")) then
 			render.SetMaterial(Material("sprites/light_glow02_add"))
 			render.DrawSprite(pos,self.CollimatorSize*4,self.CollimatorSize*4,Color(glare,glare,glare))
 		end
@@ -1578,16 +1578,16 @@ end
 function SWEP:OnRemove()
 	self:EnableFlashlight(false)
 	self:EnableLaser(false)
-	if (CLIENT && self.superlight) then
+	if (CLIENT and self.superlight) then
 			self.superlight:Remove()
 	end
-	if (CLIENT && self.optic) then
+	if (CLIENT and self.optic) then
 		self.optic:Remove()
 	end
-	if (CLIENT && self.opticmount) then
+	if (CLIENT and self.opticmount) then
 		self.opticmount:Remove()
 	end
-	if (CLIENT && self.notopticmount) then
+	if (CLIENT and self.notopticmount) then
 		self.opticmount:Remove()
 	end
 	if (CLIENT) then
@@ -1613,14 +1613,14 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	if (self.RestingCached) then
 		aimShake=0.01
 	else
-	if (ConVarExists("prone_bindkey_enabled") && !self.Owner:IsProne()) then
+	if (ConVarExists("prone_bindkey_enabled") and not self.Owner:IsProne()) then
 		if (self.Owner:Crouching()) then
 			aimShake=0.1
 		else
 			aimShake=0.2
 		end
-	elseif (!ConVarExists("prone_bindkey_enabled")) then
-		if (!self.Owner:Crouching()) then
+	elseif (not ConVarExists("prone_bindkey_enabled")) then
+		if (not self.Owner:Crouching()) then
 			aimShake=1
 		end
 	end
@@ -1635,7 +1635,7 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	else
 		ang=oldAng
 	end
-	--[[if (self:GetNWBool("Chambered")==false || self:GetNWBool("Lowered")==true) then
+	--[[if (self:GetNWBool("Chambered")==false or self:GetNWBool("Lowered")==true) then
 		if (self:GetNWBool("Lowered")==true) then self.lowerTime=0 end
 		self.lowerTime=self.lowerTime or 1
 		self.lowerTime=self.lowerTime-FrameTime()
@@ -1655,17 +1655,17 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	]]--
 	local ironpos, ironang
 	local scopepos, scopeang=Vector(),Vector()
-	if (self.ScopeName!="Default") then
+	if (self.ScopeName~="Default") then
 		scopepos,scopeang=self.ScopeOffsetPos, self.ScopeOffsetAng
 	end
-	if (self.AltIrons && self:GetNWBool("AltIrons")) then
+	if (self.AltIrons and self:GetNWBool("AltIrons")) then
 		ironpos=self.IronSightsPos+self.AltIronOffsetPos+scopepos
 		ironang=self.IronSightsAng+self.AltIronOffsetAng+scopeang
 	elseif (self.IronSightsPos) then
 		ironpos=self.IronSightsPos+self.IronOffsetPos+scopepos
 		ironang=self.IronSightsAng+self.IronOffsetAng+scopeang
 	end
-	if (!self.InsAnims) then
+	if (not self.InsAnims) then
 	if (self:GetNWBool("Lowered")==true) then
 		ang=ang+Angle(self.HoldAngle,self.HoldAngle*2,0)
 		modpos=modpos+Vector(0,0,self.LoweredOffset)
@@ -1684,7 +1684,7 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 			modpos=modpos+Vector(0,0,self.LoweredOffset)
 		end
 	end
-	if (self.InsNoIronAnim && self:GetNWBool("Sight")) then
+	if (self.InsNoIronAnim and self:GetNWBool("Sight")) then
 		ang:RotateAroundAxis(ang:Right(),ironang.x)
 		ang:RotateAroundAxis(ang:Up(),ironang.y)
 		ang:RotateAroundAxis(ang:Forward(),ironang.z)
@@ -1702,7 +1702,7 @@ end
 
 
 function SWEP:TranslateFOV(fov)
-        if (self:GetNWBool("sight") && !self.RTScope && !self.CurrentSight) then
+        if (self:GetNWBool("sight") and not self.RTScope and not self.CurrentSight) then
                 return (self.IronZoom/self.ScopeZoom)
         elseif (self:GetNWBool("sight")) then
                 return self.IronZoom
@@ -1714,9 +1714,9 @@ end
 function SWEP:AdjustMouseSensitivity()
         if (self:GetNWBool("sight")==true) then
 		local scopesens=1
-		if (self.ScopeFOVSteps!=nil) then
+		if (self.ScopeFOVSteps~=nil) then
 			scopesens=((self.MaxSensitivity-1)*(-1*(self.ScopeFOV-self.ScopeFOVMax)/(self.ScopeFOVMax-self.ScopeFOVMin)))
-		elseif (self.ScopeFOV!=nil) then
+		elseif (self.ScopeFOV~=nil) then
 			scopesens=self.MaxSensitivity
 		end
 		scopesens=1+(scopesens)*((self.IronZoomMin-self.IronZoom)/(self.IronZoomMin-self.IronZoomMax))
@@ -1755,10 +1755,10 @@ function SWEP:DiscoverAnim(anim)
 end
 function SWEP:IsRunning()
 	local runspeed=self.Owner:GetWalkSpeed()*1.2
-	if (ConVarExists("prone_bindkey_enabled") && self.Owner:IsProne()) then
+	if (ConVarExists("prone_bindkey_enabled") and self.Owner:IsProne()) then
 		runspeed=5
 	end
-	if (!self.Owner:IsPlayer()) then return false end
+	if (not self.Owner:IsPlayer()) then return false end
         if (self.Owner:GetVelocity():Length()>runspeed) then
                 return true
         else
@@ -1767,7 +1767,7 @@ function SWEP:IsRunning()
 end
 
 function SWEP:IsWallBlocked()
-	if (!self.Owner:IsPlayer()) then return false end
+	if (not self.Owner:IsPlayer()) then return false end
 	local length = self.Length
 	if (self.Suppressed) then
 		length = length+self.LengthSup
@@ -1785,8 +1785,8 @@ function SWEP:IsWallBlocked()
         end
 end
 function SWEP:IsResting()
-	if (!self.Owner:IsPlayer()) then return false end
-	if (!self:GetNWBool("Bipod")) then return false end
+	if (not self.Owner:IsPlayer()) then return false end
+	if (not self:GetNWBool("Bipod")) then return false end
 	local length = self.Length
 	if (self.Suppressed) then
 		length = length+self.LengthSup
@@ -1810,10 +1810,10 @@ end
 
 function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 	local aimPenalty=0
-	if (!self:GetNWBool("Sight")) then
+	if (not self:GetNWBool("Sight")) then
 		aimPenalty=1
 	end
-	if (!self:IsResting()) then
+	if (not self:IsResting()) then
 	if (ConVarExists("prone_bindkey_enabled")) then
 		if (self.Owner:IsProne()) then
 			aimPenalty=aimPenalty+self.PenaltyProne
@@ -1823,21 +1823,21 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 			aimPenalty=aimPenalty+self.PenaltyStand
 		end
 	else
-		if (!self.Owner:Crouching()) then
+		if (not self.Owner:Crouching()) then
 			aimPenalty=aimPenalty+self.PenaltyStand
 		end
 	end
 	end
 	
 	local recoil = self:GetNWFloat("CurRecoil")
-	if (ConVarExists("prone_bindkey_enabled") && !self.Owner:IsProne()) then
+	if (ConVarExists("prone_bindkey_enabled") and not self.Owner:IsProne()) then
 		if (self.Owner:Crouching()) then
 			recoil=recoil*1.25
 		else
 			recoil=recoil*1.5
 		end
-	elseif (!ConVarExists("prone_bindkey_enabled")) then
-		if (!self.Owner:Crouching()) then
+	elseif (not ConVarExists("prone_bindkey_enabled")) then
+		if (not self.Owner:Crouching()) then
 			recoil=recoil*1.5
 		end
 	end
@@ -1854,7 +1854,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         bullet.Force    = 1                                                                     -- Amount of force to give to phys objects
         bullet.Damage   = damage
         bullet.AmmoType = ammo
-	if (bullet.Num==1 && GetConVar("kswep_phys"):GetBool()) then
+	if (bullet.Num==1 and GetConVar("kswep_phys"):GetBool()) then
 		self:FlyBulletStart(bullet)
 	elseif (GetConVar("kswep_phys"):GetBool()) then
 		bullet.Num=1
@@ -1916,7 +1916,7 @@ end
 function SWEP:FlyBullet(shot)
 	shot.ticks=shot.ticks-1
 	local travel
-	if (shot.dist!=nil) then
+	if (shot.dist~=nil) then
 		travel=shot.dist
 	else
 		travel = shot.pos + (shot.ang*shot.speed*16*FrameTime())-Vector(0,0,shot.gravity)
@@ -1927,14 +1927,14 @@ function SWEP:FlyBullet(shot)
 		endpos = travel,
 		mask = MASK_SHOT
 		})
-	if ((tr.Hit ||  shot.ticks<1) && !tr.AllSolid) then
+	if ((tr.Hit or  shot.ticks<1) and not tr.AllSolid) then
 		shot.bullet.Src=shot.pos
 		--self.Owner:SetPos(tr.HitPos)
 		shot.bullet.Damage=shot.bullet.Damage*(shot.speed/vurtual_ammodata[shot.bullet.AmmoType].velocity)
 		self:FireShot(shot.bullet)
 	
 	end
-	if ((!tr.Hit || (!tr.HitSky)) && travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
+	if ((not tr.Hit or (not tr.HitSky)) and travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
 		if (tr.Hit) then
 			local armor=0
 			shot.speed, shot.pos, shot.dist=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
@@ -1945,8 +1945,8 @@ function SWEP:FlyBullet(shot)
 			shot.dist=nil
 		end
 			shot.time=CurTime()+FrameTime()
-		if (shot.speed>100 && shot.ticks>0) then --TODO: better minimum lethal velocity
-			if (shot.dist!=nil) then
+		if (shot.speed>100 and shot.ticks>0) then --TODO: better minimum lethal velocity
+			if (shot.dist~=nil) then
 			return self:FlyBullet(shot)
 			else
 			sound.Play("Bullets.DefaultNearMiss",shot.pos)
@@ -1977,11 +1977,11 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 	pen2=self:MaterialPenetration(btr.MatType)
 	end	
 	local penetration=self:MaterialPenetration(mat)
-	if (pen2>penetration && penetration!=0) then
+	if (pen2>penetration and penetration~=0) then
 		penetration=pen2
 	end
 	--kevlar simple fix
-	if (IsValid(ent) && ent:IsPlayer() && ent.ksarmor!=nil) then
+	if (IsValid(ent) and ent:IsPlayer() and ent.ksarmor~=nil) then
 		if (GetConVar("kevlar_enabled"):GetBool()) then
 			penetration=0
 		end
@@ -1995,7 +1995,7 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		if (tr.FractionLeftSolid>0.9) then barrier=hitpos:Distance(travel) end
 		local hitprop=false
 		
-		if (((tr.HitNonWorld && IsValid(tr.Entity)) || (tr.SurfaceProps!=0 && tr.HitTexture=="**studio**" && util.GetSurfacePropName(tr.SurfaceProps)!="default")) && !tr.Entity:IsPlayer() && !tr.Entity:IsNPC()) then 
+		if (((tr.HitNonWorld and IsValid(tr.Entity)) or (tr.SurfaceProps~=0 and tr.HitTexture=="**studio**" and util.GetSurfacePropName(tr.SurfaceProps)~="default")) and not tr.Entity:IsPlayer() and not tr.Entity:IsNPC()) then 
 		hitprop=true
 		local ent=tr.Entity
 		propexitobb=util.IntersectRayWithOBB(travel,hitpos-travel,ent:LocalToWorld(ent:OBBCenter()),ent:GetAngles(),ent:OBBMins(),ent:OBBMaxs())
@@ -2006,11 +2006,11 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 			}).HitPos
 		barrier=hitpos:Distance(propexit)
 		--local physpenetration=self:PhysMaterialPenetration(tr.Entity:GetPhysicsObject():GetMaterial())
-		--if (physpenetration!=0) then penetration=physpenetration end
+		--if (physpenetration~=0) then penetration=physpenetration end
 		end
 		local speed=shot.speed-(wallcost*barrier*penetration)
-		if (tex=="**empty**" || tex=="**displacement**") then speed=0 end
-		if (speed>0 && !tr.AllSolid) then
+		if (tex=="**empty**" or tex=="**displacement**") then speed=0 end
+		if (speed>0 and not tr.AllSolid) then
 			local fakebullet=table.Copy(shot.bullet)
 			fakebullet.Damage = 0
 			fakebullet.Dir=Vector()
@@ -2041,9 +2041,9 @@ function SWEP:FireShot(bullet)
 end
 function SWEP:MaterialPenetration(mat)
 	local penetration = 0
-	if (mat==MAT_WOOD || mat==MAT_PLASTIC || mat==MAT_GRATE || mat==MAT_GLASS || mat==MAT_TILE) then
+	if (mat==MAT_WOOD or mat==MAT_PLASTIC or mat==MAT_GRATE or mat==MAT_GLASS or mat==MAT_TILE) then
 		penetration = 0.1
-	elseif (mat==MAT_GRASS || mat==MAT_DIRT || mat==MAT_FLESH || mat==MAT_SNOW || mat==MAT_SAND || mat==MAT_SLOSH || mat==MAT_BLOODYFLESH || mat==MAT_ALIENFLESH || mat==MAT_ANTLION || mat==MAT_CONCRETE || mat==MAT_VENT) then
+	elseif (mat==MAT_GRASS or mat==MAT_DIRT or mat==MAT_FLESH or mat==MAT_SNOW or mat==MAT_SAND or mat==MAT_SLOSH or mat==MAT_BLOODYFLESH or mat==MAT_ALIENFLESH or mat==MAT_ANTLION or mat==MAT_CONCRETE or mat==MAT_VENT) then
 		penetration = 1
 	elseif (mat==MAT_METAL ) then
 		penetration = 2
@@ -2053,28 +2053,28 @@ end
 function SWEP:PhysMaterialPenetration(mat)
 	local penetration=0
 	if (mat=="dirt") then
-		penetration=0.1 --hopefully it's a couch!
+		penetration=0.1 --hopefully it's a couchnot 
 	end
-	if (mat=="metal_barrel" || mat=="metalvehicle") then
+	if (mat=="metal_barrel" or mat=="metalvehicle") then
 		penetration=0.5
 	end
 	return penetration
 end
 function SWEP:ShootEffects()
-	if (self.InsAnims && self:GetNWBool("Sight")) then
+	if (self.InsAnims and self:GetNWBool("Sight")) then
 		local anim=self.Anims.IronShootAnim
-		if (!self:GetNWBool("Chambered") || (self.OpenBolt && self:Clip1()==1)) then
+		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==1)) then
 		anim=self.Anims.ShootLastIronAnim
 		end
 		self.Weapon:SendWeaponAnim(anim) 
 	else
 		local anim=self.Anims.ShootAnim
-		if (!self:GetNWBool("Chambered") || (self.OpenBolt && self:Clip1()==1)) then
+		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==1)) then
 		anim=self.Anims.ShootLastAnim
 		end
 		self.Weapon:SendWeaponAnim(anim) 
 	end
-	if (!self.Suppressed && !self.IntegralSuppressed) then 
+	if (not self.Suppressed and not self.IntegralSuppressed) then 
 		self.Owner:MuzzleFlash()
 	end
 	if (self.Owner:IsPlayer()) then
@@ -2098,20 +2098,20 @@ function SWEP:ToggleAim()
 		if (self.InsAnims) then
 			local anim=self.Anims.IronOutAnim
 			local anim2=ACT_VM_IDLE
-			if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
+			if (not self:GetNWBool("Chambered") and self.EmptyAnims) then	
 				anim=self.Anims.IronOutAnimEmpty
 				anim2=self.Anims.IdleAnimEmpty
 			end
 			self:SendWeaponAnim(anim)
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
 		end
-        elseif (!self:GetNWBool("Lowered")) then
+        elseif (not self:GetNWBool("Lowered")) then
                 --Start using sight
                 self:ServeNWBool("Sight",true)
 		if (self.InsAnims) then
 			local anim=self.Anims.IronInAnim
 			local anim2=self.Anims.IronAnim
-			if (!self:GetNWBool("Chambered") && self.EmptyAnims) then	
+			if (not self:GetNWBool("Chambered") and self.EmptyAnims) then	
 				anim=self.Anims.IronInAnimEmpty
 				anim2=self.Anims.IronAnimEmpty
 			end
