@@ -177,6 +177,8 @@ SWEP.ScopeReticle=false
 SWEP.ScopeReticleOverride=false
 SWEP.ScopeReticleZoom=0
 SWEP.ReloadFullClipazineOnly=false
+SWEP.BaseRecoilPain=0.01
+SWEP.Breathing=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -367,6 +369,12 @@ function SWEP:NormalFire()
 		end
 	end
 	self:SetNextAttack(CurTime()+self.Primary.Delay+bolttime+self:AttackAnimWait())
+	if (SERVER && self.BaseRecoilPain>0) then
+		local rec=self.Owner:GetNWFloat("KswepRecoil")
+		rec=rec+self.BaseRecoilPain*self.Ammo.recoil*self.RecoilMassModifier
+		if (rec>1) then rec=1 end
+		self.Owner:SetNWFloat("KswepRecoil",rec)
+	end
 end
 function SWEP:AttackAnimWait()
 	local wait=self.WaitShot
@@ -1559,13 +1567,14 @@ function SWEP:PostDrawViewModel()
 	if (self.Collimator and self:GetNWBool("Sight")) then
 		local pos=self.Owner:GetShootPos()+(self.Owner:GetAimVector()*4)
 		local glare=self.CollimatorGlare*64
+		local shake=self.AimShake+Angle(self:GetNWFloat("CurRecoil")*-0.2,0,0)
 		if (LocalPlayer():HasWeapon("kswep_nvg") and LocalPlayer():GetWeapon("kswep_nvg"):GetNWBool("Active")) then
 			render.SetMaterial(Material("sprites/light_glow02_add"))
 			render.DrawSprite(pos,self.CollimatorSize*4,self.CollimatorSize*4,Color(glare,glare,glare))
 		end
 		local mat=Material(self.CollimatorTex)
 		render.SetMaterial(mat)
-		render.DrawSprite(pos,self.CollimatorSize,self.CollimatorSize,Color(255,255,255,255))
+		render.DrawSprite(pos-Vector(shake:Right().x,shake:Right().y+1,shake:Right().z),self.CollimatorSize,self.CollimatorSize,Color(255,255,255,255))
 	end
 end
 function SWEP:AttachModel(model)
@@ -1609,21 +1618,24 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	self.LastShake=self.LastShake or Angle()
 	self.ShakeTimer=self.ShakeTimer or 0
 	local modpos=oldPos
-	local aimShake=0.05
+	local aimShake=0.025
 	if (self.RestingCached) then
 		aimShake=0.01
 	else
-	if (ConVarExists("prone_bindkey_enabled") and not self.Owner:IsProne()) then
-		if (self.Owner:Crouching()) then
-			aimShake=0.1
-		else
-			aimShake=0.2
-		end
-	elseif (not ConVarExists("prone_bindkey_enabled")) then
-		if (not self.Owner:Crouching()) then
-			aimShake=1
+		if (ConVarExists("prone_bindkey_enabled") and not self.Owner:IsProne()) then
+			if (self.Owner:Crouching()) then
+				aimShake=0.05
+			else
+				aimShake=0.1
+			end
+		elseif (not ConVarExists("prone_bindkey_enabled")) then
+			if (not self.Owner:Crouching()) then
+				aimShake=0.1
+			end
 		end
 	end
+	if (self.Owner:GetNWFloat("KswepRecoil")>0) then
+		aimShake=aimShake+self.Owner:GetNWFloat("KswepRecoil")
 	end
 	if (self:GetNWBool("Sight")) then
 		self.AimShake=LerpAngle(0.99,self.LastShake,self.AimShake)
@@ -1845,7 +1857,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()                      -- Source
 	if (self.Owner:IsPlayer()) then
-		bullet.Dir              = self.WeaponSway+(0.005*recoil*VectorRand()*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+(0.005*aimPenalty*VectorRand())                  -- Dir of bullet +(0.01*Vector(0,0,recoil))
+		bullet.Dir              = self.WeaponSway+(0.005*(recoil+self.Owner:GetNWFloat("KswepRecoil"))*VectorRand()*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+(0.005*aimPenalty*VectorRand())                  -- Dir of bullet +(0.01*Vector(0,0,recoil))
 	else
 		bullet.Dir		= self.Owner:GetAimVector()+(0.005*recoil*VectorRand())
 	end

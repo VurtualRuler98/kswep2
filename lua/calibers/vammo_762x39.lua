@@ -16,7 +16,7 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	tbl.damagescale = 1
 	tbl.wallbang = 5
 	tbl.velocity = 2363 --16in barrel, roughly yugo spec
-	tbl.recoil = 1.2
+	tbl.recoil = 6
 	AddAmmodata(tbl)
 	game.AddAmmoType({name="vammo_762x39_m67",DMG_BULLET,0,0,80,10,5})
 

@@ -173,6 +173,7 @@ function SetSpawnMagazines(ply)
 	ply.KPrimaryType=nil
 	ply.KSecondaryMags={}
 	ply.KSecondaryType=nil
+	ply:SetNWFloat("KswepRecoil",0)
 end
 hook.Add("PlayerSpawn","setspawnmagazines",SetSpawnMagazines)
 
@@ -182,7 +183,35 @@ hook.Add("PlayerInitialSpawn", "plyspawnammotypes",function(ply)
 	net.WriteTable(vurtual_ammodata)
 	net.Send(ply)
 end )
-
+KswepRecoilTime=CurTime()
+hook.Add("Think","ksweprecoilthink", function()
+	if (KswepRecoilTime<CurTime()) then
+		for k,v in pairs(player.GetAll()) do
+			if (IsValid(v) and v:IsPlayer()) then
+				local rec=v:GetNWFloat("KswepRecoil")
+				if (v:GetWalkSpeed()<v:GetVelocity():Length()) then
+					if (rec<1) then
+						rec=rec+0.02
+						if (rec>1) then
+							rec=1
+						end
+						v:SetNWFloat("KswepRecoil",rec)
+					end
+				else
+					
+					if (rec>0) then
+						rec=rec-0.01
+						if (rec<0) then
+							rec=0
+						end
+						v:SetNWFloat("KswepRecoil",rec)
+					end
+				end
+			end
+		end
+		KswepRecoilTime=CurTime()+1
+	end
+end)
 
 
 
