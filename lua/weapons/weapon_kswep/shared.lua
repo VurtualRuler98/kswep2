@@ -134,7 +134,7 @@ SWEP.MagType=nil
 SWEP.ChamberAmmo={}
 SWEP.IsSecondaryWeapon=false
 SWEP.ReloadDelay=0
-SWEP.IronZoom=1
+SWEP.IronZoom=90
 SWEP.IronZoomMin=90
 SWEP.IronZoomMax=65
 SWEP.InsAttachments=false
@@ -2084,11 +2084,9 @@ function SWEP:GetShootAnim()
 		anim=self.Anims.ShootLastAnim
 		end
 	end
-	print(anim)
 	return anim
 end
 function SWEP:ShootEffects()
-	print("yopl")
 	self.Weapon:SendWeaponAnim(self:GetShootAnim()) 
 	if (not self.Suppressed and not self.IntegralSuppressed) then 
 		self.Owner:MuzzleFlash()
