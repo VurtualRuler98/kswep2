@@ -255,7 +255,7 @@ function SWEP:Initialize()
 		mat:SetTexture("$basetexture",self.RenderTarget)
 	end
 	if (self:GetNWBool("Chambered")==false and self:Clip1()>0 and self.OpenBolt==false) then
-		self:ServeNWBool("Chambered",true)
+		self:SetNWBool("Chambered",true)
 		self:TakePrimaryAmmo(1)
 		self:SetDeploySpeed(1)
 	end
@@ -295,7 +295,7 @@ function SWEP:PrimaryAttack()
 				anim = self.Anims.IronSafetyAnim
 				anim2 =self.Anims.IronAnim
 			end
-			self:SendWeaponAnim(anim)
+			self.Weapon:SendWeaponAnim(anim)
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
 			self:SetNextAttack(CurTime()+0.5)
 		else
@@ -337,12 +337,12 @@ function SWEP:NormalFire()
 	if (self.Suppressed) then
 		spreadsup = self.SpreadModSup
 	end
-	self:ShootBullet(self.Primary.Damage*ammo.damagescale, ammo.projectiles, ammo.spreadscale*(self.Primary.Spread+spreadsup),ammo.name)
 	if (self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
 	else
-		self:ServeNWBool("Chambered",false)
+		self:SetNWBool("Chambered",false)
 	end
+	self:ShootBullet(self.Primary.Damage*ammo.damagescale, ammo.projectiles, ammo.spreadscale*(self.Primary.Spread+spreadsup),ammo.name)
 	local anim=ACT_VM_IDLE
 	local animbolt = self.Anims.BoltAnim
 	if (self:GetNWBool("Sight")) then
@@ -356,11 +356,11 @@ function SWEP:NormalFire()
 		anim=self.Anims.IdleAnimEmpty
 	end
 	local bolttime = 0
-	if (animbolt and ((self.OpenBolt and self:Clip1()>0) or (not self.OpenBolt and self:GetNWBool("Chambered")))) then
+	if (animbolt) then
 		if (self.UseDelayForBolt) then
 			self:NextBolt(CurTime()+self.Primary.Delay,anim,animbolt)
 		else
-			self:NextBolt(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim,animbolt)
+			self:NextBolt(CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(self:GetShootAnim())),anim,animbolt)
 		end
 		bolttime = self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(animbolt))
 	else
@@ -692,7 +692,7 @@ end
 
 function SWEP:SendWeaponAnimIdles(anim,idle)
 	idle = idle or ACT_VM_IDLE
-	self:SendWeaponAnim(anim)
+	self.Weapon:SendWeaponAnim(anim)
 	self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),idle)
 end
 function SWEP:ReloadMag(force)
@@ -713,7 +713,7 @@ function SWEP:ReloadMag(force)
 	if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0)) then
 		anim = self.Anims.ReloadAnimEmpty
 	end
-	self:SendWeaponAnim(anim)
+	self.Weapon:SendWeaponAnim(anim)
 	self.Owner:GetViewModel():SetPlaybackRate(1/reloadspeed)
 	local seq = self.Owner:GetViewModel():SelectWeightedSequence(anim)
 	self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration(seq)*reloadspeed)
@@ -953,7 +953,7 @@ function SWEP:FinishReload()
 	end
 	self.ReloadAnimTime=0
 	self.ReloadMessage=CurTime()+2
-	self:SendWeaponAnim(ACT_VM_IDLE)
+	self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
 	if (SERVER and self.Owner:IsPlayer()) then
 		net.Start("kswep_magazines")
 		net.WriteEntity(self)
@@ -1017,7 +1017,7 @@ end
 function SWEP:FinishReloadSingle()
 	self.ChainReload=false
 	if (#self.Magazines==0) then
-	self:ServeNWBool("CurrentlyReloading",false)
+	self:SetNWBool("CurrentlyReloading",false)
 	if (self.Anims.StartReloadAnim) then
 		self:NextBolt(CurTime(),ACT_VM_IDLE,self.Anims.EndReloadAnim)
 	end
@@ -1343,14 +1343,14 @@ function SWEP:Think()
 		end
 		self.Holstering=nil
 	end
-	if (self:GetNWFloat("NextIdle")~=0 and self:GetNWFloat("NextIdle")<CurTime()) then
+	if (self:GetNWFloat("NextIdle")~=0 and self:GetNWFloat("NextIdle")<CurTime() && IsFirstTimePredicted()) then
 		if (self.NextBoltAnim) then
-			self:SendWeaponAnim(self.NextBoltAnim)
+			self.Weapon:SendWeaponAnim(self.NextBoltAnim)
 			self.NextBoltAnim=nil
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.Anims.NextIdleAnim)
 			self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
 		else
-			self:SendWeaponAnim(self.Anims.NextIdleAnim)
+			self.Weapon:SendWeaponAnim(self.Anims.NextIdleAnim)
 			self:ServeNWFloat("NextIdle",0)
 		end
 	end
@@ -1382,12 +1382,12 @@ function SWEP:LowerDo(lower,anim,anim2,canfire)
 	if (lower) then
 		self:SetNWBool("Sight",false)
 		if (self.InsAnims and not self.NoLowerAnim) then
-			self:SendWeaponAnim(anim)
+			self.Weapon:SendWeaponAnim(anim)
 			--self.DidLowerAnim=true
 			local delay=self.Owner:GetViewModel():SequenceDuration()
 			self:SetNextSecondaryFire(CurTime()+delay)
 		elseif (self.InsAnims) then
-			self:SendWeaponAnim(ACT_VM_IDLE)
+			self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
 		end
 	else
 		if (self.InsAnims and not self.NoLowerAnim) then
@@ -2072,20 +2072,24 @@ function SWEP:PhysMaterialPenetration(mat)
 	end
 	return penetration
 end
-function SWEP:ShootEffects()
+function SWEP:GetShootAnim()
+	local anim=self.Anims.ShootAnim
 	if (self.InsAnims and self:GetNWBool("Sight")) then
-		local anim=self.Anims.IronShootAnim
+		anim=self.Anims.IronShootAnim
 		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==1)) then
 		anim=self.Anims.ShootLastIronAnim
 		end
-		self.Weapon:SendWeaponAnim(anim) 
 	else
-		local anim=self.Anims.ShootAnim
 		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==1)) then
 		anim=self.Anims.ShootLastAnim
 		end
-		self.Weapon:SendWeaponAnim(anim) 
 	end
+	print(anim)
+	return anim
+end
+function SWEP:ShootEffects()
+	print("yopl")
+	self.Weapon:SendWeaponAnim(self:GetShootAnim()) 
 	if (not self.Suppressed and not self.IntegralSuppressed) then 
 		self.Owner:MuzzleFlash()
 	end
@@ -2114,7 +2118,7 @@ function SWEP:ToggleAim()
 				anim=self.Anims.IronOutAnimEmpty
 				anim2=self.Anims.IdleAnimEmpty
 			end
-			self:SendWeaponAnim(anim)
+			self.Weapon:SendWeaponAnim(anim)
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
 		end
         elseif (not self:GetNWBool("Lowered")) then
@@ -2128,7 +2132,7 @@ function SWEP:ToggleAim()
 				anim2=self.Anims.IronAnimEmpty
 			end
 		self.IronZoom=self.Owner:GetFOV()
-			self:SendWeaponAnim(anim)
+			self.Weapon:SendWeaponAnim(anim)
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
 		end
         end
