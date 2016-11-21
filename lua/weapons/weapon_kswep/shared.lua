@@ -223,7 +223,7 @@ function SWEP:Initialize()
 		end)
 	end
 	self:SetHoldType(self.HoldType)
-	if (CLIENT) then
+	if (CLIENT and self.Owner==LocalPlayer()) then
 		self.MergeParts={}
 		if (self.MergeAttachments~=nil) then
 			for k,v in pairs(self.MergeAttachments) do
@@ -251,7 +251,7 @@ function SWEP:Initialize()
 	self.Primary.ClipSize = self.MagSize
 
 	self.LastBurst=self.Burst
-	if (CLIENT and self.RTScope) then
+	if (CLIENT and self.Owner==LocalPlayer() and self.RTScope) then
 		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
 		local mat
 		mat = Material(self.ScopeMat)
@@ -262,19 +262,19 @@ function SWEP:Initialize()
 		self:TakePrimaryAmmo(1)
 		self:SetDeploySpeed(1)
 	end
-	if (self.OpticMountModel and CLIENT) then
+	if (self.OpticMountModel and CLIENT and self.Owner==LocalPlayer()) then
 		self.opticmount=ClientsideModel(self.OpticMountModel)
 		self.opticmount:SetNoDraw(true)
 	end
-	if (self.NotOpticMountModel and CLIENT) then
+	if (self.NotOpticMountModel and CLIENT and self.Owner==LocalPlayer()) then
 		self.notopticmount=ClientsideModel(self.NotOpticMountModel)
 		self.notopticmount:SetNoDraw(true)
 	end
-	if (self.CurrentSight and CLIENT) then
+	if (self.CurrentSight and CLIENT and self.Owner==LocalPlayer()) then
 		self.optic=ClientsideModel(self.CurrentSight)
 		self.optic:SetNoDraw(true)
 	end
-	if (CLIENT and self.InsAttachments and self.Owner:IsPlayer()) then
+	if (CLIENT and self.Owner==LocalPlayer() and self.InsAttachments and self.Owner:IsPlayer()) then
 		self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 	end
 	self.CurrentMagSize=self.MagSize
@@ -495,15 +495,15 @@ function SWEP:Deploy()
 end
 
 function SWEP:Holster(wep)
-	if (CLIENT and self.superlight) then
+	if (CLIENT and self.Owner==LocalPlayer() and self.superlight) then
 			self.superlight:Remove()
 	end
-	if (CLIENT and self.Flashlight) then
+	if (CLIENT and self.Owner==LocalPlayer() and self.Flashlight) then
 		self.dlight:Remove()
 		self.dlight2:Remove()
 		self:EnableFlashlight(false)
 	end
-	if (CLIENT and self.Laser) then
+	if (CLIENT and self.Owner==LocalPlayer() and self.Laser) then
 		self.dlight:Remove()
 		self.dlight2:Remove()
 		self:EnableLaser(false)
@@ -536,7 +536,7 @@ end
 function SWEP:InsOptic(name)
 	local scopedata
 	scopedata=kswep_optics[name]
-	if (CLIENT) then
+	if (CLIENT and self.Owner==LocalPlayer()) then
 		net.Start("kswep_scopesetup")
 		net.WriteEntity(self)	
 		net.WriteString(name)
@@ -561,7 +561,7 @@ function SWEP:InsOptic(name)
 		self.AltIronOffsetPos=scopedata.AltIronPos
 		self.AltIronOffsetAng=scopedata.AltIronAng
 	end
-	if (CLIENT and scopedata.rtscope) then
+	if (CLIENT and self.Owner==LocalPlayer() and scopedata.rtscope) then
 		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
 		local mat
 		mat = Material(self.ScopeMat)
@@ -593,7 +593,7 @@ function SWEP:InsOptic(name)
 	end
 	self.CurrentSight=scopemodel
 	self.MaxSensitivity=scopedata.sensitivity
-	if (CLIENT and self.CurrentSight~=nil) then
+	if (CLIENT and self.Owner==LocalPlayer() and self.CurrentSight~=nil) then
 		if(self.optic) then
 			self.optic:Remove()
 		end
@@ -935,7 +935,7 @@ function SWEP:FiremodeName()
 	end
 end
 function SWEP:BurstFire()
-	if (self.LastBurst<1  and CLIENT) then return end
+	if (self.LastBurst<1  and CLIENT and self.Owner==LocalPlayer()) then return end
 	if (self:GetNWInt("Burst")>0) then
 		self:NormalFire()
 		self:SetNWInt("Burst",self:GetNWInt("Burst")-1)
@@ -1087,7 +1087,7 @@ end
 function SWEP:CanPrimaryAttack()
 	if ( not self.Owner:OnGround()) then return false end
 	if ( not self:GetNWBool("Raised")) then return false end
-	if ( CLIENT and self.NextPrimaryAttack>CurTime()) then return false end
+	if ( CLIENT and self.Owner==LocalPlayer() and self.NextPrimaryAttack>CurTime()) then return false end
 	if ( self:GetNWFloat("NextPrimaryAttack")>CurTime()) then return false  end
 	if ( self:GetNWBool("FiremodeSelected") ) then
 		return false
@@ -1110,7 +1110,7 @@ function SWEP:TryPrimaryAttack()
 end
 function SWEP:SetNextAttack(time)
 	self:SetNWFloat("NextPrimaryAttack", time )
-	if (CLIENT) then
+	if (CLIENT and self.Owner==LocalPlayer()) then
 		self.NextPrimaryAttack=time
 	end
 end
@@ -1240,7 +1240,7 @@ function SWEP:EnableFlashlight(enable)
 end
 function SWEP:RangeFind()
 	if (not self.HasRanger) then return end
-	if (CLIENT) then
+	if (CLIENT and self.Owner==LocalPlayer()) then
 		net.Start("kswep_weaponrange")
 		net.WriteEntity(self)
 		net.SendToServer()
@@ -1282,17 +1282,17 @@ function SWEP:Think()
 		self:DiscoverModelAnimsDone()
 		self.DiscoveredAnims=true
 	end
-	if (CLIENT) then
+	if (CLIENT and self.Owner==LocalPlayer()) then
 		self.RestingCached=self:IsResting()
 	end
-	if (CLIENT and (self.Ranger or self.RTRanger or self.SuperScope)) then
+	if (CLIENT and self.Owner==LocalPlayer() and (self.Ranger or self.RTRanger or self.SuperScope)) then
 		self.RangerTrace=util.TraceLine({
 			start=self.Owner:GetShootPos(),
 			endpos=self.Owner:GetShootPos()+self.Owner:GetAimVector()*78742,
 			filter=self.Owner,
 		} )
 	end
-	if (CLIENT and self.Owner:IsPlayer()) then
+	if (CLIENT and self.Owner==LocalPlayer() and self.Owner:IsPlayer()) then
 		if (not self:GetNWBool("Sight") and self.superlight) then
 			self.superlight:Remove()
 		end
@@ -1475,7 +1475,7 @@ function SWEP:LowerHolster(lower)
 		anim=self.Anims.StowAnimEmpty
 		anim2=self.Anims.UnstowAnimEmpty
 	end
-	if (CLIENT) then return end
+	if (CLIENT and self.Owner==LocalPlayer()) then return end
 	self:LowerDo(lower,anim,anim2,false)
 end
 
@@ -1605,6 +1605,7 @@ function SWEP:AttachModel(model)
 	model:DrawModel()
 end
 function SWEP:OnRemove()
+	if (not IsValid(self)) then return end
 	self:EnableFlashlight(false)
 	self:EnableLaser(false)
 	if (CLIENT and self.superlight) then
@@ -1619,7 +1620,7 @@ function SWEP:OnRemove()
 	if (CLIENT and self.notopticmount) then
 		self.opticmount:Remove()
 	end
-	if (CLIENT) then
+	if (CLIENT && IsValid(self.MergeParts)) then
 		for k,v in pairs(self.MergeParts) do
 			v:Remove()
 		end
@@ -1964,7 +1965,8 @@ function SWEP:FlyBullet(shot)
 		endpos = travel,
 		mask = MASK_SHOT
 		})
-	if ((tr.Hit or  shot.ticks<1) and not tr.AllSolid) then
+	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid) then
+		print(tr.Entity,shot.speed)
 		shot.bullet.Src=shot.pos
 		--self.Owner:SetPos(tr.HitPos)
 		shot.bullet.Damage=shot.bullet.Damage*(shot.speed/vurtual_ammodata[shot.bullet.AmmoType].velocity)
@@ -2052,13 +2054,13 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 			fakebullet.Damage = 0
 			fakebullet.Dir=Vector()
 			fakebullet.Dir:Set(shot.bullet.Dir)
-			fakebullet.Src = hitpos+(travel*tr.FractionLeftSolid)+(tr.Normal*10)
+			fakebullet.Src = hitpos+((travel-hitpos)*tr.FractionLeftSolid)+(tr.Normal*10)
 			fakebullet.Dir:Rotate(Angle(0,180,0))
 			fakebullet.Force =0
 			self:FireShot(fakebullet)
 			dist=travel
 		end
-		local traveladj=(travel*tr.FractionLeftSolid)+(tr.Normal*10)
+		local traveladj=hitpos+((travel-hitpos)*tr.FractionLeftSolid)+(tr.Normal*10)
 		if (hitprop) then 
 			traveladj=propexit+(tr.Normal*10)
 		end
