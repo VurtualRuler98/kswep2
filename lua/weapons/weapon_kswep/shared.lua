@@ -178,7 +178,7 @@ SWEP.ScopeReticle=false
 SWEP.ScopeReticleOverride=false
 SWEP.ScopeReticleZoom=0
 SWEP.ReloadFullClipazineOnly=false
-SWEP.BaseRecoilPain=0.01
+SWEP.BaseRecoilPain=0 -- was 0.01
 SWEP.Breathing=false
 SWEP.ZeroVelocity=-1
 SWEP.ScopeZeroVelocity=0
@@ -2055,6 +2055,7 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		end
 		local speed=shot.speed-(wallcost*barrier*penetration)
 		if (tex=="**empty**" or tex=="**displacement**") then speed=0 end
+		if (tr.Entity:IsNPC()) then speed = 0 end
 		if (speed>0 and not tr.AllSolid) then
 			local fakebullet=table.Copy(shot.bullet)
 			fakebullet.Damage = 0
