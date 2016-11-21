@@ -71,6 +71,7 @@ SWEP.ReloadModMedium=1.10
 SWEP.ReloadModHeavy=1.20
 SWEP.ScopeName="Default"
 SWEP.Anims={}
+SWEP.AnimsDiscovered={}
 SWEP.Anims.ReloadAnim = ACT_VM_RELOAD
 SWEP.Anims.ReloadAnimEmpty = ACT_VM_RELOAD
 SWEP.LoweredOffset = 5
@@ -278,6 +279,18 @@ function SWEP:Initialize()
 end
 function SWEP:DiscoverModelAnims()
 end
+function SWEP:DiscoverModelAnimsDone()
+	if (self.Owner:IsPlayer() and #self.AnimsDiscovered>0) then
+		net.Start("kswep_discoveranim")
+		net.WriteEntity(self)
+		net.WriteInt(#self.AnimsDiscovered,16)
+		for k,v in pairs (self.AnimsDiscovered) do	
+			net.WriteString(k)
+			net.WriteInt(v,16)
+		end
+			net.Send(self.Owner)
+	end
+end	
 function SWEP:OnDrop()
 	self:Remove()
 end
@@ -369,7 +382,7 @@ function SWEP:NormalFire()
 		end
 	end
 	self:SetNextAttack(CurTime()+self.Primary.Delay+bolttime+self:AttackAnimWait())
-	if (SERVER && self.BaseRecoilPain>0) then
+	if (SERVER and self.BaseRecoilPain>0) then
 		local rec=self.Owner:GetNWFloat("KswepRecoil")
 		rec=rec+self.BaseRecoilPain*self.Ammo.recoil*self.RecoilMassModifier
 		if (rec>1) then rec=1 end
@@ -1260,6 +1273,7 @@ function SWEP:Think()
 	self:Think2()
 	if (SERVER and not self.DiscoveredAnims) then
 		self:DiscoverModelAnims()
+		self:DiscoverModelAnimsDone()
 		self.DiscoveredAnims=true
 	end
 	if (CLIENT) then
@@ -1343,7 +1357,7 @@ function SWEP:Think()
 		end
 		self.Holstering=nil
 	end
-	if (self:GetNWFloat("NextIdle")~=0 and self:GetNWFloat("NextIdle")<CurTime() && IsFirstTimePredicted()) then
+	if (self:GetNWFloat("NextIdle")~=0 and self:GetNWFloat("NextIdle")<CurTime() and IsFirstTimePredicted()) then
 		if (self.NextBoltAnim) then
 			self.Weapon:SendWeaponAnim(self.NextBoltAnim)
 			self.NextBoltAnim=nil
@@ -1738,21 +1752,19 @@ function SWEP:AdjustMouseSensitivity()
         end
 end
 net.Receive("kswep_discoveranim",function(len)
-	local self=net.ReadEntity()
-	local anim=net.ReadString()
-	local act=net.ReadInt(16)
 	self.Anims=self.Anims or {}
-	self.Anims[anim]=act
+	local self=net.ReadEntity()
+	local num=net.ReadInt(16)
+	local anim,act
+	for i=1,num do
+		anim=net.ReadString()
+		act=net.ReadInt(16)
+		self.Anims[anim]=act
+	end
 end)
 function SWEP:SetAnim(anim,act)
 	self.Anims[anim]=act
-	net.Start("kswep_discoveranim")
-	if (self.Owner:IsPlayer()) then
-		net.WriteEntity(self)
-		net.WriteString(anim)
-		net.WriteInt(act,16)
-		net.Send(self.Owner)
-	end
+	self.AnimsDiscovered[anim]=act
 end
 function SWEP:DiscoverAnim(anim)
 	local max=#self:GetSequenceList()
