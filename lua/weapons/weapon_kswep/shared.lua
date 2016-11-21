@@ -180,7 +180,7 @@ SWEP.ScopeReticleZoom=0
 SWEP.ReloadFullClipazineOnly=false
 SWEP.BaseRecoilPain=0.01
 SWEP.Breathing=false
-SWEP.ZeroVelocity=0
+SWEP.ZeroVelocity=-1
 SWEP.ScopeZeroVelocity=0
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
@@ -291,6 +291,9 @@ function SWEP:DiscoverModelAnimsDone()
 			net.WriteInt(v,16)
 		end
 			net.Send(self.Owner)
+	end
+	if (self.ZeroVelocity==-1) then 
+		self.ZeroVelocity=self.Ammo.velocity
 	end
 end	
 function SWEP:OnDrop()
