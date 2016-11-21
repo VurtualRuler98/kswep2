@@ -270,6 +270,10 @@ function SWEP:Initialize()
 		self.notopticmount=ClientsideModel(self.NotOpticMountModel)
 		self.notopticmount:SetNoDraw(true)
 	end
+	if (self.NotSuppressorModel and CLIENT and self.Owner==LocalPlayer()) then
+		self.notsuppressor=ClientsideModel(self.NotSuppressorModel)
+		self.notsuppressor:SetNoDraw(true)
+	end
 	if (self.CurrentSight and CLIENT and self.Owner==LocalPlayer()) then
 		self.optic=ClientsideModel(self.CurrentSight)
 		self.optic:SetNoDraw(true)
@@ -1495,6 +1499,9 @@ function SWEP:PostDrawViewModel()
 	end
 	if (self.notopticmount~=nil and self.CurrentSight==self.DefaultSight) then
 		self:AttachModel(self.notopticmount)
+	end
+	if (self.notsuppressor~=nil and not self.Suppressed) then
+		self:AttachModel(self.notsuppressor)
 	end
 	if (self.RTScope) then
 	local oldW, oldH = ScrW(),ScrH()

@@ -23,6 +23,7 @@ util.AddNetworkString("kswep_updaterack")
 util.AddNetworkString("kswep_takegunfromrack")
 util.AddNetworkString("kswep_takesuitcase")
 resource.AddFile("materials/kswep/ret_mil.png")
+resource.AddFile("materials/kswep/ret_m22_10.png")
 net.Receive("kswep_flashlight",function(len,pl)
 	if (not IsValid(pl) or not pl:IsPlayer()) then return end
 	local wep=pl:GetActiveWeapon()
