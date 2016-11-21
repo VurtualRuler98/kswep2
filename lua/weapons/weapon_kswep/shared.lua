@@ -180,6 +180,8 @@ SWEP.ScopeReticleZoom=0
 SWEP.ReloadFullClipazineOnly=false
 SWEP.BaseRecoilPain=0.01
 SWEP.Breathing=false
+SWEP.ZeroVelocity=0
+SWEP.ScopeZeroVelocity=0
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -551,6 +553,7 @@ function SWEP:InsOptic(name)
 	self.IronOffsetAng=scopedata.IronAng
 	self.AltIrons = scopedata.altirons
 	self.RTNV=scopedata.nv
+	self.ScopeZeroVelocity=scopedata.zerovel
 	if (scopedata.altirons) then
 		self.AltIronOffsetPos=scopedata.AltIronPos
 		self.AltIronOffsetAng=scopedata.AltIronAng
@@ -1923,7 +1926,14 @@ function SWEP:FlyBulletStart(bullet)
 	end
 		
 	if (self.Suppressed) then supmod=self.MuzzleVelModSup end
-	local zerotime=math.floor(((zero*39.3701)/(self.Ammo.velocity*self.MuzzleVelMod*supmod*16))/FrameTime()) --amount of frames it will take to fly the distance
+	local zerovel=self.Ammo.velocity*self.MuzzleVelMod*supmod
+	if (self.ScopeName=="Default" and self.ZeroVelocity>0) then
+		zerovel=self.ZeroVelocity
+	end
+	if (self.ScopeName~="Default" and self.ScopeZeroVelocity>0) then
+		zerovel=self.ScopeZeroVelocity
+	end
+	local zerotime=math.floor(((zero*39.3701)/(zerovel*16))/FrameTime()) --amount of frames it will take to fly the distance
 	local drop=0.5*(386*(FrameTime()^2))*(zerotime^2)
 	local dropadj=math.atan(drop/(zero*39.3701))
 	local shot = {}
@@ -1935,6 +1945,7 @@ function SWEP:FlyBulletStart(bullet)
 	shot.dist = nil
 	shot.time = CurTime()
 	shot.gravity=0
+	print(shot.speed)
 	table.insert(self.Bullets,shot)
 end
 function SWEP:FlyBullet(shot)
