@@ -1945,7 +1945,6 @@ function SWEP:FlyBulletStart(bullet)
 	shot.dist = nil
 	shot.time = CurTime()
 	shot.gravity=0
-	print(shot.speed)
 	table.insert(self.Bullets,shot)
 end
 function SWEP:FlyBullet(shot)
