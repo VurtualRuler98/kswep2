@@ -1966,7 +1966,6 @@ function SWEP:FlyBullet(shot)
 		mask = MASK_SHOT
 		})
 	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid) then
-		print(tr.Entity,shot.speed)
 		shot.bullet.Src=shot.pos
 		--self.Owner:SetPos(tr.HitPos)
 		shot.bullet.Damage=shot.bullet.Damage*(shot.speed/vurtual_ammodata[shot.bullet.AmmoType].velocity)
