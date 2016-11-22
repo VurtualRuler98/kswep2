@@ -26,6 +26,8 @@ SWEP.Anims.PullCook = ACT_VM_PULLBACK_HIGH_BAKE
 SWEP.Anims.Pull = ACT_VM_PULLBACK_HIGH
 SWEP.FuzeMin=3
 SWEP.FuzeMax=3
+SWEP.ImpactFuzeMin=0
+SWEP.ImpactFuzeMax=0
 SWEP.Cookable=true
 SWEP.GrenadeEntity="item_healthvial"
 SWEP.ThrowForce=2000
@@ -38,6 +40,7 @@ function SWEP:Initialize()
 	self:SetNWFloat("NextIdle",0)
 	self:SetNWFloat("ThrowNext",0)
 	self:SetNWFloat("Fuze",0)
+	self:SetNWFloat("ImpactFuze",0)
 	if (CLIENT and self.Owner:IsPlayer() and self.UseInsHands==true) then
 		self.Hands=ClientsideModel(kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 		self.Hands:SetNoDraw(true)
@@ -92,6 +95,9 @@ end
 function SWEP:Reload()
 	if (self.Cookable and self:GetNWInt("numgrenades")>0 and self:GetNWInt("ThrowStep")==1 and self:GetNWFloat("Fuze")==0) then
 		self:SetNWFloat("Fuze",CurTime()+math.Rand(self.FuzeMin,self.FuzeMax))
+		if (self.ImpactFuzeMax>0) then 
+			self:SetNWFloat("ImpactFuze",CurTime()+math.Rand(self.ImpactFuzeMin,self.ImpactFuzeMax))
+		end
 		self:EmitSound("Weapon_m67.SpoonEject")
 	end
 end
@@ -106,6 +112,9 @@ function SWEP:Think()
 		if (self.Owner:KeyDown(IN_RELOAD) and self.Cookable) then
 			self:SendWeaponAnim(self.Anims.PullCook)
 			self:SetNWFloat("Fuze",CurTime()+math.Rand(self.FuzeMin,self.FuzeMax))
+			if (self.ImpactFuzeMax>0) then 
+				self:SetNWFloat("ImpactFuze",CurTime()+math.Rand(self.ImpactFuzeMin,self.ImpactFuzeMax))
+			end
 		else
 			self.Weapon:SendWeaponAnim(self.Anims.Pull)
 			self:SetNWFloat("Fuze",0)
@@ -148,10 +157,14 @@ function SWEP:ThrowGrenade(force)
 		grenade:SetPos(self.Owner:GetShootPos()+self.Owner:GetAimVector()*20)
 		if (self:GetNWFloat("Fuze")==0) then
 			self:SetNWFloat("Fuze",CurTime()+math.Rand(self.FuzeMin,self.FuzeMax))
+			if (self.ImpactFuzeMax>0) then 
+				self:SetNWFloat("ImpactFuze",CurTime()+math.Rand(self.ImpactFuzeMin,self.ImpactFuzeMax))
+			end
 		end
 		grenade:Spawn()
 		grenade:SetOwner(self.Owner)
 		grenade:SetNWFloat("Fuze",self:GetNWFloat("Fuze"))
+		grenade:SetNWFloat("ImpactFuze",self:GetNWFloat("ImpactFuze"))
 		local phys=grenade:GetPhysicsObject()
 		if (IsValid(phys) ) then
 			phys:ApplyForceCenter(self.Owner:GetAimVector()*force)
