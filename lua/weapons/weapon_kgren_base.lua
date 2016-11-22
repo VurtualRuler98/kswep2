@@ -46,6 +46,12 @@ function SWEP:Initialize()
 		self.Hands:SetNoDraw(true)
 	end
 end
+function SWEP:EquipAmmo(ply)
+	local wep=self:GetClass()
+	if (ply:HasWeapon(wep)) then
+		ply:GetWeapon(wep):SetNWInt("numgrenades",ply:GetWeapon(wep):GetNWInt("numgrenades")+1)
+	end
+end
 function SWEP:Deploy()
 	--self.Owner:DrawViewModel(false)
 end
