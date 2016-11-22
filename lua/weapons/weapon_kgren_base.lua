@@ -82,7 +82,9 @@ function SWEP:DrawHUD()
 end
 SWEP.DrawCrosshair = false
 function SWEP:OnDrop()
-	self:Remove()
+	if (SERVER) then
+		self:Remove()
+	end
 end
 function SWEP:OnRemove()
 	if (self.Hands~=nil) then
@@ -183,6 +185,8 @@ function SWEP:ThrowGrenade(force)
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),ACT_VM_DRAW)
 			self:SetNWInt("numgrenades",self:GetNWInt("numgrenades")-1)
 		else
-			self:Remove()
+			if (SERVER) then
+				self:Remove()
+			end
 		end
 end
