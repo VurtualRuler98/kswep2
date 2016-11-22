@@ -167,10 +167,13 @@ function SWEP:ThrowGrenade(force)
 		grenade:SetNWFloat("ImpactFuze",self:GetNWFloat("ImpactFuze"))
 		local phys=grenade:GetPhysicsObject()
 		if (IsValid(phys) ) then
-			phys:ApplyForceCenter(self.Owner:GetAimVector()*force)
+			phys:ApplyForceCenter((self.Owner:GetAimVector()*force)+self.Owner:GetVelocity())
 		end
 		end
-		if (self:GetNWInt("numgrenades")>0) then
+		if (self:GetNWInt("numgrenades")>1) then
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),ACT_VM_DRAW)
+			self:SetNWInt("numgrenades",self:GetNWInt("numgrenades")-1)
+		else
+			self:Remove()
 		end
 end
