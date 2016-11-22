@@ -59,8 +59,11 @@ function SWEP:SecondaryAttack()
 end
 function SWEP:Reload()
 end
-function SWEP:CustomAmmoDisplay()	
-	return {}
+function SWEP:CustomAmmoDisplay()
+	self.AmmoDisplay = self.AmmoDisplay or {}
+	self.AmmoDisplay.Draw = true
+	self.AmmoDisplay.PrimaryClip=self:GetNWInt("numgrenades")
+	return self.AmmoDisplay
 end
 function SWEP:PostDrawViewModel()
 	if (self.Hands~=nil) then
