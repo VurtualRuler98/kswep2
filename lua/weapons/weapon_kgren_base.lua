@@ -31,7 +31,7 @@ SWEP.ImpactFuzeMax=0
 SWEP.Cookable=true
 SWEP.GrenadeEntity="item_healthvial"
 SWEP.ThrowForce=2000
-SWEP.RollForce=200
+SWEP.RollForce=400
 SWEP.ThrowType=0
 function SWEP:Initialize()
 	self:SetWeaponHoldType("grenade")
