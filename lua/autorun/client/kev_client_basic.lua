@@ -1,3 +1,4 @@
+CreateClientConVar("kswep_cl_scoperes","512",true,false,"Resolution in pixels of RT scopes.")
 net.Receive("kswep_flashlight_cl",function(len)
 	local wep=net.ReadEntity()
 	local lighton=net.ReadBool()

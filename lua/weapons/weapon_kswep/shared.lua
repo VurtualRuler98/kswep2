@@ -124,7 +124,12 @@ SWEP.RTScope=false
 SWEP.RTRanger=false
 SWEP.RTRangerX=0
 SWEP.RTRangerY=0
-SWEP.ScopeRes=512
+local calcres=GetConVar("kswep_cl_scoperes"):GetInt()
+if (calcres>0) then
+	SWEP.ScopeRes=calcres
+else
+	SWEP.ScopeRes=512
+end
 SWEP.SuperScope=false
 SWEP.NPCAttackAnimWait=1
 SWEP.ScopeMat = nil
