@@ -208,7 +208,9 @@ local kspawnerboxmodels = {
 "models/maver1k_xvii/stalker/props/box/expl_dinamit.mdl",
 "models/z-o-m-b-i-e/st/armory_room/st_weapons_schit_01.mdl",
 "models/z-o-m-b-i-e/st/armory_room/st_weapons_schit_02.mdl",
-"models/maver1k_xvii/stalker/props/devices/dev_merger.mdl"
+"models/maver1k_xvii/stalker/props/devices/dev_merger.mdl",
+"models/maver1k_xvii/stalker/props/army_base/prop_army_base_16.mdl",
+"models/maver1k_xvii/stalker/props/army_base/prop_army_base_17.mdl"
 }
 for k,model in pairs(kspawnerboxmodels) do
 	if (file.Exists(model,"GAME")) then
