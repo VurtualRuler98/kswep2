@@ -69,16 +69,18 @@ function ENT:DetFrag()
 	boom:Fire("Explode","",0)
 	local bullet={
 		Attacker=thrower,
-		Damage=100,
+		Damage=25,
 		Distance=7874,
 		Tracer=0,
 		AmmoType="pistol",
 		Src=self:GetPos(),
 		Dir=Vector(0,0,1),
 		Spread=Vector(10,10,10),
-		Num=100
+		Num=50
 	}
 	self:Remove()
-	self:FireBullets(bullet)
+	for i=1,20 do
+		self:FireBullets(bullet)
+	end
 end
 end
