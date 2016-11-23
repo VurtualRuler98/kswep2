@@ -3,6 +3,12 @@ if (SERVER) then
 	
 
 end
+kswep_kspawnergrenades = {
+	weapon_kgreni2_m67="M67 Frag Grenade",
+	weapon_kgreni2_m68="M68 Impact Grenade",
+	weapon_kgreni2_f1="F1 Grenade",
+	weapon_frag="HL2 Grenade"
+}
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 end

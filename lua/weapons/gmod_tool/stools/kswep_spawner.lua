@@ -9,6 +9,8 @@ TOOL.ClientConVar["give_armor"] = "1"
 TOOL.ClientConVar["gunrack"] = "1"
 TOOL.ClientConVar["portable"]="0"
 TOOL.ClientConVar["ammo_type"]="vammo_rifle"
+TOOL.ClientConVar["type"]="0"
+TOOL.ClientConVar["grenade_class"]="weapon_frag"
 if (CLIENT) then
 language.Add("Tool.kswep_spawner.name","KSwep Spawner Tool")
 language.Add("Tool.kswep_spawner.desc","Left click spawns a customized box with the settings and model, right click spawns a single-type ammocan with the model.")
@@ -74,21 +76,37 @@ function TOOL:RightClick(trace)
 		fixpos=trace.HitPos+fixpos
 		ent:SetPos(fixpos)
 		--ok done
-		ent:SetNWBool("Ammo",self:GetClientInfo("ammo_type","vammo_rifle"))
-		ent:SetOverlayText(vurtual_ammodata[self:GetClientInfo("ammo_type","vammo_rifle")].printname)
-		undo.Create("KSWEP Ammo")
-		undo.AddEntity(ent)
-		undo.SetPlayer(self:GetOwner())
-		undo.Finish("KSWEP Ammo")
-		end
+			self:SetBoxAmmo(ent)
+			undo.Create("KSWEP Ammo")
+			undo.AddEntity(ent)
+			undo.SetPlayer(self:GetOwner())
+			undo.Finish("KSWEP Ammo")
+			end
 		if (CLIENT) then return true end
 	end
 	if (trace.HitNonWorld and IsValid(trace.Entity) and trace.Entity:GetClass()=="sent_vurt_ammo") then
 		if (SERVER) then
 			local ent=trace.Entity
-			ent:SetNWBool("Ammo",self:GetClientInfo("ammo_type","vammo_rifle"))
+			self:SetBoxAmmo(ent)
 		end
 		if (CLIENT) then return true end
+	end
+end
+function TOOL:SetBoxAmmo(ent)
+	if (self:GetClientInfo("type","0")~="0") then
+		ent:SetNWBool("IsGrenades",true)
+		local frag=self:GetClientInfo("grenade_class","weapon_frag")
+		if (kswep_kspawnergrenades[frag]~=nil) then
+			ent:SetNWString("Grenade",frag)
+			ent:SetOverlayText(kswep_kspawnergrenades[frag])
+		else
+			ent:SetNWString("Grenade","weapon_frag")
+			ent:SetOverlayText(kswep_kspawnergrenades["weapon_frag"])
+		end
+	else
+		ent:SetNWBool("IsGrenades",false)
+		ent:SetNWString("Ammo",self:GetClientInfo("ammo_type","vammo_rifle"))
+		ent:SetOverlayText(vurtual_ammodata[self:GetClientInfo("ammo_type","vammo_rifle")].printname)
 	end
 end
 function TOOL.BuildCPanel(panel)
@@ -127,13 +145,16 @@ function TOOL.BuildCPanel(panel)
 		Height=4,
 		Models=list.Get("KswepBoxModels")
 	})
-	panel:AddControl("Header",{Text="KSWEP ammo spawner", Description="RIGHT CLICK: Create boxes of a single ammotype"})
+	panel:AddControl("Header",{Text="KSWEP ammo spawner", Description="RIGHT CLICK: Create boxes of a single ammotype or grenade."})
 	panel:AddControl("ListBox",{Height=256,Options=list.Get("KSwepSpawnerAmmo")})
 end
 for k,v in pairs(vurtual_ammodata) do
 	if (v.printname~=nil) then
-		list.Set("KSwepSpawnerAmmo",v.printname,{kswep_spawner_ammo_type=k})
+		list.Set("KSwepSpawnerAmmo",v.printname,{kswep_spawner_type=0, kswep_spawner_ammo_type=k})
 	end
+end
+for k,name in pairs(kswep_kspawnergrenades) do
+	list.Set("KSwepSpawnerAmmo",name,{kswep_spawner_type=1,kswep_spawner_grenade_class=k})
 end
 local kspawnerboxmodels = {
 --CSS

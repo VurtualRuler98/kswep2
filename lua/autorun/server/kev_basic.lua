@@ -1,6 +1,8 @@
 util.AddNetworkString("kswep_magazines")
 util.AddNetworkString("kswep_chamberammo")
 util.AddNetworkString("kswep_rearm")
+util.AddNetworkString("kswep_givegrenades")
+util.AddNetworkString("kswep_givegrenades_cl")
 util.AddNetworkString("kswep_rearm_cl")
 util.AddNetworkString("kswep_scroll")
 util.AddNetworkString("kswep_optic")
@@ -120,7 +122,14 @@ end
 net.Receive("kswep_attach",KswepAttach)
 function RearmMags(len,pl)
 	if (IsValid(pl) and pl:IsPlayer()) then
+		local box=net.ReadEntity()
 		local caliber=net.ReadString()
+		if (not IsValid(box) or box:GetPos():Distance(pl:GetPos())>512) then return end
+		if (box:GetClass("sent_vurt_supplybox")) then
+		elseif (box:GetClass("sent_vurt_ammo")) then
+			if (box:GetNWBool("IsGrenades")) then return end
+			if (box:GetNWString("Ammo")~=caliber) then return end
+		end	
 		local wep=net.ReadEntity()
 		if (wep~=pl:GetActiveWeapon()) then return end
 		if (wep:IsValid() and string.find(wep:GetClass(),"weapon_kswep")) then
@@ -168,7 +177,26 @@ function RearmMags(len,pl)
 	end
 end
 net.Receive("kswep_rearm_cl",RearmMags)
-
+local function KswepGiveGrenades(len,pl)
+	if (not IsValid(pl) or not pl:IsPlayer()) then return end
+	local box=net.ReadEntity()
+	local grenade=net.ReadString()
+	if (not IsValid(box) or box:GetPos():Distance(pl:GetPos())>512) then return end
+	if (not box:GetClass("sent_vurt_ammo")) then return end
+	if (not box:GetNWBool("IsGrenades")) then return end
+	if (box:GetNWString("Grenade")~=grenade) then return end
+	if (kswep_kspawnergrenades[grenade]==nil) then return end
+	if (pl:HasWeapon(grenade)) then
+		if (string.find(grenade,"weapon_kgren")) then
+			pl:GetWeapon(grenade):SetNWInt("numgrenades",pl:GetWeapon(grenade):GetNWInt("numgrenades")+1)
+		elseif (grenade=="weapon_frag") then
+			pl:GiveAmmo("Grenade")
+		end
+	else
+		pl:Give(grenade)
+	end
+end
+net.Receive("kswep_givegrenades_cl",KswepGiveGrenades)
 function SetSpawnMagazines(ply)
 	ply.KPrimaryMags={}
 	ply.KPrimaryType=nil

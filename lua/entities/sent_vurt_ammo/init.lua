@@ -15,7 +15,9 @@ end
 function ENT:Initialize()
 	if (self.Entity:GetModel()=="models/error.mdl") then
 		self.Entity:SetModel( "models/items/item_item_crate.mdl")
-		self:SetNWBool("Ammo","vammo_rifle")
+		self:SetNWString("Ammo","vammo_rifle")
+		self:SetNWBool("IsGrenades",false)
+		self:SetNWString("Grenade","")
 	end
 	self.Entity:PhysicsInit( SOLID_VPHYSICS)
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
@@ -29,16 +31,25 @@ function ENT:Initialize()
 end
 function ENT:Use(activator,caller)
 	if ( activator:IsPlayer() )  then
-		local wep=activator:GetActiveWeapon()
-		if (wep:IsValid() and string.find(wep:GetClass(),"weapon_kswep")) then
-			if (wep.MagType or wep.SingleReload) then
-				net.Start("kswep_rearm")
+		if (self:GetNWBool("IsGrenades")) then
+			local grenade=self:GetNWString("Grenade")
+			if (kswep_kspawnergrenades[grenade]~=nil) then
+				net.Start("kswep_givegrenades")
 				net.WriteEntity(self)
-				net.WriteEntity(wep)
-				net.WriteTable(vurtual_ammodata)
 				net.Send(activator)
 			end
-			
+		else
+			local wep=activator:GetActiveWeapon()
+			if (wep:IsValid() and string.find(wep:GetClass(),"weapon_kswep")) then
+				if (wep.MagType or wep.SingleReload) then
+					net.Start("kswep_rearm")
+					net.WriteEntity(self)
+					net.WriteEntity(wep)
+					net.WriteTable(vurtual_ammodata)
+					net.Send(activator)
+				end
+				
+			end
 		end
 	end
 end

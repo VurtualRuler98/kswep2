@@ -106,6 +106,11 @@ net.Receive("kswep_rearm",function()
 	box:ClUseMagBox(wep,mags)
 
 end)
+net.Receive("kswep_givegrenades",function()
+	local box=net.ReadEntity()
+	box:ClUseGrenadeBox()
+
+end)
 net.Receive("kswep_supplybox",function()
 		local box=net.ReadEntity()
 		local wep=net.ReadEntity()
