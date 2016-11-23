@@ -56,8 +56,10 @@ function ENT:DetFrag()
 	effectdata:SetScale(1000)
 	util.Effect("cball_bounce",effectdata)
 	util.Effect("ThumperDust",effectdata)
+	local thrower=self:GetOwner()
+	self:SetOwner(0)
 	local boom=ents.Create("env_explosion")
-	boom:SetOwner(self.Owner)
+	boom:SetOwner(thrower)
 	boom:SetPos(self:GetPos())
 	boom:SetKeyValue("Spawnflags","124")
 	self:EmitSound("ins2grenade.Explode")
@@ -66,7 +68,7 @@ function ENT:DetFrag()
 	boom:Activate()
 	boom:Fire("Explode","",0)
 	local bullet={
-		Attacker=self.Owner,
+		Attacker=thrower,
 		Damage=100,
 		Distance=7874,
 		Tracer=0,
