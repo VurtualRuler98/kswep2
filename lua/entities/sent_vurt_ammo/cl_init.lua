@@ -27,6 +27,7 @@ function ENT:ClUseMagBox(wep,mags)
 		button.DoClick=function()
 			net.Start("kswep_rearm_cl")
 			net.WriteString(v.name)
+			net.WriteEntity(wep)
 			net.SendToServer()
 			ammoframe:Close()
 		end
