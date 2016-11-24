@@ -169,6 +169,8 @@ local kspawnerboxmodels = {
 "models/props_crates/supply_crate01.mdl",
 "models/props_crates/supply_crate02.mdl",
 "models/props_crates/supply_crate03.mdl",
+"models/ammo/ammo_us.mdl",
+"models/ammo/ammo_axis.mdl",
 --L4D2
 "models/props_waterfront/suitcase_open.mdl",
 "models/w_models/weapons/w_eq_explosive_ammopack.mdl",

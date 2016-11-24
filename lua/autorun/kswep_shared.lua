@@ -7,6 +7,7 @@ kswep_kspawnergrenades = {
 	weapon_kgreni2_m67="M67 Frag Grenade",
 	weapon_kgreni2_m68="M68 Impact Grenade",
 	weapon_kgreni2_f1="F1 Grenade",
+	weapon_kgrend_mk2_he="Mk2 HE Grenade",
 	weapon_frag="HL2 Grenade"
 }
 function AddAmmodata(tbl)

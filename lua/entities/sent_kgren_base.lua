@@ -17,6 +17,7 @@ ENT.FragDamage=25
 ENT.SuperFragClusters=0
 ENT.SuperFragDamage=0
 ENT.SuperFragRadius=0
+ENT.DetonateSound="ins2grenade.Explode"
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -69,7 +70,7 @@ function ENT:DetFrag()
 	boom:SetOwner(thrower)
 	boom:SetPos(self:GetPos())
 	boom:SetKeyValue("Spawnflags","124")
-	self:EmitSound("ins2grenade.Explode")
+	self:EmitSound(self.DetonateSound)
 	boom:SetKeyValue("iMagnitude",self.DetFragMagnitude)
 	boom:SetKeyValue("iRadiusOverride",self.DetFragRadius)
 	boom:Spawn()
