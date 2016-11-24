@@ -89,7 +89,6 @@ function ENT:DetFrag()
 	}
 	timer.Simple(0.1,function()
 		self:Remove()
-		print("yoop",self.FragClusters)
 		for i=1,self.FragClusters do
 			self:FireBullets(bullet)
 		end

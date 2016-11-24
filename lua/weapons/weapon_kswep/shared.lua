@@ -973,7 +973,6 @@ end
 function SWEP:FiremodeFire()
 	if (self:GetFiremode().burst) then
 		if (self.LastBurst<1 and CLIENT) then return end
-		print("doot")
 		if (self:GetNWInt("Burst")>0) then
 			self:NormalFire()
 			self:SetNWInt("Burst",self:GetNWInt("Burst")-1)
