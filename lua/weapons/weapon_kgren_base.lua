@@ -22,6 +22,7 @@ SWEP.LastShake=Angle()
 SWEP.NoViewModel=false
 SWEP.Anims = {}
 SWEP.Anims.Throw = ACT_VM_THROW
+SWEP.Anims.ThrowCooked=ACT_VM_SECONDARYATTACK
 SWEP.Anims.PullCook = ACT_VM_PULLBACK_HIGH_BAKE
 SWEP.Anims.Pull = ACT_VM_PULLBACK_HIGH
 SWEP.FuzeMin=3
@@ -29,10 +30,14 @@ SWEP.FuzeMax=3
 SWEP.ImpactFuzeMin=0
 SWEP.ImpactFuzeMax=0
 SWEP.Cookable=true
+SWEP.PostCookable=true
 SWEP.GrenadeEntity="item_healthvial"
 SWEP.ThrowForce=2000
 SWEP.RollForce=400
 SWEP.ThrowType=0
+SWEP.AnimThrowDelay=0.4
+SWEP.AnimThrowDelayCooked=0.4
+SWEP.SoundSpoon="weapon_smg1.Special1"
 function SWEP:Initialize()
 	self:SetWeaponHoldType("grenade")
 	self:SetNWInt("numgrenades",1)
@@ -41,6 +46,7 @@ function SWEP:Initialize()
 	self:SetNWFloat("ThrowNext",0)
 	self:SetNWFloat("Fuze",0)
 	self:SetNWFloat("ImpactFuze",0)
+	self:SetNWFloat("FinalThrowTime",0)
 	if (CLIENT and self.Owner:IsPlayer() and self.UseInsHands==true) then
 		self.Hands=ClientsideModel(kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 		self.Hands:SetNoDraw(true)
@@ -104,12 +110,12 @@ function SWEP:ThrowAnim()
 		end
 end
 function SWEP:Reload()
-	if (self.Cookable and self:GetNWInt("numgrenades")>0 and self:GetNWInt("ThrowStep")==1 and self:GetNWFloat("Fuze")==0) then
+	if (self.Cookable and self.PostCookable and self:GetNWInt("numgrenades")>0 and self:GetNWInt("ThrowStep")==1 and self:GetNWFloat("Fuze")==0) then
 		self:SetNWFloat("Fuze",CurTime()+math.Rand(self.FuzeMin,self.FuzeMax))
 		if (self.ImpactFuzeMax>0) then 
 			self:SetNWFloat("ImpactFuze",CurTime()+math.Rand(self.ImpactFuzeMin,self.ImpactFuzeMax))
 		end
-		self:EmitSound("Weapon_m67.SpoonEject")
+		self:EmitSound(self.SoundSpoon)
 	end
 end
 function SWEP:Think()
@@ -135,17 +141,22 @@ function SWEP:Think()
 	end
 	--THROW
 	if ((not self.Owner:KeyDown(self.ThrowType) and self:GetNWInt("ThrowStep")==1 and self:GetNWFloat("ThrowNext")~=0 and self:GetNWFloat("ThrowNext")<CurTime())) then
-		self.Weapon:SendWeaponAnim(self.Anims.Throw)
+		local anim=self.Anims.Throw
+		if (self:GetNWFloat("Fuze")>0) then
+			anim=self.Anims.ThrowCooked
+		end
+		self.Weapon:SendWeaponAnim(anim)
+		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Owner:GetViewModel():SelectWeightedSequence(anim)),ACT_VM_DRAW)
 		self:SetNWFloat("ThrowNext",0)
 		self:SetNWInt("ThrowStep",2)
 		if (self.Owner:IsPlayer()) then
 			self.Owner:SetAnimation(PLAYER_ATTACK1)
 		end
-		if (self.ThrowType==IN_ATTACK) then
-			self:ThrowGrenade(self.ThrowForce)
-		else
-			self:ThrowGrenade(self.RollForce)
+		local delay=self.AnimThrowDelay
+		if (self:GetNWFloat("Fuze")>0) then
+			delay=self.AnimThrowDelayCooked
 		end
+		self:SetNWFloat("FinalThrowTime",CurTime()+delay)
 	end
 	--COOKED TOO LONG
 	if ((self:GetNWInt("ThrowStep")==1 and self:GetNWFloat("Fuze")>0 and self:GetNWFloat("Fuze")<CurTime())) then
@@ -156,6 +167,19 @@ function SWEP:Think()
 	--READY FOR NEXT THROW
 	if (not self.Owner:KeyDown(self.ThrowType) and self:GetNWInt("ThrowStep")==2 and self:GetNWFloat("NextIdle")==0) then
 		self:SetNWInt("ThrowStep",0)
+		if (self:GetNWInt("numgrenades")<1) then
+			if (SERVER) then
+				self:Remove()
+			end
+		end
+	end
+	if (self:GetNWFloat("FinalThrowTime")<CurTime() and self:GetNWFloat("FinalThrowTime")>0) then
+		if (self.ThrowType==IN_ATTACK) then
+			self:ThrowGrenade(self.ThrowForce)
+		else
+			self:ThrowGrenade(self.RollForce)
+		end
+		self:SetNWFloat("FinalThrowTime",0)
 	end
 	if (self:GetNWFloat("NextIdle")~=0 and self:GetNWFloat("NextIdle")<CurTime() and IsFirstTimePredicted()) then
 		self:SendWeaponAnim(self.Anims.NextIdleAnim)
@@ -181,12 +205,5 @@ function SWEP:ThrowGrenade(force)
 			phys:ApplyForceCenter((self.Owner:GetAimVector()*force)+self.Owner:GetVelocity())
 		end
 		end
-		if (self:GetNWInt("numgrenades")>1) then
-			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),ACT_VM_DRAW)
-			self:SetNWInt("numgrenades",self:GetNWInt("numgrenades")-1)
-		else
-			if (SERVER) then
-				self:Remove()
-			end
-		end
+		self:SetNWInt("numgrenades",self:GetNWInt("numgrenades")-1)
 end
