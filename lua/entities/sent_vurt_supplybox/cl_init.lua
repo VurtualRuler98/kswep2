@@ -66,9 +66,10 @@ function ENT:ClUseMagBox(wep,mags)
 				scrollmenu:AddLine(v.name)
 			end
 		end
+		local box=self
 		function scrollmenu:OnClickLine(line,selected)
 			net.Start("kswep_rearm_cl")
-			net.WriteEntity(self)
+			net.WriteEntity(box)
 			net.WriteString(line:GetValue(1))
 			net.WriteEntity(wep)
 			net.SendToServer()
