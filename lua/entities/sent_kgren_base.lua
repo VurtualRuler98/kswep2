@@ -87,16 +87,19 @@ function ENT:DetFrag()
 		Spread=Vector(10,10,10),
 		Num=self.FragClusterSize
 	}
-	self:Remove()
-	for i=1,self.FragClusters do
-		self:FireBullets(bullet)
-	end
-	bullet.Damage=self.SuperFragDamage
-	bullet.Distance=self.SuperFragRadius
-	if (self.SuperFragClusters>0) then
-		for i=1,self.SuperFragClusters do
+	timer.Simple(0.1,function()
+		self:Remove()
+		print("yoop",self.FragClusters)
+		for i=1,self.FragClusters do
 			self:FireBullets(bullet)
 		end
-	end
+		bullet.Damage=self.SuperFragDamage
+		bullet.Distance=self.SuperFragRadius
+		if (self.SuperFragClusters>0) then
+			for i=1,self.SuperFragClusters do
+				self:FireBullets(bullet)
+			end
+		end
+	end)
 end
 end
