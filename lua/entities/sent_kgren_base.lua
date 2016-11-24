@@ -10,6 +10,13 @@ ENT.Category	= "Vurtual's base"
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
 ENT.DetFragMagnitude="50"
+ENT.DetFragRadius="512"
+ENT.FragClusterSize=50
+ENT.FragClusters=20
+ENT.FragDamage=25
+ENT.SuperFragClusters=0
+ENT.SuperFragDamage=0
+ENT.SuperFragRadius=0
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -64,23 +71,31 @@ function ENT:DetFrag()
 	boom:SetKeyValue("Spawnflags","124")
 	self:EmitSound("ins2grenade.Explode")
 	boom:SetKeyValue("iMagnitude",self.DetFragMagnitude)
+	boom:SetKeyValue("iRadiusOverride",self.DetFragRadius)
 	boom:Spawn()
 	boom:Activate()
 	boom:Fire("Explode","",0)
 	local bullet={
 		Attacker=thrower,
-		Damage=25,
-		Distance=7874,
+		Damage=self.FragDamage,
+		Distance=self.FragRadius,
 		Tracer=0,
 		AmmoType="pistol",
 		Src=self:GetPos(),
 		Dir=Vector(0,0,1),
 		Spread=Vector(10,10,10),
-		Num=50
+		Num=self.FragClusterSize
 	}
 	self:Remove()
-	for i=1,20 do
+	for i=1,self.FragClusters do
 		self:FireBullets(bullet)
+	end
+	bullet.Damage=self.SuperFragDamage
+	bullet.Distance=self.SuperFragRadius
+	if (self.SuperFragClusters>0) then
+		for i=1,self.SuperFragClusters do
+			self:FireBullets(bullet)
+		end
 	end
 end
 end
