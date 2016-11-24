@@ -58,6 +58,7 @@ SWEP.vurtualkeys_firemode=true
 SWEP.MaxRecoil=5
 SWEP.ModeName0="SEMI"
 SWEP.ModeName1="FULL"
+SWEP.ModeName2="ERROR"
 SWEP.RecoilControl=4
 SWEP.RecoilMassModifier=1
 SWEP.HandlingModifier=200
@@ -192,6 +193,7 @@ SWEP.BaseRecoilPain=0 -- was 0.01
 SWEP.Breathing=false
 SWEP.ZeroVelocity=-1
 SWEP.ScopeZeroVelocity=0
+SWEP.Firemodes={}
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -208,6 +210,7 @@ function SWEP:Initialize()
 	self:SetNWInt("Burst",self.Burst)
 	self:SetNWBool("FiremodeSelected",false)
 	self:SetNWBool("Firemode",false)
+	self:SetNWInt("FiremodeInt",1)
 	self:SetNWFloat("NextIdle",0)
 	self:SetNWBool("Lowered",false)
 	self:SetNWFloat("NextPrimaryAttack",0)
@@ -942,14 +945,18 @@ function SWEP:MagWeight(reloadweight,magsize)
 	end
 end
 function SWEP:FiremodeName()
-	if (self:GetNWBool("Firemode")) then
-		return self.ModeName1
+	if (#self.Firemodes==0) then
+		if (self:GetNWBool("Firemode")) then
+			return self.ModeName1
+		else
+			return self.ModeName0
+		end
 	else
-		return self.ModeName0
+		return self:GetFiremode().name
 	end
 end
 function SWEP:BurstFire()
-	if (self.LastBurst<1  and CLIENT and self.Owner==LocalPlayer()) then return end
+	if (self.LastBurst<1  and CLIENT) then return end
 	if (self:GetNWInt("Burst")>0) then
 		self:NormalFire()
 		self:SetNWInt("Burst",self:GetNWInt("Burst")-1)
@@ -958,6 +965,25 @@ function SWEP:BurstFire()
 		end
 		self.LastBurst=self.LastBurst-1
 	else
+	end
+end
+function SWEP:GetFiremode()
+	return self.Firemodes[self:GetNWInt("FiremodeInt")]
+end
+function SWEP:FiremodeFire()
+	if (self:GetFiremode().burst) then
+		if (self.LastBurst<1 and CLIENT) then return end
+		print("doot")
+		if (self:GetNWInt("Burst")>0) then
+			self:NormalFire()
+			self:SetNWInt("Burst",self:GetNWInt("Burst")-1)
+			if (self:GetNWInt("Burst")==0) then
+				self:SetNWBool("FiremodeSelected",true)
+			end
+			self.LastBurst=self.LastBurst-1
+		end
+	else
+		self:NormalFire()
 	end
 end
 function SWEP:FinishReload()
@@ -1173,8 +1199,19 @@ function SWEP:ToggleZoom()
 end
 function SWEP:SwitchFiremode()
 	if (not self.SelectFire) then return end
+	if (#self.Firemodes==0) then
 	self:ServeNWBool("Firemode",not self:GetNWBool("Firemode"))
 	self.Primary.Automatic=self:GetNWBool("Firemode")
+	else
+		local mode=self:GetNWInt("FiremodeInt")
+		mode=mode+1
+		if (mode>#self.Firemodes) then mode=1 end
+		self:SetNWInt("FiremodeInt",mode)
+		self.Primary.Automatic=self.Firemodes[mode].auto
+		if (self.Firemodes[mode].burst) then
+			self:SetNWInt("Burst",self:GetFiremode().burst)
+		end
+	end
 	if (not self.InsAnims or self.InsNoSafetySound) then
 		self.Weapon:EmitSound("weapon_smg1.special1")
 	end
@@ -1395,17 +1432,28 @@ function SWEP:Think()
 	if (self:GetHoldType()~=hold and self.Owner:IsPlayer()) then
 		self:SetHoldType(hold)
 	end
-	if (self:GetNWBool("Burst")==0 and self.Burst>0 and (self.Owner:IsNPC() or not self.Owner:KeyDown(IN_ATTACK))) then
-		self:SetNWBool("Burst",self.Burst)
+	if ((self:GetNWInt("Burst")==0 || self.HKBurst) and (self.Burst>0 || #self.Firemodes>0) and (self.Owner:IsNPC() or not self.Owner:KeyDown(IN_ATTACK))) then
+		if (#self.Firemodes==0) then
+			self:SetNWInt("Burst",self.Burst)
+		else
+			self:SetNWInt("Burst",self:GetFiremode().burst)
+			self.LastBurst=self:GetFiremode().burst
+		end
 	end
 	if (self:GetNWBool("FiremodeSelected") and (self.Owner:IsNPC() or not self.Owner:KeyDown(IN_ATTACK))) then
+		if (#self.Firemodes==0) then
 		self.LastBurst=self.Burst
+		else
+			self.LastBurst=self:GetFiremode().burst
+		end
 		self:ServeNWBool("FiremodeSelected",false)
 	end
-	if (self:GetNWBool("Firemode")) then
-		self.Primary.Automatic=true
-	else
-		self.Primary.Automatic=self.Auto
+	if (#self.Firemodes==0) then
+		if (self:GetNWBool("Firemode")) then
+			self.Primary.Automatic=true
+		else
+			self.Primary.Automatic=self.Auto
+		end
 	end
 	if (self.Owner:IsPlayer()) then
 	self.WeaponSway=self.WeaponSway or self.Owner:GetAimVector()
