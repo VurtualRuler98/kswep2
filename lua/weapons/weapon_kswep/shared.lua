@@ -378,6 +378,24 @@ function SWEP:FireRocket()
 		end
 	end
 end
+function SWEP:CreateBackblast()
+	if (CLIENT or self:GetNWInt("numgrenades")<1) then return end
+	local backblast=ents.Create("env_explosion")
+	local tr=util.TraceLine( {
+		start=self.Owner:GetShootPos(),
+		endpos=self.Owner:GetShootPos()-self.Owner:GetAimVector()*100,
+		filter=self.Owner,
+		mask=MASK_SHOT
+		})
+	backblast:SetPos(tr.HitPos)
+	backblast:SetOwner(self.Owner)
+	backblast:SetKeyValue("Spawnflags","124")
+	backblast:SetKeyValue("iMagnitude","50")
+	backblast:SetKeyValue("iRadiusOverride","100")
+	backblast:Spawn()
+	backblast:Activate()
+	backblast:Fire("Explode","",0)
+end
 function SWEP:EquipAmmo(ply)
 	if (self.GivesGrenade) then
 		local wep=self:GetClass()
