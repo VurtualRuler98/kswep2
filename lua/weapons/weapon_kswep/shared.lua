@@ -383,7 +383,6 @@ function SWEP:EquipAmmo(ply)
 		local wep=self:GetClass()
 		if (ply:HasWeapon(wep)) then
 			ply:GetWeapon(wep):SetNWInt("numgrenades",ply:GetWeapon(wep):GetNWInt("numgrenades")+1)
-			ply:GetWeapon(wep):SetNWBool("Chambered",true)
 		end
 	end
 end
@@ -1386,6 +1385,10 @@ hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think2()
 end
 function SWEP:Think()
+	if (self.GrenadeLauncher and IsFirstTimePredicted() and not self:GetNWBool("Chambered") and self:GetNWInt("numgrenades")>0) then
+		self:SetNWBool("Chambered",true)
+		self:NextBolt(CurTime()+self.Primary.Delay,ACT_VM_IDLE,self.Anims.ReloadAnim)
+	end
 	if (SERVER and self:GetNWFloat("DropAfter")>0 and self:GetNWFloat("DropAfter")<CurTime()) then
 		self:Remove()
 	end
