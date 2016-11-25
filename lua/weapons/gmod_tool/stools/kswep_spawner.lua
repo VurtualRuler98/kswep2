@@ -93,6 +93,7 @@ function TOOL:RightClick(trace)
 	end
 end
 function TOOL:SetBoxAmmo(ent)
+	print (self:GetClientInfo("type","0"))
 	if (self:GetClientInfo("type","0")~="0") then
 		ent:SetNWBool("IsGrenades",true)
 		local frag=self:GetClientInfo("grenade_class","weapon_frag")
@@ -150,11 +151,11 @@ function TOOL.BuildCPanel(panel)
 end
 for k,v in pairs(vurtual_ammodata) do
 	if (v.printname~=nil) then
-		list.Set("KSwepSpawnerAmmo",v.printname,{kswep_spawner_type=0, kswep_spawner_ammo_type=k})
+		list.Set("KSwepSpawnerAmmo",v.printname,{kswep_spawner_type="0", kswep_spawner_ammo_type=k})
 	end
 end
 for k,name in pairs(kswep_kspawnergrenades) do
-	list.Set("KSwepSpawnerAmmo",name,{kswep_spawner_type=1,kswep_spawner_grenade_class=k})
+	list.Set("KSwepSpawnerAmmo",name,{kswep_spawner_type="1",kswep_spawner_grenade_class=k})
 end
 local kspawnerboxmodels = {
 --CSS
