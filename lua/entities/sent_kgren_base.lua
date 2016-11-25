@@ -43,7 +43,7 @@ function ENT:Initialize()
 	self.Entity:SetMoveType( MOVETYPE_VPHYSICS )
 	self.Entity:SetSolid( SOLID_VPHYSICS )
 	self.Entity:SetUseType(SIMPLE_USE)
-	self.Entity:SetCollisionGroup(COLLISION_GROUP_WEAPON)
+	self.Entity:SetCollisionGroup(COLLISION_GROUP_PROJECTILE)
 	local phys = self.Entity:GetPhysicsObject()
 	if (phys:IsValid()) then
 		phys:SetMass(0.6)
