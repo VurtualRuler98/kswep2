@@ -589,6 +589,10 @@ function SWEP:IsWeaponEmpty()
 	end
 end
 function SWEP:Holster(wep)
+	if (self:GetNWBool("CurrentlyReloading")) then
+		self:SetNWBool("CurrentlyReloading",false)
+		self.ReloadAnimTime=0
+	end
 	if (CLIENT and self.Owner==LocalPlayer() and self.superlight) then
 			self.superlight:Remove()
 	end
