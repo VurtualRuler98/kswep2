@@ -60,7 +60,6 @@ function ENT:Detonate()
 	self:EffectGrenadeFrag()
 	self:DetBoom()
 	self:DetFrag()
-	self:Remove()
 end
 function ENT:EffectGrenadeFrag()
 	local effectdata=EffectData()
@@ -79,7 +78,7 @@ function ENT:DetBoom()
 	local boom=ents.Create("env_explosion")
 	boom:SetOwner(self)
 	boom:SetPos(self:GetPos())
-	boom:SetKeyValue("Spawnflags","124")
+	boom:SetKeyValue("Spawnflags","60")
 	boom:SetKeyValue("iMagnitude",self.DetFragMagnitude)
 	boom:SetKeyValue("iRadiusOverride",self.DetFragRadius)
 	boom:Spawn()
@@ -101,12 +100,15 @@ function ENT:DetFrag()
 		Num=self.FragClusterSize
 	}
 	timer.Simple(0.1,function()
-		for i=1,self.FragClusters do
-			self:FireBullets(bullet)
+		self:Remove()
+		if (self.FragClusters>0) then
+			for i=1,self.FragClusters do
+				self:FireBullets(bullet)
+			end
 		end
-		bullet.Damage=self.SuperFragDamage
-		bullet.Distance=self.SuperFragRadius
 		if (self.SuperFragClusters>0) then
+			bullet.Damage=self.SuperFragDamage
+			bullet.Distance=self.SuperFragRadius
 			for i=1,self.SuperFragClusters do
 				self:FireBullets(bullet)
 			end
