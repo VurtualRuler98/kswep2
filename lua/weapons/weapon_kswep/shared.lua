@@ -215,6 +215,8 @@ function SWEP:Initialize()
 	self:SetNWBool("Lowered",false)
 	self:SetNWFloat("NextPrimaryAttack",0)
 	self:SetNWBool("Bipod",false)
+	self:SetNWInt("numgrenades",1)
+	self:SetNWFloat("DropAfter",0)
 	self.Zero=self.DefaultZero
 	self.ZeroStep=self.DefaultZeroStep
 	self.MaxZero=self.DefaultMaxZero
@@ -343,6 +345,41 @@ function SWEP:PrimaryAttack()
 end
 function SWEP:PrimaryFire()
 	self:NormalFire()
+end
+function SWEP:FireRocket()
+	if (self:IsRunning() or self:GetNWBool("Raised")==false or self:IsWallBlocked()) then return end
+	if (not self:TryPrimaryAttack() ) then return end
+	self.Weapon:EmitSound(self.Primary.Rocketsound)
+	self.Weapon:SendWeaponAnim(self:GetShootAnim())
+	self:SetNWInt("numgrenades",self:GetNWInt("numgrenades")-1)
+	if (SERVER) then
+		local rocket=ents.Create(self.RocketClass)
+		rocket:SetPos(self.Owner:GetShootPos()+self.Owner:GetAimVector()*20)
+		rocket:Spawn()
+		rocket:SetOwner(self.Owner)
+		rocket:SetAngles(self.Owner:EyeAngles())
+		local phys=rocket:GetPhysicsObject()
+		if (IsValid(phys)) then
+			phys:ApplyForceCenter((self.Owner:GetAimVector()*self.RocketForce)+self.Owner:GetVelocity())
+		end
+	end
+	if (self.RocketSingleShot) then
+		if (self:GetNWInt("numgrenades")<1) then self:SetNWFloat("DropAfter",CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(self:GetShootAnim()))) end
+		self:NextBolt(CurTime()+self.Primary.Delay,ACT_VM_READY,self.Anims.TossAnim)
+	end
+end
+function SWEP:EquipAmmo(ply)
+	if (self.GivesGrenade) then
+		local wep=self:GetClass()
+		if (ply:HasWeapon(wep)) then
+			ply:GetWeapon(wep):SetNWInt("numgrenades",ply:GetWeapon(wep):GetNWInt("numgrenades")+1)
+		end
+	end
+end
+function SWEP:NextBolt(idle,anim,bolt)
+	self:SetNWFloat("NextIdle",idle)
+	self.NextBoltAnim=bolt
+	self.Anims.NextIdleAnim=anim
 end
 function SWEP:NextBolt(idle,anim,bolt)
 	self:SetNWFloat("NextIdle",idle)
@@ -1326,6 +1363,9 @@ hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think2()
 end
 function SWEP:Think()
+	if (SERVER and self:GetNWFloat("DropAfter")>0 and self:GetNWFloat("DropAfter")<CurTime()) then
+		self:Remove()
+	end
 	self:Think2()
 	if (SERVER and not self.DiscoveredAnims) then
 		self:DiscoverModelAnims()
@@ -1840,7 +1880,7 @@ end
 function SWEP:DiscoverAnim(anim)
 	local max=#self:GetSequenceList()
 	local i=0
-	while (i<max) do
+	while (i<max+1) do
 		if (self:GetSequenceInfo(i).activityname==anim) then
 			return self:GetSequenceInfo(i).activity
 		end

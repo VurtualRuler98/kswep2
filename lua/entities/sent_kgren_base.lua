@@ -56,26 +56,39 @@ function ENT:Think()
 	end
 end
 function ENT:Detonate()
+	self:EmitSound(self.DetonateSound)
+	self:EffectGrenadeFrag()
+	self:DetBoom()
 	self:DetFrag()
+	self:Remove()
 end
-function ENT:DetFrag()
+function ENT:EffectGrenadeFrag()
 	local effectdata=EffectData()
 	effectdata:SetOrigin(self:GetPos())
 	effectdata:SetScale(1000)
 	util.Effect("cball_bounce",effectdata)
 	util.Effect("ThumperDust",effectdata)
-	local thrower=self:GetOwner()
-	self:SetOwner(0)
+end
+function ENT:EffectRocketBoom()
+	local effectdata=EffectData()
+	effectdata:SetOrigin(self:GetPos())
+	effectdata:SetScale(1000)
+	util.Effect("HelicopterMegaBomb",effectdata)
+end
+function ENT:DetBoom()
 	local boom=ents.Create("env_explosion")
-	boom:SetOwner(thrower)
+	boom:SetOwner(self)
 	boom:SetPos(self:GetPos())
 	boom:SetKeyValue("Spawnflags","124")
-	self:EmitSound(self.DetonateSound)
 	boom:SetKeyValue("iMagnitude",self.DetFragMagnitude)
 	boom:SetKeyValue("iRadiusOverride",self.DetFragRadius)
 	boom:Spawn()
 	boom:Activate()
 	boom:Fire("Explode","",0)
+end
+function ENT:DetFrag()
+	local thrower=self:GetOwner()
+	self:SetOwner(0)
 	local bullet={
 		Attacker=thrower,
 		Damage=self.FragDamage,
@@ -88,7 +101,6 @@ function ENT:DetFrag()
 		Num=self.FragClusterSize
 	}
 	timer.Simple(0.1,function()
-		self:Remove()
 		for i=1,self.FragClusters do
 			self:FireBullets(bullet)
 		end

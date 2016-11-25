@@ -34,6 +34,7 @@ SWEP.PostCookable=true
 SWEP.GrenadeEntity="item_healthvial"
 SWEP.ThrowForce=2000
 SWEP.RollForce=400
+SWEP.CanRoll=true
 SWEP.ThrowType=0
 SWEP.AnimThrowDelay=0.4
 SWEP.AnimThrowDelayCooked=0.4
@@ -120,7 +121,7 @@ function SWEP:Reload()
 end
 function SWEP:Think()
 	--BEGIN THROW
-	if ((self.Owner:KeyDown(IN_ATTACK) or self.Owner:KeyDown(IN_ATTACK2)) and self:GetNWInt("ThrowStep")==0 and self:GetNWFloat("NextIdle")==0) then
+	if ((self.Owner:KeyDown(IN_ATTACK) or (self.Owner:KeyDown(IN_ATTACK2) and self.CanRoll)) and self:GetNWInt("ThrowStep")==0 and self:GetNWFloat("NextIdle")==0) then
 		if (self.Owner:KeyDown(IN_ATTACK)) then
 			self.ThrowType=IN_ATTACK
 		else
