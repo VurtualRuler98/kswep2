@@ -187,10 +187,10 @@ local function KswepGiveGrenades(len,pl)
 	if (box:GetNWString("Grenade")~=grenade) then return end
 	if (kswep_kspawnergrenades[grenade]==nil) then return end
 	if (pl:HasWeapon(grenade)) then
-		if (string.find(grenade,"weapon_kgren")) then
+		if (string.find(grenade,"weapon_kgren") or string.find(grenade,"weapon_kswep")) then
 			pl:GetWeapon(grenade):SetNWInt("numgrenades",pl:GetWeapon(grenade):GetNWInt("numgrenades")+1)
 		elseif (grenade=="weapon_frag") then
-			pl:GiveAmmo("Grenade")
+			pl:GiveAmmo("Grenade",1)
 		end
 	else
 		pl:Give(grenade)
