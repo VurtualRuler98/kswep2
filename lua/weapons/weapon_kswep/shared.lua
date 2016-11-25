@@ -73,6 +73,7 @@ SWEP.ReloadModHeavy=1.20
 SWEP.ScopeName="Default"
 SWEP.Anims={}
 SWEP.AnimsDiscovered={}
+SWEP.Anims.IdleAnim=ACT_VM_DRAW
 SWEP.Anims.ReloadAnim = ACT_VM_RELOAD
 SWEP.Anims.ReloadAnimEmpty = ACT_VM_RELOAD
 SWEP.LoweredOffset = 5
@@ -194,6 +195,7 @@ SWEP.Breathing=false
 SWEP.ZeroVelocity=-1
 SWEP.ScopeZeroVelocity=0
 SWEP.Firemodes={}
+SWEP.GrenadeLauncher=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -349,6 +351,7 @@ end
 function SWEP:FireRocket()
 	if (self:IsRunning() or self:GetNWBool("Raised")==false or self:IsWallBlocked()) then return end
 	if (not self:TryPrimaryAttack() ) then return end
+	if (self:GetNWInt("numgrenades")<1) then return end
 	self.Weapon:EmitSound(self.Primary.Rocketsound)
 	self.Weapon:SendWeaponAnim(self:GetShootAnim())
 	self:SetNWInt("numgrenades",self:GetNWInt("numgrenades")-1)
@@ -366,6 +369,13 @@ function SWEP:FireRocket()
 	if (self.RocketSingleShot) then
 		if (self:GetNWInt("numgrenades")<1) then self:SetNWFloat("DropAfter",CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(self:GetShootAnim()))) end
 		self:NextBolt(CurTime()+self.Primary.Delay,ACT_VM_READY,self.Anims.TossAnim)
+	else
+		if (self:GetNWInt("numgrenades")<1) then
+			self:NextIdle(CurTime()+self.Primary.Delay,self.Anims.IdleAnimEmpty)
+			self:SetNWBool("Chambered",false)
+		else
+			self:NextBolt(CurTime()+self.Primary.Delay,ACT_VM_IDLE,self.Anims.ReloadAnim)
+		end
 	end
 end
 function SWEP:EquipAmmo(ply)
@@ -373,6 +383,7 @@ function SWEP:EquipAmmo(ply)
 		local wep=self:GetClass()
 		if (ply:HasWeapon(wep)) then
 			ply:GetWeapon(wep):SetNWInt("numgrenades",ply:GetWeapon(wep):GetNWInt("numgrenades")+1)
+			ply:GetWeapon(wep):SetNWBool("Chambered",true)
 		end
 	end
 end
@@ -535,9 +546,15 @@ function SWEP:Deploy()
 			net.WriteEntity(self)
 			net.Send(self.Owner)
 		end
-		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
+		local anim=self.Anims.UnstowAnim
+		local anim2=self.Anims.IdleAnim
+		if (self:IsWeaponEmpty()) then
+			anim=self.Anims.UnstowAnimEmpty
+			anim2=self.Anims.IdleAnimEmpty
+		end
+		self.Weapon:SendWeaponAnim(anim)
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
-		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),ACT_VM_IDLE)
+		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
 	end
 	
 	self:ServeNWBool("Raised",true)
@@ -547,7 +564,13 @@ function SWEP:Deploy()
 	end
 	self:ServeNWBool("Lowered",false)
 end
-
+function SWEP:IsWeaponEmpty()
+	if ((not self:GetNWBool("Chambered") and (not self.OpenBolt or self.GrenadeLauncher)) or (self.OpenBolt and self:GetClip1()==0)) then
+		return true
+	else
+		return false
+	end
+end
 function SWEP:Holster(wep)
 	if (CLIENT and self.Owner==LocalPlayer() and self.superlight) then
 			self.superlight:Remove()
@@ -1525,7 +1548,7 @@ function SWEP:Lower(lower)
 	self:SetNWBool("Raised",not lower)
 	local anim=self.Anims.LowerAnim
 	local anim2=ACT_VM_IDLE
-	if ((self.OpenBolt and self:Clip1()<1) or (not self:GetNWBool("Chambered")) and self.EmptyAnims) then	
+	if (self:IsWeaponEmpty() and self.EmptyAnims) then	
 		anim=self.Anims.LowerAnimEmpty
 		anim2=self.Anims.IdleAnimEmpty
 	end
@@ -1538,7 +1561,7 @@ function SWEP:LowerWall(lower)
 	if (not self:GetNWBool("Raised")) then
 		anim2=self.Anims.LowerAnim
 	end
-	if (not self:GetNWBool("Chambered") and self.EmptyAnims) then	
+	if (self:IsWeaponEmpty() and self.EmptyAnims) then	
 		anim=self.Anims.LowerAnimEmpty
 		anim2=self.Anims.IdleAnimEmpty
 		if (not self:GetNWBool("Raised")) then
@@ -1557,7 +1580,7 @@ function SWEP:LowerRun(lower)
 	if (ConVarExists("prone_bindkey_enabled") and self.Owner:IsProne()) then
 		anim=self.Anims.CrawlAnim
 	end
-	if ((self.OpenBolt and self:Clip1()<1) or (not self:GetNWBool("Chambered")) and self.EmptyAnims) then	
+	if (self:IsWeaponEmpty() and self.EmptyAnims) then	
 		anim=self.Anims.RunAnimEmpty
 		anim2=self.Anims.IdleAnimEmpty
 		if (ConVarExists("prone_bindkey_enabled") and self.Owner:IsProne()) then
@@ -2243,7 +2266,7 @@ function SWEP:ToggleAim()
 		if (self.InsAnims) then
 			local anim=self.Anims.IronOutAnim
 			local anim2=ACT_VM_IDLE
-			if (not self:GetNWBool("Chambered") and self.EmptyAnims) then	
+			if (self:IsWeaponEmpty() and self.EmptyAnims) then	
 				anim=self.Anims.IronOutAnimEmpty
 				anim2=self.Anims.IdleAnimEmpty
 			end
