@@ -1415,7 +1415,7 @@ function SWEP:Think()
 		self:Remove()
 	end
 	self:Think2()
-	if (SERVER and not self.DiscoveredAnims) then
+	if ((SERVER or game.SinglePlayer()) and not self.DiscoveredAnims) then
 		self:DiscoverModelAnims()
 		self:DiscoverModelAnimsDone()
 		self.DiscoveredAnims=true
