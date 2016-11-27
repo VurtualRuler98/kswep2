@@ -35,6 +35,7 @@ SWEP.ReticlePixels=512
 function SWEP:Initialize()
 	self:SetColor(Color(0,0,0,0))
 	self:SetHoldType("slam")
+	self:SetNWBool("Zoomed",false)
 	if (CLIENT and self.Owner:IsPlayer() and self.UseInsHands==true) then
 		self.Hands=ClientsideModel(kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 		self.Hands:SetNoDraw(true)
@@ -47,22 +48,22 @@ function SWEP:PrimaryAttack()
 end
 function SWEP:SecondaryAttack()
 	if (not IsFirstTimePredicted()) then return end
-	self.Zoomed=not self.Zoomed
-	if (self.Zoomed) then
+	self:SetNWBool("Zoomed",not self:GetNWBool("Zoomed"))
+	if (self:GetNWBool("Zoomed")) then
 		self:SetHoldType("camera")
 	else
 		self:SetHoldType("slam")
 	end
 end
 function SWEP:TranslateFOV(fov)
-	if (self.Zoomed) then
+	if (self:GetNWBool("Zoomed")) then
 		return fov/self.Magnification
 	else
 		return fov
 	end
 end
 function SWEP:AdjustMouseSensitivity()
-	if (self.Zoomed) then
+	if (self:GetNWBool("Zoomed")) then
 		return 1/self.Magnification
 	else
 		return 1
@@ -81,10 +82,10 @@ function SWEP:PostDrawViewModel()
 	end
 end
 function SWEP:DrawHUD()
-	if (self.Zoomed and self.Overlay~=nil) then
+	if (self:GetNWBool("Zoomed") and self.Overlay~=nil) then
 		DrawMaterialOverlay(self.Overlay,0)
 	end
-	if (self.Zoomed and self.Reticle~=nil) then
+	if (self:GetNWBool("Zoomed") and self.Reticle~=nil) then
 		local aspectratio=(ScrW()/ScrH())/(4/3)
 		local scale=self.ReticlePixels*(ScrW()/(self.Owner:GetFOV()*18))/self.PixelsPerMil
 		scale=scale/aspectratio
@@ -92,7 +93,7 @@ function SWEP:DrawHUD()
 		surface.SetDrawColor(Color(0,0,0,255))
 		surface.DrawTexturedRectUV((ScrW()-scale)/2,(ScrH()-scale)/2,scale,scale,0,0,1,1)
 	end
-	if (self.Zoomed or self.NoViewModel) then
+	if (self:GetNWBool("Zoomed") or self.NoViewModel) then
 		self.Owner:GetViewModel():SetNoDraw(true)
 	else
 		self.Owner:GetViewModel():SetNoDraw(false)
@@ -103,7 +104,7 @@ function SWEP:OnDrop()
 	self:Remove()
 end
 function SWEP:Holster()
-	self.Zoomed=false
+	self:SetNWBool("Zoomed",false)
 	return true
 end
 function SWEP:Think()
@@ -115,7 +116,7 @@ hook.Add("CalcView","KBinocCalcView",function(ply,pos,angles,fov)
 		local view = {}
 		local ang = angles
 		local aimShake=0.05
-		if ((not ConVarExists("prone_bindkey_enabled") and wep.Owner:Crouching()) or wep.Owner:IsProne()) then
+		if ((not ConVarExists("prone_bindkey_enabled") and wep.Owner:Crouching()) or (ConVarExists("prone_bindkey_enabled") and wep.Owner:IsProne())) then
 			if (wep.Tripod) then
 				aimShake=0.01
 			end
