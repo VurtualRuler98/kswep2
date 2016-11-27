@@ -582,7 +582,7 @@ function SWEP:Deploy()
 	self:ServeNWBool("Lowered",false)
 end
 function SWEP:IsWeaponEmpty()
-	if ((not self:GetNWBool("Chambered") and (not self.OpenBolt or self.GrenadeLauncher)) or (self.OpenBolt and self:GetClip1()==0)) then
+	if ((not self:GetNWBool("Chambered") and (not self.OpenBolt or self.GrenadeLauncher)) or (self.OpenBolt and self:Clip1()==0)) then
 		return true
 	else
 		return false
@@ -827,7 +827,7 @@ function SWEP:ReloadMag(force)
 	end
 	self:SetNWBool("Sight",false)
 	local anim=self.Anims.ReloadAnim
-	if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0)) then
+	if (self.EmptyAnims and not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0)) then
 		anim = self.Anims.ReloadAnimEmpty
 	end
 	self.Weapon:SendWeaponAnim(anim)
@@ -1171,7 +1171,7 @@ function SWEP:FinishReloadSingle()
 	local anim = ACT_VM_IDLE
 	if (self.Anims.StartReloadAnim) then
 		anim = self.Anims.MidReloadAnim
-		if (self.Anims.MidReloadAnimEmpty and not self:GetNWBool("Chambered")) then
+		if (self.EmptyAnims and self.Anims.MidReloadAnimEmpty and not self:GetNWBool("Chambered")) then
 			anim=self.Anims.MidReloadAnimEmpty
 			self.DidEmptyReload=true
 		end
