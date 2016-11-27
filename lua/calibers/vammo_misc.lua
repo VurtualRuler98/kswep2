@@ -264,6 +264,23 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	game.AddAmmoType({name="vammo_9x17_FMJ",DMG_BULLET,0,0,80,10,5})
 
 	local tbl = {}
+	tbl.vestpenetration=5
+	tbl.powermin=3
+	tbl.powermax=4
+	tbl.helmetpenetration=0
+	tbl.armordamagemult=1
+	tbl.name = "vammo_38special_FMJ"
+	tbl.printname = ".38 Special FMJ"
+	tbl.caliber = "vammo_38special"
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.damagescale = 1
+	tbl.wallbang = 4
+	tbl.recoil = 1.5
+	tbl.velocity = 1000 --Model 10
+	AddAmmodata(tbl)
+	game.AddAmmoType({name="vammo_38special_FMJ",DMG_BULLET,0,0,80,10,5})
+	local tbl = {}
 	tbl.vestpenetration=15
 	tbl.powermin=3.5
 	tbl.powermax=4.5
