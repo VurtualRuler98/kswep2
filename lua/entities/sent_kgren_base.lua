@@ -18,6 +18,7 @@ ENT.SuperFragClusters=0
 ENT.SuperFragDamage=0
 ENT.SuperFragRadius=0
 ENT.DetonateSound="ins2grenade.Explode"
+ENT.BurnTimer=0
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -51,15 +52,35 @@ function ENT:Initialize()
 	end
 end
 function ENT:Think()
-	if (self:GetNWFloat("Fuze")<CurTime()) then
+	if (self:GetNWFloat("Fuze")>0 and self:GetNWFloat("Fuze")<CurTime()) then
 		self:Detonate()
 	end
+	self:Think2()
+end
+function ENT:Think2()
 end
 function ENT:Detonate()
 	self:EmitSound(self.DetonateSound)
 	self:EffectGrenadeFrag()
 	self:DetBoom()
 	self:DetFrag()
+end
+function ENT:ThinkBurn()
+	if (self.BurnTimer>0) then
+		for k,v in pairs(ents.FindInSphere(self:GetPos(),16)) do
+			if ((v:GetClass()=="prop_physics" or v:IsNPC() or v:IsPlayer() or v:IsVehicle()) and not v:IsOnFire())  then
+				v:Ignite(10)
+			end
+		end
+	end
+	if (SERVER and self.BurnTimer>0 and self.BurnTimer<CurTime()) then
+		self:Remove()
+	end
+end
+function ENT:DetBurn()
+	self:SetNWFloat("Fuze",0)
+	self:Ignite(self.BurnTime)
+	self.BurnTimer=self.BurnTime+CurTime()
 end
 function ENT:EffectGrenadeFrag()
 	local effectdata=EffectData()
