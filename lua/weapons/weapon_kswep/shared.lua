@@ -827,7 +827,7 @@ function SWEP:ReloadMag(force)
 	end
 	self:SetNWBool("Sight",false)
 	local anim=self.Anims.ReloadAnim
-	if (self.EmptyAnims and not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0)) then
+	if (self.EmptyAnims and (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0))) then
 		anim = self.Anims.ReloadAnimEmpty
 	end
 	self.Weapon:SendWeaponAnim(anim)
