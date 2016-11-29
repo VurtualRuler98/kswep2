@@ -2,7 +2,7 @@ include('shared.lua')
 
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
-
+ENT.ThermiteAmmoTimer=0
 function ENT:SpawnFunction(ply, tr)
 	if (not tr.HitWorld) then return end
 
@@ -30,7 +30,7 @@ function ENT:Initialize()
 	end
 end
 function ENT:Use(activator,caller)
-	if ( activator:IsPlayer() )  then
+	if ( activator:IsPlayer() and self.ThermiteAmmoTimer==0 )  then
 		if (self:GetNWBool("IsGrenades")) then
 			local grenade=self:GetNWString("Grenade")
 			if (kswep_kspawnergrenades[grenade]~=nil) then
@@ -51,5 +51,36 @@ function ENT:Use(activator,caller)
 				
 			end
 		end
+	end
+end
+function ENT:Thermite()
+	if (not self:GetNWBool("IsGrenades")) then
+		self:Ignite(100)
+		self.ThermiteAmmoTimer=CurTime()+80
+	else
+		self:Ignite(10)
+		self.ThermiteAmmoTimer=1
+		local grenade=self:GetNWString("Grenade")
+		if (kswep_kspawnergrenades[grenade]~=nil) then
+			local effect=kswep_kspawnergrenades[grenade].effect
+			if (effect==1) then
+				local box=self
+				timer.Simple(math.Rand(1,10),function()
+				local boom=ents.Create("env_explosion")
+				boom:SetPos(self:GetPos())
+				boom:SetKeyValue("iMagnitude",200)
+				boom:Spawn()
+				boom:Activate()
+				boom:Fire("Explode","",0)
+				box:Remove()
+				end)
+			end
+		end
+				
+	end
+end
+function ENT:Think()
+	if (self.ThermiteAmmoTimer>CurTime() and math.random()>0.8) then
+		self:EmitSound("npc_floorturret.shoot")
 	end
 end

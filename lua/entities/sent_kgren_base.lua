@@ -78,6 +78,11 @@ function ENT:ThinkBurn()
 			if ((v:GetClass()=="prop_physics" or v:IsNPC() or v:IsPlayer() or v:IsVehicle()) and not v:IsOnFire())  then
 				v:Ignite(10)
 			end
+			if (v:GetClass()=="sent_vurt_supplybox" or v:GetClass()=="sent_vurt_ammo") then
+				if (SERVER and v.ThermiteAmmoTimer==0) then
+					v:Thermite()
+				end
+			end
 		end
 		end
 		if (CLIENT and self.BurnEffectTimer<CurTime()) then

@@ -99,7 +99,7 @@ function TOOL:SetBoxAmmo(ent)
 		local frag=self:GetClientInfo("grenade_class","weapon_frag")
 		if (kswep_kspawnergrenades[frag]~=nil) then
 			ent:SetNWString("Grenade",frag)
-			ent:SetOverlayText(kswep_kspawnergrenades[frag])
+			ent:SetOverlayText(kswep_kspawnergrenades[frag].name)
 		else
 			ent:SetNWString("Grenade","weapon_frag")
 			ent:SetOverlayText(kswep_kspawnergrenades["weapon_frag"])
@@ -154,8 +154,8 @@ for k,v in pairs(vurtual_ammodata) do
 		list.Set("KSwepSpawnerAmmo",v.printname,{kswep_spawner_type="0", kswep_spawner_ammo_type=k})
 	end
 end
-for k,name in pairs(kswep_kspawnergrenades) do
-	list.Set("KSwepSpawnerAmmo",name,{kswep_spawner_type="1",kswep_spawner_grenade_class=k})
+for k,v in pairs(kswep_kspawnergrenades) do
+	list.Set("KSwepSpawnerAmmo",v.name,{kswep_spawner_type="1",kswep_spawner_grenade_class=k})
 end
 local kspawnerboxmodels = {
 --CSS

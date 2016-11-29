@@ -12,7 +12,7 @@ function ENT:SpawnFunction(ply, tr)
 	ent:Spawn()
 	return ent
 end
-
+ENT.ThermiteAmmoTimer=0
 function ENT:Initialize()
 	if (self.Entity:GetModel()=="models/error.mdl") then
 		self.Entity:SetModel( "models/items/item_item_crate.mdl")
@@ -34,6 +34,22 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 	self.GunList={}
+end
+function ENT:Thermite()
+	if (self:GetNWBool("GiveAmmo")) then
+		self:Ignite(100)
+		self.ThermiteAmmoTimer=CurTime()+80
+	else
+		self:Ignite(10)
+		self.ThermiteAmmoTimer=1
+	end
+	self:SetNWBool("GiveAmmo",false)
+	self:SetNWBool("GiveSuppressors",false)
+	self:SetNWBool("GiveOptics",false)
+	self:SetNWBool("GiveLights",false)
+	self:SetNWBool("GunRack",false)
+	self:SetNWBool("GiveArmor",false)
+	self:SetNWBool("Suitcase",false)
 end
 function ENT:Use(activator,caller)
 	self:UseBox(activator,caller)
@@ -98,6 +114,9 @@ function ENT:UseOpticBox(activator,caller)
 	end
 end
 function ENT:Think()
+	if (self.ThermiteAmmoTimer>CurTime() and math.random()>0.8) then
+		self:EmitSound("npc_floorturret.shoot")
+	end
 end
 function ENT:HasGun(wep)
 	return table.HasValue(self.GunList,wep)

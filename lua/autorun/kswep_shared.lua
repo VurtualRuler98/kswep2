@@ -4,14 +4,15 @@ if (SERVER) then
 
 end
 kswep_kspawnergrenades = {
-	weapon_kgreni2_m67="M67 Frag Grenade",
-	weapon_kgreni2_m68="M68 Impact Grenade",
-	weapon_kgreni2_f1="F1 Grenade",
-	weapon_kgrend_mk2_he="Mk2 HE Grenade",
-	weapon_kgrend_model24="Model 24 hand grenade",
-	weapon_kswepi2_m136="M136 AT4",
-	weapon_kswepi2_rpg7="RPG-7",
-	weapon_frag="HL2 Grenade"
+	weapon_kgreni2_m67={name="M67 Frag Grenade",effect=1},
+	weapon_kgreni2_m68={name="M68 Impact Grenade",effect=1},
+	weapon_kgreni2_f1={name="F1 Grenade",effect=1},
+	weapon_kgrend_mk2_he={name="Mk2 HE Grenade",effect=1},
+	weapon_kgrend_model24={name="Model 24 hand grenade",effect=1},
+	weapon_kswepi2_m136={name="M136 AT4",effect=1},
+	weapon_kswepi2_rpg7={name="RPG-7",effect=1},
+	weapon_kgreni2_anm14={name="AN-M14 Incendiary Grenade",effect=2},
+	weapon_frag={name="HL2 Grenade",effect=1}
 }
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
