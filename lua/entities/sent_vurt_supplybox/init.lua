@@ -36,6 +36,7 @@ function ENT:Initialize()
 	self.GunList={}
 end
 function ENT:Thermite()
+	if (self.ThermiteAmmoTimer>0) then return end
 	if (self:GetNWBool("GiveAmmo")) then
 		self:Ignite(100)
 		self.ThermiteAmmoTimer=CurTime()+80

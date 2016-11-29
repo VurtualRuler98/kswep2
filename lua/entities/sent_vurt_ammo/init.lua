@@ -54,6 +54,8 @@ function ENT:Use(activator,caller)
 	end
 end
 function ENT:Thermite()
+	if (self.ThermiteAmmoTimer>0) then return end
+	self:SetOverlayText("")
 	if (not self:GetNWBool("IsGrenades")) then
 		self:Ignite(100)
 		self.ThermiteAmmoTimer=CurTime()+80
