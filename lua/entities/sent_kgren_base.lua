@@ -23,6 +23,7 @@ ENT.BurnEffectDelay=0.05
 ENT.Detonated=false
 ENT.BurnEffectTimer=0
 ENT.IsRemoved=false
+ENT.MolotovFlames=10
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -109,6 +110,20 @@ function ENT:DetBurn()
 	self:SetNWFloat("Fuze",0)
 	self.BurnTimer=self.BurnTime+CurTime()
 	self:EmitSound(self.BurnSound)
+end
+function ENT:DetMolotov()
+	if (SERVER) then
+		for i=1,self.MolotovFlames do
+			local flame=ents.Create("sent_ksweps_molotovflame")
+			flame:SetPos(self:GetPos()+Vector(0,0,2))
+			flame:SetOwner(self.Owner)
+			flame:Spawn()
+			local phys=flame:GetPhysicsObject()
+			if (IsValid(phys)) then
+				phys:ApplyForceCenter(self:GetVelocity()+Vector(math.Rand(-100,100),math.Rand(-100,100),math.Rand(0,100)))
+			end
+		end
+	end
 end
 function ENT:EffectGrenadeFrag()
 	local effectdata=EffectData()
