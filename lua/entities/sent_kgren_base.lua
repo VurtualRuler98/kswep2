@@ -88,8 +88,10 @@ function ENT:ThinkBurn()
 		if (CLIENT and self.BurnEffectTimer<CurTime()) then
 			local effectdata=EffectData()
 			effectdata:SetOrigin(self:GetPos())
-			util.Effect("cball_explode",effectdata,true,true)
-			util.Effect("kswep_thermite",effectdata,true,true)
+			if (IsFirstTimePredicted()) then
+				util.Effect("cball_explode",effectdata,true,true)
+				util.Effect("kswep_thermite",effectdata,true,true)
+			end
 			self.BurnEffectTimer=CurTime()+self.BurnEffectDelay
 		end
 	end
@@ -111,14 +113,18 @@ function ENT:EffectGrenadeFrag()
 	local effectdata=EffectData()
 	effectdata:SetOrigin(self:GetPos())
 	effectdata:SetScale(1000)
-	util.Effect("cball_bounce",effectdata)
-	util.Effect("ThumperDust",effectdata)
+	if (IsFirstTimePredicted()) then
+		util.Effect("cball_bounce",effectdata)
+		util.Effect("ThumperDust",effectdata)
+	end
 end
 function ENT:EffectRocketBoom()
 	local effectdata=EffectData()
 	effectdata:SetOrigin(self:GetPos())
 	effectdata:SetScale(1000)
-	util.Effect("HelicopterMegaBomb",effectdata)
+	if (IsFirstTimePredicted()) then
+		util.Effect("HelicopterMegaBomb",effectdata)
+	end
 end
 function ENT:DetBoom()
 	if (CLIENT) then return end
