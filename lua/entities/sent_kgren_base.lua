@@ -72,6 +72,25 @@ function ENT:Detonate()
 	self:DetBoom()
 	self:DetFrag()
 end
+function ENT:ThinkSmoke()
+	if (self.BurnTimer>0) then
+		if (CLIENT and self.BurnEffectTimer<CurTime()) then
+		local effectdata=EffectData()
+		effectdata:SetOrigin(self:GetPos())
+		effectdata:SetStart(self.SmokeColor)
+		util.Effect("kswep_smoke",effectdata,true,true)
+		self.BurnEffectTimer=CurTime()+self.BurnEffectDelay
+		end
+		if (self.BurnTimer<CurTime() and not self.IsRemoved) then
+			self:StopSound(self.BurnSound)
+			self:EmitSound(self.BurnEndSound)
+			self.IsRemoved=true
+			if (SERVER) then
+				self:Remove()
+			end
+		end
+	end
+end
 function ENT:ThinkBurn()
 	if (self.BurnTimer>0) then
 		if (SERVER) then
@@ -105,6 +124,11 @@ function ENT:ThinkBurn()
 			self:Remove()
 		end
 	end
+end
+function ENT:DetSmoke()
+	self:SetNWFloat("Fuze",0)
+	self.BurnTimer=self.BurnTime+CurTime()
+	self:EmitSound(self.BurnSound)
 end
 function ENT:DetBurn()
 	self:SetNWFloat("Fuze",0)
