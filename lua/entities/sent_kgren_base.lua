@@ -121,6 +121,7 @@ function ENT:EffectRocketBoom()
 	util.Effect("HelicopterMegaBomb",effectdata)
 end
 function ENT:DetBoom()
+	if (CLIENT) then return end
 	local boom=ents.Create("env_explosion")
 	boom:SetOwner(self)
 	boom:SetPos(self:GetPos())
@@ -145,6 +146,7 @@ function ENT:DetFrag()
 		Spread=Vector(10,10,10),
 		Num=self.FragClusterSize
 	}
+	if (SERVER) then
 	timer.Simple(0.1,function()
 		self:Remove()
 		if (self.FragClusters>0) then
@@ -160,4 +162,5 @@ function ENT:DetFrag()
 			end
 		end
 	end)
+	end
 end
