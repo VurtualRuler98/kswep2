@@ -88,7 +88,10 @@ function ENT:ThinkBurn()
 		if (CLIENT and self.BurnEffectTimer<CurTime()) then
 			local effectdata=EffectData()
 			effectdata:SetOrigin(self:GetPos())
-			util.Effect("cball_explode",effectdata,true,true)
+			effectdata:SetMagnitude(3)
+			effectdata:SetScale(1)
+			effectdata:SetRadius(64)
+			util.Effect("ElectricSpark",effectdata,true,true)
 			util.Effect("kswep_thermite",effectdata,true,true)
 			self.BurnEffectTimer=CurTime()+self.BurnEffectDelay
 		end
