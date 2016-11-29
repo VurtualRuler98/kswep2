@@ -1163,9 +1163,15 @@ function SWEP:FinishReloadSingle()
 	return
 	end
 	if (SERVER) then
-		local mag=table.GetLastValue(self.Magazines)
-		table.insert(self.MagTable,mag)
-		table.remove(self.Magazines)
+		local mag=self.Magazines[1]
+		if (mag.num>1) then
+			local round={caliber=mag.caliber,num=1,max=1}
+			table.insert(self.MagTable,round)
+			self.Magazines[1].num=self.Magazines[1].num-1
+		else
+			table.insert(self.MagTable,mag)
+			table.remove(self.Magazines,1)
+		end
 		self:SetNWInt("MagRounds",#self.MagTable)
 	end
 	local anim = ACT_VM_IDLE

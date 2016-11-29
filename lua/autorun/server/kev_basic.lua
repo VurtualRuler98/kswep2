@@ -138,13 +138,13 @@ function RearmMags(len,pl)
 				local tbl=pl.KPrimaryMags
 				local magsize=wep.MagSize
 				local magtype=wep.MagType
-				if (wep.SingleReload) then
+				if (wep.SingleReload and not wep.SingleClips) then
 					magsize=1
 					magtype=wep.Caliber
 					magcount=magcount+wep.MagSize
-					if (not wep.OpenBolt) then
-						magcount=magcount+1
-					end
+				end
+				if (wep.SingleClips) then
+					magsize=wep.ReloadClipSize
 				end
 				
 				if (wep.IsSecondaryWeapon) then
