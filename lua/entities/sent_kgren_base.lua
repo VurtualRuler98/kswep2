@@ -19,6 +19,10 @@ ENT.SuperFragDamage=0
 ENT.SuperFragRadius=0
 ENT.DetonateSound="ins2grenade.Explode"
 ENT.BurnTimer=0
+ENT.BurnEffectDelay=0.05
+ENT.Detonated=false
+ENT.BurnEffectTimer=0
+ENT.IsRemoved=false
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -51,8 +55,10 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 end
+end
 function ENT:Think()
-	if (self:GetNWFloat("Fuze")>0 and self:GetNWFloat("Fuze")<CurTime()) then
+	if (not self.Detonated and self:GetNWFloat("Fuze")>0 and self:GetNWFloat("Fuze")<CurTime()) then
+		self.Detonated=true
 		self:Detonate()
 	end
 	self:Think2()
@@ -67,20 +73,34 @@ function ENT:Detonate()
 end
 function ENT:ThinkBurn()
 	if (self.BurnTimer>0) then
+		if (SERVER) then
 		for k,v in pairs(ents.FindInSphere(self:GetPos(),16)) do
 			if ((v:GetClass()=="prop_physics" or v:IsNPC() or v:IsPlayer() or v:IsVehicle()) and not v:IsOnFire())  then
 				v:Ignite(10)
 			end
 		end
+		end
+		if (CLIENT and self.BurnEffectTimer<CurTime()) then
+			local effectdata=EffectData()
+			effectdata:SetOrigin(self:GetPos())
+			util.Effect("cball_explode",effectdata,true,true)
+			util.Effect("kswep_thermite",effectdata,true,true)
+			self.BurnEffectTimer=CurTime()+self.BurnEffectDelay
+		end
 	end
-	if (SERVER and self.BurnTimer>0 and self.BurnTimer<CurTime()) then
-		self:Remove()
+	if (self.BurnTimer>0 and self.BurnTimer<CurTime() and not self.IsRemoved) then
+		self:StopSound(self.BurnSound)
+		self:EmitSound(self.BurnEndSound)
+		self.IsRemoved=true
+		if (SERVER) then
+			self:Remove()
+		end
 	end
 end
 function ENT:DetBurn()
 	self:SetNWFloat("Fuze",0)
-	self:Ignite(self.BurnTime)
 	self.BurnTimer=self.BurnTime+CurTime()
+	self:EmitSound(self.BurnSound)
 end
 function ENT:EffectGrenadeFrag()
 	local effectdata=EffectData()
@@ -135,5 +155,4 @@ function ENT:DetFrag()
 			end
 		end
 	end)
-end
 end
