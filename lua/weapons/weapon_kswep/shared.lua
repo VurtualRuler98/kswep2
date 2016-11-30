@@ -76,6 +76,7 @@ SWEP.AnimsDiscovered={}
 SWEP.Anims.IdleAnim=ACT_VM_IDLE
 SWEP.Anims.ReloadAnim = ACT_VM_RELOAD
 SWEP.Anims.ReloadAnimEmpty = ACT_VM_RELOAD
+SWEP.Anims.DryfireAnim = ACT_VM_DRYFIRE
 SWEP.LoweredOffset = 5
 SWEP.DrawOnce=true
 SWEP.InsAnims=false
@@ -1226,6 +1227,7 @@ function SWEP:TryPrimaryAttack()
 		if (self:GetNWBool("FiringPin")==true or self.DoubleAction) then
 			if (not self.HoldOpen) then
 	                	self:EmitSound(self.Primary.SoundEmpty )
+				self:SendWeaponAnim(self.Anims.DryfireAnim)
 			end
 			self:SetNWBool("FiringPin",false)
 		end
