@@ -69,10 +69,12 @@ end
 function ENT:Think2()
 end
 function ENT:Detonate()
+	if (IsFirstTimePredicted()) then
 	self:EmitSound(self.DetonateSound)
 	self:EffectGrenadeFrag()
 	self:DetBoom()
 	self:DetFrag()
+	end
 end
 function ENT:ThinkSmokeCS()
 	if (self.BurnTimer>0) then
@@ -207,7 +209,7 @@ function ENT:DetBoom()
 	local boom=ents.Create("env_explosion")
 	boom:SetOwner(self)
 	boom:SetPos(self:GetPos())
-	boom:SetKeyValue("Spawnflags","60")
+	boom:SetKeyValue("Spawnflags","894")
 	boom:SetKeyValue("iMagnitude",self.DetFragMagnitude)
 	boom:SetKeyValue("iRadiusOverride",self.DetFragRadius)
 	boom:Spawn()
