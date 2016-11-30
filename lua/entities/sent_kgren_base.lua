@@ -60,7 +60,7 @@ function ENT:Initialize()
 end
 end
 function ENT:Think()
-	if (IsFirstTimePredicted() and not self.Detonated and self:GetNWFloat("Fuze")>0 and self:GetNWFloat("Fuze")<CurTime()) then
+	if (not self.Detonated and self:GetNWFloat("Fuze")>0 and self:GetNWFloat("Fuze")<CurTime()) then
 		self.Detonated=true
 		self:Detonate()
 	end
@@ -69,6 +69,7 @@ end
 function ENT:Think2()
 end
 function ENT:Detonate()
+	if (not IsFirstTimePredicted()) then return end
 	self:EmitSound(self.DetonateSound)
 	self:EffectGrenadeFrag()
 	self:DetBoom()
