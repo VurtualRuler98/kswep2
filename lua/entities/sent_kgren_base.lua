@@ -132,12 +132,26 @@ function ENT:ThinkSmoke()
 		end
 	end
 end
+function ENT:DetConstraints() --basically what siminov stuff does
+	for k,v in pairs(ents.FindInSphere(self:GetPos(),self.DeconstraintRadius)) do
+		if (IsValid(v:GetPhysicsObject()) and constraint.HasConstraints(v)) then
+			for k,v in pairs(constraint.GetTable(v)) do
+				if (v.forcelimit and v.forcelimit>0) then v.Constraint:Remove() end
+			end
+		end
+	end
+end
 function ENT:ThinkBurn()
 	if (self.BurnTimer>0) then
 		if (SERVER) then
 		for k,v in pairs(ents.FindInSphere(self:GetPos(),16)) do
 			if ((v:GetClass()=="prop_physics" or v:IsNPC() or v:IsPlayer() or v:IsVehicle()) and not v:IsOnFire())  then
 				v:Ignite(10)
+			end
+			if (IsValid(v:GetPhysicsObject()) and constraint.HasConstraints(v)) then
+				for k,v in pairs(constraint.GetTable(v)) do
+					if (v.forcelimit and v.forcelimit>0) then v.Constraint:Remove() end
+				end
 			end
 			if (v:GetClass()=="sent_vurt_supplybox" or v:GetClass()=="sent_vurt_ammo") then
 				if (SERVER and v.ThermiteAmmoTimer==0) then
