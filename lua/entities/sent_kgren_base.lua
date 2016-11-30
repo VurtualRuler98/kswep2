@@ -24,6 +24,8 @@ ENT.Detonated=false
 ENT.BurnEffectTimer=0
 ENT.IsRemoved=false
 ENT.MolotovFlames=10
+ENT.CSGasTimer=0
+ENT.CSGasEffectDelay=0.3
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -72,12 +74,50 @@ function ENT:Detonate()
 	self:DetBoom()
 	self:DetFrag()
 end
+function ENT:ThinkSmokeCS()
+	if (self.BurnTimer>0) then
+		if (CLIENT and self.BurnEffectTimer<CurTime()) then
+		local effectdata=EffectData()
+		effectdata:SetOrigin(self:GetPos())
+		effectdata:SetStart(self:GetNWVector("SmokeColor"))
+		effectdata:SetAngles(self:GetAngles())
+		util.Effect("kswep_csgas",effectdata,true,true)
+		self.BurnEffectTimer=CurTime()+self.BurnEffectDelay
+		end
+		if (SERVER and self.CSGasTimer<CurTime()) then
+			local dmginfo=DamageInfo()
+			dmginfo:SetDamage(1)
+			dmginfo:SetDamageType(DMG_ACID)
+			dmginfo:SetAttacker(self.Owner)
+			for k,v in pairs(ents.FindInSphere(self:GetPos(),256)) do
+				if (v:IsPlayer() and not v.KswepGasMask) then
+					v:TakeDamageInfo(dmginfo)
+				elseif (v:IsNPC()) then
+					local c=v:GetClass()
+					if (c=="npc_citizen" or c=="npc_kleiner" or c=="npc_eli" or c=="npc_mossman" or c=="npc_magnusson") then
+						v:TakeDamageInfo(dmginfo)
+					end
+				end
+			end
+			self.CSGasTimer=CurTime()+self.CSGasEffectDelay
+		end
+		if (self.BurnTimer<CurTime() and not self.IsRemoved) then
+			self:StopSound(self.BurnSound)
+			self:EmitSound(self.BurnEndSound)
+			self.IsRemoved=true
+			if (SERVER) then
+				self:Remove()
+			end
+		end
+	end
+end
 function ENT:ThinkSmoke()
 	if (self.BurnTimer>0) then
 		if (CLIENT and self.BurnEffectTimer<CurTime()) then
 		local effectdata=EffectData()
 		effectdata:SetOrigin(self:GetPos())
-		effectdata:SetStart(self.SmokeColor)
+		effectdata:SetStart(self:GetNWVector("SmokeColor"))
+		effectdata:SetAngles(self:GetAngles())
 		util.Effect("kswep_smoke",effectdata,true,true)
 		self.BurnEffectTimer=CurTime()+self.BurnEffectDelay
 		end

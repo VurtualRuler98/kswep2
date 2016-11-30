@@ -12,6 +12,12 @@ kswep_kspawnergrenades = {
 	weapon_kswepi2_m136={name="M136 AT4",effect=1},
 	weapon_kswepi2_rpg7={name="RPG-7",effect=1},
 	weapon_kgreni2_anm14={name="AN-M14 Incendiary Grenade",effect=2},
+	weapon_kgreni2_m83={name="M83 Smoke Grenade",effect=0},
+	weapon_kgreni2_m18_red={name="M18 Red Smoke Grenade",effect=0},
+	weapon_kgreni2_m18_green={name="M18 Green Smoke Grenade",effect=0},
+	weapon_kgreni2_m18_yellow={name="M18 Yellow Smoke Grenade",effect=0},
+	weapon_kgreni2_m18_violet={name="M18 Violet Smoke Grenade",effect=0},
+	weapon_kgreni2_m7a2={name="M7A2 CS Grenade",effect=0},
 	weapon_kgreni2_molotov={name="Molotov",effect=0},
 	weapon_frag={name="HL2 Grenade",effect=1}
 }

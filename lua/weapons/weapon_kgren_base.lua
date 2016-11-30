@@ -187,6 +187,8 @@ function SWEP:Think()
 		self:SetNWFloat("NextIdle",0)
 	end
 end
+function SWEP:RunGrenadeCode(grenade)
+end
 function SWEP:ThrowGrenade(force)
 		if (SERVER) then
 		local grenade = ents.Create(self.GrenadeEntity)
@@ -201,6 +203,7 @@ function SWEP:ThrowGrenade(force)
 		grenade:SetOwner(self.Owner)
 		grenade:SetNWFloat("Fuze",self:GetNWFloat("Fuze"))
 		grenade:SetNWFloat("ImpactFuze",self:GetNWFloat("ImpactFuze"))
+		self:RunGrenadeCode(grenade)
 		local phys=grenade:GetPhysicsObject()
 		if (IsValid(phys) ) then
 			phys:ApplyForceCenter((self.Owner:GetAimVector()*force)+self.Owner:GetVelocity())
