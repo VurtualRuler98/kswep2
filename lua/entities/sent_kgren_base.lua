@@ -60,7 +60,7 @@ function ENT:Initialize()
 end
 end
 function ENT:Think()
-	if (not self.Detonated and self:GetNWFloat("Fuze")>0 and self:GetNWFloat("Fuze")<CurTime()) then
+	if (IsFirstTimePredicted() and not self.Detonated and self:GetNWFloat("Fuze")>0 and self:GetNWFloat("Fuze")<CurTime()) then
 		self.Detonated=true
 		self:Detonate()
 	end
@@ -69,12 +69,10 @@ end
 function ENT:Think2()
 end
 function ENT:Detonate()
-	if (IsFirstTimePredicted()) then
 	self:EmitSound(self.DetonateSound)
 	self:EffectGrenadeFrag()
 	self:DetBoom()
 	self:DetFrag()
-	end
 end
 function ENT:ThinkSmokeCS()
 	if (self.BurnTimer>0) then
@@ -166,6 +164,13 @@ function ENT:ThinkBurn()
 			self:Remove()
 		end
 	end
+end
+function ENT:DetSmokeFOG()
+	local effectdata=EffectData()
+	effectdata:SetOrigin(self:GetPos())
+	effectdata:SetStart(self:GetNWVector("SmokeColor"))
+	effectdata:SetAngles(self:GetAngles())
+	util.Effect("kswep_smokefog",effectdata,true,true)
 end
 function ENT:DetSmoke()
 	self:SetNWFloat("Fuze",0)
