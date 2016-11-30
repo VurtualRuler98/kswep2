@@ -49,10 +49,14 @@ function ENT:Detonate()
 		flame:SetKeyValue("damagescale","2")
 		flame:Spawn()
 		flame:Activate()
+		if (IsValid(self.Stickto) and (self.Stickto:IsNPC() or self.Stickto:IsPlayer() or self.Stickto:IsVehicle() or self.Stickto:GetClass()=="prop_physics")) then
+			flame:SetParent(self.Stickto)
+		end
 		flame:Fire("StartFire","",0)
 		self:Remove()
 	end
 end
 function ENT:PhysicsCollide(data,phys)
 	self.Igniting=true
+	self.Stickto=data.HitObject:GetEntity()
 end
