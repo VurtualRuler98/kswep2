@@ -2059,6 +2059,9 @@ function SWEP:FlyBulletStart(bullet)
 	local zero=self.Zero
 	if (zero==0) then
 		zero=self.BattlesightZero
+		if (self.BattlesightZero==0) then
+			zero=1
+		end
 	end
 	if (zero==-1337) then
 		local tr
