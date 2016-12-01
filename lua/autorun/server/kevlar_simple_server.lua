@@ -46,7 +46,7 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 			armor=ply.ksarmor.head
 		end
 	end
-	if (ent:IsNPC()) then
+	if (ent:IsNPC() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
 		armor=KSGetArmorNPC(ent,hitgroup)
 	end
 	if (armor~=-1) then
@@ -114,6 +114,10 @@ function KSGetArmorNPC(npc,hitgroup)
 		elseif (hitgroup==HITGROUP_HEAD) then
 			return 0
 		end
+	elseif (class=="npc_antlion") then
+		return KSWEP_ARMOR_IIA
+	elseif (class=="npc_antlionguard") then
+		return KSWEP_ARMOR_III
 	end
 	return -1
 end
