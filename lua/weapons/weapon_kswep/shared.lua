@@ -946,7 +946,7 @@ function SWEP:DrawHUD()
 	if (zero==0) then
 		zero=self.BattlesightZero
 	end
-	if (self.AltIrons and self.AltIronsZero) then
+	if (self.AltIrons and self.AltIronsZero and self:GetNWBool("AltIrons")) then
 		zero=self.AltIronsZero
 	end
 	local zerostring=zero.."m"
@@ -1649,7 +1649,7 @@ function SWEP:PostDrawViewModel()
 	local oldW, oldH = ScrW(),ScrH()
 	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
 	render.PushRenderTarget(self.RenderTarget)
-	if ((self.AltIrons and self:GetNWBool("AltIrons")) or not self:GetNWBool("Sight")) then
+	if ((self.AltIrons and self:GetNWBool("AltIrons") and not self.AltIronRTScope) or (self.AltIrons and not self:GetNWBool("AltIrons") and self.AltIronRTScope) or not self:GetNWBool("Sight")) then
 		render.Clear(0,0,0,255)
 	else
 	local texperture=0
@@ -2067,7 +2067,7 @@ function SWEP:FlyBulletStart(bullet)
 			zero=1
 		end
 	end
-	if (self.AltIrons and self.AltIronsZero) then
+	if (self.AltIrons and self.AltIronsZero and self:GetNWBool("AltIrons")) then
 		zero=self.AltIronsZero
 	end
 	if (zero==-1337) then
