@@ -1294,7 +1294,13 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (wep.ScopeFOV>wep.ScopeFOVMax) then wep.ScopeFOV=wep.ScopeFOVMax end
 				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
 					wep.Zero=wep.Zero-wep.ZeroStep
-					if (wep.Zero<wep.MinZero) then wep.Zero=wep.MinZero end
+					if (wep.Zero<wep.MinZero) then
+						if (wep.DefaultZero==0) then
+							wep.Zero=0
+						else
+							wep.Zero=wep.MinZero
+						end
+					end
 					net.Start("kswep_zero")
 					net.WriteEntity(wep)
 					net.WriteInt(wep.Zero,16)
