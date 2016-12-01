@@ -23,6 +23,7 @@ kswep_kspawnergrenades = {
 }
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
+	game.AddAmmoType({name=tbl.name,dmgtype=DMG_BULLET,force=10})
 end
 function AddKswepHands(tbl)
 	kswep_hands[tbl.name]=table.Copy(tbl)

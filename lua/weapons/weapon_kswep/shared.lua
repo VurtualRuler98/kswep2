@@ -443,7 +443,7 @@ function SWEP:NormalFire()
 	else
 		self:SetNWBool("Chambered",false)
 	end
-	self:ShootBullet(self.Primary.Damage*ammo.damagescale, ammo.projectiles, ammo.spreadscale*(self.Primary.Spread+spreadsup),ammo.name)
+	self:ShootBullet(ammo.dmgbase, ammo.projectiles, ammo.spreadscale*(self.Primary.Spread+spreadsup),ammo.name)
 	local anim=ACT_VM_IDLE
 	local animbolt = self.Anims.BoltAnim
 	if (self:GetNWBool("Sight")) then
@@ -612,13 +612,6 @@ function SWEP:Holster(wep)
 		return true
 	else
 		local holsterpenalty=0
-		if (self.Owner.ksarmor) then
-			if (self.Owner.ksarmor==2) then
-				holsterpenalty=0.4
-			elseif (self.Owner.ksarmor==1) then
-				holsterpenalty=0.2
-			end
-		end
 		if (IsValid(wep)) then
 			self.Holstering=wep
 		else
@@ -819,13 +812,6 @@ function SWEP:ReloadMag(force)
 	self:SetNWBool("Lowered",false)
 	self:SetNWFloat("NextIdle",0)
 	local reloadspeed=self.ReloadModLight
-	if (self.Owner.ksarmor) then
-		if (self.Owner.ksarmor==2) then
-			reloadspeed=self.ReloadModHeavy
-		elseif (self.Owner.ksarmor==1) then
-			reloadspeed=self.ReloadModMedium
-		end
-	end
 	self:SetNWBool("Sight",false)
 	local anim=self.Anims.ReloadAnim
 	if (self.EmptyAnims and (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0))) then
@@ -939,13 +925,6 @@ function SWEP:ReloadTube()
 	if (#self.MagTable>=self.Primary.ClipSize) then return end
 	self:SetNWBool("Lowered",false)
 	local reloadspeed=self.ReloadModLight
-	if (self.Owner.ksarmor) then
-		if (self.Owner.ksarmor==2) then
-			reloadspeed=self.ReloadModHeavy
-		elseif (self.Owner.ksarmor==1) then
-			reloadspeed=self.ReloadModMedium
-		end
-	end
 	self:SetNWBool("Sight",false)
 	if (self.Anims.StartReloadAnim) then
 		reloadspeed=1

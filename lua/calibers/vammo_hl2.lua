@@ -6,24 +6,22 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 
 
 	local tbl = {}
-	tbl.name="smg1"
-	tbl.vestpenetration=25
-	tbl.powermin=1
-	tbl.powermax=2
-	tbl.helmetpenetration=1
-	tbl.armordamagemult=1
+	tbl.name="SMG1"
+	tbl.vestpenetration=KSWEP_ARMOR_III
+	tbl.dmgbase=4
+	tbl.dmgvitalmin=2
+	tbl.dmgvitalmax=3
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.velocity = 2200 --DM31
 	AddAmmodata(tbl)
 
 	local tbl = {}
-	tbl.name="pistol"
-	tbl.vestpenetration=20
-	tbl.powermin=2
-	tbl.powermax=3
-	tbl.helmetpenetration=0
-	tbl.armordamagemult=1
+	tbl.name="Pistol"
+	tbl.vestpenetration=KSWEP_ARMOR_II
+	tbl.dmgbase=5
+	tbl.dmgvitalmin=3
+	tbl.dmgvitalmax=4
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -31,25 +29,23 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	AddAmmodata(tbl)
 
 	local tbl = {}
-	tbl.name="shotgun"
+	tbl.name="Buckshot"
 	tbl.vestpenetration=0
-	tbl.powermin=4
-	tbl.powermax=5
-	tbl.helmetpenetration=0
-	tbl.armordamagemult=1
-	tbl.projectiles = 1
+	tbl.dmgbase=8
+	tbl.dmgvitalmin=2
+	tbl.dmgvitalmax=4
+	tbl.projectiles = 7
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.velocity = 1200 --00buck
 	AddAmmodata(tbl)
 
 	local tbl = {}
-	tbl.name="ar2"
-	tbl.vestpenetration=25
-	tbl.powermin=8
-	tbl.powermax=8
-	tbl.helmetpenetration=1
-	tbl.armordamagemult=1
+	tbl.name="AR2"
+	tbl.vestpenetration=KSWEP_ARMOR_CRISAT
+	tbl.dmgbase=8
+	tbl.dmgvitalmin=4
+	tbl.dmgvitalmax=4
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -58,15 +54,14 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 
 	local tbl = {}
 	tbl.name="357"
-	tbl.vestpenetration=15
-	tbl.powermin=1
-	tbl.powermax=1
-	tbl.helmetpenetration=0
-	tbl.armordamagemult=0.1
+	tbl.vestpenetration=KSWEP_ARMOR_II
+	tbl.dmgbase=8
+	tbl.dmgvitalmin=3
+	tbl.dmgvitalmax=4
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
-	tbl.velocity = 1395 --NIJ II test round
+	tbl.velocity = 1395 --ARMOR II test round
 	AddAmmodata(tbl)
 
 
