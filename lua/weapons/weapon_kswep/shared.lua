@@ -2087,6 +2087,8 @@ function SWEP:FlyBulletStart(bullet)
 	shot.bullet=bullet
 	shot.dist = nil
 	shot.time = CurTime()
+	shot.crack=-1
+	shot.crackpos=shot.pos
 	shot.gravity=0
 	table.insert(self.Bullets,shot)
 end
@@ -2126,7 +2128,17 @@ function SWEP:FlyBullet(shot)
 			if (shot.dist~=nil) then
 			return self:FlyBullet(shot)
 			else
-			sound.Play("Bullets.DefaultNearMiss",shot.pos)
+			if (CLIENT and shot.speed>1125) then
+				local cr=EyePos():Distance(shot.pos)
+				if ((cr<shot.crack or shot.crack==-1) and self.Owner:GetPos():Distance(shot.pos)<self.Owner:GetPos():Distance(EyePos()))then
+					shot.crack=cr
+					shot.crackpos=shot.pos
+				elseif (shot.crack>0) then
+					print(shot.crack)
+					shot.crack=0
+					sound.Play("kswep.supersonic",shot.crackpos)
+				end
+			end
 			return shot
 			end
 		else
