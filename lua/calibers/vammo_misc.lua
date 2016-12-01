@@ -183,7 +183,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 
 
 	local tbl = {}
-	tbl.vestpenetration=KSWEP_NIJ_III
+	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=15
 	tbl.dmgvitalmin=6
 	tbl.dmgvitalmax=8
@@ -232,7 +232,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 
 
 	local tbl = {}
-	tbl.vestpenetration=KSWEP_NIJ_II --VERIFY
+	tbl.vestpenetration=KSWEP_ARMOR_II --VERIFY
 	tbl.dmgbase=4
 	tbl.powermin=5
 	tbl.powermax=8

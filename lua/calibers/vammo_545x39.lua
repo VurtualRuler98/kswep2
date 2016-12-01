@@ -3,7 +3,7 @@ if (SERVER) then
 end
 hook.Add("VurtualAmmotypes","vammo_545x39", function()
 	local tbl = {}
-	tbl.vestpenetration=KSWEP_NIJ_III
+	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=10
 	tbl.powermin=5
 	tbl.powermax=8

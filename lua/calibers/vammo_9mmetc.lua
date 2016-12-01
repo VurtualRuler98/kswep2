@@ -30,7 +30,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	AddAmmodata(tbl)
 	
 	local tbl = {}
-	tbl.vestpenetration=KSWEP_NIJ_IIA
+	tbl.vestpenetration=KSWEP_ARMOR_IIA
 	tbl.dmgbase = 4
 	tbl.dmgvitalmin = 5
 	tbl.dmgvitalmax = 8
@@ -44,7 +44,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.velocity = 1030 --makarov
 	AddAmmodata(tbl)
 	local tbl = {}
-	tbl.vestpenetration=KSWEP_NIJ_IIA
+	tbl.vestpenetration=KSWEP_ARMOR_IIA
 	tbl.dmgbase = 4
 	tbl.dmgvitalmax = 7
 	tbl.dmgvitalmin = 5
@@ -59,7 +59,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	AddAmmodata(tbl)
 
 	local tbl = {}
-	tbl.vestpenetration=KSWEP_NIJ_IIA
+	tbl.vestpenetration=KSWEP_ARMOR_IIA
 	tbl.dmgbase = 4
 	tbl.dmgvitalmin = 4
 	tbl.dmgvitalmax = 7
