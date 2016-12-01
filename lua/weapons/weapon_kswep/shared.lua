@@ -2262,11 +2262,11 @@ function SWEP:GetShootAnim()
 	local anim=self.Anims.ShootAnim
 	if (self.InsAnims and self:GetNWBool("Sight")) then
 		anim=self.Anims.IronShootAnim
-		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==1)) then
+		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0)) then
 		anim=self.Anims.ShootLastIronAnim
 		end
 	else
-		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==1)) then
+		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0)) then
 		anim=self.Anims.ShootLastAnim
 		end
 	end
