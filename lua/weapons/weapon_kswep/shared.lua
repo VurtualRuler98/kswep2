@@ -2134,7 +2134,6 @@ function SWEP:FlyBullet(shot)
 					shot.crack=cr
 					shot.crackpos=shot.pos
 				elseif (shot.crack>0) then
-					print(shot.crack)
 					shot.crack=0
 					sound.Play("kswep.supersonic",shot.crackpos)
 				end
