@@ -647,6 +647,7 @@ function SWEP:InsOptic(name)
 	self.IronOffsetPos=scopedata.IronPos
 	self.IronOffsetAng=scopedata.IronAng
 	self.AltIrons = scopedata.altirons
+	self.AltIronsZero = scopedata.altironzero
 	self.RTNV=scopedata.nv
 	self.ScopeZeroVelocity=scopedata.zerovel
 	if (scopedata.altirons) then
@@ -944,6 +945,9 @@ function SWEP:DrawHUD()
 	local zero=self.Zero
 	if (zero==0) then
 		zero=self.BattlesightZero
+	end
+	if (self.AltIrons and self.AltIronsZero) then
+		zero=self.AltIronsZero
 	end
 	local zerostring=zero.."m"
 	if (zero==-1337) then
@@ -2062,6 +2066,9 @@ function SWEP:FlyBulletStart(bullet)
 		if (self.BattlesightZero==0) then
 			zero=1
 		end
+	end
+	if (self.AltIrons and self.AltIronsZero) then
+		zero=self.AltIronsZero
 	end
 	if (zero==-1337) then
 		local tr
