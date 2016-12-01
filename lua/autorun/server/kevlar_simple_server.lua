@@ -104,6 +104,16 @@ function KSGetArmorNPC(npc,hitgroup)
 		if (hitgroup==HITGROUP_CHEST) then
 			return KSWEP_ARMOR_IV
 		end
+	elseif (class=="npc_citizen") then
+		if (hitgroup==HITGROUP_CHEST) then
+			if (string.find(npc:GetModel(),"group03")) then
+				return KSWEP_ARMOR_IIIA
+			else
+				return 0
+			end
+		elseif (hitgroup==HITGROUP_HEAD) then
+			return 0
+		end
 	end
 	return -1
 end

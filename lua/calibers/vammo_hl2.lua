@@ -9,8 +9,8 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.name="SMG1"
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=4
-	tbl.dmgvitalmin=2
-	tbl.dmgvitalmax=3
+	tbl.dmgvitalmin=4
+	tbl.dmgvitalmax=6
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.velocity = 2200 --DM31
@@ -20,8 +20,8 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.name="Pistol"
 	tbl.vestpenetration=KSWEP_ARMOR_II
 	tbl.dmgbase=5
-	tbl.dmgvitalmin=3
-	tbl.dmgvitalmax=4
+	tbl.dmgvitalmin=6
+	tbl.dmgvitalmax=8
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -32,8 +32,8 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.name="Buckshot"
 	tbl.vestpenetration=0
 	tbl.dmgbase=8
-	tbl.dmgvitalmin=2
-	tbl.dmgvitalmax=4
+	tbl.dmgvitalmin=4
+	tbl.dmgvitalmax=8
 	tbl.projectiles = 7
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -45,7 +45,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.vestpenetration=KSWEP_ARMOR_CRISAT
 	tbl.dmgbase=8
 	tbl.dmgvitalmin=4
-	tbl.dmgvitalmax=4
+	tbl.dmgvitalmax=8
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -56,8 +56,8 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.name="357"
 	tbl.vestpenetration=KSWEP_ARMOR_II
 	tbl.dmgbase=8
-	tbl.dmgvitalmin=3
-	tbl.dmgvitalmax=4
+	tbl.dmgvitalmin=6
+	tbl.dmgvitalmax=8
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
