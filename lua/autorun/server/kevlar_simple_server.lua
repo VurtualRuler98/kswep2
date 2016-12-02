@@ -43,7 +43,7 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 		if (hitgroup == HITGROUP_CHEST) then
 			armor=KSGetArmorVest(ent,dmgangle)
 		else
-			armor=ply.ksarmor.head
+			armor=ent.ksarmor.head
 		end
 	end
 	if (ent:IsNPC() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
@@ -56,14 +56,6 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 		dmginfo:ScaleDamage(0.2)
 	end
 	
-end
-function KSArmorHitCheck(ply,hitgroup,dmginfo,dmgangle)
-	kevlardebugprint(dmginfo:GetAmmoType())
-	local armor=ply.ksarmor
-	local helmet=ply.kshelmet
-	ply.ksarmordmgtime=CurTime()
-	return dmginfo
-end
 function KSScaleDamage(armor,dmginfo,ent)
 	local bullet=vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())]
 	if (not bullet) then
