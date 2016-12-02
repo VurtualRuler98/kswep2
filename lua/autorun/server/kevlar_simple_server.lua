@@ -71,14 +71,17 @@ function KSScaleDamage(armor,dmginfo,ent)
 	end
 	if (bullet.vestpenetration>armor) then
 		if (ent:IsPlayer()) then
+			return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)
+		else
+			return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)/2
+		end
+	else
+		if (ent:IsPlayer()) then
 			if (ent.ksarmordmgtime~=CurTime()) then
-				timer.Create("KevlarHitSound",0.1,1,function() ply:EmitSound("player/bhit_helmet-1.wav",100,100) end)
+				timer.Create("KevlarHitSound",0.1,1,function() ent:EmitSound("player/bhit_helmet-1.wav",100,100) end)
 				ent.ksarmordmgtime=CurTime()
 			end
 		end
-		return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)
-	else
-		return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)/2
 	end
 	return 1
 end
