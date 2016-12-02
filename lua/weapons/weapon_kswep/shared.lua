@@ -75,7 +75,6 @@ SWEP.Anims={}
 SWEP.AnimsDiscovered={}
 SWEP.Anims.IdleAnim=ACT_VM_IDLE
 SWEP.Anims.ReloadAnim = ACT_VM_RELOAD
-SWEP.Anims.ReloadAnimEmpty = ACT_VM_RELOAD
 SWEP.Anims.DryfireAnim = ACT_VM_DRYFIRE
 SWEP.LoweredOffset = 5
 SWEP.DrawOnce=true
@@ -814,7 +813,7 @@ function SWEP:ReloadMag(force)
 	local reloadspeed=self.ReloadModLight
 	self:SetNWBool("Sight",false)
 	local anim=self.Anims.ReloadAnim
-	if (self.EmptyAnims and (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0))) then
+	if (self.Anims.ReloadAnimEmpty and (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0))) then
 		anim = self.Anims.ReloadAnimEmpty
 	end
 	self.Weapon:SendWeaponAnim(anim)
