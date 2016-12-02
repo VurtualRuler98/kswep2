@@ -51,6 +51,8 @@ function ENT:Think()
 		end
 	end
 end
+function ENT:RunGrenadeCode(grenade)
+end
 function ENT:Use(activator,caller)
 	print(self.GrenadeType)
 	if (IsValid(caller) and caller:IsPlayer()) then
@@ -59,6 +61,7 @@ function ENT:Use(activator,caller)
 			local wep=caller:GetActiveWeapon()
 			if (string.find(wep:GetClass(),"weapon_kgren")) then
 				self.GrenadeType=wep.GrenadeEntity
+				self.RunGrenadeCode=wep.RunGrenadeCode
 				self:EmitSound("npc_combine.zipline_start")
 				wep:SetNWInt("numgrenades",wep:GetNWInt("numgrenades")-1)
 				if (wep:GetNWInt("numgrenades")<1) then
@@ -81,6 +84,7 @@ function ENT:Detonate()
 		nade:SetKeyValue("health","20")
 		nade:SetKeyValue("damagescale","2")
 		nade:Spawn()
+		self:RunGrenadeCode(nade)
 		nade:SetNWFloat("Fuze",1)
 		self:Remove()
 	end
