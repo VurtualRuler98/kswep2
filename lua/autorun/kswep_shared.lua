@@ -27,6 +27,8 @@ kswep_kspawnergrenades = {
 	weapon_kgreni2_m18_yellow={name="M18 Yellow Smoke Grenade",effect=0},
 	weapon_kgreni2_m18_violet={name="M18 Violet Smoke Grenade",effect=0},
 	weapon_kgreni2_m7a2={name="M7A2 CS Grenade",effect=0},
+	weapon_kgreni2_m84={name="M84 Stun Grenade",effect=0},
+	weapon_ksweps_grenadetrap={name="Grenade Trap",effect=0},
 	weapon_kgreni2_molotov={name="Molotov",effect=0},
 	weapon_frag={name="HL2 Grenade",effect=1}
 }
