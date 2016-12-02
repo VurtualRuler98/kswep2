@@ -75,6 +75,48 @@ function ENT:Detonate()
 	self:DetBoom()
 	self:DetFrag()
 end
+function ENT:LookingAtMe(ent)
+	if (ent:IsLineOfSightClear(self)) then
+		local ang=ent:EyeAngles()
+		local ang2=(self:GetPos()-ent:EyePos())
+		ang2:Normalize()
+		ang2=ang2:Angle()
+		if (math.abs(math.AngleDifference(ang.p,ang2.p))<45 and math.abs(math.AngleDifference(ang.y,ang2.y))<60) then
+			return true
+		end
+	end
+	return false
+end
+function ENT:DetFlash()
+	if (SERVER) then
+		for k,v in pairs(ents.FindInSphere(self:GetPos(),1024)) do
+			if (v:IsNPC()) then
+				if self:LookingAtMe(v) then
+					v:SetSchedule(SCHED_NPC_FREEZE)
+					timer.Simple(5,function() if (IsValid(v)) then v:SetCondition(68) end end) --TODO don't harcode this COND
+				end
+			end
+			if (v:IsPlayer() and (not v:HasWeapon("kswep_nvg") or not v:GetWeapon("kswep_nvg"):GetNWBool("Active"))) then
+				if self:LookingAtMe(v) then
+					v:ScreenFade(SCREENFADE.IN,color_white,1,4.5)
+				end
+			end
+		end
+	end
+	if (CLIENT) then
+		local dlight=DynamicLight(self:EntIndex())
+		if (dlight) then
+			dlight.pos=self:GetPos()
+			dlight.r=255
+			dlight.g=255
+			dlight.b=255
+			dlight.brightness=10
+			dlight.decay=1000
+			dlight.size=256
+			dlight.DieTime=CurTime()+0.1
+		end
+	end
+end
 function ENT:ThinkSmokeCS()
 	if (self.BurnTimer>0) then
 		if (CLIENT and self.BurnEffectTimer<CurTime()) then
