@@ -646,6 +646,7 @@ function SWEP:InsOptic(name)
 	self.IronOffsetPos=scopedata.IronPos
 	self.IronOffsetAng=scopedata.IronAng
 	self.AltIrons = scopedata.altirons
+	self.AltIronsZero = scopedata.altironzero
 	self.RTNV=scopedata.nv
 	self.ScopeZeroVelocity=scopedata.zerovel
 	if (scopedata.altirons) then
@@ -943,6 +944,9 @@ function SWEP:DrawHUD()
 	local zero=self.Zero
 	if (zero==0) then
 		zero=self.BattlesightZero
+	end
+	if (self.AltIrons and self.AltIronsZero and self:GetNWBool("AltIrons")) then
+		zero=self.AltIronsZero
 	end
 	local zerostring=zero.."m"
 	if (zero==-1337) then
@@ -1293,7 +1297,13 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (wep.ScopeFOV>wep.ScopeFOVMax) then wep.ScopeFOV=wep.ScopeFOVMax end
 				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
 					wep.Zero=wep.Zero-wep.ZeroStep
-					if (wep.Zero<wep.MinZero) then wep.Zero=wep.MinZero end
+					if (wep.Zero<wep.MinZero) then
+						if (wep.DefaultZero==0) then
+							wep.Zero=0
+						else
+							wep.Zero=wep.MinZero
+						end
+					end
 					net.Start("kswep_zero")
 					net.WriteEntity(wep)
 					net.WriteInt(wep.Zero,16)
@@ -1638,7 +1648,7 @@ function SWEP:PostDrawViewModel()
 	local oldW, oldH = ScrW(),ScrH()
 	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
 	render.PushRenderTarget(self.RenderTarget)
-	if ((self.AltIrons and self:GetNWBool("AltIrons")) or not self:GetNWBool("Sight")) then
+	if ((self.AltIrons and self:GetNWBool("AltIrons") and not self.AltIronRTScope) or (self.AltIrons and not self:GetNWBool("AltIrons") and self.AltIronRTScope) or not self:GetNWBool("Sight")) then
 		render.Clear(0,0,0,255)
 	else
 	local texperture=0
@@ -2052,6 +2062,12 @@ function SWEP:FlyBulletStart(bullet)
 	local zero=self.Zero
 	if (zero==0) then
 		zero=self.BattlesightZero
+		if (self.BattlesightZero==0) then
+			zero=1
+		end
+	end
+	if (self.AltIrons and self.AltIronsZero and self:GetNWBool("AltIrons")) then
+		zero=self.AltIronsZero
 	end
 	if (zero==-1337) then
 		local tr
@@ -2086,6 +2102,8 @@ function SWEP:FlyBulletStart(bullet)
 	shot.bullet=bullet
 	shot.dist = nil
 	shot.time = CurTime()
+	shot.crack=-1
+	shot.crackpos=shot.pos
 	shot.gravity=0
 	table.insert(self.Bullets,shot)
 end
@@ -2125,7 +2143,16 @@ function SWEP:FlyBullet(shot)
 			if (shot.dist~=nil) then
 			return self:FlyBullet(shot)
 			else
-			sound.Play("Bullets.DefaultNearMiss",shot.pos)
+			if (CLIENT and shot.speed>1125) then
+				local cr=EyePos():Distance(shot.pos)
+				if ((cr<shot.crack or shot.crack==-1) and self.Owner:GetPos():Distance(shot.pos)<self.Owner:GetPos():Distance(EyePos()))then
+					shot.crack=cr
+					shot.crackpos=shot.pos
+				elseif (shot.crack>0) then
+					shot.crack=0
+					sound.Play("kswep.supersonic",shot.crackpos)
+				end
+			end
 			return shot
 			end
 		else
@@ -2241,11 +2268,11 @@ function SWEP:GetShootAnim()
 	local anim=self.Anims.ShootAnim
 	if (self.InsAnims and self:GetNWBool("Sight")) then
 		anim=self.Anims.IronShootAnim
-		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==1)) then
+		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0)) then
 		anim=self.Anims.ShootLastIronAnim
 		end
 	else
-		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==1)) then
+		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0)) then
 		anim=self.Anims.ShootLastAnim
 		end
 	end

@@ -4,9 +4,9 @@ end
 hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
-	tbl.dmgbase = 20
-	tbl.dmgvitalmin = 3
-	tbl.dmgvitalmax = 4
+	tbl.dmgbase = 10
+	tbl.dmgvitalmin = 6
+	tbl.dmgvitalmax = 8
 	tbl.name = "vammo_556x45_m193"
 	tbl.caliber = "vammo_556x45"
 	tbl.printname = "5.56x45mm M193"
@@ -20,9 +20,9 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
-	tbl.dmgbase = 20
-	tbl.dmgvitalmin = 2.5
-	tbl.dmgvitalmax = 4
+	tbl.dmgbase = 10
+	tbl.dmgvitalmin = 5
+	tbl.dmgvitalmax = 8
 	tbl.name = "vammo_556x45_m855"
 	tbl.printname = "5.56x45mm M855"
 	tbl.caliber = "vammo_556x45"
@@ -36,9 +36,9 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_IV+1
-	tbl.dmgbase = 20
-	tbl.dmgvitalmin = 2
-	tbl.dmgvitalmax = 4
+	tbl.dmgbase = 10
+	tbl.dmgvitalmin = 4
+	tbl.dmgvitalmax = 8
 	tbl.name = "vammo_556x45_m995"
 	tbl.printname = "5.56x45mm M995 AP"
 	tbl.caliber = "vammo_556x45"
@@ -52,9 +52,9 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
-	tbl.dmgbase = 20
-	tbl.dmgvitalmin = 3.5
-	tbl.dmgvitalmax = 4
+	tbl.dmgbase = 10
+	tbl.dmgvitalmin = 6.5
+	tbl.dmgvitalmax = 8
 	tbl.name = "vammo_556x45_mk262mod1"
 	tbl.printname = "5.56x45mm Mk 262 Mod 1"
 	tbl.caliber = "vammo_556x45"

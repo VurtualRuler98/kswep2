@@ -39,14 +39,14 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 	if (GetConVar("kevlar_enabled"):GetBool()==false) then return end
 	local armor=-1
 	if (ent:IsPlayer() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
-		local dmgangle=(dmginfo:GetDamagePosition()-ply:GetPos()):GetNormalized():Angle()[2]
+		local dmgangle=(dmginfo:GetDamagePosition()-ent:GetPos()):GetNormalized():Angle()[2]
 		if (hitgroup == HITGROUP_CHEST) then
 			armor=KSGetArmorVest(ent,dmgangle)
 		else
-			armor=ply.ksarmor.head
+			armor=ent.ksarmor.helmet
 		end
 	end
-	if (ent:IsNPC()) then
+	if (ent:IsNPC() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
 		armor=KSGetArmorNPC(ent,hitgroup)
 	end
 	if (armor~=-1) then
@@ -55,15 +55,7 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 	if (game.GetAmmoName(dmginfo:GetAmmoType())=="357") then
 		dmginfo:ScaleDamage(0.2)
 	end
-	
-end
-function KSArmorHitCheck(ply,hitgroup,dmginfo,dmgangle)
-	kevlardebugprint(dmginfo:GetAmmoType())
-	local armor=ply.ksarmor
-	local helmet=ply.kshelmet
-	ply.ksarmordmgtime=CurTime()
-	return dmginfo
-end
+end	
 function KSScaleDamage(armor,dmginfo,ent)
 	local bullet=vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())]
 	if (not bullet) then
@@ -71,14 +63,17 @@ function KSScaleDamage(armor,dmginfo,ent)
 	end
 	if (bullet.vestpenetration>armor) then
 		if (ent:IsPlayer()) then
+			return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)
+		else
+			return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)/2
+		end
+	else
+		if (ent:IsPlayer()) then
 			if (ent.ksarmordmgtime~=CurTime()) then
-				timer.Create("KevlarHitSound",0.1,1,function() ply:EmitSound("player/bhit_helmet-1.wav",100,100) end)
+				timer.Create("KevlarHitSound",0.1,1,function() ent:EmitSound("player/bhit_helmet-1.wav",100,100) end)
 				ent.ksarmordmgtime=CurTime()
 			end
 		end
-		return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)
-	else
-		return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)/2
 	end
 	return 1
 end
@@ -104,6 +99,20 @@ function KSGetArmorNPC(npc,hitgroup)
 		if (hitgroup==HITGROUP_CHEST) then
 			return KSWEP_ARMOR_IV
 		end
+	elseif (class=="npc_citizen") then
+		if (hitgroup==HITGROUP_CHEST) then
+			if (string.find(npc:GetModel(),"group03")) then
+				return KSWEP_ARMOR_IIIA
+			else
+				return 0
+			end
+		elseif (hitgroup==HITGROUP_HEAD) then
+			return 0
+		end
+	elseif (class=="npc_antlion") then
+		return KSWEP_ARMOR_IIA
+	elseif (class=="npc_antlionguard") then
+		return KSWEP_ARMOR_III
 	end
 	return -1
 end

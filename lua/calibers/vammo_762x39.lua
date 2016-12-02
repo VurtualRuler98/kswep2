@@ -4,9 +4,9 @@ end
 hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
-	tbl.dmgbase=25
-	tbl.dmgvitalmin=2
-	tbl.dmgvitalmax=4
+	tbl.dmgbase=12
+	tbl.dmgvitalmin=4
+	tbl.dmgvitalmax=8
 	tbl.name = "vammo_762x39_m43"
 	tbl.printname = "7.62x39mm M43"
 	tbl.caliber = "vammo_762x39"
@@ -19,9 +19,9 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	AddAmmodata(tbl)
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
-	tbl.dmgbase=25
-	tbl.dmgvitalmin=3
-	tbl.dmgvitalmax=4
+	tbl.dmgbase=12
+	tbl.dmgvitalmin=6
+	tbl.dmgvitalmax=8
 	tbl.helmetpenetration=2
 	tbl.armordamagemult=0.7
 	tbl.name = "vammo_762x39_m67"
@@ -36,9 +36,9 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	AddAmmodata(tbl)
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
-	tbl.dmgbase=10
-	tbl.dmgvitalmin=3
-	tbl.dmgvitalmax=4
+	tbl.dmgbase=6
+	tbl.dmgvitalmin=6
+	tbl.dmgvitalmax=8
 	tbl.name = "vammo_762x39_us"
 	tbl.printname = "7.62x39mm US"
 	tbl.caliber = "vammo_762x39"
