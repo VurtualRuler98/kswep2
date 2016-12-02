@@ -43,7 +43,7 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 		if (hitgroup == HITGROUP_CHEST) then
 			armor=KSGetArmorVest(ent,dmgangle)
 		else
-			armor=ent.ksarmor.head
+			armor=ent.ksarmor.helmet
 		end
 	end
 	if (ent:IsNPC() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
