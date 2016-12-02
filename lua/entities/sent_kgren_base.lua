@@ -132,7 +132,9 @@ function ENT:ThinkSmokeCS()
 			local dmginfo=DamageInfo()
 			dmginfo:SetDamage(1)
 			dmginfo:SetDamageType(DMG_ACID)
-			dmginfo:SetAttacker(self.Owner)
+			if (IsValid(self.Owner)) then
+				dmginfo:SetAttacker(self.Owner)
+			end
 			for k,v in pairs(ents.FindInSphere(self:GetPos(),256)) do
 				if (v:IsPlayer() and not v.KswepGasMask) then
 					v:TakeDamageInfo(dmginfo)
