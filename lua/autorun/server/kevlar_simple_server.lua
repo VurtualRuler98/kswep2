@@ -39,7 +39,7 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 	if (GetConVar("kevlar_enabled"):GetBool()==false) then return end
 	local armor=-1
 	if (ent:IsPlayer() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
-		local dmgangle=(dmginfo:GetDamagePosition()-ply:GetPos()):GetNormalized():Angle()[2]
+		local dmgangle=(dmginfo:GetDamagePosition()-ent:GetPos()):GetNormalized():Angle()[2]
 		if (hitgroup == HITGROUP_CHEST) then
 			armor=KSGetArmorVest(ent,dmgangle)
 		else
