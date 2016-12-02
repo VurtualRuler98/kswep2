@@ -303,10 +303,10 @@ end
 function SWEP:DiscoverModelAnims()
 end
 function SWEP:DiscoverModelAnimsDone()
-	if (self.Owner:IsPlayer() and #self.AnimsDiscovered>0) then
+	if (self.Owner:IsPlayer() and table.Count(self.AnimsDiscovered)>0) then
 		net.Start("kswep_discoveranim")
 		net.WriteEntity(self)
-		net.WriteInt(#self.AnimsDiscovered,16)
+		net.WriteInt(table.Count(self.AnimsDiscovered),16)
 		for k,v in pairs (self.AnimsDiscovered) do	
 			net.WriteString(k)
 			net.WriteInt(v,16)
@@ -1907,8 +1907,8 @@ function SWEP:AdjustMouseSensitivity()
         end
 end
 net.Receive("kswep_discoveranim",function(len)
-	self.Anims=self.Anims or {}
 	local self=net.ReadEntity()
+	self.Anims=self.Anims or {}
 	local num=net.ReadInt(16)
 	local anim,act
 	for i=1,num do
