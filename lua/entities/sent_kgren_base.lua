@@ -91,14 +91,14 @@ function ENT:DetFlash()
 	if (SERVER) then
 		for k,v in pairs(ents.FindInSphere(self:GetPos(),1024)) do
 			if (v:IsNPC()) then
-				if self:LookingAtMe(v) then
+				if (self:LookingAtMe(v) or self:GetPos():Distance(v:GetPos())<128) then
 					v:SetSchedule(SCHED_FLEE_FROM_BEST_SOUND)
 					timer.Simple(1,function() if (IsValid(v)) then v:SetSchedule(SCHED_WAIT_FOR_SCRIPT) end end)
 					timer.Simple(5,function() if (IsValid(v)) then v:SetSchedule(SCHED_FAIL) end end) 
 				end
 			end
 			if (v:IsPlayer() and (not v:HasWeapon("kswep_nvg") or not v:GetWeapon("kswep_nvg"):GetNWBool("Active"))) then
-				if self:LookingAtMe(v) then
+				if (self:LookingAtMe(v) or self:GetPos():Distance(v:GetPos())<128) then
 					v:ScreenFade(SCREENFADE.IN,color_white,1,4.5)
 				end
 			end

@@ -36,6 +36,7 @@ function ENT:Initialize()
 end
 function ENT:SpawnFunction(ply,tr)
 	if (not tr.Hit) then return end
+	if (tr.HitNormal.z<0.5) then return end
 	local ent=ents.Create("sent_ksweps_grenadetrap")
 	ent:SetPos(tr.HitPos+Vector(0,0,-3))
 	ent:Spawn()
@@ -54,7 +55,6 @@ end
 function ENT:RunGrenadeCode(grenade)
 end
 function ENT:Use(activator,caller)
-	print(self.GrenadeType)
 	if (IsValid(caller) and caller:IsPlayer()) then
 		if (not self.GrenadeType) then
 			if (not IsValid(caller:GetActiveWeapon())) then return end
