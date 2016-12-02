@@ -68,6 +68,10 @@ function ENT:Use(activator,caller)
 					wep:Remove()
 				end
 			end
+			if (wep:GetClass()=="weapon_ksweps_grenadetrap") then
+				wep:SetNWInt("numgrenades",wep:GetNWInt("numgrenades")+1)
+				self:Remove()
+			end
 		elseif (self.Live<0) then
 			self.Live=CurTime()+2
 			self:EmitSound("weapon_slam.tripminemode")
