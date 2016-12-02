@@ -100,6 +100,7 @@ function ENT:DetFlash()
 			if (v:IsPlayer() and (not v:HasWeapon("kswep_nvg") or not v:GetWeapon("kswep_nvg"):GetNWBool("Active"))) then
 				if (self:LookingAtMe(v) or self:GetPos():Distance(v:GetPos())<128) then
 					v:ScreenFade(SCREENFADE.IN,color_white,1,4.5)
+					v:SetDSP(35,false)
 				end
 			end
 		end
