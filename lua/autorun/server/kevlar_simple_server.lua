@@ -55,7 +55,7 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 	if (game.GetAmmoName(dmginfo:GetAmmoType())=="357") then
 		dmginfo:ScaleDamage(0.2)
 	end
-	
+end	
 function KSScaleDamage(armor,dmginfo,ent)
 	local bullet=vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())]
 	if (not bullet) then
