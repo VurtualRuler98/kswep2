@@ -25,6 +25,12 @@ net.Receive("kswep_flashlight_cl",function(len)
 		end
 	end
 end)
+net.Receive("kswep_supersonic",function(len)
+	local pos=net.ReadVector()
+	if (isvector(pos)) then
+		sound.Play("kswep.supersonic",pos)
+	end
+end)
 function KSwepRenderClientLights()
 	if (kswep_client_lights~=nil) then
 		for k,v in pairs(kswep_client_lights) do

@@ -2143,14 +2143,20 @@ function SWEP:FlyBullet(shot)
 			if (shot.dist~=nil) then
 			return self:FlyBullet(shot)
 			else
-			if (CLIENT and shot.speed>1125) then
-				local cr=EyePos():Distance(shot.pos)
-				if ((cr<shot.crack or shot.crack==-1) and self.Owner:GetPos():Distance(shot.pos)<self.Owner:GetPos():Distance(EyePos()))then
-					shot.crack=cr
-					shot.crackpos=shot.pos
-				elseif (shot.crack>0) then
-					shot.crack=0
-					sound.Play("kswep.supersonic",shot.crackpos)
+			if (SERVER and shot.speed>1125) then
+				for k,v in pairs(player.GetAll()) do
+				shot["crack"..v:EntIndex()]=shot["crack"..v:EntIndex()] or -1
+				shot["crackpos"..v:EntIndex()]=shot["crackpos"..v:EntIndex()] or shot.pos
+				local cr=v:EyePos():Distance(shot.pos)
+				if ((cr<shot["crack"..v:EntIndex()] or shot["crack"..v:EntIndex()]==-1) and self.Owner:GetPos():Distance(shot.pos)<self.Owner:GetPos():Distance(v:EyePos()))then
+					shot["crack"..v:EntIndex()]=cr
+					shot["crackpos"..v:EntIndex()]=shot.pos
+				elseif (shot["crack"..v:EntIndex()]>0) then
+					shot["crack"..v:EntIndex()]=0
+					net.Start("kswep_supersonic")
+					net.WriteVector(shot["crackpos"..v:EntIndex()])
+					net.Send(v)
+				end
 				end
 			end
 			return shot
