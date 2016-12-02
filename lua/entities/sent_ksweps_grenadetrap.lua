@@ -46,7 +46,7 @@ end
 function ENT:Think()
 	if (self.Live>0 and self.Live<CurTime()) then
 		for k,v in pairs(ents.FindInSphere(self:GetPos(),64)) do
-			if (v:IsNPC() or v:IsPlayer()) then
+			if (v:IsNPC() or v:IsPlayer() or v:IsVehicle()) then
 				self:Detonate()
 			end
 		end
