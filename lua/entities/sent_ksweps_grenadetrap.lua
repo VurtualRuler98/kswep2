@@ -74,7 +74,7 @@ function ENT:Use(activator,caller)
 				if (wep:GetNWInt("numgrenades")<1) then
 					wep:Remove()
 				end
-				self.nade:SetOwner(self.Owner)
+				self.nade:SetOwner(caller)
 				self:SetPos(self:GetPos()-Vector(0,0,2))
 				self.nade:SetPos(self:GetPos()+Vector(0,0,8))
 				self.nade:Spawn()
