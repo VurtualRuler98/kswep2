@@ -314,3 +314,8 @@ function ENT:DetFrag()
 	end)
 	end
 end
+function ENT:Use(activator,caller,usetype,value)
+	if (IsValid(self:GetParent())) then
+		self:GetParent():Use(activator,caller,usetype,value)
+	end
+end

@@ -67,6 +67,17 @@ function ENT:Use(activator,caller)
 				if (wep:GetNWInt("numgrenades")<1) then
 					wep:Remove()
 				end
+				if (SERVER) then
+					self.nade=ents.Create(self.GrenadeType)
+					self.nade:SetOwner(self.Owner)
+					self:SetPos(self:GetPos()-Vector(0,0,2))
+					self.nade:SetPos(self:GetPos()+Vector(0,0,8))
+					self.nade:Spawn()
+					self.nade:SetParent(self)
+					self.nade:SetCollisionGroup(COLLISION_GROUP_WEAPON)
+					self:RunGrenadeCode(self.nade)
+					self.nade:SetNWFloat("Fuze",0)
+				end
 			end
 			if (wep:GetClass()=="weapon_ksweps_grenadetrap") then
 				wep:SetNWInt("numgrenades",wep:GetNWInt("numgrenades")+1)
@@ -74,22 +85,14 @@ function ENT:Use(activator,caller)
 			end
 		elseif (self.Live<0) then
 			self.Live=CurTime()+2
-			self:EmitSound("weapon_slam.tripminemode")
+			self.nade:EmitSound("weapon_slam.tripminemode")
 		end
 	end
 end
 function ENT:Detonate()
 	if (SERVER) then
-		local nade=ents.Create(self.GrenadeType)
-		nade:SetOwner(self.Owner)
-		nade:SetPos(self:GetPos()+Vector(0,0,10))
-		nade:SetKeyValue("Spawnflags","182")
-		nade:SetKeyValue("firesize","64")
-		nade:SetKeyValue("health","20")
-		nade:SetKeyValue("damagescale","2")
-		nade:Spawn()
-		self:RunGrenadeCode(nade)
-		nade:SetNWFloat("Fuze",1)
+		self.nade:SetNWFloat("Fuze",1)
+		self.nade:SetParent(nil)
 		self:Remove()
 	end
 end
