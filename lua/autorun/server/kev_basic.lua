@@ -47,8 +47,8 @@ net.Receive("kswep_flashlight",function(len,pl)
 end)
 net.Receive("kswep_takesuitcase",function(len,pl)
 	local box=net.ReadEntity()
-	if (not pl:HasWeapon("weapon_kguncase")) then
-		local wep=pl:Give("weapon_kguncase")
+	if (not pl:HasWeapon("weapon_kweps_guncase")) then
+		local wep=pl:Give("weapon_kweps_guncase")
 		wep.GiveAmmo=box:GetNWBool("GiveAmmo")
 		wep.GiveSuppressors=box:GetNWBool("GiveSuppressors")
 		wep.GiveOptics=box:GetNWBool("GiveOptics")

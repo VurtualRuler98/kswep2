@@ -1,5 +1,5 @@
 if (SERVER) then
-	AddCSLuaFile("shared.lua")
+	AddCSLuaFile()
 end
 if (CLIENT) then
 	SWEP.PrintName = "KSwep Flashlight"
@@ -8,6 +8,7 @@ if (CLIENT) then
 	SWEP.SlotPos = 0
 end
 SWEP.Spawnable = true
+SWEP.Category="Vurtual's K-Weapons Equipment"
 SWEP.AdminSpawnable = true
 SWEP.ViewModel = nil
 SWEP.WorldModel = "models/weapons/w_toolgun.mdl"
@@ -34,7 +35,7 @@ SWEP.DrawCrosshair = false
 function SWEP.DetectKey(ply,bind,pressed)
 	if (pressed) then
 		local wep=ply:GetActiveWeapon()
-		if (IsValid(wep) and wep:GetClass()=="weapon_klight") then
+		if (IsValid(wep) and wep:GetClass()=="weapon_kweps_light") then
 			if (bind=="impulse 100") then
 				wep:EnableFlashlight(not wep.Flashlight)
 				return true

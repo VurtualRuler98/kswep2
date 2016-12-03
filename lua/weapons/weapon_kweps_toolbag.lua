@@ -1,5 +1,5 @@
 if (SERVER) then
-	AddCSLuaFile("shared.lua")
+	AddCSLuaFile()
 end
 if (CLIENT) then
 	SWEP.PrintName = "KSwep Toolbag"
@@ -8,6 +8,7 @@ if (CLIENT) then
 	SWEP.SlotPos = 99
 end
 SWEP.Spawnable = true
+SWEP.Category="Vurtual's K-Weapons Equipment"
 SWEP.AdminSpawnable = true
 SWEP.ViewModel = nil
 SWEP.WorldModel = "models/weapons/w_toolgun.mdl"
