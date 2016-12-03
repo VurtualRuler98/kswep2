@@ -10,7 +10,8 @@ ENT.Category	= "Vurtual's base"
 ENT.Spawnable = true
 ENT.AdminSpawnable = true
 ENT.Igniting=false
-ENT.GrenadeType=nil
+ENT.HasGrenade=false
+ENT.nade=nil
 ENT.Live=-1
 if (CLIENT) then
 function ENT:Draw()
@@ -44,6 +45,11 @@ function ENT:SpawnFunction(ply,tr)
 end
 end
 function ENT:Think()
+	if (self.HasGrenade==true) then
+		if (not IsValid(self.nade)) then
+			self:Remove()
+		end
+	end
 	if (self.Live>0 and self.Live<CurTime()) then
 		for k,v in pairs(ents.FindInSphere(self:GetPos(),64)) do
 			if (v:IsNPC() or v:IsPlayer() or v:IsVehicle()) then
@@ -56,28 +62,26 @@ function ENT:RunGrenadeCode(grenade)
 end
 function ENT:Use(activator,caller)
 	if (IsValid(caller) and caller:IsPlayer()) then
-		if (not self.GrenadeType) then
+		if (not IsValid(self.nade)) then
 			if (not IsValid(caller:GetActiveWeapon())) then return end
 			local wep=caller:GetActiveWeapon()
 			if (string.find(wep:GetClass(),"weapon_kgren")) then
-				self.GrenadeType=wep.GrenadeEntity
+				self.HasGrenade=true
 				self.RunGrenadeCode=wep.RunGrenadeCode
 				self:EmitSound("npc_combine.zipline_start")
+				self.nade=ents.Create(wep.GrenadeEntity)
 				wep:SetNWInt("numgrenades",wep:GetNWInt("numgrenades")-1)
 				if (wep:GetNWInt("numgrenades")<1) then
 					wep:Remove()
 				end
-				if (SERVER) then
-					self.nade=ents.Create(self.GrenadeType)
-					self.nade:SetOwner(self.Owner)
-					self:SetPos(self:GetPos()-Vector(0,0,2))
-					self.nade:SetPos(self:GetPos()+Vector(0,0,8))
-					self.nade:Spawn()
-					self.nade:SetParent(self)
-					self.nade:SetCollisionGroup(COLLISION_GROUP_WEAPON)
-					self:RunGrenadeCode(self.nade)
-					self.nade:SetNWFloat("Fuze",0)
-				end
+				self.nade:SetOwner(self.Owner)
+				self:SetPos(self:GetPos()-Vector(0,0,2))
+				self.nade:SetPos(self:GetPos()+Vector(0,0,8))
+				self.nade:Spawn()
+				self.nade:SetParent(self)
+				self.nade:SetCollisionGroup(COLLISION_GROUP_WEAPON)
+				self:RunGrenadeCode(self.nade)
+				self.nade:SetNWFloat("Fuze",0)
 			end
 			if (wep:GetClass()=="weapon_ksweps_grenadetrap") then
 				wep:SetNWInt("numgrenades",wep:GetNWInt("numgrenades")+1)
