@@ -81,6 +81,11 @@ function SWEP:PostDrawViewModel()
 		self.Hands:DrawModel()
 	end
 end
+function SWEP:OnRemove()
+	if (IsValid(self.Hands)) then
+		self.Hands:Remove()
+	end
+end
 function SWEP:DrawHUD()
 	if (self:GetNWBool("Zoomed") and self.Overlay~=nil) then
 		DrawMaterialOverlay(self.Overlay,0)
