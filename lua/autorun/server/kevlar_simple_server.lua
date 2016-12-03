@@ -59,7 +59,7 @@ end
 function KSScaleDamage(armor,dmginfo,ent)
 	local bullet=vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())]
 	if (not bullet) then
-		local bullet=vurtual_ammodata["Pistol"]
+		bullet=vurtual_ammodata["Pistol"]
 	end
 	if (bullet.vestpenetration>armor) then
 		if (ent:IsPlayer()) then
