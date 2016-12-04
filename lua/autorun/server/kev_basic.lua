@@ -82,12 +82,19 @@ net.Receive("kswep_takegunfromrack",function(len,pl)
 end)
 net.Receive("kswep_zero",function(len,pl)
 	local wep=net.ReadEntity()
+	local zalt=net.ReadBool()
 	local zero=net.ReadInt(16)
 	if (not IsValid(wep)) then return end
 	if (wep.Owner~=pl) then return end
-	wep.Zero=zero
-	if (wep.Zero>wep.MaxZero) then wep.Zero=wep.MaxZero end
-	if (wep.Zero<wep.MinZero) then wep.Zero=wep.MinZero end
+	if (zalt) then
+		if (zero>wep.ZerodataAlt.max) then zero=wep.ZerodataAlt.max end
+		if (zero<wep.ZerodataAlt.min) then zero=wep.ZerodataAlt.min end
+		wep.ZeroAlt=zero
+	else
+		if (zero>wep.Zerodata.max) then zero=wep.Zerodata.max end
+		if (zero<wep.Zerodata.min) then zero=wep.Zerodata.min end
+		wep.Zero=zero
+	end
 end)
 net.Receive("kswep_weaponrange",function(len,pl)
 	local wep=net.ReadEntity()

@@ -170,10 +170,14 @@ SWEP.Collimator=false
 SWEP.CollimatorTex=nil
 SWEP.CollimatorSize=0.5
 SWEP.CollimatorGlare=1
-SWEP.DefaultMinZero=100
-SWEP.DefaultMaxZero=100
-SWEP.DefaultZeroStep=0
-SWEP.DefaultZero=100
+SWEP.DefaultZerodata = {
+	min=100,
+	max=100,
+	step=0,
+	default=100,
+	battlesight=false
+}
+SWEP.DefaultZerodataAlt = SWEP.DefaultZerodata
 SWEP.DefaultBattlesightZero=100
 SWEP.UseDelayForBolt=false
 SWEP.WaitShot=false
@@ -219,14 +223,13 @@ function SWEP:Initialize()
 	self:SetNWBool("Bipod",false)
 	self:SetNWInt("numgrenades",1)
 	self:SetNWFloat("DropAfter",0)
-	self.Zero=self.DefaultZero
-	self.ZeroStep=self.DefaultZeroStep
-	self.MaxZero=self.DefaultMaxZero
-	self.MinZero=self.DefaultMinZero
-	self.BattlesightZero=self.DefaultBattlesightZero
 	if (self.AltIrons) then
 		self:SetNWBool("AltIrons",false)
 	end
+	self.Zerodata=self.DefaultZerodata
+	self.Zero=self.Zerodata.default
+	self.ZerodataAlt = self.DefaultZerodataAlt
+	self.ZeroAlt=self.ZerodataAlt.default
 	if (self.Anims.RunAnim==nil) then
 		self.Anims.RunAnim=self.Anims.LowerAnim
 		self.Anims.RunAnimEmpty=self.Anims.LowerAnimEmpty
@@ -665,19 +668,17 @@ function SWEP:InsOptic(name)
 	self.CollimatorGlare=scopedata.colglare
 	local scopemodel
 	if (scopedata.model~=nil) then
-		self.MaxZero=scopedata.maxzero
-		self.Zero=scopedata.zero
-		self.MinZero=scopedata.minzero
-		self.ZeroStep=scopedata.zerostep
-		self.BattlesightZero=scopedata.bszero
+		self.Zerodata=scopedata.zero
+		self.Zero=self.Zerodata.default
+		self.ZerodataAlt=scopedata.zeroalt
+		self.ZeroAlt=self.ZerodataAlt.default
 		scopemodel=scopedata.model
 	else
 		scopemodel=self.DefaultSight
-		self.Zero=self.DefaultZero
-		self.ZeroStep=self.DefaultZeroStep
-		self.MaxZero=self.DefaultMaxZero
-		self.MinZero=self.DefaultMinZero
-		self.BattlesightZero=self.DefaultBattlesightZero
+		self.Zerodata=self.DefaultZerodata
+		self.Zero=self.Zerodata.default
+		self.ZerodataAlt = self.DefaultZerodataAlt
+		self.ZeroAlt=self.ZerodataAlt.default
 		if (self.DefaultSight==nil and self.optic) then
 			self.optic:Remove()
 			self.optic=nil
@@ -945,8 +946,8 @@ function SWEP:DrawHUD()
 	if (zero==0) then
 		zero=self.BattlesightZero
 	end
-	if (self.AltIrons and self.AltIronsZero and self:GetNWBool("AltIrons")) then
-		zero=self.AltIronsZero
+	if (self:GetNWBool("AltIrons")) then
+		zero=self.ZeroAlt
 	end
 	local zerostring=zero.."m"
 	if (zero==-1337) then
@@ -1296,17 +1297,33 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					wep.ScopeFOV=wep.ScopeFOV+((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
 					if (wep.ScopeFOV>wep.ScopeFOVMax) then wep.ScopeFOV=wep.ScopeFOVMax end
 				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
-					wep.Zero=wep.Zero-wep.ZeroStep
-					if (wep.Zero<wep.MinZero) then
-						if (wep.DefaultZero==0) then
-							wep.Zero=0
+					local zdata
+					local zalt=false
+					local zero=wep.Zero
+					if (wep.ZerodataAlt.default~=false and wep:GetNWBool("AltIrons")) then
+						zdata=wep.ZerodataAlt
+						zalt=true
+						zero=wep.ZeroAlt
+					else
+						zdata=wep.Zerodata
+					end
+					zero=zero-zdata.step
+					if (zero<zdata.min) then
+						if (zdata.default==0) then
+							zero=0
 						else
-							wep.Zero=wep.MinZero
+							zero=zdata.min
 						end
+					end
+					if (zalt) then
+						wep.ZeroAlt=zero
+					else
+						wep.Zero=zero
 					end
 					net.Start("kswep_zero")
 					net.WriteEntity(wep)
-					net.WriteInt(wep.Zero,16)
+					net.WriteBool(zalt)
+					net.WriteInt(zero,16)
 					net.SendToServer()
 				else
 					wep.IronZoom=wep.IronZoom+5
@@ -1317,11 +1334,28 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					wep.ScopeFOV=wep.ScopeFOV-((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
 					if (wep.ScopeFOV<wep.ScopeFOVMin) then wep.ScopeFOV=wep.ScopeFOVMin end
 				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
-					wep.Zero=wep.Zero+wep.ZeroStep
-					net.WriteEntity(wep)
-					if (wep.Zero>wep.MaxZero) then wep.Zero=wep.MaxZero end
+					local zdata
+					local zalt=false
+					local zero=wep.Zero
+					if (wep.ZerodataAlt.default~=false and wep:GetNWBool("AltIrons")) then
+						zdata=wep.ZerodataAlt
+						zalt=true
+						zero=wep.ZeroAlt
+					else
+						zdata=wep.Zerodata
+					end
+					zero=zero+zdata.step
+					if (zero>zdata.max) then
+						zero=zdata.max
+					end
+					if (zalt) then
+						wep.ZeroAlt=zero
+					else
+						wep.Zero=zero
+					end
 					net.Start("kswep_zero")
 					net.WriteEntity(wep)
+					net.WriteBool(zalt)
 					net.WriteInt(wep.Zero,16)
 					net.SendToServer()
 				else
@@ -1648,7 +1682,7 @@ function SWEP:PostDrawViewModel()
 	local oldW, oldH = ScrW(),ScrH()
 	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
 	render.PushRenderTarget(self.RenderTarget)
-	if ((self.AltIrons and self:GetNWBool("AltIrons") and not self.AltIronRTScope) or (self.AltIrons and not self:GetNWBool("AltIrons") and self.AltIronRTScope) or not self:GetNWBool("Sight")) then
+	if ((self:GetNWBool("AltIrons") and not self.AltIronRTScope) or (not self:GetNWBool("AltIrons") and self.AltIronRTScope) or not self:GetNWBool("Sight")) then
 		render.Clear(0,0,0,255)
 	else
 	local texperture=0
@@ -1839,7 +1873,7 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	if (self.ScopeName~="Default") then
 		scopepos,scopeang=self.ScopeOffsetPos, self.ScopeOffsetAng
 	end
-	if (self.AltIrons and self:GetNWBool("AltIrons")) then
+	if (self:GetNWBool("AltIrons")) then
 		ironpos=self.IronSightsPos+self.AltIronOffsetPos+scopepos
 		ironang=self.IronSightsAng+self.AltIronOffsetAng+scopeang
 	elseif (self.IronSightsPos) then
@@ -2073,8 +2107,8 @@ function SWEP:FlyBulletStart(bullet)
 			zero=1
 		end
 	end
-	if (self.AltIrons and self.AltIronsZero and self:GetNWBool("AltIrons")) then
-		zero=self.AltIronsZero
+	if (self:GetNWBool("AltIrons")) then
+		zero=self.ZeroAlt
 	end
 	if (zero==-1337) then
 		local tr
