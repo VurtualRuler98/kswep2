@@ -222,9 +222,7 @@ function SWEP:Initialize()
 	self:SetNWBool("Bipod",false)
 	self:SetNWInt("numgrenades",1)
 	self:SetNWFloat("DropAfter",0)
-	if (self.AltIrons) then
-		self:SetNWBool("AltIrons",false)
-	end
+	self:SetNWBool("AltIrons",false)
 	self.Zerodata=self.DefaultZerodata
 	self.Zero=self.Zerodata.default
 	self.ZerodataAlt = self.DefaultZerodataAlt
@@ -649,11 +647,9 @@ function SWEP:InsOptic(name)
 	self.SuperScope=scopedata.super
 	self.IronOffsetPos=scopedata.IronPos
 	self.IronOffsetAng=scopedata.IronAng
-	self.AltIrons = scopedata.altirons
-	self.AltIronsZero = scopedata.altironzero
 	self.RTNV=scopedata.nv
 	self.ScopeZeroVelocity=scopedata.zerovel
-	if (scopedata.altirons) then
+	if (scopedata.zeroalt.default) then
 		self.AltIronOffsetPos=scopedata.AltIronPos
 		self.AltIronOffsetAng=scopedata.AltIronAng
 	end
@@ -1242,7 +1238,7 @@ function SWEP:SecondaryAttack()
 	end
 	if ((self.Owner:KeyDown(IN_WALK)) and not self:GetNWBool("Sight")) then
 		self:ToggleZoom()
-	elseif (self.Owner:KeyDown(IN_WALK)) then
+	elseif (self.Owner:KeyDown(IN_WALK) and self.ZerodataAlt.default) then
 		self:SetNWBool("AltIrons",not self:GetNWBool("AltIrons"))
 	else
 		self:ToggleAim()
