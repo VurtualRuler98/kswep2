@@ -177,8 +177,7 @@ SWEP.DefaultZerodata = {
 	default=100,
 	battlesight=false
 }
-SWEP.DefaultZerodataAlt = SWEP.DefaultZerodata
-SWEP.DefaultBattlesightZero=100
+SWEP.DefaultZerodataAlt = table.Copy(SWEP.DefaultZerodata)
 SWEP.UseDelayForBolt=false
 SWEP.WaitShot=false
 SWEP.WaitShotIron=false
@@ -943,11 +942,13 @@ end
 function SWEP:DrawHUD()
 	local ammo = self.Ammo
 	local zero=self.Zero
-	if (zero==0) then
-		zero=self.BattlesightZero
-	end
+	local zdata=self.Zerodata
 	if (self:GetNWBool("AltIrons")) then
 		zero=self.ZeroAlt
+		zdata=self.ZerodataAlt
+	end
+	if (zero==0) then
+		zero=zdata.battlesight
 	end
 	local zerostring=zero.."m"
 	if (zero==-1337) then
@@ -1309,7 +1310,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					end
 					zero=zero-zdata.step
 					if (zero<zdata.min) then
-						if (zdata.default==0) then
+						if (zdata.battlesight) then
 							zero=0
 						else
 							zero=zdata.min
@@ -1347,6 +1348,9 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					zero=zero+zdata.step
 					if (zero>zdata.max) then
 						zero=zdata.max
+					end
+					if (zero<zdata.min) then
+						zero=zdata.min
 					end
 					if (zalt) then
 						wep.ZeroAlt=zero
@@ -2101,14 +2105,16 @@ end
 function SWEP:FlyBulletStart(bullet)
 	local supmod=1
 	local zero=self.Zero
-	if (zero==0) then
-		zero=self.BattlesightZero
-		if (self.BattlesightZero==0) then
-			zero=1
-		end
-	end
+	local zdata=self.Zerodata
 	if (self:GetNWBool("AltIrons")) then
 		zero=self.ZeroAlt
+		zdata=self.ZerodataAlt
+	end
+	if (zero==0) then
+		zero=zdata.battlesight
+		if (zdata.battlesight==0) then
+			zero=1
+		end
 	end
 	if (zero==-1337) then
 		local tr

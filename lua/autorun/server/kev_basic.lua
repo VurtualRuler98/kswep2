@@ -86,13 +86,19 @@ net.Receive("kswep_zero",function(len,pl)
 	local zero=net.ReadInt(16)
 	if (not IsValid(wep)) then return end
 	if (wep.Owner~=pl) then return end
+	local zdata=wep.Zerodata
+	if (zalt) then zdata=wep.ZerodataAlt end
+	if (zero>zdata.max) then zero=zdata.max end
+	if (zero<zdata.min) then
+		if (zdata.battlesight) then
+			zero=0
+		else
+			zero=zdata.min
+		end
+	end
 	if (zalt) then
-		if (zero>wep.ZerodataAlt.max) then zero=wep.ZerodataAlt.max end
-		if (zero<wep.ZerodataAlt.min) then zero=wep.ZerodataAlt.min end
 		wep.ZeroAlt=zero
 	else
-		if (zero>wep.Zerodata.max) then zero=wep.Zerodata.max end
-		if (zero<wep.Zerodata.min) then zero=wep.Zerodata.min end
 		wep.Zero=zero
 	end
 end)
