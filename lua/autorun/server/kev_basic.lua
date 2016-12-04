@@ -159,7 +159,6 @@ function RearmMags(len,pl)
 				end
 				if (wep.SingleClips) then
 					magsize=wep.ReloadClipSize
-					print(magtype)
 				end
 				
 				if (wep.IsSecondaryWeapon) then

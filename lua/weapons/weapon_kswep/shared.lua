@@ -263,7 +263,9 @@ function SWEP:Initialize()
 			table.insert(self.MagTable,{caliber=self.Ammo.name,num=1})
 		end
 		self:SetNWInt("MagRounds",#self.MagTable)
-		self.MagType=self.Caliber
+		if (not self.SingleClips) then
+			self.MagType=self.Caliber
+		end
 	end
 	self.Magazines = {}
 	self.Primary.DefaultClip = self.MagSize
