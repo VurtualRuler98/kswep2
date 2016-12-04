@@ -102,7 +102,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.dmgvitalmax=8
 	tbl.name = "vammo_792x57_ball"
 	tbl.printname = "7.92x57mm ball"
-	tbl.caliber = "vammo_303"
+	tbl.caliber = "vammo_792x57"
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
