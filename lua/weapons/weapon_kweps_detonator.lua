@@ -21,6 +21,7 @@ SWEP.Primary.Ammo="none"
 SWEP.UseInsHands=false
 SWEP.NextIdle=0
 SWEP.NextDetonate=0
+SWEP.DetonatorDelay=0
 SWEP.ConnectedExplosives = {}
 SWEP.Anims={}
 SWEP.Anims.Draw=ACT_SLAM_DETONATOR_DRAW
@@ -124,6 +125,13 @@ function SWEP:Reload()
 	self:SendWeaponAnim(self.Anims.Detonate)
 	self.NextIdle=CurTime()+self.Owner:GetViewModel():SequenceDuration()
 	self.NextDetonate=self.NextIdle+0.5
+	if (self.DetonatorDelay>0) then
+		timer.Simple(self.DetonatorDelay,function() self:Detonate() end)
+	else
+		self:Detonate()
+	end
+end
+function SWEP:Detonate()
 	for k,v in pairs(self.ConnectedExplosives) do
 		if (IsValid(v)) then
 			v:Detonate()
