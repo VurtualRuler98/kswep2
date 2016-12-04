@@ -8,6 +8,7 @@ if (CLIENT) then
 	SWEP.SlotPos = 0
 end
 SWEP.Base="weapon_kbinoc_base"
+SWEP.Category = "Vurtual's K-Weapons Equipment"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.Magnification=3
