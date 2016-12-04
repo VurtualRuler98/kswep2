@@ -159,6 +159,7 @@ function RearmMags(len,pl)
 				end
 				if (wep.SingleClips) then
 					magsize=wep.ReloadClipSize
+					print(magtype)
 				end
 				
 				if (wep.IsSecondaryWeapon) then
@@ -171,7 +172,7 @@ function RearmMags(len,pl)
 				for i=1,magcount do
 					table.insert(tbl,{caliber=caliber,num=magsize,max=magsize})
 				end
-				if (wep.MagType) then
+				if (not wep.SingleReload) then
 					table.insert(tbl,{caliber=caliber,num=magsize,max=magsize})
 					wep:SetClip1(0)
 					wep:SetNWBool("Chambered",false)
