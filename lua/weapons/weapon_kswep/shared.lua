@@ -1598,13 +1598,13 @@ function SWEP:LowerRun(lower)
 	if (not self:GetNWBool("Raised")) then
 		anim2=self.Anims.LowerAnim
 	end
-	if (ConVarExists("prone_bindkey_enabled") and self.Owner:IsProne()) then
+	if (self:IsProne()) then
 		anim=self.Anims.CrawlAnim
 	end
 	if (self:IsWeaponEmpty() and self.EmptyAnims) then	
 		anim=self.Anims.RunAnimEmpty
 		anim2=self.Anims.IdleAnimEmpty
-		if (ConVarExists("prone_bindkey_enabled") and self.Owner:IsProne()) then
+		if (self:IsProne()) then
 			anim=self.Anims.CrawlAnimEmpty
 		end
 		if (not self:GetNWBool("raised")) then
@@ -1932,9 +1932,16 @@ function SWEP:DiscoverAnim(anim)
 	end
 	return nil
 end
+function SWEP:IsProne()
+	if (not self.Owner:IsPlayer()) then return false end
+	if (not ConVarExists("prone_bindkey_enabled")) then return false end
+	if (not self.Owner:IsProne()) then return false end
+	return true
+end
 function SWEP:IsRunning()
+	if (not self.Owner:IsPlayer()) then return false end
 	local runspeed=self.Owner:GetWalkSpeed()*1.2
-	if (ConVarExists("prone_bindkey_enabled") and self.Owner:IsProne()) then
+	if (self:IsProne()) then
 		runspeed=5
 	end
 	if (not self.Owner:IsPlayer()) then return false end
@@ -1993,7 +2000,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 		aimPenalty=1
 	end
 	if (not self:IsResting()) then
-	if (ConVarExists("prone_bindkey_enabled")) then
+	if (self.Owner:IsPlayer() and ConVarExists("prone_bindkey_enabled")) then
 		if (self.Owner:IsProne()) then
 			aimPenalty=aimPenalty+self.PenaltyProne
 		elseif (self.Owner:Crouching()) then
@@ -2002,14 +2009,14 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 			aimPenalty=aimPenalty+self.PenaltyStand
 		end
 	else
-		if (not self.Owner:Crouching()) then
+		if (not self.Owner:IsPlayer() or not self.Owner:Crouching()) then
 			aimPenalty=aimPenalty+self.PenaltyStand
 		end
 	end
 	end
 	
 	local recoil = self:GetNWFloat("CurRecoil")
-	if (ConVarExists("prone_bindkey_enabled") and not self.Owner:IsProne()) then
+	if (self.Owner:IsPlayer() and ConVarExists("prone_bindkey_enabled") and not self.Owner:IsProne()) then
 		if (self.Owner:Crouching()) then
 			recoil=recoil*1.25
 		else
