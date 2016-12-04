@@ -1574,10 +1574,6 @@ function SWEP:Think()
 			self.Primary.Automatic=self.Auto
 		end
 	end
-	if (self.Owner:IsPlayer()) then
-	self.WeaponSway=self.WeaponSway or self.Owner:GetAimVector()
-	self.WeaponSway=Lerp(FrameTime()*30,self.WeaponSway,self.Owner:GetAimVector())
-	end
 end
 function SWEP:LowerDo(lower,anim,anim2,canfire)
 	if (lower) then
@@ -2029,7 +2025,17 @@ function SWEP:IsResting()
                 return false
         end
 end
+function SWEP:SharedVectorRand()
+	return Vector(util.SharedRandom("aimpenaltyx",-1,1,CurTime()),util.SharedRandom("aimpenaltyy",-1,1,CurTime()),util.SharedRandom("aimpenaltyz",-1,1,CurTime())):GetNormalized()
+end
 
+function SWEP:GenerateBulletDir(recoil,aimPenalty,aimcone)
+	local dir
+	local spray=Vector(util.SharedRandom("randbulletone",-aimcone,aimcone,CurTime()),util.SharedRandom("randbullettwo",-aimcone,aimcone,CurTime()),0)
+	local handling=1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)
+	dir=self.Owner:GetAimVector()+spray+(0.005*recoil*aimPenalty*self:SharedVectorRand()*handling)
+	return dir
+end
 function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 	local aimPenalty=0
 	if (not self:GetNWBool("Sight")) then
@@ -2067,7 +2073,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()                      -- Source
 	if (self.Owner:IsPlayer()) then
-		bullet.Dir              = self.WeaponSway+(0.005*(recoil+self.Owner:GetNWFloat("KswepRecoil"))*VectorRand()*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+(0.005*aimPenalty*VectorRand())                  -- Dir of bullet +(0.01*Vector(0,0,recoil))
+		bullet.Dir=self:GenerateBulletDir(recoil,aimPenalty,0)
 	else
 		bullet.Dir		= self.Owner:GetAimVector()+(0.005*recoil*VectorRand())
 	end
@@ -2084,7 +2090,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 			local tbl=table.Copy(bullet)
 			tbl.Spread = Vector()
 			if (self.Owner:IsPlayer()) then
-				tbl.Dir=self.WeaponSway+(0.005*recoil*VectorRand()*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)))+Vector(math.Rand(-aimcone,aimcone),0,math.Rand(-aimcone,aimcone))+(0.005*aimPenalty*VectorRand())
+				bullet.Dir=self:GenerateBulletDir(recoil,aimPenalty,aimcone)
 			else
 				tbl.Dir=self.Owner:GetAimVector()+(0.005*recoil*VectorRand()*aimPenalty)+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
 			end
