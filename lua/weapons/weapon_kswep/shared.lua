@@ -2151,6 +2151,7 @@ function SWEP:FlyBulletStart(bullet)
 	shot.speed=self.Ammo.velocity*self.MuzzleVelMod*supmod
 	shot.ang=bullet.Dir+Vector(0,0,math.sin(dropadj))
 	shot.bullet=bullet
+	shot.dmg=bullet.Damage
 	shot.dist = nil
 	shot.time = CurTime()
 	shot.crack=-1
@@ -2175,7 +2176,7 @@ function SWEP:FlyBullet(shot)
 	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid) then
 		shot.bullet.Src=shot.pos
 		--self.Owner:SetPos(tr.HitPos)
-		shot.bullet.Damage=shot.bullet.Damage*(shot.speed/vurtual_ammodata[shot.bullet.AmmoType].velocity)
+		shot.bullet.Damage=shot.dmg*(shot.speed/vurtual_ammodata[shot.bullet.AmmoType].velocity)
 		self:FireShot(shot.bullet)
 	
 	end
