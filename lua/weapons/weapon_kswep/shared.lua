@@ -2337,15 +2337,14 @@ function SWEP:GetShootAnim()
 	return anim
 end
 function SWEP:ShootEffects()
-	self.Weapon:SendWeaponAnim(self:GetShootAnim()) 
+	if (self.Owner:IsPlayer()) then
+		self.Weapon:SendWeaponAnim(self:GetShootAnim()) 
+	end
 	if (not self.Suppressed and not self.IntegralSuppressed) then 
 		self.Owner:MuzzleFlash()
 	end
-	if (self.Owner:IsPlayer()) then
 	self.Owner:SetAnimation(PLAYER_ATTACK1)
-	end
 end
-
 function SWEP:Recoil(recoil)
 	self:SetNWFloat("CurRecoil",self:GetNWFloat("CurRecoil")+recoil)
 	if (self:GetNWFloat("CurRecoil")>self.MaxRecoil) then
