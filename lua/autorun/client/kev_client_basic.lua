@@ -25,9 +25,11 @@ net.Receive("kswep_flashlight_cl",function(len)
 		end
 	end
 end)
+KSWEP_LAST_SUPERSONIC=0
 net.Receive("kswep_supersonic",function(len)
 	local pos=net.ReadVector()
-	if (isvector(pos)) then
+	if (isvector(pos) and KSWEP_LAST_SUPERSONIC<CurTime()) then
+		KSWEP_LAST_SUPERSONIC=CurTime()+0.1
 		sound.Play("kswep.supersonic",pos)
 	end
 end)
