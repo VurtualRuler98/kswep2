@@ -117,6 +117,7 @@ SWEP.Anims.ShootLastIronAnim=ACT_VM_ISHOOT
 SWEP.Anims.InitialDrawAnim=ACT_VM_DRAW
 SWEP.Anims.CrawlAnim=ACT_VM_CRAWL
 SWEP.Anims.CrawlAnimEmpty=ACT_VM_CRAWL_EMPTY
+SWEP.ShowViewModel=0
 SWEP.DidLowerAnim=false
 SWEP.MergeAttachments = nil
 SWEP.ReloadMessage=0
@@ -199,6 +200,7 @@ SWEP.ZeroVelocity=-1
 SWEP.ScopeZeroVelocity=0
 SWEP.Firemodes={}
 SWEP.GrenadeLauncher=false
+SWEP.Bayonet=false
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -322,8 +324,57 @@ end
 function SWEP:OnDrop()
 	self:Remove()
 end
+function SWEP:Melee()
+	local hit=false
+	local dmgtype=DMG_CLUB
+	local dmg=10
+	local tr=self.Owner:GetEyeTrace()
+	if (self.Bayonet) then
+		local anim=self.Anims.IdleAnim
+		if (self:IsRunning()) then
+			anim=self.Anims.RunBayonet
+		end
+		if (self.Anims.BayonetEmpty and self:IsWeaponEmpty()) then
+			self:SendWeaponAnim(self.Anims.BayonetEmpty)
+			if (self:IsRunning()) then
+				anim=self.Anims.RunBayonetEmpty
+			end
+		else
+			self:SendWeaponAnim(self.Anims.Bayonet)
+		end
+		if (tr.HitPos:Distance(self.Owner:GetShootPos())<self.Length+self.BayonetLength) then
+			hit=true
+			self:EmitSound("weapon_crowbar.hitflesh")
+			dmgtype=DMG_SLASH
+			dmg=25
+		end
+		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
+	else
+		if (tr.HitPos:Distance(self.Owner:GetShootPos())<40) then
+			hit=true
+			self:EmitSound("flesh.ImpactHard")
+		else
+			self:EmitSound("weapon_slam.satchelthrow")
+		end
+		self.ShowViewModel=CurTime()+0.8
+	end
+	if (SERVER and hit) then
+		local dmginfo=DamageInfo()
+		dmginfo:SetDamage(dmg)
+		dmginfo:SetInflictor(self)
+		dmginfo:SetAttacker(self.Owner)
+		dmginfo:SetDamageType(dmgtype)
+		dmginfo:SetDamagePosition(tr.HitPos)
+		tr.Entity:TakeDamageInfo(dmginfo)
+	end
+	self:SetNextAttack(CurTime()+1)
+end
 function SWEP:PrimaryAttack()
 	if (self:CanPrimaryAttack()) then
+	if (self.Owner:IsPlayer() and not self:GetNWBool("Sight") and self.Owner:KeyDown(IN_SPEED)) then
+		self:Melee()
+		return
+	end
 	if (self.Owner:IsPlayer() and self.Owner:KeyDown(IN_WALK) and not self:GetNWBool("FiremodeSelected") and not self:GetNWBool("Lowered")) then
 		self:SwitchFiremode()
 		self:SetNWBool("FiremodeSelected",true)
@@ -741,6 +792,8 @@ function SWEP:AddAttachment(item,attach)
 		end
 	elseif (item=="suppressor" and self.Suppressable) then
 		self.Suppressed=attach
+	elseif (item=="bayonet" and self.BayonetCapable) then
+		self.Bayonet=attach
 	else
 		return
 	end
@@ -850,6 +903,16 @@ net.Receive("kswep_attach_cl",function(len,ply)
 	local self=net.ReadEntity()
 	local item=net.ReadString()
 	local attach=net.ReadBool()
+	if (item=="bayonet") then
+		self.Bayonet=attach
+		if (attach) then
+			self.MergeParts.bayonet=ClientsideModel(self.BayonetModel)
+			self.MergeParts.bayonet:SetNoDraw(true)
+		else
+			self.MergeParts.bayonet:Remove()
+			self.MergeParts.bayonet=nil
+		end
+	end
 	if (item=="suppressor") then
 		self.Suppressed=attach
 		if (attach) then
@@ -938,6 +1001,11 @@ function SWEP:ReloadTube()
 end
 
 function SWEP:DrawHUD()
+	if (self.ShowViewModel>CurTime()) then
+		self.Owner:GetViewModel():SetNoDraw(true)
+	else
+		self.Owner:GetViewModel():SetNoDraw(false)
+	end
 	local ammo = self.Ammo
 	local zero=self.Zero
 	local zdata=self.Zerodata
@@ -1626,6 +1694,9 @@ end
 function SWEP:LowerRun(lower)
 	self:SetNWBool("Lowered",lower)
 	local anim=self.Anims.RunAnim
+	if (self.Bayonet and self.Anims.RunBayonet) then
+		anim=self.Anims.RunBayonet
+	end
 	local anim2=ACT_VM_IDLE
 	if (not self:GetNWBool("Raised")) then
 		anim2=self.Anims.LowerAnim
@@ -1635,6 +1706,9 @@ function SWEP:LowerRun(lower)
 	end
 	if (self:IsWeaponEmpty() and self.EmptyAnims) then	
 		anim=self.Anims.RunAnimEmpty
+		if (self.Bayonet and self.Anims.RunBayonetEmpty) then
+			anim=self.Anims.RunBayonetEmpty
+		end
 		anim2=self.Anims.IdleAnimEmpty
 		if (self:IsProne()) then
 			anim=self.Anims.CrawlAnimEmpty
@@ -1989,6 +2063,9 @@ function SWEP:IsWallBlocked()
 	local length = self.Length
 	if (self.Suppressed) then
 		length = length+self.LengthSup
+	end
+	if (self.Bayonet) then
+		length=length+self.BayonetLength
 	end
 	local tr = util.TraceLine( {
 		filter = self.Owner,

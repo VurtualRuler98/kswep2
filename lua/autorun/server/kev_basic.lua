@@ -123,6 +123,9 @@ function KswepAttach(len,pl)
 	if (attachment=="suppressor" and wep.Suppressable) then
 		wep:AddAttachment("suppressor",not wep.Suppressed)
 	end
+	if (attachment=="bayonet" and wep.BayonetCapable) then
+		wep:AddAttachment("bayonet",not wep.Bayonet)
+	end
 	if (attachment=="flashlight" and wep.CanFlashlight) then
 		wep:AddAttachment("flashlight",not wep.HasFlashlight)
 	end

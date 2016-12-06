@@ -127,6 +127,21 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				ammoframe:Close()
 				end
 		end
+		if (wep.BayonetCapable and self:GetNWBool("GiveSuppressors")) then
+			local dbutton=vgui.Create("DButton")
+				dbutton:SetParent(ammoframe)
+				dbutton:SetPos(20,120)
+				dbutton:SetSize(180,40)
+				dbutton:SetText("Bayonet")
+				dbutton.DoClick = function()
+				if (LocalPlayer():GetActiveWeapon()==wep) then
+					net.Start("kswep_attach")
+					net.WriteString("bayonet")
+					net.SendToServer()
+				end
+				ammoframe:Close()
+				end
+		end
 		if (wep.CanFlashlight and self:GetNWBool("GiveLights")) then
 			local dbutton=vgui.Create("DButton")
 				dbutton:SetParent(ammoframe)
