@@ -344,9 +344,17 @@ function SWEP:Melee()
 		end
 		if (tr.HitPos:Distance(self.Owner:GetShootPos())<self.Length+self.BayonetLength) then
 			hit=true
-			self:EmitSound("weapon_crowbar.hitflesh")
+			local prop=util.GetSurfacePropName(tr.SurfaceProps)
+			if (prop=="flesh" or prop=="alienflesh" or prop=="zombieflesh" or prop=="watermelon" or prop=="armorflesh") then
+				self:EmitSound("weapon_knife.stab")
+			else
+				self:EmitSound("weapon_knife.hitwall")
+			end
 			dmgtype=DMG_SLASH
 			dmg=25
+			if (tr.Entity:IsPlayer()) then
+				dmg=50
+			end
 		end
 		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
 	else
