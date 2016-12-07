@@ -73,6 +73,10 @@ SWEP.ReloadModHeavy=1.20
 SWEP.ScopeName="Default"
 SWEP.Anims={}
 SWEP.AnimsDiscovered={}
+SWEP.DefaultZeroTable=nil
+SWEP.ZeroTable=nil
+SWEP.DefaultZeroTableAlt=nil
+SWEP.ZeroTableAlt=nil
 SWEP.Anims.IdleAnim=ACT_VM_IDLE
 SWEP.Anims.ReloadAnim = ACT_VM_RELOAD
 SWEP.Anims.DryfireAnim = ACT_VM_DRYFIRE
@@ -179,6 +183,7 @@ SWEP.DefaultZerodata = {
 	battlesight=false
 }
 SWEP.DefaultZerodataAlt = table.Copy(SWEP.DefaultZerodata)
+SWEP.DefaultZerodataAlt.default=-1
 SWEP.UseDelayForBolt=false
 SWEP.WaitShot=false
 SWEP.WaitShotIron=false
@@ -233,6 +238,12 @@ function SWEP:Initialize()
 	if (self.Anims.RunAnim==nil) then
 		self.Anims.RunAnim=self.Anims.LowerAnim
 		self.Anims.RunAnimEmpty=self.Anims.LowerAnimEmpty
+	end
+	if (self.DefaultZeroTable) then
+		self.ZeroTable=self.DefaultZeroTable
+	end
+	if (self.DefaultZeroTableAlt) then
+		self.ZeroTableAlt=self.DefaultZeroTableAlt
 	end
 	if (self.Owner:IsNPC()) then
 		local weapon=self
@@ -736,12 +747,24 @@ function SWEP:InsOptic(name)
 		self.ZerodataAlt=scopedata.zeroalt
 		self.ZeroAlt=self.ZerodataAlt.default
 		scopemodel=scopedata.model
+		if (scopedata.zerotable) then
+			self.ZeroTable=scopedata.zerotable
+		else
+			self.ZeroTable=nil
+		end
+		if (scopedata.zerotablealt) then
+			self.ZeroTableAlt=scopedata.zerotablealt
+		else
+			self.ZeroTableAlt=nil
+		end
 	else
 		scopemodel=self.DefaultSight
 		self.Zerodata=self.DefaultZerodata
 		self.Zero=self.Zerodata.default
 		self.ZerodataAlt = self.DefaultZerodataAlt
 		self.ZeroAlt=self.ZerodataAlt.default
+		self.ZeroTable=self.DefaultZeroTable
+		self.ZeroTableAlt=self.DefaultZeroTableAlt
 		if (self.DefaultSight==nil and self.optic) then
 			self.optic:Remove()
 			self.optic=nil
@@ -1030,6 +1053,12 @@ function SWEP:DrawHUD()
 	end
 	if (zero==0) then
 		zero=zdata.battlesight
+	end
+	if (not self:GetNWBool("AltIrons") and self.ZeroTable) then 
+		zero=self.ZeroTable[zero]
+	end
+	if (self:GetNWBool("AltIrons") and self.ZeroTableAlt) then
+		zero=self.ZeroTableAlt[zero]
 	end
 	local zerostring=zero.."m"
 	if (zero==-1337) then
@@ -1321,7 +1350,7 @@ function SWEP:SecondaryAttack()
 	end
 	if ((self.Owner:KeyDown(IN_WALK)) and not self:GetNWBool("Sight")) then
 		self:ToggleZoom()
-	elseif (self.Owner:KeyDown(IN_WALK) and self.ZerodataAlt.default) then
+	elseif (self.Owner:KeyDown(IN_WALK) and self.ZerodataAlt.default~=-1) then
 		self:SetNWBool("AltIrons",not self:GetNWBool("AltIrons"))
 	else
 		self:ToggleAim()
@@ -2231,7 +2260,12 @@ function SWEP:FlyBulletStart(bullet)
 		end
 		zero=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
 	end
-		
+	if (not self:GetNWBool("AltIrons") and self.ZeroTable) then 
+		zero=self.ZeroTable[zero]
+	end
+	if (self:GetNWBool("AltIrons") and self.ZeroTableAlt) then
+		zero=self.ZeroTableAlt[zero]
+	end	
 	if (self.Suppressed) then supmod=self.MuzzleVelModSup end
 	local zerovel=self.Ammo.velocity*self.MuzzleVelMod*supmod
 	if (self.ScopeName=="Default" and self.ZeroVelocity>0) then
