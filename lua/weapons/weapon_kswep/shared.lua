@@ -201,6 +201,7 @@ SWEP.ScopeZeroVelocity=0
 SWEP.Firemodes={}
 SWEP.GrenadeLauncher=false
 SWEP.Bayonet=false
+SWEP.RunTimer=0
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -342,18 +343,24 @@ function SWEP:Melee()
 		else
 			self:SendWeaponAnim(self.Anims.Bayonet)
 		end
+		local runbonus=0.1*self.Owner:GetVelocity():Dot(self.Owner:GetAimVector())
 		if (tr.HitPos:Distance(self.Owner:GetShootPos())<self.Length+self.BayonetLength) then
 			hit=true
 			local prop=util.GetSurfacePropName(tr.SurfaceProps)
+			dmgtype=DMG_SLASH
+			dmg=20
+			if (tr.Entity:IsPlayer()) then
+				dmg=25
+			end
 			if (prop=="flesh" or prop=="alienflesh" or prop=="zombieflesh" or prop=="watermelon" or prop=="armorflesh") then
-				self:EmitSound("weapon_knife.stab")
+				if (self.RunTimer>0 and self.RunTimer+1<CurTime()) then
+					self:EmitSound("weapon_knife.stab")
+					dmg=dmg*4
+				else
+					self:EmitSound("weapon_knife.hit")
+				end
 			else
 				self:EmitSound("weapon_knife.hitwall")
-			end
-			dmgtype=DMG_SLASH
-			dmg=25
-			if (tr.Entity:IsPlayer()) then
-				dmg=50
 			end
 		end
 		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
@@ -1515,6 +1522,12 @@ hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think2()
 end
 function SWEP:Think()
+	if (self:IsRunning() and self.RunTimer==0) then
+		self.RunTimer=CurTime()
+	end
+	if (not self:IsRunning() and self.RunTimer>0) then
+		self.RunTimer=0
+	end
 	if (self.GrenadeLauncher and IsFirstTimePredicted() and not self:GetNWBool("Chambered") and self:GetNWInt("numgrenades")>0) then
 		self:SetNWBool("Chambered",true)
 		self:NextBolt(CurTime()+self.Primary.Delay,ACT_VM_IDLE,self.Anims.ReloadAnim)
