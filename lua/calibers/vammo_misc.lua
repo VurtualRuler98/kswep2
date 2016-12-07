@@ -215,6 +215,20 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity = 1400 --C96
 	AddAmmodata(tbl)
 	local tbl = {}
+	tbl.vestpenetration=KSWEP_ARMOR_I
+	tbl.dmgbase = 2
+	tbl.dmgvitalmin = 2
+	tbl.dmgvitalmax = 5
+	tbl.name = "vammo_22_ball"
+	tbl.printname = ".22 LR Ball"
+	tbl.caliber = "vammo_22"
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.wallbang = 2
+	tbl.recoil = 0.5
+	tbl.velocity =	1200 --kinda 5 inch barrel? TODO make this better
+	AddAmmodata(tbl)
+	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_IIIA
 	tbl.dmgbase = 7
 	tbl.dmgvitalmin = 5
