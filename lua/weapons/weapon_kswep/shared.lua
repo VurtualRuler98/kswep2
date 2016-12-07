@@ -2164,9 +2164,9 @@ function SWEP:GenerateBulletDir(recoil,aimPenalty,aimcone)
 	return dir
 end
 function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
-	local aimPenalty=0
+	local aimPenalty=1
 	if (not self:GetNWBool("Sight")) then
-		aimPenalty=1
+		aimPenalty=2
 	end
 	if (not self:IsResting()) then
 	if (self.Owner:IsPlayer() and ConVarExists("prone_bindkey_enabled")) then
