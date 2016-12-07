@@ -9,7 +9,7 @@ if (CLIENT) then
 end
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
-SWEP.Category="Vurtual's K-Weapons Equipment"
+SWEP.Category="KSwep Equipment"
 SWEP.ViewModel = "models/weapons/v_grenade.mdl"
 SWEP.WorldModel = "models/weapons/w_grenade.mdl"
 SWEP.Flashlight=false

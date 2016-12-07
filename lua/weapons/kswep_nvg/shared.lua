@@ -10,6 +10,7 @@ end
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.ViewModel = nil
+SWEP.Category = "KSwep Equipment"
 SWEP.WorldModel = "models/weapons/w_toolgun.mdl"
 SWEP.Flashlight=false
 SWEP.Primary.Delay=0.5

@@ -8,7 +8,7 @@ if (CLIENT) then
 	SWEP.SlotPos = 99
 end
 SWEP.Spawnable = false
-SWEP.Category="Vurtual's K-Weapons Equipment"
+SWEP.Category="KSwep Equipment"
 SWEP.AdminSpawnable = false
 SWEP.ViewModel = nil
 SWEP.WorldModel = "models/weapons/w_suitcase_passenger.mdl"
