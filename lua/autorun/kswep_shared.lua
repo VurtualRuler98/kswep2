@@ -30,6 +30,8 @@ kswep_kspawnergrenades = {
 	weapon_kgreni2_m84={name="M84 Stun Grenade",effect=0},
 	weapon_ksweps_grenadetrap={name="Grenade Trap",effect=0},
 	weapon_kgreni2_molotov={name="Molotov",effect=0},
+	weapon_kgreni2_m106={name="M106 Fast Obscurant Grenade",effect=0},
+	weapon_kswepd_panzerfaust={name="Panzerfaust",effect=1},
 	weapon_frag={name="HL2 Grenade",effect=1}
 }
 function AddAmmodata(tbl)
