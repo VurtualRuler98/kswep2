@@ -55,14 +55,11 @@ function SWEP:Holster(wep)
 	local delay=0
 	if (self:GetNWFloat("NextIdle")>CurTime()) then 
 		delay=delay+(self:GetNWFloat("NextIdle")-CurTime())
-		print(delay)
 	end
 	if (self.Holstering~=nil and self.HolsterAfter==0 and self:GetNWFloat("NextIdle")<CurTime()) then
 		self.Holstering=nil
-		print(wep)
 		return true
 	else
-		print(wep)
 		self.Holstering=wep
 		delay=delay+self.Owner:GetViewModel():SequenceDuration(self:SelectWeightedSequence(self.Anims.Holster))
 		self.HolsterAfter=CurTime()+delay
