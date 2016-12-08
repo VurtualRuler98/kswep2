@@ -235,15 +235,15 @@ hook.Add("Think","ksweprecoilthink", function()
 		for k,v in pairs(player.GetAll()) do
 			if (IsValid(v) and v:IsPlayer()) then
 				local rec=v:GetNWFloat("KswepRecoil")
-				if (false and v:GetWalkSpeed()<v:GetVelocity():Length()) then
-					if (rec<1) then
-						rec=rec+0.02
-						if (rec>1) then
-							rec=1
-						end
-						v:SetNWFloat("KswepRecoil",rec)
-					end
-				else
+				--if (v:GetWalkSpeed()<v:GetVelocity():Length()) then
+				--	if (rec<1) then
+				--		rec=rec+0.02
+				--		if (rec>1) then
+				--			rec=1
+				--		end
+				--		v:SetNWFloat("KswepRecoil",rec)
+				--	end
+				--else
 					
 					if (rec>0) then
 						rec=rec-0.01
@@ -252,7 +252,7 @@ hook.Add("Think","ksweprecoilthink", function()
 						end
 						v:SetNWFloat("KswepRecoil",rec)
 					end
-				end
+				--end
 			end
 		end
 		KswepRecoilTime=CurTime()+1
