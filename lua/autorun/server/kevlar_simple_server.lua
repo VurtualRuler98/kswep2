@@ -117,10 +117,11 @@ function KSGetArmorNPC(npc,hitgroup)
 		if (hitgroup==HITGROUP_CHEST) then
 			return KSWEP_ARMOR_IV
 		elseif (hitgroup==HITGROUP_HEAD) then
-		if (npc:GetBodygroup(npc:FindBodygroupByName("heads"))==0) then
-			return KSWEP_ARMOR_IIIA
-		else
-			return 0
+			if (npc:GetBodygroup(npc:FindBodygroupByName("heads"))==0) then
+				return KSWEP_ARMOR_IIIA
+			else
+				return 0
+			end
 		end
 	end
 	return -1
