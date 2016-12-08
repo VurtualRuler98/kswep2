@@ -330,7 +330,7 @@ function SWEP:DiscoverModelAnimsDone()
 			net.Send(self.Owner)
 	end
 	if (self.ZeroVelocity==-1) then 
-		self.ZeroVelocity=self.Ammo.velocity
+		self.ZeroVelocity=self.Ammo.velocity*self.MuzzleVelMod
 	end
 end	
 function SWEP:OnDrop()
