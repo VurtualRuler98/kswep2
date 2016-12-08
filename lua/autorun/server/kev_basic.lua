@@ -235,7 +235,7 @@ hook.Add("Think","ksweprecoilthink", function()
 		for k,v in pairs(player.GetAll()) do
 			if (IsValid(v) and v:IsPlayer()) then
 				local rec=v:GetNWFloat("KswepRecoil")
-				if (v:GetWalkSpeed()<v:GetVelocity():Length()) then
+				if (false and v:GetWalkSpeed()<v:GetVelocity():Length()) then
 					if (rec<1) then
 						rec=rec+0.02
 						if (rec>1) then
