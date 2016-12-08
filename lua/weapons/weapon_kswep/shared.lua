@@ -2166,7 +2166,7 @@ end
 function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 	local aimPenalty=1
 	if (not self:GetNWBool("Sight")) then
-		aimPenalty=2
+		aimPenalty=1.2
 	end
 	if (not self:IsResting()) then
 	if (self.Owner:IsPlayer() and ConVarExists("prone_bindkey_enabled")) then
