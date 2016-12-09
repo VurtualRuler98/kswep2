@@ -250,10 +250,6 @@ function SetSpawnMagazines(ply)
 	ply:SetNWFloat("KswepRecoil",0)
 	ply.KPrimaryItem="nothing"
 	ply.KSecondaryItem="nothing"
-	net.Start("kswep_setequipment_cl")
-	net.WriteString("nothing")
-	net.WriteString("nothing")
-	net.Send(ply)
 end
 hook.Add("PlayerSpawn","setspawnmagazines",SetSpawnMagazines)
 
