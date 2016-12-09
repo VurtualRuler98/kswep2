@@ -155,6 +155,22 @@ function RearmMags(len,pl)
 				local tbl=pl.KPrimaryMags
 				local magsize=wep.MagSize
 				local magtype=wep.MagType
+				local magbonus=1
+				local magitem="primaryammo"	
+				if (wep.IsSecondaryWeapon) then
+					tbl=pl.KSecondaryMags
+					pl.KSecondaryType=magtype
+					magitem="secondaryammo"
+				else
+					pl.KPrimaryType=magtype
+				end
+				if (pl.KPrimaryItem==magitem) then
+					magbonus=magbonus+1
+				end
+				if (pl.KSecondaryItem==magitem) then
+					magbonus=magbonus+1
+				end
+				magcount=magcount*magbonus
 				if (wep.SingleReload and not wep.SingleClips) then
 					magsize=1
 					magtype=wep.Caliber
@@ -162,13 +178,6 @@ function RearmMags(len,pl)
 				end
 				if (wep.SingleClips) then
 					magsize=wep.ReloadClipSize
-				end
-				
-				if (wep.IsSecondaryWeapon) then
-					tbl=pl.KSecondaryMags
-					pl.KSecondaryType=magtype
-				else
-					pl.KPrimaryType=magtype
 				end
 				table.Empty(tbl)
 				for i=1,magcount do
@@ -220,6 +229,8 @@ function SetSpawnMagazines(ply)
 	ply.KSecondaryMags={}
 	ply.KSecondaryType=nil
 	ply:SetNWFloat("KswepRecoil",0)
+	ply.KPrimaryItem=""
+	ply.KSecondaryItem=""
 end
 hook.Add("PlayerSpawn","setspawnmagazines",SetSpawnMagazines)
 
