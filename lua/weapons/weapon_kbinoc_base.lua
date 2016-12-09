@@ -144,7 +144,7 @@ end)
 function SWEP.DetectScroll(ply,bind,pressed)
 	if (ply:IsPlayer() and pressed) then
 		local wep=ply:GetActiveWeapon()
-		if (IsValid(wep) and string.find(wep:GetClass(),"weapon_kbinoc") and wep.MagSteps~=0 and wep.Zoomed) then
+		if (IsValid(wep) and string.find(wep:GetClass(),"weapon_kbinoc") and wep.MagSteps~=0 and wep:GetNWBool("Zoomed")) then
 			local adj=((1/wep.MagSteps)*(wep.MaxMag-wep.MinMag))
 			if (bind=="invprev") then
 				wep.Magnification=wep.Magnification+adj
