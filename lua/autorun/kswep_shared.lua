@@ -34,6 +34,12 @@ kswep_kspawnergrenades = {
 	weapon_kswepd_panzerfaust={name="Panzerfaust",effect=1},
 	weapon_frag={name="HL2 Grenade",effect=1}
 }
+kswep_validitems= {
+	"primaryammo",
+	"secondaryammo",
+	"nothing"
+}
+	
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 	game.AddAmmoType({name=tbl.name,dmgtype=DMG_BULLET,force=10})

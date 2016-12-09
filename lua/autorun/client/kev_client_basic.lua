@@ -25,6 +25,15 @@ net.Receive("kswep_flashlight_cl",function(len)
 		end
 	end
 end)
+local function KSwepSetEquipment_cl(len)
+	local primary=net.ReadString()
+	local secondary=net.ReadString()
+	if (primary~=nil and secondary~=nil) then
+		LocalPlayer().KPrimaryItem=primary
+		LocalPlayer().KSecondaryItem=secondary
+	end
+end
+net.Receive("kswep_setequipment_cl",KSwepSetEquipment_cl)
 KSWEP_LAST_SUPERSONIC=0
 net.Receive("kswep_supersonic",function(len)
 	local pos=net.ReadVector()

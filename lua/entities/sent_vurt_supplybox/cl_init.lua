@@ -77,9 +77,44 @@ function ENT:ClUseMagBox(wep,mags)
 		end
 
 end 
+function ENT:ShowEquipmentMenu(secondary)
+	local menuwidth=200
+	local menuheight=200
+	local title="Item 1"
+	if (secondary) then
+		title="Item 2"
+	end
+	local ammoframe = vgui.Create("DFrame")
+		ammoframe:SetPos((ScrW()/2)-(menuwidth/2),(ScrH()/2)-(menuheight/2))
+		ammoframe:SetSize(menuwidth,menuheight)
+		ammoframe:SetTitle(title)
+		ammoframe:MakePopup()
+	local scrollmenu = vgui.Create("DListView",ammoframe)
+		scrollmenu:SetPos(16,32)
+		scrollmenu:SetSize(menuwidth-32,menuheight-32)
+		scrollmenu:AddColumn("item")
+		for k,v in pairs(kswep_validitems) do
+			scrollmenu:AddLine(v)
+		end
+		local box=self
+		function scrollmenu:OnClickLine(line,selected)
+			if (secondary) then
+				LocalPlayer().KSecondaryItem=line:GetValue(1)
+			else
+				LocalPlayer().KPrimaryItem=line:GetValue(1)
+			end
+			net.Start("kswep_setequipment")
+			net.WriteBool(secondary)
+			net.WriteString(line:GetValue(1))
+			net.WriteEntity(box)
+			net.SendToServer()
+			ammoframe:Close()
+		end
+end
+	
 function ENT:ClUseBox(wep,mags,canmag,canoptic)
 	local menuwidth=200
-	local menuheight=300
+	local menuheight=400
 	local ammoframe = vgui.Create("DFrame")
 		ammoframe:SetPos((ScrW()/2)-(menuwidth/2),(ScrH()/2)-(menuheight/2))
 		ammoframe:SetSize(menuwidth,menuheight)
@@ -224,6 +259,27 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				net.Start("kswep_takesuitcase")
 				net.WriteEntity(self)
 				net.SendToServer()
+				ammoframe:Close()
+			end
+	end
+	local box=self
+	if (self:GetNWBool("Equipment")) then
+		local dbutton=vgui.Create("DButton")
+			dbutton:SetParent(ammoframe)
+			dbutton:SetPos(20,240)
+			dbutton:SetSize(90,40)
+			dbutton:SetText("["..LocalPlayer().KPrimaryItem.."]")
+			dbutton.DoClick = function()
+				box:ShowEquipmentMenu(false)
+				ammoframe:Close()
+			end
+		local dbutton=vgui.Create("DButton")
+			dbutton:SetParent(ammoframe)
+			dbutton:SetPos(110,240)
+			dbutton:SetSize(90,40)
+			dbutton:SetText("["..LocalPlayer().KSecondaryItem.."]")
+			dbutton.DoClick = function()
+				box:ShowEquipmentMenu(true)
 				ammoframe:Close()
 			end
 	end

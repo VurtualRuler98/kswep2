@@ -25,6 +25,8 @@ util.AddNetworkString("kswep_updaterack")
 util.AddNetworkString("kswep_takegunfromrack")
 util.AddNetworkString("kswep_takesuitcase")
 util.AddNetworkString("kswep_supersonic")
+util.AddNetworkString("kswep_setequipment")
+util.AddNetworkString("kswep_setequipment_cl")
 resource.AddFile("materials/kswep/ret_mil.png")
 resource.AddFile("materials/kswep/ret_m22_10.png")
 net.Receive("kswep_flashlight",function(len,pl)
@@ -137,6 +139,22 @@ function KswepAttach(len,pl)
 	end
 end
 net.Receive("kswep_attach",KswepAttach)
+local function KSwepSetEquipment(len,pl)
+	local slot=net.ReadBool()
+	local item=net.ReadString()
+	local box=net.ReadEntity()
+	if (IsValid(pl) and pl:IsPlayer() and slot~=nil and item~=nil and IsValid(box)) then
+		if (not box:GetClass("sent_vurt_supplybox")) then return end
+		if (box:GetPos():Distance(pl:GetPos())>512) then return end
+		if (not box:GetNWBool("Equipment")) then return end
+		if (slot) then
+			pl.KSecondaryItem=item
+		else
+			pl.KPrimaryItem=item
+		end
+	end
+end
+net.Receive("kswep_setequipment",KSwepSetEquipment)
 function RearmMags(len,pl)
 	if (IsValid(pl) and pl:IsPlayer()) then
 		local box=net.ReadEntity()
@@ -155,8 +173,9 @@ function RearmMags(len,pl)
 				local tbl=pl.KPrimaryMags
 				local magsize=wep.MagSize
 				local magtype=wep.MagType
-				local magbonus=1
+				local magbonus=0
 				local magitem="primaryammo"	
+				local bonusnum=wep.MaxMagsBonus
 				if (wep.IsSecondaryWeapon) then
 					tbl=pl.KSecondaryMags
 					pl.KSecondaryType=magtype
@@ -170,7 +189,7 @@ function RearmMags(len,pl)
 				if (pl.KSecondaryItem==magitem) then
 					magbonus=magbonus+1
 				end
-				magcount=magcount*magbonus
+				magcount=magcount+(bonusnum*magbonus)
 				if (wep.SingleReload and not wep.SingleClips) then
 					magsize=1
 					magtype=wep.Caliber
@@ -229,8 +248,12 @@ function SetSpawnMagazines(ply)
 	ply.KSecondaryMags={}
 	ply.KSecondaryType=nil
 	ply:SetNWFloat("KswepRecoil",0)
-	ply.KPrimaryItem=""
-	ply.KSecondaryItem=""
+	ply.KPrimaryItem="nothing"
+	ply.KSecondaryItem="nothing"
+	net.Start("kswep_setequipment_cl")
+	net.WriteString("nothing")
+	net.WriteString("nothing")
+	net.Send(ply)
 end
 hook.Add("PlayerSpawn","setspawnmagazines",SetSpawnMagazines)
 

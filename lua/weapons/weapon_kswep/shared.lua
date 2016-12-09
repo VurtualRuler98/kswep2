@@ -64,6 +64,7 @@ SWEP.RecoilMassModifier=1
 SWEP.HandlingModifier=200
 SWEP.HoldAngle=20
 SWEP.MaxMags=6
+SWEP.MaxMagsBonus=2
 SWEP.DoubleAction=false
 SWEP.SpawnChambered=false
 SWEP.ScopeZoom = 1
