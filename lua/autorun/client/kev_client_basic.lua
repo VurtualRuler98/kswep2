@@ -33,6 +33,14 @@ local function KSwepSetEquipment_cl(len)
 		LocalPlayer().KSecondaryItem=secondary
 	end
 end
+net.Receive("kswep_stabsound",function(len)
+	local crit=net.ReadBool()
+	if (crit) then
+		LocalPlayer():EmitSound("weapon_knife.stab")
+	else
+		LocalPlayer():EmitSound("weapon_knife.hit")
+	end
+end)
 net.Receive("kswep_setequipment_cl",KSwepSetEquipment_cl)
 KSWEP_LAST_SUPERSONIC=0
 net.Receive("kswep_supersonic",function(len)

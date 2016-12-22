@@ -356,7 +356,7 @@ function SWEP:Melee()
 			self:SendWeaponAnim(self.Anims.Bayonet)
 		end
 		local runbonus=0.1*self.Owner:GetVelocity():Dot(self.Owner:GetAimVector())
-		if (tr.HitPos:Distance(self.Owner:GetShootPos())<self.Length+self.BayonetLength) then
+		if (tr.HitPos:Distance(self.Owner:GetShootPos())<self.Length+self.BayonetLength+10) then
 			hit=true
 			local prop=util.GetSurfacePropName(tr.SurfaceProps)
 			dmgtype=DMG_SLASH
@@ -365,11 +365,19 @@ function SWEP:Melee()
 				dmg=25
 			end
 			if (prop=="flesh" or prop=="alienflesh" or prop=="zombieflesh" or prop=="watermelon" or prop=="armorflesh") then
-				if (self.RunTimer>0 and self.RunTimer+1<CurTime()) then
-					self:EmitSound("weapon_knife.stab")
-					dmg=dmg*4
-				else
-					self:EmitSound("weapon_knife.hit")
+				if (SERVER) then
+					if (self.RunTimer>0 and self.RunTimer+1<CurTime()) then
+						self:EmitSound("weapon_knife.stab")
+						net.Start("kswep_stabsound")
+						net.WriteBool(true)
+						net.Send(self.Owner)
+						dmg=dmg*4
+					else
+						self:EmitSound("weapon_knife.hit")
+						net.Start("kswep_stabsound")
+						net.WriteBool(false)
+						net.Send(self.Owner)
+					end
 				end
 			else
 				self:EmitSound("weapon_knife.hitwall")
