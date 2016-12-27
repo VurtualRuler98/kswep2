@@ -116,9 +116,9 @@ SWEP.Anims.UnstowAnimEmpty=ACT_VM_DRAW
 SWEP.Anims.StowAnimEmpty=ACT_VM_HOLSTER
 SWEP.Anims.LowerAnimEmpty=ACT_VM_DOWN
 SWEP.Anims.IronAnimEmpty=ACT_VM_IIDLE
-SWEP.Anims.ShootLastAnim=ACT_VM_PRIMARYATTACK
+SWEP.Anims.ShootLastAnim=nil
 SWEP.Anims.ShootAnim=ACT_VM_PRIMARYATTACK
-SWEP.Anims.ShootLastIronAnim=ACT_VM_ISHOOT
+SWEP.Anims.ShootLastIronAnim=nil
 SWEP.Anims.InitialDrawAnim=ACT_VM_DRAW
 SWEP.Anims.CrawlAnim=ACT_VM_CRAWL
 SWEP.Anims.CrawlAnimEmpty=ACT_VM_CRAWL_EMPTY
@@ -341,6 +341,7 @@ function SWEP:Melee()
 	local hit=false
 	local dmgtype=DMG_CLUB
 	local dmg=10
+	local nextattack=1
 	local tr=self.Owner:GetEyeTrace()
 	if (self.Bayonet) then
 		local anim=self.Anims.IdleAnim
@@ -384,6 +385,7 @@ function SWEP:Melee()
 			end
 		end
 		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
+		nextattack=0.1+self.Owner:GetViewModel():SequenceDuration()
 	else
 		if (tr.HitPos:Distance(self.Owner:GetShootPos())<self.Length+10) then
 			hit=true
@@ -392,10 +394,22 @@ function SWEP:Melee()
 			self:EmitSound("weapon_slam.satchelthrow")
 		end
 		if (self.Anims.Bash) then
-			self:SendWeaponAnim(self.Anims.Bash)
-			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.Anims.IdleAnim)
+			local anim=self.Anims.Bash
+			local anim2=self.Anims.IdleAnim
+			if (self:IsWeaponEmpty()) then
+				if (self.Anims.BashEmpty) then
+					anim=self.Anims.BashEmpty
+				end
+				if (self.Anims.IdleAnimEmpty) then
+					anim2=self.Anims.IdleAnimEmpty
+				end
+			end
+			self:SendWeaponAnim(anim)
+			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
+			nextattack=0.1+self.Owner:GetViewModel():SequenceDuration()
 		else
 			self.ShowViewModel=CurTime()+0.8
+			nextattack=0.9
 		end
 	end
 	if (SERVER and hit) then
@@ -407,7 +421,7 @@ function SWEP:Melee()
 		dmginfo:SetDamagePosition(tr.HitPos)
 		tr.Entity:TakeDamageInfo(dmginfo)
 	end
-	self:SetNextAttack(CurTime()+1)
+	self:SetNextAttack(CurTime()+nextattack)
 end
 function SWEP:PrimaryAttack()
 	if (self:CanPrimaryAttack()) then
@@ -540,12 +554,12 @@ function SWEP:NormalFire()
 	local animbolt = self.Anims.BoltAnim
 	if (self:GetNWBool("Sight")) then
 		animbolt = self.Anims.BoltAnimIron
-		if (self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()<1)) then
+		if (not self:IsWeaponEmpty() or self.Anims.ShootLastAnim==nil) then
 			anim=self.Anims.IronAnim
 		else
 			anim=self.Anims.IronAnimEmpty
 		end
-	elseif (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()<1)) then
+	elseif (self:IsWeaponEmpty() and self.Anims.ShootLastAnim~=nil) then
 		anim=self.Anims.IdleAnimEmpty
 	end
 	local bolttime = 0
@@ -675,7 +689,7 @@ function SWEP:Deploy()
 	self:ServeNWBool("Lowered",false)
 end
 function SWEP:IsWeaponEmpty()
-	if ((not self:GetNWBool("Chambered") and (not self.OpenBolt or self.GrenadeLauncher)) or (self.OpenBolt and self:Clip1()==0)) then
+	if ((not self:GetNWBool("Chambered") and (not self.OpenBolt or self.GrenadeLauncher)) or (self.OpenBolt and (not self:GetNWBool("FiringPin") or not self.SingleReloadFiringPin) and self:Clip1()==0)) then
 		return true
 	else
 		return false
@@ -2472,11 +2486,11 @@ function SWEP:GetShootAnim()
 	local anim=self.Anims.ShootAnim
 	if (self.InsAnims and self:GetNWBool("Sight")) then
 		anim=self.Anims.IronShootAnim
-		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0)) then
+		if (self:IsWeaponEmpty() and self.Anims.ShootLastIronAnim~=nil) then
 		anim=self.Anims.ShootLastIronAnim
 		end
 	else
-		if (not self:GetNWBool("Chambered") or (self.OpenBolt and self:Clip1()==0)) then
+		if (self:IsWeaponEmpty() and self.Anims.ShootLastAnim~=nil) then
 		anim=self.Anims.ShootLastAnim
 		end
 	end
