@@ -385,13 +385,18 @@ function SWEP:Melee()
 		end
 		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
 	else
-		if (tr.HitPos:Distance(self.Owner:GetShootPos())<40) then
+		if (tr.HitPos:Distance(self.Owner:GetShootPos())<self.Length+10) then
 			hit=true
 			self:EmitSound("flesh.ImpactHard")
 		else
 			self:EmitSound("weapon_slam.satchelthrow")
 		end
-		self.ShowViewModel=CurTime()+0.8
+		if (self.Anims.Bash) then
+			self:SendWeaponAnim(self.Anims.Bash)
+			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.Anims.IdleAnim)
+		else
+			self.ShowViewModel=CurTime()+0.8
+		end
 	end
 	if (SERVER and hit) then
 		local dmginfo=DamageInfo()
