@@ -1691,10 +1691,12 @@ function SWEP:Think()
 	end
 	if (self:GetNWFloat("NextIdle")~=0 and self:GetNWFloat("NextIdle")<CurTime() and IsFirstTimePredicted()) then
 		if (self.NextBoltAnim) then
+			if (not self.Owner:KeyDown(IN_ATTACK)) then
 			self.Weapon:SendWeaponAnim(self.NextBoltAnim)
 			self.NextBoltAnim=nil
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.Anims.NextIdleAnim)
 			self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+			end
 		else
 			self.Weapon:SendWeaponAnim(self.Anims.NextIdleAnim)
 			self:ServeNWFloat("NextIdle",0)
@@ -2530,7 +2532,7 @@ function SWEP:ToggleAim()
 		self:ServeNWBool("Sight",false)
 		if (self.InsAnims) then
 			local anim=self.Anims.IronOutAnim
-			local anim2=ACT_VM_IDLE
+			local anim2=self.Anims.IdleAnim
 			if (self:IsWeaponEmpty() and self.EmptyAnims) then	
 				anim=self.Anims.IronOutAnimEmpty
 				anim2=self.Anims.IdleAnimEmpty
