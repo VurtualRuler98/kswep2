@@ -154,8 +154,6 @@ SWEP.ChamberAmmo={}
 SWEP.IsSecondaryWeapon=false
 SWEP.ReloadDelay=0
 SWEP.IronZoom=90
-SWEP.IronZoomMin=90
-SWEP.IronZoomMax=65
 SWEP.InsAttachments=false
 SWEP.IronOffsetPos=Vector()
 SWEP.ScopeOffsetPos=Vector()
@@ -1426,7 +1424,19 @@ function SWEP:SwitchFiremode()
 		self.Weapon:EmitSound("weapon_smg1.special1")
 	end
 end
-
+function SWEP:IronZoomMax()
+	local width=(ScrW()/(ScrW()/ScrH()))*(4/3)
+	local fovlimit=width/60
+	if (fovlimit>90) then fovlimit=90 end --your monitor is higher resolution than the actual human eye!
+	return fovlimit
+end
+function SWEP:IronZoomMin()
+	local width=(ScrW()/ScrH())/(4/3)
+	local fovlimit=150/width
+	if (fovlimit<90*width) then fovlimit=90*width end --TRIPLE HEAD
+	return fovlimit
+end
+	
 function SWEP.DetectScroll(ply,bind,pressed)
 	if (pressed) then
 		local wep=ply:GetActiveWeapon()
@@ -1466,7 +1476,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					net.SendToServer()
 				else
 					wep.IronZoom=wep.IronZoom+5
-					if (wep.IronZoom>wep.IronZoomMin) then wep.IronZoom=wep.IronZoomMin end
+					if (wep.IronZoom>wep:IronZoomMin()) then wep.IronZoom=wep:IronZoomMin() end
 				end
 			elseif (bind=="invprev" and wep:GetNWBool("Sight")) then
 				if (wep.Owner:KeyDown(IN_WALK) and wep.ScopeFOVSteps~=nil) then
@@ -1502,7 +1512,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					net.SendToServer()
 				else
 					wep.IronZoom=wep.IronZoom-5
-					if (wep.IronZoom<wep.IronZoomMax) then wep.IronZoom=wep.IronZoomMax end
+					if (wep.IronZoom<wep:IronZoomMax()) then wep.IronZoom=wep:IronZoomMax() end
 				end
 			end
 			if (bind=="impulse 100" and (not GetConVar("mp_flashlight"):GetBool() or not wep.Owner:KeyDown(IN_WALK)) and (wep.HasFlashlight or wep.HasLaser or wep.HasRanger)) then
@@ -2084,7 +2094,7 @@ function SWEP:AdjustMouseSensitivity()
 		elseif (self.ScopeFOV~=nil) then
 			scopesens=self.MaxSensitivity
 		end
-		scopesens=1+(scopesens)*((self.IronZoomMin-self.IronZoom)/(self.IronZoomMin-self.IronZoomMax))
+		scopesens=1+(scopesens)*((self:IronZoomMin()-self.IronZoom)/(self:IronZoomMin()-self:IronZoomMax()))
 		return 1/scopesens/self.ScopeZoom
 	else
                 return 1
