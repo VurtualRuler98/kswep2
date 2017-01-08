@@ -49,6 +49,9 @@ end
 function SWEP:SecondaryAttack()
 	if (not IsFirstTimePredicted()) then return end
 	self:SetNWBool("Zoomed",not self:GetNWBool("Zoomed"))
+	if (CLIENT) then
+		self.Magfov=self:GetMaxFOV()
+	end
 	if (self:GetNWBool("Zoomed")) then
 		self:SetHoldType("camera")
 	else
@@ -57,14 +60,14 @@ function SWEP:SecondaryAttack()
 end
 function SWEP:TranslateFOV(fov)
 	if (self:GetNWBool("Zoomed")) then
-		return fov/self.Magnification
+		return self.Magfov
 	else
 		return fov
 	end
 end
 function SWEP:AdjustMouseSensitivity()
 	if (self:GetNWBool("Zoomed")) then
-		return 1/self.Magnification
+		return self.Magfov/GetConVar("fov_desired"):GetInt()
 	else
 		return 1
 	end
@@ -141,21 +144,41 @@ hook.Add("CalcView","KBinocCalcView",function(ply,pos,angles,fov)
 	end
 	end
 end)
+function SWEP:GetMagSteps()
+	return self.MagSteps+3
+end
+function SWEP:GetMinFOV()
+	local width=(ScrW()/(ScrW()/ScrH()))*(4/3)
+	local fovlimit=width/60
+	if (fovlimit>90) then fovlimit=90 end
+	local mag=self.MaxMag
+	if (mag==nil) then mag=self.Magnification end
+	return fovlimit/mag
+end
+function SWEP:GetMaxFOV()
+	local width=(ScrW()/ScrH())/(4/3)
+	local fovlimit=150/width
+	if (fovlimit<90*width) then fovlimit=90*width end
+	local mag=self.MinMag
+	if (mag==nil) then mag=self.Magnification end
+	return fovlimit/mag
+end
 function SWEP.DetectScroll(ply,bind,pressed)
+	if (SERVER) then return end
 	if (ply:IsPlayer() and pressed) then
 		local wep=ply:GetActiveWeapon()
-		if (IsValid(wep) and string.find(wep:GetClass(),"weapon_kbinoc") and wep.MagSteps~=0 and wep:GetNWBool("Zoomed")) then
-			local adj=((1/wep.MagSteps)*(wep.MaxMag-wep.MinMag))
-			if (bind=="invprev") then
-				wep.Magnification=wep.Magnification+adj
-				if (wep.Magnification>wep.MaxMag) then
-					wep.Magnification=wep.MaxMag
+		if (IsValid(wep) and string.find(wep:GetClass(),"weapon_kbinoc") and wep:GetNWBool("Zoomed")) then
+			local adj=((1/wep:GetMagSteps())*(wep:GetMaxFOV()-wep:GetMinFOV()))
+			if (bind=="invnext") then
+				wep.Magfov=wep.Magfov+adj
+				if (wep.Magfov>wep:GetMaxFOV()) then
+					wep.Magfov=wep:GetMaxFOV()
 				end
 				return true
-			elseif (bind=="invnext") then
-				wep.Magnification=wep.Magnification-adj
-				if (wep.Magnification<wep.MinMag) then
-					wep.Magnification=wep.MinMag
+			elseif (bind=="invprev") then
+				wep.Magfov=wep.Magfov-adj
+				if (wep.Magfov<wep:GetMinFOV()) then
+					wep.Magfov=wep:GetMinFOV()
 				end
 				return true
 			end
