@@ -2620,8 +2620,12 @@ function SWEP:ToggleAim()
 				anim=self.Anims.IronOutAnimEmpty
 				anim2=self.Anims.IdleAnimEmpty
 			end
-			self.Weapon:SendWeaponAnim(anim)
-			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
+			if (self.InsIronAnims) then
+				self.Weapon:SendWeaponAnim(anim)
+				self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
+			else
+				self:SendWeaponAnim(anim2)
+			end
 		end
         elseif (not self:GetNWBool("Lowered")) then
                 --Start using sight
@@ -2633,9 +2637,13 @@ function SWEP:ToggleAim()
 				anim=self.Anims.IronInAnimEmpty
 				anim2=self.Anims.IronAnimEmpty
 			end
-		self.IronZoom=self.Owner:GetFOV()
-			self.Weapon:SendWeaponAnim(anim)
-			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
+			self.IronZoom=self.Owner:GetFOV()
+			if (self.InsIronAnims) then
+				self.Weapon:SendWeaponAnim(anim)
+				self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
+			else
+				self:SendWeaponAnim(anim2)
+			end
 		end
         end
 end
