@@ -132,6 +132,7 @@ SWEP.RTScope=false
 SWEP.RTRanger=false
 SWEP.RTRangerX=0
 SWEP.RTRangerY=0
+SWEP.ReloadTwoClips=false
 if (CLIENT) then
 local calcres=0
 if (ConVarExists("kswep_cl_scoperes")) then
@@ -1043,6 +1044,38 @@ function SWEP:SetChamberAmmo(ammo)
 	net.Send(self.Owner)
 	end
 end
+function SWEP:ReloadClip()
+	if (self.Owner:IsNPC()) then self:FinishReloadSingle() return end
+	if (self:GetNWBool("CurrentlyReloading")==true) then return end
+	if (#self.Magazines<1) then return end
+	if (#self.MagTable>=self.Primary.ClipSize) then return end
+	self.ReloadingClips=0
+	local anim=self.Anims.ReloadSingleClip
+	if (self.ReloadTwoClips and #self.Magazines>1 and (#self.MagTable+self.Magazines[1].num)<self.Primary.ClipSize) then
+		self.ReloadingClips=2
+		anim=self.Anims.ReloadDoubleClip
+	elseif (#self.Magazines>0) then
+		self.ReloadingClips=1
+	end
+	if (self.ReloadingClips>0) then
+		self:SetNWBool("Sight",false)
+		self.Weapon:SendWeaponAnim(anim)
+		local seq = self.Owner:GetViewModel():SelectWeightedSequence(anim)
+		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration(seq))
+		self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration(seq)
+		self:SetNWBool("CurrentlyReloading",true)
+		if (SERVER and self.Owner:IsPlayer()) then
+			net.Start("kswep_magazines")
+			net.WriteEntity(self)
+			net.WriteTable(self.Ammo)
+			net.WriteTable(self.Magazines)
+			net.Send(self.Owner)
+		end
+	else
+		self:ReloadTube()
+	end
+end
+	
 function SWEP:ReloadTube()
 	if (self.Owner:IsNPC()) then self:FinishReloadSingle() end
 	if (self:GetNWBool("CurrentlyReloading")==true) then return end
@@ -1187,6 +1220,54 @@ function SWEP:FiremodeFire()
 		self:NormalFire()
 	end
 end
+function SWEP:FinishReloadClip()
+		self:ServeNWBool("CurrentlyReloading",false)
+		self:ServeNWBool("FiringPin",true)
+	if (SERVER) then
+		if (self.ReloadingClips>0) then
+			for i=1,self.ReloadingClips do
+				local clip=table.GetLastValue(self.Magazines)
+				for k,v in pairs(self.Magazines) do
+					if (v.num+#self.MagTable<self.Primary.ClipSize and clip.num<v.num) then
+						clip=v
+					end
+				end
+				local clippy=true
+				while clippy do
+					if (clip.num==0) then
+						table.RemoveByValue(self.Magazines,clip)
+						clippy=false
+					elseif (#self.MagTable==self.Primary.ClipSize) then
+						clippy=false
+					else
+						local round={caliber=clip.caliber,num=1,max=1}
+						table.insert(self.MagTable,round)
+						clip.num=clip.num-1
+					end
+				end
+			end
+			self:SetNWInt("MagRounds",#self.MagTable)
+		end
+	end
+	if (self:GetNWBool("Chambered")==false and self.OpenBolt==false and self:Clip1()>0) then
+		self:TakePrimaryAmmo(1)
+		self:ServeNWBool("Chambered",true)
+	end
+	if (self.OpenBolt==true) then
+		self:ServeNWBool("Chambered",true)
+	end
+	self.ReloadAnimTime=0
+	self.ReloadMessage=CurTime()+2
+	self.Weapon:SendWeaponAnim(self.Anims.IdleAnim)
+	if (SERVER and self.Owner:IsPlayer()) then
+		net.Start("kswep_magtable")
+		net.WriteEntity(self)
+		net.WriteTable(self.MagTable)
+		net.Send(self.Owner)
+	end
+	self:UpdateMagazines()
+end
+			
 function SWEP:FinishReload()
 	self:ServeNWBool("CurrentlyReloading",false)
 	self:ServeNWBool("FiringPin",true)
@@ -1644,7 +1725,9 @@ function SWEP:Think()
 		end
 	end
 	if (self.ReloadAnimTime~=0 and CurTime()>self.ReloadAnimTime and self:GetNWBool("CurrentlyReloading")==true) then
-		if (self.SingleReload) then
+		if (self.ClipReload) then
+			self:FinishReloadClip()
+		elseif (self.SingleReload) then
 			self:FinishReloadSingle()
 		else
 			self:FinishReload()
