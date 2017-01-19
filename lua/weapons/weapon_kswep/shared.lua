@@ -97,6 +97,8 @@ SWEP.RecoilModSup = 1
 SWEP.Length=0
 SWEP.LengthSup=0
 SWEP.LowerType=nil
+SWEP.VMSmallFOV=62
+SWEP.VMLargeFOV=90
 SWEP.Anims.SafetyAnim=ACT_VM_UNDEPLOY
 SWEP.Anims.IronSafetyAnim=ACT_VM_IFIREMODE
 SWEP.Anims.IronShootAnim=ACT_VM_ISHOOT
@@ -1558,6 +1560,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 				else
 					wep.IronZoom=wep.IronZoom+5
 					if (wep.IronZoom>wep:IronZoomMin()) then wep.IronZoom=wep:IronZoomMin() end
+					wep.ViewModelFOV=wep.VMSmallFOV+(wep.VMLargeFOV-wep.VMSmallFOV)*(wep:IronZoomMin()-wep.IronZoom)/(wep:IronZoomMin()-wep:IronZoomMax())
 				end
 			elseif (bind=="invprev" and wep:GetNWBool("Sight")) then
 				if (wep.Owner:KeyDown(IN_WALK) and wep.ScopeFOVSteps~=nil) then
@@ -1592,8 +1595,9 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					net.WriteInt(wep.Zero,16)
 					net.SendToServer()
 				else
-					wep.IronZoom=wep.IronZoom-5
+					wep.IronZoom=wep.IronZoom-5 --flabbis
 					if (wep.IronZoom<wep:IronZoomMax()) then wep.IronZoom=wep:IronZoomMax() end
+					wep.ViewModelFOV=wep.VMSmallFOV+(wep.VMLargeFOV-wep.VMSmallFOV)*(wep:IronZoomMin()-wep.IronZoom)/(wep:IronZoomMin()-wep:IronZoomMax())
 				end
 			end
 			if (bind=="impulse 100" and (not GetConVar("mp_flashlight"):GetBool() or not wep.Owner:KeyDown(IN_WALK)) and (wep.HasFlashlight or wep.HasLaser or wep.HasRanger)) then
@@ -2637,6 +2641,7 @@ function SWEP:ToggleAim()
 				anim=self.Anims.IronInAnimEmpty
 				anim2=self.Anims.IronAnimEmpty
 			end
+			self.ViewModelFOV=self.VMSmallFOV
 			self.IronZoom=self.Owner:GetFOV()
 			if (self.InsIronAnims) then
 				self.Weapon:SendWeaponAnim(anim)
