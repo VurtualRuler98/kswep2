@@ -178,6 +178,7 @@ SWEP.CollimatorTex=nil
 SWEP.CollimatorSize=0.5
 SWEP.CollimatorGlare=1
 SWEP.DefaultZerodata = {
+	mils=false,
 	min=100,
 	max=100,
 	step=0,
@@ -200,6 +201,8 @@ SWEP.RestingCached=false
 SWEP.ScopeReticle=false
 SWEP.ScopeReticleOverride=false
 SWEP.ScopeReticleZoom=0
+SWEP.ScopeReticleZoomMax=0
+SWEP.ScopeReticleZoomMin=0
 SWEP.ReloadFullClipazineOnly=false
 SWEP.BaseRecoilPain=0 -- was 0.01
 SWEP.Breathing=false
@@ -745,6 +748,8 @@ function SWEP:InsOptic(name)
 	self.ScopeMat=scopedata.rtmat
 	self.ScopeReticle=scopedata.reticle
 	self.ScopeReticleZoom=scopedata.retzoom
+	self.ScopeReticleZoomMax=scopedata.retzoommax
+	self.ScopeReticleZoomMin=scopedata.retzoommin
 	self.ScopeReticleOverride=scopedata.retoverride
 	self.RTScope=scopedata.rtscope
 	self.RTRanger=scopedata.rtranger
@@ -775,6 +780,12 @@ function SWEP:InsOptic(name)
 		self.Zero=self.Zerodata.default
 		self.ZerodataAlt=scopedata.zeroalt
 		self.ZeroAlt=self.ZerodataAlt.default
+		if (self.Zerodata.mils) then
+			self.Zero=0
+		end
+		if (self.ZerodataAlt.mils) then
+			self.ZeroAlt=0
+		end
 		scopemodel=scopedata.model
 		if (scopedata.zerotable) then
 			self.ZeroTable=scopedata.zerotable
@@ -1112,7 +1123,7 @@ function SWEP:DrawHUD()
 		zero=self.ZeroAlt
 		zdata=self.ZerodataAlt
 	end
-	if (zero==0) then
+	if (zero==0 and not zdata.mils) then
 		zero=zdata.battlesight
 	end
 	if (not self:GetNWBool("AltIrons") and self.ZeroTable) then 
@@ -1124,6 +1135,9 @@ function SWEP:DrawHUD()
 	local zerostring=zero.."m"
 	if (zero==-1337) then
 		zerostring="<RANGER>"
+	end
+	if (zdata.mils) then
+		zerostring=zero/zdata.mils.." mils"
 	end
 	if (self.SingleReload and not self.OpenBolt) then
 		ammo =self.ChamberAmmo
@@ -1527,7 +1541,15 @@ function SWEP.DetectScroll(ply,bind,pressed)
 			if (bind=="invnext" and wep:GetNWBool("Sight")) then
 				if (wep.Owner:KeyDown(IN_WALK) and wep.ScopeFOVSteps~=nil) then
 					wep.ScopeFOV=wep.ScopeFOV+((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
-					if (wep.ScopeFOV>wep.ScopeFOVMax) then wep.ScopeFOV=wep.ScopeFOVMax end
+					if (wep.ScopeReticleZoomMax>0) then
+						wep.ScopeReticleZoom=wep.ScopeReticleZoom-((1/wep.ScopeFOVSteps)*(wep.ScopeReticleZoomMax-wep.ScopeReticleZoomMin))
+					end
+					if (wep.ScopeFOV>wep.ScopeFOVMax) then
+						wep.ScopeFOV=wep.ScopeFOVMax
+						if (wep.ScopeReticleZoomMax>0) then
+							wep.ScopeReticleZoom=wep.ScopeReticleZoomMin
+						end
+					 end
 				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
 					local zdata
 					local zalt=false
@@ -1565,7 +1587,15 @@ function SWEP.DetectScroll(ply,bind,pressed)
 			elseif (bind=="invprev" and wep:GetNWBool("Sight")) then
 				if (wep.Owner:KeyDown(IN_WALK) and wep.ScopeFOVSteps~=nil) then
 					wep.ScopeFOV=wep.ScopeFOV-((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
-					if (wep.ScopeFOV<wep.ScopeFOVMin) then wep.ScopeFOV=wep.ScopeFOVMin end
+					if (wep.ScopeReticleZoomMax>0) then
+						wep.ScopeReticleZoom=wep.ScopeReticleZoom+((1/wep.ScopeFOVSteps)*(wep.ScopeReticleZoomMax-wep.ScopeReticleZoomMin))
+					end
+					if (wep.ScopeFOV<wep.ScopeFOVMin) then
+						wep.ScopeFOV=wep.ScopeFOVMin
+						if (wep.ScopeReticleZoomMax>0) then
+							wep.ScopeReticleZoom=wep.ScopeReticleZoomMax
+						end
+					end
 				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
 					local zdata
 					local zalt=false
@@ -2368,7 +2398,7 @@ function SWEP:FlyBulletStart(bullet)
 		zero=self.ZeroAlt
 		zdata=self.ZerodataAlt
 	end
-	if (zero==0) then
+	if (zero==0 and not zdata.mils) then
 		zero=zdata.battlesight
 		if (zdata.battlesight==0) then
 			zero=1
@@ -2392,7 +2422,7 @@ function SWEP:FlyBulletStart(bullet)
 	end
 	if (self:GetNWBool("AltIrons") and self.ZeroTableAlt) then
 		zero=self.ZeroTableAlt[zero]
-	end	
+	end
 	if (self.Suppressed) then supmod=self.MuzzleVelModSup end
 	local zerovel=self.Ammo.velocity*self.MuzzleVelMod*supmod
 	if (self.ScopeName=="Default" and self.ZeroVelocity>0) then
@@ -2401,14 +2431,24 @@ function SWEP:FlyBulletStart(bullet)
 	if (self.ScopeName~="Default" and self.ScopeZeroVelocity>0) then
 		zerovel=self.ScopeZeroVelocity
 	end
+	local miladj=0
+	if (zdata.mils) then
+		miladj=zero/zdata.mils
+		zero=zdata.default
+	end
 	local zerotime=math.floor(((zero*39.3701)/(zerovel*16))/FrameTime()) --amount of frames it will take to fly the distance
 	local drop=0.5*(386*(FrameTime()^2))*(zerotime^2)
 	local dropadj=math.atan(drop/(zero*39.3701))
+	local scopeang=Vector(0,0,math.sin(dropadj))
+	if (zdata.mils) then
+		scopeang=scopeang+Vector(0,0,math.sin(miladj/1000))
+	end
+	print(scopeang)
 	local shot = {}
 	shot.ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 	shot.pos=bullet.Src
 	shot.speed=self.Ammo.velocity*self.MuzzleVelMod*supmod
-	shot.ang=bullet.Dir+Vector(0,0,math.sin(dropadj))
+	shot.ang=bullet.Dir+scopeang
 	shot.bullet=bullet
 	shot.dmg=bullet.Damage
 	shot.dist = nil
