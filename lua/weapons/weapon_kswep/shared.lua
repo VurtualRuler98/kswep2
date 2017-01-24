@@ -2443,7 +2443,6 @@ function SWEP:FlyBulletStart(bullet)
 	if (zdata.mils) then
 		scopeang=scopeang+Vector(0,0,math.sin(miladj/1000))
 	end
-	print(scopeang)
 	local shot = {}
 	shot.ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 	shot.pos=bullet.Src
