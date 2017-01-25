@@ -2507,7 +2507,6 @@ function SWEP:FlyBulletStart(bullet)
 	shot.ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 	shot.pos=bullet.Src
 	shot.speed=self.Ammo.velocity*self.MuzzleVelMod*supmod
-	print(shot.speed,zerovel)
 	shot.ang=bullet.Dir+scopeang
 	shot.bullet=bullet
 	shot.bc=self.Ammo.coefficient or 0.25
