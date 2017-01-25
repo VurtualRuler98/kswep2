@@ -650,6 +650,9 @@ function SWEP:TakePrimaryAmmo(num)
 					net.WriteEntity(self)
 					net.WriteTable(self.MagTable)
 					net.Send(self.Owner)
+					if (self.OpenBolt and #self.MagTable>0) then 
+						self.Ammo=vurtual_ammodata[self.MagTable[#self.MagTable].caliber]
+					end
 				end
 			else
 				self:SetChamberAmmo(vurtual_ammodata[self.MagTable[#self.MagTable].caliber])
@@ -1297,6 +1300,9 @@ function SWEP:FinishReloadClip()
 		net.WriteEntity(self)
 		net.WriteTable(self.MagTable)
 		net.Send(self.Owner)
+		if (self.OpenBolt and #self.MagTable>0) then 
+			self.Ammo=vurtual_ammodata[self.MagTable[#self.MagTable].caliber]
+		end
 	end
 	self:UpdateMagazines()
 end
@@ -1442,6 +1448,9 @@ function SWEP:FinishReloadSingle()
 		net.WriteEntity(self)
 		net.WriteTable(self.MagTable)
 		net.Send(self.Owner)
+		if (self.OpenBolt and #self.MagTable>0) then 
+			self.Ammo=vurtual_ammodata[self.MagTable[#self.MagTable].caliber]
+		end
 	end
 end
 
