@@ -99,6 +99,7 @@ SWEP.LengthSup=0
 SWEP.LowerType=nil
 SWEP.VMSmallFOV=62
 SWEP.VMLargeFOV=80
+SWEP.IronSightHeight=1.5
 SWEP.Anims.SafetyAnim=ACT_VM_UNDEPLOY
 SWEP.Anims.IronSafetyAnim=ACT_VM_IFIREMODE
 SWEP.Anims.IronShootAnim=ACT_VM_ISHOOT
@@ -2416,7 +2417,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 	end
         local bullet = {}
         bullet.Num              = num_bullets
-        bullet.Src              = self.Owner:GetShootPos()                      -- Source
+        bullet.Src              = self.Owner:GetShootPos()+Vector(0,0,self:GetSightHeight()*-1)                      -- Source
 	if (self.Owner:IsPlayer()) then
 		bullet.Dir=self:GenerateBulletDir(recoil,aimPenalty,0)
 	else
@@ -2450,6 +2451,16 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 		recsup = self.RecoilModSup
 	end
 	self:Recoil(self.Ammo.recoil*self.RecoilMassModifier*aimPenalty*recsup)
+end
+function SWEP:GetSightHeight()
+	local height=self.IronSightHeight
+	if (self.ScopeName~="Default") then
+		height=height-self.ScopeOffsetPos.z
+	end
+	if (self:GetNWBool("AltIrons")) then
+		height=height-self.AltIronOffsetPos.z
+	end
+	return height
 end
 function SWEP:FlyBulletStart(bullet)
 	local supmod=1
@@ -2510,6 +2521,7 @@ function SWEP:FlyBulletStart(bullet)
 	end	
 	local zerotime=drag_time --amount of frames it will take to fly the distance
 	local drop=0.5*(386*(FrameTime()^2))*(zerotime^2) --386 inches per second squared gravity
+	drop=drop+self:GetSightHeight()
 	local dropadj=math.atan(drop/(zero*39.3701))
 	local scopeang=Vector(0,0,math.sin(dropadj-0.0005))
 	if (zdata.mils) then
