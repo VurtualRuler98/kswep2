@@ -37,13 +37,13 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	AddAmmodata(tbl)
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
-	tbl.dmgbase=6
+	tbl.dmgbase=10
 	tbl.dmgvitalmin=6
 	tbl.dmgvitalmax=8
 	tbl.name = "vammo_762x51_sub"
 	tbl.printname = "7.62x51mm NATO Subsonic"
 	tbl.caliber = "vammo_762x51"
-	tbl.coefficient=0.393
+	tbl.coefficient=0.648
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.wallbang = 3
