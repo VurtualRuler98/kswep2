@@ -90,18 +90,26 @@ function SWEP:CalcDrop()
 		local drag_time=0
 		local drag_bc=self.Gun.Coefficient
 		local drag_ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
+		while (drag_ticks>0 and drag_dist<self.Gun.Zero*39.3701) do
+			drag_ticks=drag_ticks-1
+			drag_time=drag_time+1
+			drag_dist=drag_dist+drag_speed*12*FrameTime()
+			drag_speed=drag_speed+(-1*self:GetDrag("G1",drag_speed)/drag_bc)*drag_speed*FrameTime()
+		end
+		local drop=0.5*(386*(FrameTime()^2))*(drag_time^2)
+		local dropadj=math.atan(drop/(self.Gun.Zero*39.3701))
+		drag_ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
+		drag_time=0
+		drag_dist=0
+		drag_speed=self.Gun.Velocity
 		while (drag_ticks>0 and drag_dist<self.GunRange*39.3701) do
 			drag_ticks=drag_ticks-1
 			drag_time=drag_time+1
 			drag_dist=drag_dist+drag_speed*12*FrameTime()
 			drag_speed=drag_speed+(-1*self:GetDrag("G1",drag_speed)/drag_bc)*drag_speed*FrameTime()
-		end	
-		local zerotime=drag_time --amount of frames it will take to fly the distance
-		local drop=0.5*(386*(FrameTime()^2))*(zerotime^2)
-		local dropadj=math.atan(drop/(self.Gun.Zero*39.3701))
-		zerotime=math.floor(((self.GunRange*39.3701)/(self.Gun.Velocity*16))/FrameTime())
-		drop=0.5*(386*(FrameTime()^2))*(zerotime^2)
-		dropadj=math.atan(drop/(self.GunRange*39.3701))-dropadj
+		end
+		drop=0.5*(386*(FrameTime()^2))*(drag_time^2)
+		dropadj=dropadj-math.atan(drop/(self.GunRange*39.3701))
 		dropadj=math.floor(dropadj*10000)/10
 		if (dropadj~=dropadj) then return "no data" end
 		return ((dropadj)*-1).." mils, BC: "..self.Gun.Coefficient.." G1, "..math.floor(self.Gun.Velocity).." FPS muzzle, "..math.floor(drag_speed).." FPS target"
