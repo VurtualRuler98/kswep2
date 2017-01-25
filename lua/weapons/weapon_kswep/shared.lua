@@ -758,6 +758,9 @@ function SWEP:InsOptic(name)
 	self.ScopeName=scopedata.name
 	self.ScopeMat=scopedata.rtmat
 	self.ScopeReticle=scopedata.reticle
+	self.ScopeReticlePix=scopedata.retpix
+	self.ScopeReticlePixMil=scopedata.retpixmil
+	self.ScopeReticleColor=scopedata.retcolor
 	self.ScopeReticleZoom=scopedata.retzoom
 	self.ScopeReticleZoomMax=scopedata.retzoommax
 	self.ScopeReticleZoomMin=scopedata.retzoommin
