@@ -112,7 +112,7 @@ function SWEP:CalcDrop()
 		dropadj=dropadj-math.atan(drop/(self.GunRange*39.3701))
 		dropadj=math.floor(dropadj*10000)/10
 		if (dropadj~=dropadj) then return "no data" end
-		return ((dropadj)*-1).." mils, BC: "..self.Gun.Coefficient.." G1, "..math.floor(self.Gun.Velocity).." FPS muzzle, "..math.floor(drag_speed).." FPS target"
+		return ((dropadj)*-1).." mils, BC: "..(math.floor(self.Gun.Coefficient*1000)/1000).." G1, "..math.floor(self.Gun.Velocity).." FPS muzzle, "..math.floor(drag_speed).." FPS target"
 end
 function SWEP:GetDrag(func,speed)
 	if (func~="G1") then func="G1" end --Always use G1 if nothing else, check to make sure it's not any other implemented function first though.
