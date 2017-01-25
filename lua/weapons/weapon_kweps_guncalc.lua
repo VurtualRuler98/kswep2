@@ -20,6 +20,7 @@ SWEP.HasGun=false
 SWEP.Gun = {}
 SWEP.Gun.Velocity=0
 SWEP.Gun.Zero=0
+SWEP.Gun.Coefficient=0
 SWEP.reloadtime=0
 SWEP.GunRange=100
 function SWEP:Initialize()
@@ -58,6 +59,7 @@ function SWEP:Reload()
 			end
 			RangeInputLabel:SetText("no data")
 			RangeInputLabel:SetPos(50,100)
+			RangeInputLabel:SetSize(450,10)
 			local cbox=vgui.Create("DComboBox",Frame)
 			cbox:SetPos(50,150)
 			cbox:SetSize(300,20)
@@ -65,7 +67,7 @@ function SWEP:Reload()
 			for k,v in pairs(LocalPlayer():GetWeapons()) do
 				if (string.find(v:GetClass(),"weapon_kswep") and v.Zerodata.mils) then
 					local bc=v.Zerodata.bc
-					if (v.Zerodata.bc==-1) then bc=v.Zerodata.Ammo.coefficient or 0.25 end
+					if (v.Zerodata.bc==-1) then bc=v.Ammo.coefficient or 0.25 end
 					cbox:AddChoice(v.PrintName,Vector(v.Ammo.velocity*v.MuzzleVelMod,v.Zerodata.default,bc))
 				end
 			end
@@ -88,7 +90,7 @@ function SWEP:CalcDrop()
 		local drag_time=0
 		local drag_bc=self.Gun.Coefficient
 		local drag_ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
-		while (drag_ticks>0 and drag_dist<zero*39.3701) do
+		while (drag_ticks>0 and drag_dist<self.GunRange*39.3701) do
 			drag_ticks=drag_ticks-1
 			drag_time=drag_time+1
 			drag_dist=drag_dist+drag_speed*12*FrameTime()
@@ -101,8 +103,55 @@ function SWEP:CalcDrop()
 		drop=0.5*(386*(FrameTime()^2))*(zerotime^2)
 		dropadj=math.atan(drop/(self.GunRange*39.3701))-dropadj
 		dropadj=math.floor(dropadj*10000)/10
-		if (dropadj~=dropadj) then dropadj="no data" end
-		return dropadj
+		if (dropadj~=dropadj) then return "no data" end
+		return ((dropadj)*-1).." mils, BC: "..self.Gun.Coefficient.." G1, "..math.floor(self.Gun.Velocity).." FPS muzzle, "..math.floor(drag_speed).." FPS target"
+end
+function SWEP:GetDrag(func,speed)
+	if (func~="G1") then func="G1" end --Always use G1 if nothing else, check to make sure it's not any other implemented function first though.
+	if (func=="G1") then
+		if (speed<400) then return 0.0176
+		elseif (speed<500) then return 0.0212
+		elseif (speed<600) then return 0.0249
+		elseif (speed<700) then return 0.0294
+		elseif (speed<800) then return 0.0361
+		elseif (speed<900) then return 0.0473
+		elseif (speed<1000) then return 0.0682
+		elseif (speed<1100) then return 0.1024
+		elseif (speed<1200) then return 0.1387
+		elseif (speed<1300) then return 0.1663
+		elseif (speed<1400) then return 0.1869
+		elseif (speed<1500) then return 0.2033
+		elseif (speed<1600) then return 0.2169
+		elseif (speed<1700) then return 0.2284
+		elseif (speed<1800) then return 0.2385
+		elseif (speed<1900) then return 0.2473
+		elseif (speed<2000) then return 0.2553
+		elseif (speed<2100) then return 0.2627
+		elseif (speed<2200) then return 0.2697
+		elseif (speed<2300) then return 0.2762
+		elseif (speed<2400) then return 0.2829
+		elseif (speed<2500) then return 0.2894
+		elseif (speed<2600) then return 0.2959
+		elseif (speed<2700) then return 0.3027
+		elseif (speed<2800) then return 0.3097
+		elseif (speed<2900) then return 0.3168
+		elseif (speed<3000) then return 0.3243
+		elseif (speed<3100) then return 0.3321
+		elseif (speed<3200) then return 0.3400
+		elseif (speed<3300) then return 0.3482
+		elseif (speed<3400) then return 0.3568
+		elseif (speed<3500) then return 0.3657
+		elseif (speed<3600) then return 0.3748
+		elseif (speed<3700) then return 0.3841
+		elseif (speed<3800) then return 0.3936
+		elseif (speed<3900) then return 0.4030
+		elseif (speed<4000) then return 0.4125
+		elseif (speed<4100) then return 0.4221
+		elseif (speed<4200) then return 0.4320
+		elseif (speed<4300) then return 0.4418
+		else return 0.4516
+		end
+	end
 end
 function SWEP:Deploy()
 	self.Owner:DrawViewModel(false)
