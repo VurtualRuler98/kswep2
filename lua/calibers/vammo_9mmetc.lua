@@ -9,6 +9,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.dmgbase = 5 --how much hp to do when hitting a vest, "energy" of a round
 	tbl.dmgvitalmin = 5 --Damage multiplier done with an unarmored headshot/chest shot, halved for NPCs
 	tbl.dmgvitalmax = 8
+	tbl.coefficient = 0.149
 	tbl.spreadscale = 1 --ratio of bullet spread, primarily used for shotgun shells.
 	tbl.wallbang = 4 --units of generic wall it can penetrate
 	tbl.recoil = 1 --recoil value
@@ -19,6 +20,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.dmgbase = 8
 	tbl.dmgvitalmin = 5
 	tbl.dmgvitalmax = 8
+	tbl.coefficient = 0.178
 	tbl.name = "vammo_30car_FMJ"
 	tbl.printname = ".30 Carbine FMJ"
 	tbl.caliber = "vammo_30car"
@@ -34,6 +36,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.dmgbase = 4
 	tbl.dmgvitalmin = 5
 	tbl.dmgvitalmax = 8
+	tbl.coefficient = 0.1
 	tbl.name = "vammo_9x18_FMJ"
 	tbl.printname = "9x18mm FMJ"
 	tbl.caliber = "vammo_9x18"
@@ -48,6 +51,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.dmgbase = 4
 	tbl.dmgvitalmax = 7
 	tbl.dmgvitalmin = 5
+	tbl.coefficient=0.138
 	tbl.name = "vammo_9x17_FMJ"
 	tbl.printname = "9x17mm FMJ"
 	tbl.caliber = "vammo_9x17"
@@ -63,6 +67,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.dmgbase = 4
 	tbl.dmgvitalmin = 4
 	tbl.dmgvitalmax = 7
+	tbl.coefficient = 0.181
 	tbl.name = "vammo_38special_FMJ"
 	tbl.printname = ".38 Special FMJ"
 	tbl.caliber = "vammo_38special"
@@ -77,6 +82,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.dmgbase=5
 	tbl.dmgvitalmin=8
 	tbl.dmgvitalmax=8
+	tbl.coefficient = 0.149
 	tbl.name = "vammo_9x19_JHP"
 	tbl.printname = "9x19mm JHP"
 	tbl.caliber = "vammo_9x19"
@@ -92,6 +98,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.dmgbase=6
 	tbl.dmgvitalmin=5
 	tbl.dmgvitalmax=8
+	tbl.coefficient = 0.149
 	tbl.name = "vammo_9x19_plusP_FMJ"
 	tbl.printname = "9x19mm +P FMJ"
 	tbl.caliber = "vammo_9x19"

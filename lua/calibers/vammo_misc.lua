@@ -11,6 +11,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.printname = ".300 Winchester Magnum"
 	tbl.caliber = "vammo_300wm"
 	tbl.projectiles = 1
+	tbl.coefficient = 0.408
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 15
@@ -27,6 +28,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.printname = "7.62x51mm NATO M80"
 	tbl.caliber = "vammo_762x51"
 	tbl.projectiles = 1
+	tbl.coefficient = 0.393
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 12
@@ -41,6 +43,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_762x51_sub"
 	tbl.printname = "7.62x51mm NATO Subsonic"
 	tbl.caliber = "vammo_762x51"
+	tbl.coefficient=0.393
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.wallbang = 3
@@ -55,6 +58,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.dmgbase=16
 	tbl.dmgvitalmin=5
 	tbl.dmgvitalmax=8
+	coefficient=0.411
 	tbl.name = "vammo_762x54_7n1"
 	tbl.printname = "7.62x54mm 7N1"
 	tbl.caliber = "vammo_762x54"
@@ -70,6 +74,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.dmgbase=17
 	tbl.dmgvitalmin=6
 	tbl.dmgvitalmax=8
+	tbl.coefficient=0.405
 	tbl.name = "vammo_3006_ball"
 	tbl.printname = ".30-06 M2 ball"
 	tbl.caliber = "vammo_3006"
@@ -83,6 +88,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=17
+	tbl.coefficient=0.478
 	tbl.dmgvitalmin=6
 	tbl.dmgvitalmax=8
 	tbl.name = "vammo_303_ball"
@@ -99,6 +105,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=17
 	tbl.dmgvitalmin=6
+	tbl.coefficient=0.559 --PPU FMJBT
 	tbl.dmgvitalmax=8
 	tbl.name = "vammo_792x57_ball"
 	tbl.printname = "7.92x57mm ball"
@@ -111,12 +118,29 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity = 2493
 	AddAmmodata(tbl)
 	local tbl = {}
+	tbl.vestpenetration=KSWEP_ARMOR_III
+	tbl.dmgbase=12
+	tbl.dmgvitalmin=6
+	tbl.coefficient=0.246
+	tbl.dmgvitalmax=8
+	tbl.name = "vammo_792x33_ball"
+	tbl.printname = "7.92x33mm ball"
+	tbl.caliber = "vammo_792x33"
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.damagescale = 1
+	tbl.recoil = 6
+	tbl.wallbang = 4
+	tbl.velocity = 2250
+	AddAmmodata(tbl)
+	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_IV
 	tbl.dmgbase=17
 	tbl.dmgvitalmin=4
 	tbl.dmgvitalmax=8
 	tbl.name = "vammo_3006_ap"
 	tbl.printname = ".30-06 M2 AP"
+	tbl.coefficient = 0.405 --TODO find actual M2AP coefficient
 	tbl.caliber = "vammo_3006"
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
@@ -130,6 +154,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.dmgbase=0
 	tbl.dmgvitalmin=0
 	tbl.dmgvitalmax=0
+	tbl.coefficient=0.1
 	tbl.name = "vammo_762x54t"
 	tbl.printname = "7.62x54mm Tranq."
 	tbl.caliber = "vammo_762x54t"
@@ -145,6 +170,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.dmgbase=15
 	tbl.dmgvitalmin=4
 	tbl.dmgvitalmax=8
+	tbl.coefficient=0.47 --turkish website+government spec!
 	tbl.name = "vammo_762x51_m993"
 	tbl.printname = "7.62x51mm NATO M993 AP"
 	tbl.caliber = "vammo_762x51"
@@ -161,6 +187,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.dmgbase=15
 	tbl.dmgvitalmin=6.5
 	tbl.dmgvitalmax=8
+	tbl.coefficient=0.5
 	tbl.name = "vammo_762x51_mk316mod0"
 	tbl.printname = "7.62x51mm NATO Mk316 Mod 0"
 	tbl.caliber = "vammo_762x51"
@@ -174,6 +201,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 
 	local tbl = {}
 	tbl.vestpenetration=0
+	tbl.coefficient=0.1
 	tbl.dmgbase=0
 	tbl.dmgvitalmin=0
 	tbl.dmgvitalmax=0
@@ -189,6 +217,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_II
 	tbl.dmgbase=5
+	tbl.coefficient=0.196
 	tbl.dmgvitalmin=6
 	tbl.dmgvitalmax=8
 	tbl.name = "vammo_45acp_FMJ"
@@ -205,6 +234,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.dmgbase=6
 	tbl.dmgvitalmin=5
 	tbl.dmgvitalmax=8
+	tbl.coefficient=0.164
 	tbl.name = "vammo_763x25_FMJ"
 	tbl.printname = "7.63x25mm FMJ"
 	tbl.caliber = "vammo_763x25"
@@ -218,6 +248,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.vestpenetration=KSWEP_ARMOR_I
 	tbl.dmgbase = 3
 	tbl.dmgvitalmin = 1
+	tbl.coefficient=0.125
 	tbl.dmgvitalmax = 5
 	tbl.name = "vammo_22_lead"
 	tbl.printname = ".22 LR Lead"
@@ -231,6 +262,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_IIIA
 	tbl.dmgbase = 7
+	tbl.coefficient=0.284
 	tbl.dmgvitalmin = 5
 	tbl.dmgvitalmax = 8
 	tbl.name = "vammo_10mm_FMJ"
@@ -247,6 +279,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.dmgbase = 7
 	tbl.dmgvitalmin = 8
 	tbl.dmgvitalmax = 8
+	tbl.coefficient=0.284
 	tbl.name = "vammo_10mm_JHP"
 	tbl.printname = "10mm Auto JHP"
 	tbl.caliber = "vammo_10mm"
@@ -262,6 +295,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.dmgbase=15
 	tbl.dmgvitalmin=6
 	tbl.dmgvitalmax=8
+	tbl.coefficient=0.3
 	tbl.name = "vammo_rifle"
 	tbl.printname = "Rifle Ammo"
 	tbl.caliber = "vammo_rifle"
@@ -277,6 +311,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name="vammo_12gauge_00buck"
 	tbl.printname = "12 Gauge 00 Buck"
 	tbl.caliber = "vammo_12gauge"
+	tbl.coefficient=0.05
 	tbl.vestpenetration=0
 	tbl.dmgbase=3
 	tbl.dmgvitalmin=5
@@ -292,6 +327,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name="vammo_12gauge_slug"
 	tbl.printname = "12 Gauge Slug"
 	tbl.caliber = "vammo_12gauge"
+	tbl.coefficient=0.2
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=27
 	tbl.dmgvitalmin=6
@@ -309,6 +345,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_II --VERIFY
 	tbl.dmgbase=4
+	tbl.coefficient=0.157
 	tbl.powermin=5
 	tbl.powermax=8
 	tbl.name = "vammo_762x38"
