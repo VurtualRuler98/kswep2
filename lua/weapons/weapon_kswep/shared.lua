@@ -200,6 +200,9 @@ SWEP.PenaltyKneel=0.1
 SWEP.PenaltyProne=0.05
 SWEP.RestingCached=false
 SWEP.ScopeReticle=false
+SWEP.ScopeReticleColor=color_black
+SWEP.ScopeReticlePix=1024
+SWEP.ScopeReticlePixMil=20
 SWEP.ScopeReticleOverride=false
 SWEP.ScopeReticleZoom=0
 SWEP.ScopeReticleZoomMax=0
@@ -250,6 +253,12 @@ function SWEP:Initialize()
 	end
 	if (self.DefaultZeroTableAlt) then
 		self.ZeroTableAlt=self.DefaultZeroTableAlt
+	end
+	if (self.Zerodata.mils) then
+		self.Zero=0
+	end
+	if (self.ZerodataAlt.mils) then
+		self.ZeroAlt=0
 	end
 	if (self.Owner:IsNPC()) then
 		local weapon=self
@@ -1166,15 +1175,18 @@ function SWEP:DrawHUD()
 		surface.DrawText(rangetext)
 		end
 		if (self.ScopeReticle~=false) then
-			local pixmil=10
-			local retpix=512
+			local pixmil=self.ScopeReticlePixMil
+			local retpix=self.ScopeReticlePix
+			local aspectratio=(oldW/oldH)/(4/3)
 			local retmag=self.ScopeZoom
 			if (self.ScopeReticleZoom>0) then
 				retmag=self.ScopeReticleZoom
 			end
-			local scale=(retpix/pixmil)*oldW/(retmag*18)
-			surface.SetDrawColor(color_black)
+			--local scale=(retpix/pixmil)*oldW/(retmag*18)
+			local scale=retpix*(self.ScopeRes/(self.ScopeFOV*18))/pixmil
+			surface.SetDrawColor(self.ScopeReticleColor)
 			surface.SetMaterial(Material(self.ScopeReticle,"noclamp smooth"))
+			scale=scale/aspectratio
 			scalemod=oldH/oldW
 			surface.DrawTexturedRectUV((oldW-scale)/2,(oldH-scale*scalemod)/2,scale,scale*scalemod,0,0,1,1)
 		end

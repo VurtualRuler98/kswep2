@@ -29,6 +29,7 @@ util.AddNetworkString("kswep_setequipment")
 util.AddNetworkString("kswep_setequipment_cl")
 util.AddNetworkString("kswep_stabsound")
 resource.AddFile("materials/kswep/ret_mil.png")
+resource.AddFile("materials/kswep/ret_mil2_illuminated.png")
 resource.AddFile("materials/kswep/ret_m22_10.png")
 net.Receive("kswep_flashlight",function(len,pl)
 	if (not IsValid(pl) or not pl:IsPlayer()) then return end
