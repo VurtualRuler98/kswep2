@@ -179,6 +179,7 @@ SWEP.CollimatorSize=0.5
 SWEP.CollimatorGlare=1
 SWEP.DefaultZerodata = {
 	mils=false,
+	bc=0.25,
 	min=100,
 	max=100,
 	step=0,
