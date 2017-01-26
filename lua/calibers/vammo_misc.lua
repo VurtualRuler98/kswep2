@@ -246,7 +246,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	AddAmmodata(tbl)
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_I
-	tbl.dmgbase = 3
+	tbl.dmgbase = 5
 	tbl.dmgvitalmin = 1
 	tbl.coefficient=0.125
 	tbl.dmgvitalmax = 5
@@ -258,6 +258,20 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.wallbang = 2
 	tbl.recoil = 0.2
 	tbl.velocity =	1200 --kinda 5 inch barrel? TODO make this better
+	AddAmmodata(tbl)
+	tbl.vestpenetration=KSWEP_ARMOR_I
+	tbl.dmgbase = 5
+	tbl.dmgvitalmin = 3
+	tbl.coefficient=0.084
+	tbl.dmgvitalmax = 5
+	tbl.name = "vammo_22_stinger"
+	tbl.printname = ".22 LR CCI Stinger"
+	tbl.caliber = "vammo_22"
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.wallbang = 2
+	tbl.recoil = 0.25
+	tbl.velocity =	1640
 	AddAmmodata(tbl)
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_IIIA
