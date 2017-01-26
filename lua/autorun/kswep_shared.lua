@@ -44,6 +44,9 @@ function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 	game.AddAmmoType({name=tbl.name,dmgtype=DMG_BULLET,force=10})
 end
+function AddKswepReticle(tbl,name)
+	kswep_reticles[name]=tbl
+end
 function AddKswepHands(tbl)
 	kswep_hands[tbl.name]=table.Copy(tbl)
 end
@@ -65,3 +68,13 @@ end
 if (vurtual_ammotypes==nil) then
 	KSwepSetupAmmoTypes()
 end
+local files,directories= file.Find("lua/reticle/*.lua","GAME")
+for k,v in pairs(files) do
+	include ("reticle/"..v)
+end
+local function KSwepSetupReticles()
+	kswep_reticles = {}
+	hook.Run("KswepReticles")
+end
+
+KSwepSetupReticles()

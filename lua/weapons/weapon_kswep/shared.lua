@@ -201,6 +201,7 @@ SWEP.PenaltyKneel=0.1
 SWEP.PenaltyProne=0.05
 SWEP.RestingCached=false
 SWEP.ScopeReticle=false
+SWEP.ScopeLuaReticle=false
 SWEP.ScopeReticleColor=color_black
 SWEP.ScopeReticlePix=1024
 SWEP.ScopeReticlePixMil=20
@@ -762,6 +763,7 @@ function SWEP:InsOptic(name)
 	self.ScopeName=scopedata.name
 	self.ScopeMat=scopedata.rtmat
 	self.ScopeReticle=scopedata.reticle
+	self.ScopeLuaReticle=scopedata.luareticle
 	self.ScopeReticlePix=scopedata.retpix
 	self.ScopeReticlePixMil=scopedata.retpixmil
 	self.ScopeReticleColor=scopedata.retcolor
@@ -1163,7 +1165,7 @@ function SWEP:DrawHUD()
 	if (self.ReloadMessage > CurTime()) then
 		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
 	end
-	if ((self.RTRanger or self.ScopeReticle) and self:GetNWBool("Sight")) then
+	if ((self.RTRanger or self.ScopeReticle or self.ScopeLuaReticle) and self:GetNWBool("Sight")) then
 		local oldW,oldH=ScrW(),ScrH()
 		render.PushRenderTarget(self.RenderTarget)
 		render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)
@@ -1194,8 +1196,57 @@ function SWEP:DrawHUD()
 			surface.SetDrawColor(self.ScopeReticleColor)
 			surface.SetMaterial(Material(self.ScopeReticle,"noclamp smooth"))
 			scale=scale/aspectratio
-			scalemod=oldH/oldW
+			local scalemod=oldH/oldW
 			surface.DrawTexturedRectUV((oldW-scale)/2,(oldH-scale*scalemod)/2,scale,scale*scalemod,0,0,1,1)
+		end
+		if (self.ScopeLuaReticle~=false) then
+			local scale=self.ScopeRes/(self.ScopeFOV*3.6)
+			local aspectratio=(oldW/oldH)/(4/3)
+			scale=scale/aspectratio
+			local scalemod=oldH/oldW
+			draw.NoTexture()
+			for k,v in pairs(kswep_reticles[self.ScopeLuaReticle]) do
+				if (v.shape=="line") then
+					if (v.color) then surface.SetDrawColor(v.color) else 
+						surface.SetDrawColor(self.ScopeReticleColor)
+					end
+					local x1=(v.start[1]*scale)+0.5*oldW
+					local y1=(v.start[2]*scale*scalemod)+0.5*oldH
+					local x2=(v.endpos[1]*scale)+0.5*oldW
+					local y2=(v.endpos[2]*scale*scalemod)+0.5*oldH
+					surface.DrawLine(x1,y1,x2,y2)
+				end
+				if (v.shape=="circle") then
+					local circle={}
+					local x=(v.pos[1]*scale)+0.5*oldW
+					local y=(v.pos[2]*scale*scalemod)+0.5*oldH
+					local radiusx=v.radius*scale
+					local radiusy=v.radius*scale*scalemod
+					if (v.color) then surface.SetDrawColor(v.color) else 
+						surface.SetDrawColor(self.ScopeReticleColor)
+					end
+					table.insert(circle,{x=x,y=y})
+					for i=0,32 do
+						local a=math.rad((i/32)*-360)
+						table.insert(circle,{x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy})
+					end
+					local a=math.rad(0)
+					table.insert(circle,{x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy})
+					surface.DrawPoly(circle)
+				end
+				if (v.shape=="rect") then
+					local x1=(v.start[1]*scale)+0.5*oldW
+					local y1=(v.start[2]*scale*scalemod)+0.5*oldH
+					local x2=(v.endpos[1]*scale)+0.5*oldW
+					local y2=(v.endpos[2]*scale*scalemod)+0.5*oldH
+					local box={{x=x1,y=y1},{x=x2,y=y1},{x=x2,y=y2},{x=x1,y=y2}}
+					if (v.color) then surface.SetDrawColor(v.color) else 
+						surface.SetDrawColor(self.ScopeReticleColor)
+					end
+					surface.DrawPoly(box)
+				end
+					
+			end
 		end
 		render.SetViewPort(0,0,oldW,oldH)
 		render.PopRenderTarget()
