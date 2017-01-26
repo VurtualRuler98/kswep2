@@ -198,6 +198,22 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.wallbang = 5
 	tbl.velocity = 2580 --M118LR is the same projectile
 	AddAmmodata(tbl)
+	local tbl = {}
+	tbl.vestpenetration=KSWEP_ARMOR_III
+	tbl.dmgbase=15
+	tbl.dmgvitalmin=6.5
+	tbl.dmgvitalmax=8
+	tbl.coefficient=0.485
+	tbl.name = "vammo_762x51_m118"
+	tbl.printname = "7.62x51mm NATO M118"
+	tbl.caliber = "vammo_762x51"
+	tbl.projectiles = 1
+	tbl.spreadscale = 0.5
+	tbl.damagescale = 1
+	tbl.recoil = 10
+	tbl.wallbang = 5
+	tbl.velocity = 2452 --real life ~m40a1 velocity divided by the muzzle mod of the m40a1 itself
+	AddAmmodata(tbl)
 
 	local tbl = {}
 	tbl.vestpenetration=0
