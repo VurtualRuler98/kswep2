@@ -202,6 +202,7 @@ SWEP.PenaltyProne=0.05
 SWEP.RestingCached=false
 SWEP.ScopeReticle=false
 SWEP.ScopeLuaReticle=false
+SWEP.ScopeLuaReticlePlane=false
 SWEP.ScopeReticleColor=color_black
 SWEP.ScopeReticlePix=1024
 SWEP.ScopeReticlePixMil=20
@@ -764,6 +765,7 @@ function SWEP:InsOptic(name)
 	self.ScopeMat=scopedata.rtmat
 	self.ScopeReticle=scopedata.reticle
 	self.ScopeLuaReticle=scopedata.luareticle
+	self.ScopeLuaReticlePlane=scopedata.luaretsfp
 	self.ScopeReticlePix=scopedata.retpix
 	self.ScopeReticlePixMil=scopedata.retpixmil
 	self.ScopeReticleColor=scopedata.retcolor
@@ -1200,7 +1202,11 @@ function SWEP:DrawHUD()
 			surface.DrawTexturedRectUV((oldW-scale)/2,(oldH-scale*scalemod)/2,scale,scale*scalemod,0,0,1,1)
 		end
 		if (self.ScopeLuaReticle~=false) then
-			local scale=self.ScopeRes/(self.ScopeFOV*3.6)
+			local fov=self.ScopeFOV
+			if (self.ScopeLuaReticlePlane) then
+				fov=self.ScopeLuaReticlePlane
+			end
+			local scale=self.ScopeRes/(fov*3.6)
 			local aspectratio=(oldW/oldH)/(4/3)
 			scale=scale/aspectratio
 			local scalemod=oldH/oldW
