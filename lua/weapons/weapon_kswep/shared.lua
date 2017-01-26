@@ -1940,7 +1940,7 @@ function SWEP:LowerWall(lower)
 		end
 	end
 	self:LowerDo(lower,anim,anim2,true)
-	if (not self:GetNWBool("Raised") and self.Owner:KeyDown(IN_ATTACK2)) then
+	if (not lower and not self:GetNWBool("Raised") and self.Owner:KeyDown(IN_ATTACK2)) then
 		self:ToggleAim(false)
 	end
 end
@@ -1971,6 +1971,9 @@ function SWEP:LowerRun(lower)
 		end
 	end
 	self:LowerDo(lower,anim,anim2,true)
+	if (not lower and not self:GetNWBool("Raised") and self.Owner:KeyDown(IN_ATTACK2)) then
+		self:ToggleAim(false)
+	end
 end
 function SWEP:LowerHolster(lower)
 	local anim=self.Anims.StowAnim
