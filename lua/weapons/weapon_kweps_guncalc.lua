@@ -20,6 +20,7 @@ SWEP.HasGun=false
 SWEP.Gun = {}
 SWEP.Gun.Velocity=0
 SWEP.Gun.Zero=0
+SWEP.MOAMode=false
 SWEP.Gun.Coefficient=0
 SWEP.reloadtime=0
 SWEP.GunRange=100
@@ -65,10 +66,22 @@ function SWEP:Reload()
 			cbox:SetSize(300,20)
 			cbox:SetValue("Select firearm")
 			for k,v in pairs(LocalPlayer():GetWeapons()) do
-				if (string.find(v:GetClass(),"weapon_kswep") and v.Zerodata.mils) then
-					local bc=v.Zerodata.bc
-					if (v.Zerodata.bc==-1) then bc=v.Ammo.coefficient or 0.25 end
-					cbox:AddChoice(v.PrintName,Vector(v.Ammo.velocity*v.MuzzleVelMod,v.Zerodata.default,bc))
+				if (string.find(v:GetClass(),"weapon_kswep")) then
+					local hasdata=false
+					local zdata
+					if (v.Zerodata.mils or v.Zerodata.moa) then
+						zdata=v.Zerodata
+						hasdata=true
+					elseif (v.ZerodataAlt.mils or v.ZerodataAlt.moa) then
+						zdata=v.ZerodataAlt
+						hasdata=true
+					end
+					if (hasdata) then
+						if (zdata.moa) then self.MOAMode=true else self.MOAMode=false end
+						local bc=zdata.bc
+						if (zdata.bc==-1) then bc=v.Ammo.coefficient or 0.25 end
+						cbox:AddChoice(v.PrintName,Vector(v.Ammo.velocity*v.MuzzleVelMod,zdata.default,bc))
+					end
 				end
 			end
 				
@@ -110,9 +123,11 @@ function SWEP:CalcDrop()
 		end
 		drop=0.5*(386*(FrameTime()^2))*(drag_time^2)
 		dropadj=dropadj-math.atan(drop/(self.GunRange*39.3701))
+		local label="mils"
+		if (self.MOAMode) then dropadj=dropadj*3.43775 label="MOA" end
 		dropadj=math.floor(dropadj*10000)/10
 		if (dropadj~=dropadj) then return "no data" end
-		return ((dropadj)*-1).." mils, BC: "..(math.floor(self.Gun.Coefficient*1000)/1000).." G1, "..math.floor(self.Gun.Velocity).." FPS muzzle, "..math.floor(drag_speed).." FPS target"
+		return ((dropadj)*-1).." "..label..", BC: "..(math.floor(self.Gun.Coefficient*1000)/1000).." G1, "..math.floor(self.Gun.Velocity).." FPS muzzle, "..math.floor(drag_speed).." FPS target"
 end
 function SWEP:GetDrag(func,speed)
 	if (func~="G1") then func="G1" end --Always use G1 if nothing else, check to make sure it's not any other implemented function first though.

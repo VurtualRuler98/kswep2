@@ -261,10 +261,10 @@ function SWEP:Initialize()
 	if (self.DefaultZeroTableAlt) then
 		self.ZeroTableAlt=self.DefaultZeroTableAlt
 	end
-	if (self.Zerodata.mils) then
+	if (self.Zerodata.mils or self.Zerodata.moa) then
 		self.Zero=0
 	end
-	if (self.ZerodataAlt.mils) then
+	if (self.ZerodataAlt.mils or self.ZerodataAlt.moa) then
 		self.ZeroAlt=0
 	end
 	if (self.Owner:IsNPC()) then
@@ -1148,7 +1148,7 @@ function SWEP:DrawHUD()
 		zero=self.ZeroAlt
 		zdata=self.ZerodataAlt
 	end
-	if (zero==0 and not zdata.mils) then
+	if (zero==0 and not zdata.mils and not zdata.moa) then
 		zero=zdata.battlesight
 	end
 	if (not self:GetNWBool("AltIrons") and self.ZeroTable) then 
@@ -1163,6 +1163,9 @@ function SWEP:DrawHUD()
 	end
 	if (zdata.mils) then
 		zerostring=zero/zdata.mils.." mils"
+	end
+	if (zdata.moa) then
+		zerostring=zero/zdata.moa.." MOA"
 	end
 	if (self.SingleReload and not self.OpenBolt) then
 		ammo =self.ChamberAmmo
@@ -1227,7 +1230,6 @@ function SWEP:DrawHUD()
 					surface.DrawLine(x1,y1,x2,y2)
 				end
 				if (v.shape=="ring") then
-					local circle={}
 					local x=(v.pos[1]*scale)+0.5*oldW
 					local y=(v.pos[2]*scale*scalemod)+0.5*oldH
 					local radiusx=v.radius*scale
@@ -1244,7 +1246,18 @@ function SWEP:DrawHUD()
 					end
 					--local a=math.rad(0)
 					--table.insert(circle,{x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy})
-					surface.DrawPoly(circle)
+				end
+				if (v.shape=="poly") then
+					local poly=table.Copy(v.poly)
+					for l,m in pairs(poly) do
+						m.x=m.x*scale+0.5*oldW
+						m.y=m.y*scale*scalemod+0.5*oldH
+					end
+					table.insert(poly,poly[1])
+					if (v.color) then surface.SetDrawColor(v.color) else 
+						surface.SetDrawColor(self.ScopeReticleColor)
+					end
+					surface.DrawPoly(poly)
 				end
 				if (v.shape=="circle") then
 					local circle={}
@@ -2586,7 +2599,7 @@ function SWEP:FlyBulletStart(bullet)
 		zero=self.ZeroAlt
 		zdata=self.ZerodataAlt
 	end
-	if (zero==0 and not zdata.mils) then
+	if (zero==0 and not zdata.mils and not zdata.moa) then
 		zero=zdata.battlesight
 		if (zdata.battlesight==0) then
 			zero=1
@@ -2624,6 +2637,10 @@ function SWEP:FlyBulletStart(bullet)
 		miladj=zero/zdata.mils
 		zero=zdata.default
 	end
+	if (zdata.moa) then
+		miladj=(zero/zdata.moa)*3.43775
+		zero=zdata.default
+	end
 	local drag_speed=zerovel
 	local drag_dist=0
 	local drag_time=0
@@ -2640,7 +2657,7 @@ function SWEP:FlyBulletStart(bullet)
 	drop=drop+self:GetSightHeight()
 	local dropadj=math.atan(drop/(zero*39.3701))
 	local scopeang=Vector(0,0,math.sin(dropadj-0.0005))
-	if (zdata.mils) then
+	if (zdata.mils or zdata.moa) then
 		scopeang=scopeang+Vector(0,0,math.sin(miladj/1000))
 	end
 	local shot = {}
