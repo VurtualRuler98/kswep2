@@ -20,6 +20,7 @@ SWEP.Zoomed=false
 SWEP.Magnification=6
 SWEP.Overlay = nil
 SWEP.Reticle = nil
+SWEP.ScopeLuaReticle=false
 SWEP.UseInsHands=false
 SWEP.Tripod=false
 SWEP.IsKBinoc=true
@@ -100,6 +101,61 @@ function SWEP:DrawHUD()
 		surface.SetMaterial(Material(self.Reticle,"noclamp smooth"))
 		surface.SetDrawColor(Color(0,0,0,255))
 		surface.DrawTexturedRectUV((ScrW()-scale)/2,(ScrH()-scale)/2,scale,scale,0,0,1,1)
+	end
+	if (self:GetNWBool("Zoomed") and self.ScopeLuaReticle~=false) then
+		local fov=self.Owner:GetFOV()
+		local oldW=ScrW()
+		local oldH=ScrH()
+		if (self.ScopeLuaReticlePlane) then
+			fov=self.ScopeLuaReticlePlane
+		end
+		local scale=oldW/(fov*18)
+		local aspectratio=(oldW/oldH)/(4/3)
+		scale=scale/aspectratio
+		local scalemod=1
+		draw.NoTexture()
+		for k,v in pairs(kswep_reticles[self.ScopeLuaReticle]) do
+			if (v.shape=="line") then
+				if (v.color) then surface.SetDrawColor(v.color) else 
+					surface.SetDrawColor(self.ScopeReticleColor)
+				end
+				local x1=(v.start[1]*scale)+0.5*oldW
+				local y1=(v.start[2]*scale*scalemod)+0.5*oldH
+				local x2=(v.endpos[1]*scale)+0.5*oldW
+				local y2=(v.endpos[2]*scale*scalemod)+0.5*oldH
+				surface.DrawLine(x1,y1,x2,y2)
+			end
+			if (v.shape=="circle") then
+				local circle={}
+				local x=(v.pos[1]*scale)+0.5*oldW
+				local y=(v.pos[2]*scale*scalemod)+0.5*oldH
+				local radiusx=v.radius*scale
+				local radiusy=v.radius*scale*scalemod
+				if (v.color) then surface.SetDrawColor(v.color) else 
+					surface.SetDrawColor(self.ScopeReticleColor)
+				end
+				table.insert(circle,{x=x,y=y})
+				for i=0,32 do
+					local a=math.rad((i/32)*-360)
+					table.insert(circle,{x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy})
+				end
+				local a=math.rad(0)
+				table.insert(circle,{x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy})
+				surface.DrawPoly(circle)
+			end
+			if (v.shape=="rect") then
+				local x1=(v.start[1]*scale)+0.5*oldW
+				local y1=(v.start[2]*scale*scalemod)+0.5*oldH
+				local x2=(v.endpos[1]*scale)+0.5*oldW
+				local y2=(v.endpos[2]*scale*scalemod)+0.5*oldH
+				local box={{x=x1,y=y1},{x=x2,y=y1},{x=x2,y=y2},{x=x1,y=y2}}
+				if (v.color) then surface.SetDrawColor(v.color) else 
+					surface.SetDrawColor(self.ScopeReticleColor)
+				end
+				surface.DrawPoly(box)
+			end
+				
+		end
 	end
 	if (self:GetNWBool("Zoomed") or self.NoViewModel) then
 		self.Owner:GetViewModel():SetNoDraw(true)
