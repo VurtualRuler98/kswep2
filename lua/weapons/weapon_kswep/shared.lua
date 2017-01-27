@@ -123,6 +123,8 @@ SWEP.Anims.ShootLastAnim=nil
 SWEP.Anims.ShootAnim=ACT_VM_PRIMARYATTACK
 SWEP.Anims.ShootLastIronAnim=nil
 SWEP.Anims.InitialDrawAnim=ACT_VM_DRAW
+SWEP.Anims.Deploy=ACT_VM_DEPLOYED_IN
+SWEP.Anims.Undeploy=ACT_VM_DEPLOYED_OUT
 SWEP.Anims.CrawlAnim=ACT_VM_CRAWL
 SWEP.Anims.CrawlAnimEmpty=ACT_VM_CRAWL_EMPTY
 SWEP.ShowViewModel=0
@@ -2849,7 +2851,10 @@ function SWEP:ToggleAim(unhold)
 					anim2=self.Anims.LowerAnimEmpty
 				end
 			end
-			if (self.InsIronAnims) then
+			if (self:IsProne() and self.Bipod) then
+				self:SendWeaponAnim(self.Anims.Deploy)
+				self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
+			elseif (self.InsIronAnims) then
 				self.Weapon:SendWeaponAnim(anim)
 				self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
 			else
@@ -2869,7 +2874,10 @@ function SWEP:ToggleAim(unhold)
 			end
 			self.ViewModelFOV=self.VMSmallFOV
 			self.IronZoom=self.Owner:GetFOV()
-			if (self.InsIronAnims) then
+			if (self:IsProne() and self.Bipod) then
+				self:SendWeaponAnim(self.Anims.Deploy)
+				self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
+			elseif (self.InsIronAnims) then
 				self.Weapon:SendWeaponAnim(anim)
 				self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
 			else
