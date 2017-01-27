@@ -1226,6 +1226,26 @@ function SWEP:DrawHUD()
 					local y2=(v.endpos[2]*scale*scalemod)+0.5*oldH
 					surface.DrawLine(x1,y1,x2,y2)
 				end
+				if (v.shape=="ring") then
+					local circle={}
+					local x=(v.pos[1]*scale)+0.5*oldW
+					local y=(v.pos[2]*scale*scalemod)+0.5*oldH
+					local radiusx=v.radius*scale
+					local radiusy=v.radius*scale*scalemod
+					if (v.color) then surface.SetDrawColor(v.color) else 
+						surface.SetDrawColor(self.ScopeReticleColor)
+					end
+					local lastpoint={x=x,y=y+radiusy}
+					for i=0,32 do
+						local a=math.rad((i/32)*-360)
+						local point={x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy}
+						surface.DrawLine(point.x,point.y,lastpoint.x,lastpoint.y)
+						lastpoint=point
+					end
+					--local a=math.rad(0)
+					--table.insert(circle,{x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy})
+					surface.DrawPoly(circle)
+				end
 				if (v.shape=="circle") then
 					local circle={}
 					local x=(v.pos[1]*scale)+0.5*oldW
