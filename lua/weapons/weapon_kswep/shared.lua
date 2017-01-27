@@ -167,6 +167,7 @@ SWEP.AltIronOffsetPos=Vector()
 SWEP.AltIronOffsetAng=Vector()
 SWEP.Sensitivity=1
 SWEP.MaxSensitivity=1
+SWEP.MinSensitivity=1
 SWEP.RTNV=false
 SWEP.HolsterAfter=0
 SWEP.ScopeFOVMin=nil
@@ -834,6 +835,7 @@ function SWEP:InsOptic(name)
 	end
 	self.CurrentSight=scopemodel
 	self.MaxSensitivity=scopedata.sensitivity
+	self.MinSensitivity=scopedata.minsensitivity
 	if (CLIENT and self.Owner==LocalPlayer() and self.CurrentSight~=nil) then
 		if(self.optic) then
 			self.optic:Remove()
@@ -2319,7 +2321,7 @@ function SWEP:AdjustMouseSensitivity()
 		elseif (self.ScopeFOV~=nil) then
 			scopesens=self.MaxSensitivity
 		end
-		scopesens=1+(scopesens)*((self:IronZoomMin()-self.IronZoom)/(self:IronZoomMin()-self:IronZoomMax()))
+		scopesens=1+(scopesens+self.MinSensitivity-1)*((self:IronZoomMin()-self.IronZoom)/(self:IronZoomMin()-self:IronZoomMax()))
 		return 1/scopesens/self.ScopeZoom
 	else
                 return 1
