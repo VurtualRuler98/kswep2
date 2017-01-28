@@ -2638,7 +2638,7 @@ function SWEP:FlyBulletStart(bullet)
 		zero=zdata.default
 	end
 	if (zdata.moa) then
-		miladj=(zero/zdata.moa)*3.43775
+		miladj=(zero/zdata.moa)/3.43775
 		zero=zdata.default
 	end
 	local drag_speed=zerovel
