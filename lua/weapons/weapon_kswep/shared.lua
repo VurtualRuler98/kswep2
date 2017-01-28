@@ -2580,6 +2580,19 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 		recsup = self.RecoilModSup
 	end
 	self:Recoil(self.Ammo.recoil*self.RecoilMassModifier*aimPenalty*recsup)
+	if (SERVER) then
+		local snd=self.Primary.Sound
+		if (self.Suppressed) then
+			snd=self.Primary.SoundSup
+		end
+		local sndrange=sound.GetProperties(snd).level
+		for k,v in pairs(ents.FindByClass("npc*")) do
+			local dist=v:GetPos():Distance(self.Owner:GetPos())
+			if ((sndrange*(512/dist))>10 and not util.TraceLine({start=v:EyePos(),endpos=self.Owner:GetShootPos(),mask=MASK_BLOCKLOS}).Hit) then
+				v:UpdateEnemyMemory(self.Owner,self.Owner:GetPos())
+			end
+		end
+	end
 end
 function SWEP:GetSightHeight()
 	local height=self.IronSightHeight
