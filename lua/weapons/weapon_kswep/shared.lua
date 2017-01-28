@@ -805,10 +805,10 @@ function SWEP:InsOptic(name)
 		self.Zero=self.Zerodata.default
 		self.ZerodataAlt=scopedata.zeroalt
 		self.ZeroAlt=self.ZerodataAlt.default
-		if (self.Zerodata.mils) then
+		if (self.Zerodata.mils or self.Zerodata.moa) then
 			self.Zero=0
 		end
-		if (self.ZerodataAlt.mils) then
+		if (self.ZerodataAlt.mils or self.Zerodata.moa) then
 			self.ZeroAlt=0
 		end
 		scopemodel=scopedata.model
