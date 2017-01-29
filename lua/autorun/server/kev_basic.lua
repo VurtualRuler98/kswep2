@@ -254,7 +254,7 @@ function SetSpawnMagazines(ply)
 	ply.KSecondaryItem="nothing"
 	ply.KHearingRing=0
 	ply.KDeafState=0
-	ply.KEarPro=0
+	ply.KEarPro=GetConVar("kswep_earpro"):GetInt()
 end
 hook.Add("PlayerSpawn","setspawnmagazines",SetSpawnMagazines)
 

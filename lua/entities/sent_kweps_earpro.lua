@@ -47,8 +47,8 @@ end
 function ENT:Think()
 end
 function ENT:Use(activator,caller)
-	if (IsValid(caller) and caller:IsPlayer() and caller.KEarPro<1) then
-		caller.KEarPro=40
+	if (IsValid(caller) and caller:IsPlayer() and caller.KEarPro<30) then
+		caller.KEarPro=30
 		self.Entity:EmitSound("npc_sniper.reload")
 	end
 end
