@@ -2592,6 +2592,14 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 				v:UpdateEnemyMemory(self.Owner,self.Owner:GetPos())
 			end
 		end
+		for k,v in pairs(ents.FindByClass("player")) do
+			local dist=v:GetPos():Distance(self.Owner:GetPos())
+			local db=sndrange*(512/dist)
+			if (db>sndrange) then db=sndrange end
+			if (db>130+v.KEarPro and not util.TraceLine({start=v:EyePos(),endpos=self.Owner:GetShootPos(),mask=MASK_BLOCKLOS}).Hit) then
+				v.KHearingRing=v.KHearingRing+db-130-v.KEarPro
+			end
+		end
 	end
 end
 function SWEP:GetSightHeight()

@@ -252,6 +252,9 @@ function SetSpawnMagazines(ply)
 	ply:SetNWFloat("KswepRecoil",0)
 	ply.KPrimaryItem="nothing"
 	ply.KSecondaryItem="nothing"
+	ply.KHearingRing=0
+	ply.KDeafState=0
+	ply.KEarPro=0
 end
 hook.Add("PlayerSpawn","setspawnmagazines",SetSpawnMagazines)
 
@@ -262,6 +265,30 @@ hook.Add("PlayerInitialSpawn", "plyspawnammotypes",function(ply)
 	net.Send(ply)
 end )
 KswepRecoilTime=CurTime()
+KswepHearingTime=CurTime()
+hook.Add("Think","kswephearingthink",function()
+	if (KswepHearingTime<CurTime()) then
+		for k,v in pairs(player.GetAll()) do
+			if (IsValid(v) and v:IsPlayer()) then
+				if (v.KHearingRing>0) then
+					v.KHearingRing=v.KHearingRing-1
+					if (v.KHearingRing>200 and v.KDeafState>0 and v.KDeafState<CurTime()) then
+						v:SetDSP(32)
+						v.KDeafState=CurTime()+math.random(20,30)
+					elseif (v.KHearingRing>200 and v.KDeafState==0) then
+						v.KDeafState=CurTime()+math.random(20,30)
+						v:SetDSP(35)
+					elseif (v.KHearingRing<0) then
+						v.KHearingRing=0
+					end
+				else
+					v.KDeafState=0
+				end
+			end
+		end
+		KswepHearingTime=CurTime()+0.2
+	end
+end)
 hook.Add("Think","ksweprecoilthink", function()
 	if (KswepRecoilTime<CurTime()) then
 		for k,v in pairs(player.GetAll()) do
@@ -285,6 +312,7 @@ hook.Add("Think","ksweprecoilthink", function()
 						v:SetNWFloat("KswepRecoil",rec)
 					end
 				--end
+				
 			end
 		end
 		KswepRecoilTime=CurTime()+1
