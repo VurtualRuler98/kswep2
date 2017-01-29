@@ -254,6 +254,7 @@ function SetSpawnMagazines(ply)
 	ply.KSecondaryItem="nothing"
 	ply.KHearingRing=0
 	ply.KDeafState=0
+	ply.KLastDeaf=1
 	ply.KEarPro=GetConVar("kswep_earpro"):GetInt()
 end
 hook.Add("PlayerSpawn","setspawnmagazines",SetSpawnMagazines)
@@ -272,17 +273,19 @@ hook.Add("Think","kswephearingthink",function()
 			if (IsValid(v) and v:IsPlayer()) then
 				if (v.KHearingRing>0) then
 					v.KHearingRing=v.KHearingRing-1
-					if (v.KHearingRing>200 and v.KDeafState>0 and v.KDeafState<CurTime()) then
+					if (v.KHearingRing > 50 and v.KDeafState>0 and v.KDeafState<CurTime()) then
 						v:SetDSP(32)
 						v.KDeafState=CurTime()+math.random(20,30)
-					elseif (v.KHearingRing>200 and v.KDeafState==0) then
+					elseif (v.KHearingRing>50 and v.KLastDeaf/v.KHearingRing<0.5 ) then
 						v.KDeafState=CurTime()+math.random(20,30)
 						v:SetDSP(35)
+						v.KLastDeaf=v.KHearingRing
 					elseif (v.KHearingRing<0) then
 						v.KHearingRing=0
 					end
 				else
 					v.KDeafState=0
+					v.KLastDeaf=0
 				end
 			end
 		end

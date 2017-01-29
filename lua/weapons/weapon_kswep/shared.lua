@@ -2592,13 +2592,11 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 				v:UpdateEnemyMemory(self.Owner,self.Owner:GetPos())
 			end
 		end
+		local supmod=1
+		if (self.Suppressed) then supmod=self.MuzzleVelModSup end
+		if (sndrange<140 and self.Ammo.velocity*self.MuzzleVelMod*supmod>1125) then sndrange=140 end
 		for k,v in pairs(ents.FindByClass("player")) do
-			local dist=v:GetPos():Distance(self.Owner:GetPos())
-			local db=sndrange*(512/dist)
-			if (db>sndrange) then db=sndrange end
-			if (db>130+v.KEarPro and not util.TraceLine({start=v:EyePos(),endpos=self.Owner:GetShootPos(),mask=MASK_BLOCKLOS}).Hit) then
-				v.KHearingRing=v.KHearingRing+db-130-v.KEarPro
-			end
+			self:CalcHearingLoss(sndrange,self.Owner:GetShootPos(),v)
 		end
 	end
 end
@@ -2746,6 +2744,8 @@ function SWEP:FlyBullet(shot)
 					net.Start("kswep_supersonic")
 					net.WriteVector(shot["crackpos"..v:EntIndex()])
 					net.Send(v)
+					local sndrange=sound.GetProperties("kswep_supersonic").level
+					self:CalcHearingLoss(sndrange,shot.pos,v)
 				end
 				end
 			end
@@ -2757,6 +2757,15 @@ function SWEP:FlyBullet(shot)
 	else
 		return nil
 	end
+end
+function SWEP:CalcHearingLoss(sndrange,start,ply)
+		local endpos=ply:EyePos()
+		local dist=endpos:Distance(start)
+		local db=sndrange*(512/dist)
+		if (db>sndrange) then db=sndrange end
+		if (db>130+ply.KEarPro and not util.TraceLine({start=start,endpos=endpos,mask=MASK_BLOCKLOS}).Hit) then
+			ply.KHearingRing=ply.KHearingRing+db-130-ply.KEarPro
+		end
 end
 function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 	local tr = util.TraceLine( {
