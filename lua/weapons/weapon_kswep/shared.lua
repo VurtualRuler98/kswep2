@@ -2744,7 +2744,7 @@ function SWEP:FlyBullet(shot)
 					net.Start("kswep_supersonic")
 					net.WriteVector(shot["crackpos"..v:EntIndex()])
 					net.Send(v)
-					local sndrange=sound.GetProperties("kswep_supersonic").level
+					local sndrange=sound.GetProperties("kswep.supersonic").level
 					self:CalcHearingLoss(sndrange,shot.pos,v)
 				end
 				end
