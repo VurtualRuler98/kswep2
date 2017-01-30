@@ -273,10 +273,7 @@ hook.Add("Think","kswephearingthink",function()
 			if (IsValid(v) and v:IsPlayer()) then
 				if (v.KHearingRing>0) then
 					v.KHearingRing=v.KHearingRing-1
-					if (v.KHearingRing > 50 and v.KDeafState>0 and v.KDeafState<CurTime()) then
-						v:SetDSP(32)
-						v.KDeafState=CurTime()+math.random(20,30)
-					elseif (v.KHearingRing>50 and v.KLastDeaf/v.KHearingRing<0.5 ) then
+					if (v.KHearingRing>50 and v.KLastDeaf/v.KHearingRing<0.5 ) then
 						v.KDeafState=CurTime()+math.random(20,30)
 						v:SetDSP(35)
 						v.KLastDeaf=v.KHearingRing
