@@ -283,6 +283,25 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 				ammoframe:Close()
 			end
 	end
+	if (canmag and self:GetNWBool("GiveAmmo")) then
+		local dbutton=vgui.Create("DButton")
+			dbutton:SetParent(ammoframe)
+			dbutton:SetPos(20,280)
+			dbutton:SetSize(180,40)
+			if (wep.IsSecondaryWeapon) then
+				dbutton:SetText("Make Primary")
+			else
+				dbutton:SetText("Make Secondary")
+			end
+			dbutton.DoClick = function()
+				if (LocalPlayer():GetActiveWeapon()==wep) then
+					net.Start("kswep_swapslot")
+					net.WriteEntity(wep)
+					net.SendToServer()
+				end
+				ammoframe:Close()
+			end
+	end
 end 
 net.Receive("kswep_opticbox", function()
 	local box=net.ReadEntity()

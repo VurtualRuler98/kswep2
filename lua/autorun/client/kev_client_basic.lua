@@ -25,6 +25,12 @@ net.Receive("kswep_flashlight_cl",function(len)
 		end
 	end
 end)
+net.Receive("kswep_swapslot_cl",function(len)
+	local wep=net.ReadEntity()
+	local slot=net.ReadBool()
+	if (not IsValid(wep)) then return end
+	wep.IsSecondaryWeapon=slot
+end)
 local function KSwepSetEquipment_cl(len)
 	local primary=net.ReadString()
 	local secondary=net.ReadString()
