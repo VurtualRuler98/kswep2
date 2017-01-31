@@ -656,7 +656,7 @@ function SWEP:TakePrimaryAmmo(num)
 					net.WriteEntity(self)
 					net.WriteTable(self.MagTable)
 					net.Send(self.Owner)
-					if (self.OpenBolt and #self.MagTable>0) then 
+					if (self.SingleReload and #self.MagTable>0) then 
 						self.Ammo=vurtual_ammodata[self.MagTable[#self.MagTable].caliber]
 					end
 				end
