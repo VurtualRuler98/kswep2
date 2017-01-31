@@ -26,6 +26,7 @@ ENT.IsRemoved=false
 ENT.MolotovFlames=10
 ENT.CSGasTimer=0
 ENT.CSGasEffectDelay=0.3
+ENT.LastCough=0
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -139,6 +140,11 @@ function ENT:ThinkSmokeCS()
 			for k,v in pairs(ents.FindInSphere(self:GetPos(),256)) do
 				if (v:IsPlayer() and not v.KswepGasMask) then
 					v:TakeDamageInfo(dmginfo)
+					local cough="ambient/voices/cough"..math.random(1,4)..".wav"
+					if (self.LastCough<CurTime()) then
+						v:EmitSound(cough)
+						self.LastCough=math.random(1,4)+CurTime()
+					end
 				elseif (v:IsNPC()) then
 					local c=v:GetClass()
 					if (c=="npc_citizen" or c=="npc_kleiner" or c=="npc_eli" or c=="npc_mossman" or c=="npc_magnusson") then
