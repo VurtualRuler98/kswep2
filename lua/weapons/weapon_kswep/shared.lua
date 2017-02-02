@@ -2702,13 +2702,35 @@ function SWEP:FlyBullet(shot)
 	else
 		travel = shot.pos + (shot.ang*shot.speed*12*FrameTime())-Vector(0,0,shot.gravity)
 	end
-	local tr = util.TraceLine( {
+	local tr=util.TraceLine( {
 		filter = self.Owner,
 		start = shot.pos,
 		endpos = travel,
-		mask = MASK_SHOT
+		mask = MASK_WATER+MASK_SHOT
+	})
+	local water
+	local waterlength=0
+	if (tr.Hit) then
+		local water=util.TraceLine( {
+			filter = self.Owner,
+			start = shot.pos,
+			endpos = travel,
+			mask = MASK_WATER
 		})
-	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid) then
+		tr = util.TraceLine( {
+			filter = self.Owner,
+			start = shot.pos,
+			endpos = travel,
+			mask = MASK_SHOT
+			})
+		waterlength=tr.Fraction-water.Fraction+water.FractionLeftSolid-tr.FractionLeftSolid
+	end
+	local drag=self:GetDrag("G1",shot.speed)
+	if (waterlength>0) then drag=drag+(drag*1000*waterlength) end
+	print(shot.speed)
+	shot.speed=shot.speed+(-1*drag/shot.bc)*shot.speed*FrameTime()
+	print(shot.speed,waterlength)
+	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.speed>100) then
 		shot.bullet.Src=shot.pos
 		--self.Owner:SetPos(tr.HitPos)
 		shot.bullet.Damage=(shot.dmg/vurtual_ammodata[shot.bullet.AmmoType].velocity^2)*shot.speed^2
@@ -2720,7 +2742,6 @@ function SWEP:FlyBullet(shot)
 			local armor=0
 			shot.speed, shot.pos, shot.dist=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
 		else
-			shot.speed=shot.speed+(-1*self:GetDrag("G1",shot.speed)/shot.bc)*shot.speed*FrameTime()
 			--386 inches per second also thanks justarandomgeek
 			shot.gravity=shot.gravity+(386*(FrameTime()^2))
 			shot.pos=travel
