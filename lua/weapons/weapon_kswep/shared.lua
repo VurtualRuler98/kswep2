@@ -2727,9 +2727,7 @@ function SWEP:FlyBullet(shot)
 	end
 	local drag=self:GetDrag("G1",shot.speed)
 	if (waterlength>0) then drag=drag+(drag*1000*waterlength) end
-	print(shot.speed)
 	shot.speed=shot.speed+(-1*drag/shot.bc)*shot.speed*FrameTime()
-	print(shot.speed,waterlength)
 	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.speed>100) then
 		shot.bullet.Src=shot.pos
 		--self.Owner:SetPos(tr.HitPos)
