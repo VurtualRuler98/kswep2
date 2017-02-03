@@ -56,6 +56,7 @@ net.Receive("kswep_swapslot",function(len,pl)
 	local wep=net.ReadEntity()
 	if (wep.Owner~=pl or not IsValid(wep) or not string.find(wep:GetClass(),"weapon_kswep")) then return end
 	wep.IsSecondaryWeapon=not wep.IsSecondaryWeapon
+	wep:UpdateMagazines()
 	net.Start("kswep_swapslot_cl")
 	net.WriteEntity(wep)
 	net.WriteBool(wep.IsSecondaryWeapon)

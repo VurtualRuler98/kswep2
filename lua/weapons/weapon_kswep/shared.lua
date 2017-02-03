@@ -287,7 +287,6 @@ function SWEP:Initialize()
 	end
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.Caliber=self.Ammo.caliber
-	self.DefaultMagazines = {}
 	if (self.InsAttachments and self.DefaultSight) then
 		self.CurrentSight=self.DefaultSight
 	end

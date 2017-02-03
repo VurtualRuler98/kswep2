@@ -79,7 +79,7 @@ function KSScaleDamage(armor,dmginfo,ent)
 end
 function KSGetArmorNPC(npc,hitgroup)
 	local class=npc:GetClass()
-	if (class=="npc_metropolice") then
+	if (class=="npc_metropolice" or class=="nz_metro_zombie") then
 		if (hitgroup==HITGROUP_CHEST) then
 			return KSWEP_ARMOR_IIIA
 		elseif (hitgroup==HITGROUP_HEAD) then
@@ -124,6 +124,10 @@ function KSGetArmorNPC(npc,hitgroup)
 			else
 				return 0
 			end
+		end
+	elseif (class=="nz_infected" or class=="nz_crazies" or class=="nz_grabber" or class=="nz_corrupt" or class=="nz_maniac") then
+		if (hitgroup==HITGROUP_CHEST or hitgroup==HITGROUP_HEAD) then
+			return 0
 		end
 	end
 	return -1
