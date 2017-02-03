@@ -2588,7 +2588,9 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 		for k,v in pairs(ents.FindByClass("npc*")) do
 			local dist=v:GetPos():Distance(self.Owner:GetPos())
 			if ((sndrange*(512/dist))>10 and not util.TraceLine({start=v:EyePos(),endpos=self.Owner:GetShootPos(),mask=MASK_BLOCKLOS}).Hit) then
-				v:UpdateEnemyMemory(self.Owner,self.Owner:GetPos())
+				if (type(v.UpdateEnemyMemory)=="function") then
+					v:UpdateEnemyMemory(self.Owner,self.Owner:GetPos())
+				end
 			end
 		end
 		local supmod=1
