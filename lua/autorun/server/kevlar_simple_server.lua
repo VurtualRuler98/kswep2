@@ -95,7 +95,7 @@ function KSGetArmorNPC(npc,hitgroup)
 		if (hitgroup==HITGROUP_CHEST or hitgroup==HITGROUP_HEAD) then
 			return 0
 		end
-	elseif (class=="npc_headcrab" or class=="npc_headcrab_fast" or class=="npc_headcrab_black") then
+	elseif (class=="npc_headcrab" or class=="npc_headcrab_fast" or class=="npc_headcrab_black" or class=="npc_headcrab_poison") then
 		return 0
 	elseif (class=="npc_zombine") then
 		if (hitgroup==HITGROUP_CHEST) then
