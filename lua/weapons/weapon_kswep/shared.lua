@@ -2707,27 +2707,34 @@ function SWEP:FlyBullet(shot)
 		filter = self.Owner,
 		start = shot.pos,
 		endpos = travel,
-		mask = MASK_WATER+MASK_SHOT
+		mask = bit.bor(MASK_SHOT,MASK_WATER)
 	})
 	local water
 	local waterlength=0
 	if (tr.Hit) then
-		local water=util.TraceLine( {
-			filter = self.Owner,
-			start = shot.pos,
-			endpos = travel,
-			mask = MASK_WATER
-		})
+		water=tr
 		tr = util.TraceLine( {
 			filter = self.Owner,
 			start = shot.pos,
 			endpos = travel,
 			mask = MASK_SHOT
 			})
-		waterlength=tr.Fraction-water.Fraction+water.FractionLeftSolid-tr.FractionLeftSolid
+		if (water.StartSolid) then water.Length=0 end
+		local backwater=util.TraceLine( {filter=self.Owner,start=tr.HitPos,endpos=shot.pos,mask=MASK_WATER})
+		waterlength=tr.Fraction-water.Fraction-(backwater.Fraction*tr.Fraction)
 	end
 	local drag=self:GetDrag("G1",shot.speed)
-	if (waterlength>0) then drag=drag+(drag*1000*waterlength) end
+	if (waterlength>0) then
+		drag=drag+(drag*1000*waterlength)
+		if (not water.AllSolid) then
+			local fakebullet=table.Copy(shot.bullet)
+			fakebullet.Damage = 0
+			fakebullet.Src = shot.pos
+			fakebullet.AmmoType="pistol"
+			fakebullet.Force = 0
+			self:FireShot(fakebullet)
+		end
+	end
 	shot.speed=shot.speed+(-1*drag/shot.bc)*shot.speed*FrameTime()
 	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.speed>100) then
 		shot.bullet.Src=shot.pos
