@@ -637,7 +637,7 @@ end
 net.Receive("kswep_magtable",function(len)
 	local self=net.ReadEntity()
 	self.MagTable=net.ReadTable()
-	if (self.OpenBolt and #self.MagTable>0) then 
+	if (self.SingleReload and #self.MagTable>0) then 
 		self.Ammo=vurtual_ammodata[self.MagTable[#self.MagTable].caliber]
 	end
 end)
@@ -2719,23 +2719,28 @@ function SWEP:FlyBullet(shot)
 			endpos = travel,
 			mask = MASK_SHOT
 			})
-		if (water.StartSolid) then water.Length=0 end
+		if (water.StartSolid) then water.Fraction=0 end
 		local backwater=util.TraceLine( {filter=self.Owner,start=tr.HitPos,endpos=shot.pos,mask=MASK_WATER})
+		if (backwater.StartSolid) then backwater.Fraction=0 end
 		waterlength=tr.Fraction-water.Fraction-(backwater.Fraction*tr.Fraction)
 	end
 	local drag=self:GetDrag("G1",shot.speed)
 	if (waterlength>0) then
-		drag=drag+(drag*1000*waterlength)
-		if (not water.AllSolid) then
+		drag=drag+(drag*100*waterlength)
+		if (not water.StartSolid) then
 			local fakebullet=table.Copy(shot.bullet)
 			fakebullet.Damage = 0
 			fakebullet.Src = shot.pos
 			fakebullet.AmmoType="pistol"
 			fakebullet.Force = 0
+			fakebullet.Distance=(shot.speed*12*FrameTime())
 			self:FireShot(fakebullet)
 		end
 	end
+	local oldspeed=shot.speed
 	shot.speed=shot.speed+(-1*drag/shot.bc)*shot.speed*FrameTime()
+	print(oldspeed-shot.speed)
+	if (oldspeed-shot.speed>1125) then shot.speed=0 end
 	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.speed>100) then
 		shot.bullet.Src=shot.pos
 		--self.Owner:SetPos(tr.HitPos)
