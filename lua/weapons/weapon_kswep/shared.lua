@@ -2739,7 +2739,6 @@ function SWEP:FlyBullet(shot)
 	end
 	local oldspeed=shot.speed
 	shot.speed=shot.speed+(-1*drag/shot.bc)*shot.speed*FrameTime()
-	print(oldspeed-shot.speed)
 	if (oldspeed-shot.speed>1125) then shot.speed=0 end
 	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.speed>100) then
 		shot.bullet.Src=shot.pos
