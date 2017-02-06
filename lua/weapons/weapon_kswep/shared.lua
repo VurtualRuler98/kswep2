@@ -1131,6 +1131,10 @@ function SWEP:ReloadTube()
 	self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed+self.ReloadDelay)
 	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed+self.ReloadDelay
 	self:ServeNWBool("CurrentlyReloading",true)
+	if (self.SingleReloadDump) then
+		table.Add(self.Magazines,self.MagTable)
+		table.Empty(self.MagTable)
+	end
 		
 end
 
