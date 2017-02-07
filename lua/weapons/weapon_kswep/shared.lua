@@ -1445,7 +1445,6 @@ end
 function SWEP:FinishReload()
 	self:ServeNWBool("CurrentlyReloading",false)
 	self:ServeNWBool("FiringPin",true)
-	table.insert(self.Magazines,{caliber=self.Ammo.name,num = self:Clip1(),max=self.CurrentMagSize})
 	table.SortByMember(self.Magazines,"num",true)
 	local idleanim=self.Anims.IdleAnim
 	if (not self:GetNWBool("Raised")) then
@@ -1456,13 +1455,23 @@ function SWEP:FinishReload()
 	else
 		self.Weapon:SendWeaponAnim(idleanim)
 	end
-	local mag=table.GetLastValue(self.Magazines)
-	self:SetClip1(mag.num)
-	self.CurrentMagSize=mag.max
-	self.Ammo=vurtual_ammodata[mag.caliber]
-	table.remove(self.Magazines)
+	if (SERVER) then
+		local mag=table.Copy(table.GetLastValue(self.Magazines))
+		local oldmag={caliber=self.Ammo.name,num = self:Clip1(),max=self.CurrentMagSize}
+		self:SetClip1(mag.num)
+		self.CurrentMagSize=mag.max
+		self.Ammo=vurtual_ammodata[mag.caliber]
+		if (self:Clip1()>0) then
+			self.Magazines[#self.Magazines].num=oldmag.num
+			self.Magazines[#self.Magazines].caliber=oldmag.caliber
+			self.Magazines[#self.Magazines].max=oldmag.max
+			table.SortByMember(self.Magazines,"num",true)
+		else
+			table.Empty(table.GetLastValue(self.Magazines))
+		end
+	end
 	if (#self.Magazines>0 and self.Magazines[1].num==0) then
-		table.remove(self.Magazines,1)
+		table.Empty(self.Magazines[1])
 	end
 	self.ReloadWeight=self:Clip1()
 	if (self:GetNWBool("Chambered")==false and self.OpenBolt==false and self:Clip1()>0) then
