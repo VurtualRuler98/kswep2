@@ -12,7 +12,11 @@ tbl.slots = {{STANAG=6,BattleRifle=4},{Pistol1=2,Pistol2=1,Shotshell=10,Speedloa
 KswepAddLBE(tbl)
 local tbl={}
 tbl.name="MOLLE Rifleman"
-tbl.slots = {{STANAG=6,BattleRifle=3},{STANAG=6},{Pistol1=2,Pistol2=2,Speedloader=2}}
+tbl.slots = {{STANAG=6,BattleRifle=3},{STANAG=6}}
+KswepAddLBE(tbl)
+local tbl={}
+tbl.name="MOLLE Pistolman"
+tbl.slots = {{Pistol1=4,Pistol2=4}}
 KswepAddLBE(tbl)
 local tbl={}
 tbl.name="ALICE Machinegunner"
@@ -25,6 +29,10 @@ KswepAddLBE(tbl)
 local tbl={}
 tbl.name="M1910 Cartridge Belt"
 tbl.slots = {{RifleClip=20,RifleClip2=10}}
+KswepAddLBE(tbl)
+local tbl={}
+tbl.name="M1912 Pistol Belt"
+tbl.slots = {{Pistol1=2,PistolCarbine=2}}
 KswepAddLBE(tbl)
 local tbl={}
 tbl.name="M1918 Cartridge Belt"
