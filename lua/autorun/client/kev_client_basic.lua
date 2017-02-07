@@ -32,15 +32,9 @@ net.Receive("kswep_swapslot_cl",function(len)
 	wep.IsSecondaryWeapon=slot
 end)
 local function KSwepSetEquipment_cl(len)
-	local primary=net.ReadString()
-	local secondary=net.ReadString()
-	local primarytwo=net.ReadString()
-	local secondarytwo=net.ReadString()
-	if (primary~=nil and secondary~=nil and primarytwo~=nil and secondarytwo~=nil) then
-		LocalPlayer().KPrimaryItem=primary
-		LocalPlayer().KSecondaryItem=secondary
-		LocalPlayer().KPrimaryItemTwo=primarytwo
-		LocalPlayer().KSecondaryItemTwo=secondarytwo
+	local lbe=net.ReadString()
+	if (lbe~=nil) then
+		LocalPlayer().KswepLBEType=lbe
 	end
 end
 net.Receive("kswep_stabsound",function(len)

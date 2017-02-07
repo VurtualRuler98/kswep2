@@ -155,27 +155,15 @@ function KswepAttach(len,pl)
 end
 net.Receive("kswep_attach",KswepAttach)
 local function KSwepSetEquipment(len,pl)
-	local slot=net.ReadBool()
-	local slottwo=net.ReadBool()
 	local item=net.ReadString()
 	local box=net.ReadEntity()
-	if (IsValid(pl) and pl:IsPlayer() and slot~=nil and item~=nil and IsValid(box)) then
+	if (IsValid(pl) and pl:IsPlayer() and item~=nil and IsValid(box)) then
 		if (not box:GetClass("sent_vurt_supplybox")) then return end
 		if (box:GetPos():Distance(pl:GetPos())>512) then return end
 		if (not box:GetNWBool("Equipment")) then return end
-		if (slot) then
-			if (slottwo) then
-				pl.KSecondaryItemTwo=item
-			else
-				pl.KSecondaryItem=item
-			end
-		else
-			if (slottwo) then
-				pl.KPrimaryItemTwo=item
-			else
-				pl.KPrimaryItem=item
-			end
-		end
+		if (not kswep_lbe[item]) then return end
+		pl.KswepLBEType=item
+		table.Empty(pl.KswepLBE)
 	end
 end
 net.Receive("kswep_setequipment",KSwepSetEquipment)
@@ -220,7 +208,7 @@ function RearmMags(len,pl)
 						end
 					end
 				end
-				wep:UpdateMagazines()
+				wep:ForceReload(caliber,magsize)
 				
 			end
 		end

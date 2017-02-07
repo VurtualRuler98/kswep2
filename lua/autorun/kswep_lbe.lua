@@ -6,10 +6,13 @@ kswep_lbe={}
 local function KswepAddLBE(tbl)
 	kswep_lbe[tbl.name]=tbl.slots
 end
-
 local tbl={}
 tbl.name="ALICE Rifleman"
 tbl.slots = {{STANAG=6,BattleRifle=4},{Pistol1=2,Pistol2=1,Shotshell=10,Speedloader=2}}
+KswepAddLBE(tbl)
+local tbl={}
+tbl.name="MOLLE Rifleman"
+tbl.slots = {{STANAG=6,BattleRifle=3},{STANAG=6},{Pistol1=2,Pistol2=2,Speedloader=2}}
 KswepAddLBE(tbl)
 local tbl={}
 tbl.name="ALICE Machinegunner"

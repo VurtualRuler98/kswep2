@@ -686,6 +686,7 @@ function SWEP:Deploy()
 		self:SetClip1(self.MagSize)
 		self.Weapon:SendWeaponAnim(self.Anims.InitialDrawAnim)
 		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.Anims.IdleAnim)
 		self.InitialDraw=false
 	else
 		if (SERVER) then
@@ -1408,7 +1409,39 @@ function SWEP:FinishReloadClip()
 	end
 	self:UpdateMagazines()
 end
-			
+function SWEP:ForceReload(caliber,max)
+	if (not self.OpenBolt) then self.ChamberAmmo=vurtual_ammodata[caliber] end
+	if (self.SingleReload) then
+		table.Empty(self.MagTable)
+		for i=1,self.MagSize do
+			local round={caliber=caliber,num=1,max=1}
+			table.insert(self.MagTable,round)
+		end
+		self:SetNWInt("MagRounds",#self.MagTable)
+	else
+		self:SetClip1(max)
+		self.CurrentMagSize=max
+		if (self:GetNWBool("Chambered")==false and self.OpenBolt==false and self:Clip1()>0) then
+			self:TakePrimaryAmmo(1)
+			self:ServeNWBool("Chambered",true)
+		end
+		if (self.OpenBolt==true) then
+			self:ServeNWBool("Chambered",true)
+		end
+	end
+	if (SERVER and self.Owner:IsPlayer()) then
+		net.Start("kswep_magazines")
+		net.WriteEntity(self)
+		net.WriteTable(vurtual_ammodata[caliber])
+		net.WriteTable(self.Magazines)
+		net.Send(self.Owner)
+	end
+	self.Ammo=vurtual_ammodata[caliber]
+	self:UpdateMagazines()
+	self.Weapon:SendWeaponAnim(self.Anims.InitialDrawAnim)
+	self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.Anims.IdleAnim)
+end
+		
 function SWEP:FinishReload()
 	self:ServeNWBool("CurrentlyReloading",false)
 	self:ServeNWBool("FiringPin",true)
