@@ -156,6 +156,7 @@ end
 net.Receive("kswep_attach",KswepAttach)
 local function KSwepSetEquipment(len,pl)
 	local slot=net.ReadBool()
+	local slottwo=net.ReadBool()
 	local item=net.ReadString()
 	local box=net.ReadEntity()
 	if (IsValid(pl) and pl:IsPlayer() and slot~=nil and item~=nil and IsValid(box)) then
@@ -163,9 +164,17 @@ local function KSwepSetEquipment(len,pl)
 		if (box:GetPos():Distance(pl:GetPos())>512) then return end
 		if (not box:GetNWBool("Equipment")) then return end
 		if (slot) then
-			pl.KSecondaryItem=item
+			if (slottwo) then
+				pl.KSecondaryItemTwo=item
+			else
+				pl.KSecondaryItem=item
+			end
 		else
-			pl.KPrimaryItem=item
+			if (slottwo) then
+				pl.KPrimaryItemTwo=item
+			else
+				pl.KPrimaryItem=item
+			end
 		end
 	end
 end
@@ -184,51 +193,32 @@ function RearmMags(len,pl)
 		if (wep~=pl:GetActiveWeapon()) then return end
 		if (wep:IsValid() and string.find(wep:GetClass(),"weapon_kswep")) then
 			if (wep.MagType or wep.SingleReload) then
-				local magcount=wep.MaxMags
-				local tbl=pl.KPrimaryMags
 				local magsize=wep.MagSize
 				local magtype=wep.MagType
-				local magbonus=0
-				local magitem="primaryammo"	
-				local bonusnum=wep.MaxMagsBonus
-				if (wep.IsSecondaryWeapon) then
-					tbl=pl.KSecondaryMags
-					pl.KSecondaryType=magtype
-					magitem="secondaryammo"
-				else
-					pl.KPrimaryType=magtype
-				end
-				if (pl.KPrimaryItem==magitem) then
-					magbonus=magbonus+1
-				end
-				if (pl.KSecondaryItem==magitem) then
-					magbonus=magbonus+1
-				end
-				magcount=magcount+(bonusnum*magbonus)
+				local magclass=wep.MagClass
+				--local magbonus=0
+				--local magitem="primaryammo"	
+				--local bonusnum=wep.MaxMagsBonus
 				if (wep.SingleReload and not wep.SingleClips) then
 					magsize=1
 					magtype=wep.Caliber
-					magcount=magcount+wep.MagSize
 				end
 				if (wep.SingleClips) then
 					magsize=wep.ReloadClipSize
 				end
-				table.Empty(tbl)
-				for i=1,magcount do
-					table.insert(tbl,{caliber=caliber,num=magsize,max=magsize})
-				end
-				if (not wep.SingleReload) then
-					table.insert(tbl,{caliber=caliber,num=magsize,max=magsize})
-					wep:SetClip1(0)
-					wep:SetNWBool("Chambered",false)
-					wep:ReloadAct(true)
-				end
-				if (wep.SingleReload) then
-					wep.MagTable={}
-					net.Start("kswep_magtable")
-					net.WriteEntity(wep)
-					net.WriteTable(wep.MagTable)
-					net.Send(wep.Owner)
+				for k,v in pairs(kswep_lbe[pl.KswepLBEType]) do
+					local fits=false
+					for g,w in pairs(v) do
+						if (g==magclass) then
+							fits=w
+						end
+					end
+					if (fits) then
+						pl.KswepLBE[k]={}
+						for i=1,fits do
+							table.insert(pl.KswepLBE[k],{caliber=caliber,num=magsize,max=magsize,magtype=magtype})
+						end
+					end
 				end
 				wep:UpdateMagazines()
 				
@@ -258,13 +248,9 @@ local function KswepGiveGrenades(len,pl)
 end
 net.Receive("kswep_givegrenades_cl",KswepGiveGrenades)
 function SetSpawnMagazines(ply)
-	ply.KPrimaryMags={}
-	ply.KPrimaryType=nil
-	ply.KSecondaryMags={}
-	ply.KSecondaryType=nil
+	ply.KswepLBEType="Range Belt"
+	ply.KswepLBE={}
 	ply:SetNWFloat("KswepRecoil",0)
-	ply.KPrimaryItem="nothing"
-	ply.KSecondaryItem="nothing"
 	ply.KHearingRing=0
 	ply.KDeafState=0
 	ply.KLastDeaf=1

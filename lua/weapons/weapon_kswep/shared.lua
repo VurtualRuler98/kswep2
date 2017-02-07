@@ -63,8 +63,8 @@ SWEP.RecoilControl=4
 SWEP.RecoilMassModifier=1
 SWEP.HandlingModifier=200
 SWEP.HoldAngle=20
-SWEP.MaxMags=6
-SWEP.MaxMagsBonus=2
+SWEP.MaxMags=1
+SWEP.MaxMagsBonus=3
 SWEP.DoubleAction=false
 SWEP.SpawnChambered=false
 SWEP.ScopeZoom = 1
@@ -1144,7 +1144,8 @@ function SWEP:DrawHUD()
 	else
 		self.Owner:GetViewModel():SetNoDraw(false)
 	end
-	local ammo = self.Ammo
+	local ammo = "none"
+	if (self.Ammo) then ammo=self.Ammo.printname end
 	local zero=self.Zero
 	local zdata=self.Zerodata
 	if (self:GetNWBool("AltIrons")) then
@@ -1171,9 +1172,9 @@ function SWEP:DrawHUD()
 		zerostring=zero/zdata.moa.." MOA"
 	end
 	if (self.SingleReload and not self.OpenBolt) then
-		ammo =self.ChamberAmmo
+		ammo =self.ChamberAmmo.printname
 	end
-	draw.DrawText(self:FiremodeName() .. " ".. zerostring .." " .. ammo.printname,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
+	draw.DrawText(self:FiremodeName() .. " ".. zerostring .." " .. ammo,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
 	if (self.ReloadMessage > CurTime()) then
 		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
 	end
@@ -1474,16 +1475,13 @@ function SWEP:UpdateMagazines()
 		self:SetClip1(self:GetNWInt("MagRounds"))
 	end
 	if (SERVER) then
-		local plmags=self.Owner.KPrimaryMags
-		local pltype=self.Owner.KPrimaryType
-		if (self.IsSecondaryWeapon) then
-			plmags=self.Owner.KSecondaryMags
-			pltype=self.Owner.KSecondaryType
-		end
-		if (pltype==self.MagType) then
-			self.Magazines=plmags
-		else
-			self.Magazines={}
+		self.Magazines={}
+		for k,v in pairs(self.Owner.KswepLBE) do
+			for g,w in pairs(v) do
+				if (w.magtype==self.MagType) then
+					table.insert(self.Magazines,w)
+				end
+			end
 		end
 		self:UpdateMagCount()
 	end
@@ -1517,7 +1515,7 @@ function SWEP:FinishReloadSingle()
 			self.Magazines[1].num=self.Magazines[1].num-1
 		else
 			table.insert(self.MagTable,mag)
-			table.remove(self.Magazines,1)
+			table.Empty(self.Magazines[1])
 		end
 		self:SetNWInt("MagRounds",#self.MagTable)
 	end

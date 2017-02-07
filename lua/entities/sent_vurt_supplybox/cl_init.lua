@@ -77,7 +77,7 @@ function ENT:ClUseMagBox(wep,mags)
 		end
 
 end 
-function ENT:ShowEquipmentMenu(secondary)
+function ENT:ShowEquipmentMenu(secondary,slottwo)
 	local menuwidth=200
 	local menuheight=200
 	local title="Item 1"
@@ -99,12 +99,21 @@ function ENT:ShowEquipmentMenu(secondary)
 		local box=self
 		function scrollmenu:OnClickLine(line,selected)
 			if (secondary) then
-				LocalPlayer().KSecondaryItem=line:GetValue(1)
+				if (slottwo) then
+					LocalPlayer().KSecondaryItemTwo=line:GetValue(1)
+				else
+					LocalPlayer().KSecondaryItem=line:GetValue(1)
+				end
 			else
-				LocalPlayer().KPrimaryItem=line:GetValue(1)
+				if (slottwo) then
+					LocalPlayer().KPrimaryItemTwo=line:GetValue(1)
+				else
+					LocalPlayer().KPrimaryItem=line:GetValue(1)
+				end
 			end
 			net.Start("kswep_setequipment")
 			net.WriteBool(secondary)
+			net.WriteBool(slottwo)
 			net.WriteString(line:GetValue(1))
 			net.WriteEntity(box)
 			net.SendToServer()
@@ -267,19 +276,37 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(20,280)
-			dbutton:SetSize(90,40)
+			dbutton:SetSize(90,20)
 			dbutton:SetText("["..(LocalPlayer().KPrimaryItem).."]")
 			dbutton.DoClick = function()
-				box:ShowEquipmentMenu(false)
+				box:ShowEquipmentMenu(false,false)
+				ammoframe:Close()
+			end
+		local dbutton=vgui.Create("DButton")
+			dbutton:SetParent(ammoframe)
+			dbutton:SetPos(20,300)
+			dbutton:SetSize(90,20)
+			dbutton:SetText("["..(LocalPlayer().KPrimaryItemTwo).."]")
+			dbutton.DoClick = function()
+				box:ShowEquipmentMenu(false,true)
 				ammoframe:Close()
 			end
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(110,280)
-			dbutton:SetSize(90,40)
+			dbutton:SetSize(90,20)
 			dbutton:SetText("["..(LocalPlayer().KSecondaryItem).."]")
 			dbutton.DoClick = function()
-				box:ShowEquipmentMenu(true)
+				box:ShowEquipmentMenu(true,false)
+				ammoframe:Close()
+			end
+		local dbutton=vgui.Create("DButton")
+			dbutton:SetParent(ammoframe)
+			dbutton:SetPos(110,300)
+			dbutton:SetSize(90,20)
+			dbutton:SetText("["..(LocalPlayer().KSecondaryItemTwo).."]")
+			dbutton.DoClick = function()
+				box:ShowEquipmentMenu(true,true)
 				ammoframe:Close()
 			end
 	end

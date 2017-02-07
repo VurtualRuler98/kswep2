@@ -62,6 +62,8 @@ function ENT:UseBox( activator, caller )
 		net.Start("kswep_setequipment_cl")
 		net.WriteString(activator.KPrimaryItem)
 		net.WriteString(activator.KSecondaryItem)
+		net.WriteString(activator.KPrimaryItemTwo)
+		net.WriteString(activator.KSecondaryItemTwo)
 		net.Send(activator)
 		local wep=activator:GetActiveWeapon()
 		if (wep:IsValid() and string.find(wep:GetClass(),"weapon_kswep")) then

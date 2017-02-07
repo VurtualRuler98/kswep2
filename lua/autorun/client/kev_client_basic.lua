@@ -34,9 +34,13 @@ end)
 local function KSwepSetEquipment_cl(len)
 	local primary=net.ReadString()
 	local secondary=net.ReadString()
-	if (primary~=nil and secondary~=nil) then
+	local primarytwo=net.ReadString()
+	local secondarytwo=net.ReadString()
+	if (primary~=nil and secondary~=nil and primarytwo~=nil and secondarytwo~=nil) then
 		LocalPlayer().KPrimaryItem=primary
 		LocalPlayer().KSecondaryItem=secondary
+		LocalPlayer().KPrimaryItemTwo=primarytwo
+		LocalPlayer().KSecondaryItemTwo=secondarytwo
 	end
 end
 net.Receive("kswep_stabsound",function(len)
