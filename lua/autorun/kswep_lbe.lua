@@ -7,24 +7,24 @@ local function KswepAddLBE(tbl)
 	kswep_lbe[tbl.name]=tbl.slots
 end
 local tbl={}
-tbl.name="ALICE Rifleman"
+tbl.name="ALICE Rifleman(+Misc)"
 tbl.slots = {{STANAG=6,BattleRifle=4},{Pistol1=2,Pistol2=1,Shotshell=10,Speedloader=2}}
 KswepAddLBE(tbl)
 local tbl={}
-tbl.name="MOLLE Rifleman"
-tbl.slots = {{STANAG=6,BattleRifle=3},{STANAG=6}}
+tbl.name="MOLLE Rifleman(+Pistolman)"
+tbl.slots = {{STANAG=6,BattleRifle=3},{STANAG=6},{Pistol1=4,Pistol2=4}}
 KswepAddLBE(tbl)
 local tbl={}
-tbl.name="MOLLE Pistolman"
-tbl.slots = {{Pistol1=4,Pistol2=4}}
+tbl.name="MOLLE Machinegunner(+Pistolman)"
+tbl.slots = {{Drum=2},{Pistol1=4,Pistol2=4}}
 KswepAddLBE(tbl)
 local tbl={}
-tbl.name="ALICE Machinegunner"
+tbl.name="ALICE Machinegunner(+Misc)"
 tbl.slots = {{Drum=2},{Pistol1=2,Pistol2=1,Shotshell=10,Speedloader=2}}
 KswepAddLBE(tbl)
 local tbl={}
 tbl.name="ALICE Pistol"
-tbl.slots = {{Pistol1=4,Pistol2=2,Speedloader="4"}}
+tbl.slots = {{Pistol1=4,Pistol2=2}}
 KswepAddLBE(tbl)
 local tbl={}
 tbl.name="M1910 Cartridge Belt"
@@ -45,4 +45,8 @@ KswepAddLBE(tbl)
 local tbl={}
 tbl.name="Range Belt"
 tbl.slots = {{Stick=1,AK=1,STANAG=1,BattleRifle=1,BoltMag=1,Drum=1},{Shotshell=10,RifleClip=4,RifleClip2=2,Box=1,Speedloader=2},{Pistol1=2,Pistol2=2,PistolCarbine=2}}
+KswepAddLBE(tbl)
+local tbl={}
+tbl.name="Generic Tactical Vest"
+tbl.slots = {{STANAG=6,BattleRifle=3,AK=3,Stick=3},{Pistol1=3,Pistol2=3,PistolCarbine=3},{Shotshell=10,Box=1,BoltMag=1}}
 KswepAddLBE(tbl)
