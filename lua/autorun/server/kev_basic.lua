@@ -269,7 +269,7 @@ net.Receive("kswep_givegrenades_cl",KswepGiveGrenades)
 function SetSpawnMagazines(ply)
 	ply.KswepLBEType="Range Belt"
 	ply.KswepLBE={}
-	ply.KswepLBEAddonType="none"
+	ply.KswepLBEAddonType="None"
 	ply.KswepLBEAddon={}
 	ply:SetNWFloat("KswepRecoil",0)
 	ply.KHearingRing=0
