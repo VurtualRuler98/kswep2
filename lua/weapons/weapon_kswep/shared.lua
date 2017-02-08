@@ -1563,7 +1563,8 @@ function SWEP:FinishReloadSingle()
 			table.insert(self.MagTable,round)
 			self.Magazines[1].num=self.Magazines[1].num-1
 		else
-			table.insert(self.MagTable,mag)
+			local round={caliber=mag.caliber,num=1,max=1}
+			table.insert(self.MagTable,round)
 			table.Empty(self.Magazines[1])
 		end
 		self:SetNWInt("MagRounds",#self.MagTable)
