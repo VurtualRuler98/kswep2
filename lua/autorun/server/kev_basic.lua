@@ -223,7 +223,7 @@ function RearmMags(len,pl)
 						end
 					end
 				end
-				if (kswep_lbe[pl.KswepLBEType].addon and kswep_lbeaddon[pl.KswepLBEAddonType].addon==kswep_lbe[pl.KswepLBEType].addon) then
+				if (kswep_lbe[pl.KswepLBEType].addon~="none" and kswep_lbeaddon[pl.KswepLBEAddonType].addon==(kswep_lbe[pl.KswepLBEType].addon)) then
 					for k,v in pairs(kswep_lbeaddon[pl.KswepLBEAddonType].slots) do
 						local fits=false
 						for g,w in pairs(v) do
