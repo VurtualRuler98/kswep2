@@ -990,6 +990,11 @@ net.Receive("kswep_magazines",function(len,ply)
 	self.Ammo=net.ReadTable()
 	self.Magazines=net.ReadTable()
 end)
+net.Receive("kswep_reloadmessage",function(len)
+	local self=net.ReadEntity()
+	self.ReloadWeight=net.ReadInt(8)
+	self.ReloadMessage=CurTime()+2
+end)
 net.Receive("kswep_suppress",function(len,ply)
 	local self=net.ReadEntity()
 	local sup=net.ReadBool()
@@ -1469,11 +1474,15 @@ function SWEP:FinishReload()
 		else
 			table.Empty(table.GetLastValue(self.Magazines))
 		end
+		self.ReloadWeight=self:Clip1()
+		net.Start("kswep_reloadmessage")
+		net.WriteEntity(self)
+		net.WriteInt(self.ReloadWeight,8)
+		net.Send(self.Owner)
 	end
 	if (#self.Magazines>0 and self.Magazines[1].num==0) then
 		table.Empty(self.Magazines[1])
 	end
-	self.ReloadWeight=self:Clip1()
 	if (self:GetNWBool("Chambered")==false and self.OpenBolt==false and self:Clip1()>0) then
 		self:TakePrimaryAmmo(1)
 		self:ServeNWBool("Chambered",true)
@@ -1482,7 +1491,6 @@ function SWEP:FinishReload()
 		self:ServeNWBool("Chambered",true)
 	end
 	self.ReloadAnimTime=0
-	self.ReloadMessage=CurTime()+2
 	if (SERVER and self.Owner:IsPlayer()) then
 		net.Start("kswep_magazines")
 		net.WriteEntity(self)
