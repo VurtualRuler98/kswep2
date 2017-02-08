@@ -102,6 +102,34 @@ function ENT:ShowEquipmentMenu()
 			ammoframe:Close()
 		end
 end
+function ENT:ShowEquipmentAddonMenu()
+	local menuwidth=200
+	local menuheight=200
+	local title="Equipment"
+	local ammoframe = vgui.Create("DFrame")
+		ammoframe:SetPos((ScrW()/2)-(menuwidth/2),(ScrH()/2)-(menuheight/2))
+		ammoframe:SetSize(menuwidth,menuheight)
+		ammoframe:SetTitle(title)
+		ammoframe:MakePopup()
+	local scrollmenu = vgui.Create("DListView",ammoframe)
+		scrollmenu:SetPos(16,32)
+		scrollmenu:SetSize(menuwidth-32,menuheight-32)
+		scrollmenu:AddColumn("item")
+		local addontype=kswep_lbe[LocalPlayer().KswepLBEType].addon
+		for k,v in pairs(kswep_lbeaddon) do
+			if (v.addon==addontype or v.addon=="none") then
+				scrollmenu:AddLine(k)
+			end
+		end
+		local box=self
+		function scrollmenu:OnClickLine(line,selected)
+			net.Start("kswep_setequipmentaddon")
+			net.WriteString(line:GetValue(1))
+			net.WriteEntity(box)
+			net.SendToServer()
+			ammoframe:Close()
+		end
+end
 	
 function ENT:ClUseBox(wep,mags,canmag,canoptic)
 	local menuwidth=200
@@ -258,14 +286,23 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 		local dbutton=vgui.Create("DButton")
 			dbutton:SetParent(ammoframe)
 			dbutton:SetPos(20,280)
-			dbutton:SetSize(180,40)
+			dbutton:SetSize(90,40)
 			dbutton:SetText("["..(LocalPlayer().KswepLBEType).."]")
 			dbutton.DoClick = function()
 				box:ShowEquipmentMenu()
 				ammoframe:Close()
 			end
+		local dbutton=vgui.Create("DButton")
+			dbutton:SetParent(ammoframe)
+			dbutton:SetPos(110,280)
+			dbutton:SetSize(90,20)
+			dbutton:SetText("+("..(LocalPlayer().KswepLBEAddonType)..")")
+			dbutton.DoClick = function()
+				box:ShowEquipmentAddonMenu()
+				ammoframe:Close()
+			end
 	end
-end 
+end
 net.Receive("kswep_opticbox", function()
 	local box=net.ReadEntity()
 	local wep=net.ReadEntity()

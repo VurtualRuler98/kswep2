@@ -1525,6 +1525,13 @@ function SWEP:UpdateMagazines()
 				end
 			end
 		end
+		for k,v in pairs(self.Owner.KswepLBEAddon) do
+			for g,w in pairs(v) do
+				if (w.magtype==self.MagType) then
+					table.insert(self.Magazines,w)
+				end
+			end
+		end
 		self:UpdateMagCount()
 	end
 end

@@ -61,6 +61,7 @@ function ENT:UseBox( activator, caller )
 	if (IsValid(activator) and  activator:IsPlayer() )  then
 		net.Start("kswep_setequipment_cl")
 		net.WriteString(activator.KswepLBEType)
+		net.WriteString(activator.KswepLBEAddonType)
 		net.Send(activator)
 		local wep=activator:GetActiveWeapon()
 		if (wep:IsValid() and string.find(wep:GetClass(),"weapon_kswep")) then

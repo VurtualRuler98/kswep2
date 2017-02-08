@@ -27,6 +27,8 @@ util.AddNetworkString("kswep_takesuitcase")
 util.AddNetworkString("kswep_supersonic")
 util.AddNetworkString("kswep_setequipment")
 util.AddNetworkString("kswep_setequipment_cl")
+util.AddNetworkString("kswep_setequipmentaddon")
+util.AddNetworkString("kswep_setequipmentaddon_cl")
 util.AddNetworkString("kswep_stabsound")
 util.AddNetworkString("kswep_swapslot")
 util.AddNetworkString("kswep_swapslot_cl")
@@ -166,7 +168,20 @@ local function KSwepSetEquipment(len,pl)
 		table.Empty(pl.KswepLBE)
 	end
 end
+local function KSwepSetEquipmentAddon(len,pl)
+	local item=net.ReadString()
+	local box=net.ReadEntity()
+	if (IsValid(pl) and pl:IsPlayer() and item~=nil and IsValid(box)) then
+		if (not box:GetClass("sent_vurt_supplybox")) then return end
+		if (box:GetPos():Distance(pl:GetPos())>512) then return end
+		if (not box:GetNWBool("Equipment")) then return end
+		if (not kswep_lbeaddon[item]) then return end
+		pl.KswepLBEAddonType=item
+		table.Empty(pl.KswepLBEAddon)
+	end
+end
 net.Receive("kswep_setequipment",KSwepSetEquipment)
+net.Receive("kswep_setequipmentaddon",KSwepSetEquipmentAddon)
 function RearmMags(len,pl)
 	if (IsValid(pl) and pl:IsPlayer()) then
 		local box=net.ReadEntity()
@@ -194,7 +209,7 @@ function RearmMags(len,pl)
 				if (wep.SingleClips) then
 					magsize=wep.ReloadClipSize
 				end
-				for k,v in pairs(kswep_lbe[pl.KswepLBEType]) do
+				for k,v in pairs(kswep_lbe[pl.KswepLBEType].slots) do
 					local fits=false
 					for g,w in pairs(v) do
 						if (g==magclass) then
@@ -205,6 +220,22 @@ function RearmMags(len,pl)
 						pl.KswepLBE[k]={}
 						for i=1,fits do
 							table.insert(pl.KswepLBE[k],{caliber=caliber,num=magsize,max=magsize,magtype=magtype})
+						end
+					end
+				end
+				if (kswep_lbe[pl.KswepLBEType].addon and kswep_lbeaddon[pl.KswepLBEAddonType].addon==kswep_lbe[pl.KswepLBEType].addon) then
+					for k,v in pairs(kswep_lbeaddon[pl.KswepLBEAddonType].slots) do
+						local fits=false
+						for g,w in pairs(v) do
+							if (g==magclass) then
+								fits=w
+							end
+						end
+						if (fits) then
+							pl.KswepLBEAddon[k]={}
+							for i=1,fits do
+								table.insert(pl.KswepLBEAddon[k],{caliber=caliber,num=magsize,max=magsize,magtype=magtype})
+							end
 						end
 					end
 				end
@@ -238,6 +269,8 @@ net.Receive("kswep_givegrenades_cl",KswepGiveGrenades)
 function SetSpawnMagazines(ply)
 	ply.KswepLBEType="Range Belt"
 	ply.KswepLBE={}
+	ply.KswepLBEAddonType="none"
+	ply.KswepLBEAddon={}
 	ply:SetNWFloat("KswepRecoil",0)
 	ply.KHearingRing=0
 	ply.KDeafState=0

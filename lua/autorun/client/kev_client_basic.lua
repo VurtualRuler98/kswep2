@@ -33,8 +33,10 @@ net.Receive("kswep_swapslot_cl",function(len)
 end)
 local function KSwepSetEquipment_cl(len)
 	local lbe=net.ReadString()
-	if (lbe~=nil) then
+	local lbeaddon=net.ReadString()
+	if (lbe~=nil and lbeaddon~=nil) then
 		LocalPlayer().KswepLBEType=lbe
+		LocalPlayer().KswepLBEAddonType=lbeaddon
 	end
 end
 net.Receive("kswep_stabsound",function(len)
