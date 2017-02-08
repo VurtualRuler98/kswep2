@@ -27,7 +27,7 @@ tbl.slots = {{Drum=2}}
 tbl.addon="ALICE"
 KswepAddLBE(tbl)
 local tbl={}
-tbl.name="M1910 Cartridge Belt"
+tbl.name="M1910 Dismounted Cartridge Belt"
 tbl.slots = {{RifleClip=20,RifleClip2=10}}
 tbl.addon="none"
 KswepAddLBE(tbl)
@@ -37,9 +37,14 @@ tbl.slots = {{Pistol1=2,PistolCarbine=2}}
 tbl.addon="none"
 KswepAddLBE(tbl)
 local tbl={}
-tbl.name="M1918 Cartridge Belt"
+tbl.name="M1918 Mounted Cartridge Belt"
 tbl.slots = {{RifleClip=18,RifleClip2=9},{Pistol1=2,PistolCarbine=2}}
 tbl.addon="none"
+KswepAddLBE(tbl)
+local tbl={}
+tbl.name="Pattern 37 Webbing (4 bandoliers)"
+tbl.slots = {{RifleClip=40,Stick=5,Bren=2},{Stick=5,Bren=2}}
+tbl.addon="P37"
 KswepAddLBE(tbl)
 local tbl={}
 tbl.name="WW2 Belt SMG Generic"
