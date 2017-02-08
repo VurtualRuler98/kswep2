@@ -18,7 +18,7 @@ tbl.addon="ALICE"
 KswepAddLBEAddon(tbl)
 local tbl={}
 tbl.name="ALICE 9mm Mag Pouches 2x"
-tbl.slots = {{PistolCarbine=2,Pistol2=2}}
+tbl.slots = {{PistolCarbine=2,Pistol2=2,Pistol1=2}}
 tbl.addon="ALICE"
 KswepAddLBEAddon(tbl)
 local tbl={}
