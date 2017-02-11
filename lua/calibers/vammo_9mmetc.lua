@@ -47,6 +47,21 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.velocity = 1030 --makarov
 	AddAmmodata(tbl)
 	local tbl = {}
+	tbl.vestpenetration=KSWEP_ARMOR_III
+	tbl.dmgbase = 4
+	tbl.dmgvitalmin = 4
+	tbl.dmgvitalmax = 6
+	tbl.coefficient = 0.1 --no idea 
+	tbl.name = "vammo_9x18_PBM"
+	tbl.printname = "9x18mm PBM"
+	tbl.caliber = "vammo_9x18"
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.wallbang = 6
+	tbl.recoil = 1
+	tbl.velocity = 820 --makarov
+	AddAmmodata(tbl)
+	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_IIA
 	tbl.dmgbase = 4
 	tbl.dmgvitalmax = 7
