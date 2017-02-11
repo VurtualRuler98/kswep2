@@ -50,7 +50,16 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 		armor=KSGetArmorNPC(ent,hitgroup)
 	end
 	if (armor~=-1) then
-		dmginfo:ScaleDamage(KSScaleDamage(armor,dmginfo,ent))
+		local scale=KSScaleDamage(armor,dmginfo,ent)
+		dmginfo:ScaleDamage(scale)
+		if (scale>1) then
+			local bone=ent:LookupBone("ValveBiped.Bip01_Spine4")
+			local bonevec=Vector(2,0,2)
+			bonevec:Rotate(ent:GetAngles())
+			if (bone and hitgroup==HITGROUP_CHEST and (ent:GetBonePosition(bone)+bonevec):Distance(dmginfo:GetDamagePosition())<8) then
+				dmginfo:ScaleDamage(10)
+			end
+		end
 	end
 	if (game.GetAmmoName(dmginfo:GetAmmoType())=="357") then
 		dmginfo:ScaleDamage(0.2)
