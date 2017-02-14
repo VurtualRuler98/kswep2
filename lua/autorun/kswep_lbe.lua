@@ -62,7 +62,7 @@ tbl.slots = {{Stick=1,AK=1,STANAG=1,BattleRifle=1,BoltMag=1,Drum=1},{Shotshell=1
 tbl.addon="none"
 KswepAddLBE(tbl)
 local tbl={}
-tbl.name="Generic Tactical Vest"
-tbl.slots = {{STANAG=6,BattleRifle=3,AK=3,Stick=3},{Pistol1=3,Pistol2=3,PistolCarbine=3},{Shotshell=10,Box=1,BoltMag=1}}
-tbl.addon="none"
+tbl.name="Eagle TAC-V1"
+tbl.slots = {{STANAG=12,BattleRifle=6,AK=6,Stick=12},{Pistol1=3,Pistol2=3,PistolCarbine=3},{Shotshell=5,Box=1,BoltMag=1}}
+tbl.addon="ALICE"
 KswepAddLBE(tbl)
