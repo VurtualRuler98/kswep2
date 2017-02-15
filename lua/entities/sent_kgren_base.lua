@@ -133,12 +133,12 @@ function ENT:ThinkSmokeCS()
 		if (SERVER and self.CSGasTimer<CurTime()) then
 			local dmginfo=DamageInfo()
 			dmginfo:SetDamage(1)
-			dmginfo:SetDamageType(DMG_ACID)
+			dmginfo:SetDamageType(DMG_NERVEGAS)
 			if (IsValid(self.Owner)) then
 				dmginfo:SetAttacker(self.Owner)
 			end
 			for k,v in pairs(ents.FindInSphere(self:GetPos(),256)) do
-				if (v:IsPlayer() and not v.KswepGasMask) then
+				if (v:IsPlayer() and v.ksarmor.nervegas<100) then
 					v:TakeDamageInfo(dmginfo)
 					local cough="ambient/voices/cough"..math.random(1,4)..".wav"
 					if (self.LastCough<CurTime()) then

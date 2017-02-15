@@ -9,31 +9,14 @@ function ENT:ClKSimpleBox()
 	local scrollmenu = vgui.Create("DListView",ammoframe)
 		scrollmenu:SetPos((ScrW()/2)-(menuwidth/2)+16,(ScrH()/2)-(menuheight/2)+32)
 		scrollmenu:SetSize(menuwidth-32,menuheight-32)
-		scrollmenu:AddColumn("vest")
-		scrollmenu:AddLine("No armor")
-		if (vurtual_ammodata) then
-			scrollmenu:AddLine("Kevlar Vest")
-			scrollmenu:AddLine("+Front/Back Plates")
-			scrollmenu:AddLine("+Side Plates/Helmet")
-		else	
-			scrollmenu:AddLine("Front")
-			scrollmenu:AddLine("+Back")
-			scrollmenu:AddLine("+Sides/Helmet")
+		scrollmenu:AddColumn("armor")
+		for k,v in pairs(kswep_armors) do
+			scrollmenu:AddLine(v.name)
 		end
 		function scrollmenu:OnClickLine(line,selected)
 			local choice=line:GetColumnText(1)
-			local choicenum=-1
-			if (choice=="Front" or choice == "Kevlar Vest") then
-				choicenum=0
-			end
-			if (choice=="+Back" or choice == "+Front/Back Plates") then
-				choicenum=1
-			end
-			if (choice=="+Sides/Helmet"or choice == "+Side Plates/Helmet") then
-				choicenum=2
-			end
 			net.Start("showvestmenu")
-			net.WriteInt(choicenum,4)
+			net.WriteString(choice)
 			net.SendToServer()
 			ammoframe:Close()
 		end

@@ -3,7 +3,7 @@ function kevlardebugprint(str)
 	if (GetConVar("kevlar_debug"):GetBool()==true) then print(str) end
 end
 function KSSetSpawnArmor(ply)
-	ply.ksarmor={}
+	ply.ksarmor=kswep_armors["none"]
 	ply.ksarmor.front=0
 	ply.ksarmor.back=0
 	ply.ksarmor.side=0
@@ -12,7 +12,10 @@ function KSSetSpawnArmor(ply)
 end
 hook.Add("PlayerSpawn","SetSpawnArmor",KSSetSpawnArmor)
 net.Receive("showvestmenu",function(len,pl)
-local choice=net.ReadInt(4)
+local choice=net.ReadString()
+	if (choice and kswep_armors[choice]) then
+		pl.ksarmor=kswep_armors[choice]
+	end
 	if (choice==-1) then
 		pl.ksarmor.helmet=0
 		pl.ksarmor.front=0
@@ -35,6 +38,47 @@ local choice=net.ReadInt(4)
 		pl.ksarmor.side=KSWEP_ARMOR_IV
 	end
 end)
+local function KSSuitHandler(ent,dmginfo)
+	local scale=0
+	local dmgtype=dmginfo:GetDamageType()
+	if (bit.band(dmgtype,DMG_SLASH)>0) then
+		if (ent.ksarmor.slash>scale) then scale=ent.ksarmor.slash end
+	end
+	if (bit.band(dmgtype,DMG_BURN)>0) then
+		if (ent.ksarmor.burn>scale) then scale=ent.ksarmor.burn end
+	end
+	if (bit.band(dmgtype,DMG_BLAST)>0) then
+		if (ent.ksarmor.blast>scale) then scale=ent.ksarmor.blast end
+	end
+	if (bit.band(dmgtype,DMG_SHOCK)>0) then
+		if (ent.ksarmor.shock>scale) then scale=ent.ksarmor.shock end
+	end
+	if (bit.band(dmgtype,DMG_POISON)>0) then
+		if (ent.ksarmor.poison>scale) then scale=ent.ksarmor.poison end
+	end
+	if (bit.band(dmgtype,DMG_ACID)>0) then
+		if (ent.ksarmor.acid>scale) then scale=ent.ksarmor.acid end
+	end
+	if (bit.band(dmgtype,DMG_NERVEGAS)>0) then
+		if (ent.ksarmor.nervegas>scale) then scale=ent.ksarmor.nervegas end
+	end
+	if (bit.band(dmgtype,DMG_RADIATION)>0) then
+		if (ent.ksarmor.radiation>scale) then scale=ent.ksarmor.radiation end
+	end
+	if (bit.band(dmgtype,DMG_CLUB)>0) then
+		if (ent.ksarmor.club>scale) then scale=ent.ksarmor.club end
+	end
+	if (bit.band(dmgtype,DMG_CRUSH)>0) then
+		if (ent.ksarmor.crush>scale) then scale=ent.ksarmor.crush end
+	end
+	return 1-(scale/100)
+end
+local function KSDamageHandlerEnt(ent,dmginfo)
+	if (ent:IsPlayer()) then
+		print(dmginfo:GetDamageType())
+		dmginfo:ScaleDamage(KSSuitHandler(ent,dmginfo))
+	end
+end
 function KSDamageHandler(ent,hitgroup,dmginfo)
 	if (GetConVar("kevlar_enabled"):GetBool()==false) then return end
 	local armor=-1
@@ -65,6 +109,7 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 		dmginfo:ScaleDamage(0.2)
 	end
 end	
+	
 function KSScaleDamage(armor,dmginfo,ent)
 	local bullet=vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())]
 	if (not bullet) then
@@ -161,6 +206,7 @@ function KSGetArmorVest(ply,dmgangle)
 	end
 end
 hook.Add("ScalePlayerDamage","KSDamageHandler",KSDamageHandler)
+hook.Add("EntityTakeDamage","KSDamageHandler",KSDamageHandlerEnt)
 hook.Add("ScaleNPCDamage","KSDamageHandler",KSDamageHandler)
 kevlardebugprint("Kevlar simple loaded.")
 
