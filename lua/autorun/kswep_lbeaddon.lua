@@ -51,3 +51,8 @@ tbl.name="PALS Utility Pouches"
 tbl.slots = {{Box=4},{Speedloader=4}}
 tbl.addon="PALS"
 KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="Soviet Pistol Holster"
+tbl.slots = {{Pistol1=1}}
+tbl.addon="SovietBelt"
+KswepAddLBEAddon(tbl)

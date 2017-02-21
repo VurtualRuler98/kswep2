@@ -66,3 +66,13 @@ tbl.name="Eagle TAC-V1"
 tbl.slots = {{STANAG=12,BattleRifle=6,AK=6,Stick=12},{Pistol1=3,Pistol2=3,PistolCarbine=3},{Shotshell=5,Box=1,BoltMag=1}}
 tbl.addon="ALICE"
 KswepAddLBE(tbl)
+local tbl={}
+tbl.name="Soviet Y-Harness 2xMag Pouch"
+tbl.slots = {{AK=8}}
+tbl.addon="SovietBelt"
+KswepAddLBE(tbl)
+local tbl={}
+tbl.name="Soviet Mosin Belt"
+tbl.slots = {{RifleClip=8,RifleClip2=4}}
+tbl.addon="SovietBelt"
+KswepAddLBE(tbl)
