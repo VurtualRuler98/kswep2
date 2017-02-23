@@ -340,7 +340,7 @@ end
 function SWEP:DiscoverModelAnims()
 end
 function SWEP:DiscoverModelAnimsDone()
-	if (self.Owner:IsPlayer() and table.Count(self.AnimsDiscovered)>0) then
+	if (self.Owner:IsPlayer() and not game.SinglePlayer() and table.Count(self.AnimsDiscovered)>0) then
 		net.Start("kswep_discoveranim")
 		net.WriteEntity(self)
 		net.WriteInt(table.Count(self.AnimsDiscovered),16)

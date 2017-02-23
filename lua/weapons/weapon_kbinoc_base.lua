@@ -48,7 +48,8 @@ end
 function SWEP:PrimaryAttack()
 end
 function SWEP:SecondaryAttack()
-	if (not IsFirstTimePredicted()) then return end
+	if (not game.SinglePlayer() and not IsFirstTimePredicted()) then return end
+	if (game.SinglePlayer() ) then self:CallOnClient("SecondaryAttack") end
 	self:SetNWBool("Zoomed",not self:GetNWBool("Zoomed"))
 	if (CLIENT) then
 		self.Magfov=self:GetMaxFOV()
