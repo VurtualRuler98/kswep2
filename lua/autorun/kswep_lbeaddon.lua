@@ -27,6 +27,11 @@ tbl.slots = {{Shotshell=20}}
 tbl.addon="ALICE"
 KswepAddLBEAddon(tbl)
 local tbl={}
+tbl.name="WWII Shotgun Pouches 2x"
+tbl.slots = {{Shotshell=24}}
+tbl.addon="WW2US"
+KswepAddLBEAddon(tbl)
+local tbl={}
 tbl.name="Pattern 37 Pistol Mag Pouches 2x"
 tbl.slots = {{Pistol1=4,Pistol2=4}}
 tbl.addon="P37"

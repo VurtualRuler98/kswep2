@@ -34,7 +34,7 @@ KswepAddLBE(tbl)
 local tbl={}
 tbl.name="M1912 Pistol Belt"
 tbl.slots = {{Pistol1=2,PistolCarbine=2}}
-tbl.addon="none"
+tbl.addon="WW2US"
 KswepAddLBE(tbl)
 local tbl={}
 tbl.name="M1918 Mounted Cartridge Belt"
