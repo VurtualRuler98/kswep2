@@ -75,3 +75,74 @@ local tbl = {
 {shape="poly",poly={{x=-0.3,y=0},{x=0.3,y=0},{x=0.75,y=60},{x=-0.75,y=60}}}
 }
 AddKswepReticle(tbl,"m84")
+
+--Steiner SCR
+local tbl = {
+{shape="line",start={-0.2,0},endpos={-3,0},color=Color(255,0,0,255)},
+{shape="line",start={0.2,0},endpos={3,0},color=Color(255,0,0,255)},
+{shape="line",start={0,0.2},endpos={0,6},color=Color(255,0,0,255)},
+{shape="line",start={-0.1,0},endpos={0.1,0},color=Color(255,0,0,255)},
+{shape="line",start={0,-0.1},endpos={0,0.1},color=Color(255,0,0,255)},
+{shape="line",start={0,-0.2},endpos={0,-5}},
+{shape="line",start={-3.2,0},endpos={-6.5,0}},
+{shape="line",start={3.2,0},endpos={6.5,0}},
+}
+for i=1,6 do
+	table.insert(tbl,{shape="line",start={-0.25,i-0.5},endpos={0.25,i-0.5},color=Color(255,0,0,255)})
+	table.insert(tbl,{shape="line",start={-0.5,i},endpos={0.5,i},color=Color(255,0,0,255)})
+end
+for i=1,3 do
+	table.insert(tbl,{shape="line",start={-0.25,0.5-i},endpos={0.25,0.5-i}})
+end
+for i=1,2 do
+	table.insert(tbl,{shape="line",start={-0.5,-i},endpos={0.5,-i}})
+end
+local function LittleLineyThingJr(tbl,col,start,dir)
+	table.insert(tbl,{shape="line",start={start,-0.1},endpos={start,0.1},color=col})
+	table.insert(tbl,{shape="line",start={start-(dir*0.2),0},endpos={start-(dir*0.2),0.05},color=col})
+	table.insert(tbl,{shape="line",start={start-(dir*0.4),-0.05},endpos={start-(dir*0.4),0},color=col})
+	table.insert(tbl,{shape="line",start={start-(dir*0.6),-0.05},endpos={start-(dir*0.6),0},color=col})
+end
+local function LittleLineyThingTwo(tbl,start,dir)
+	table.insert(tbl,{shape="line",start={start,-0.4},endpos={start,0.4},color=col})
+	table.insert(tbl,{shape="line",start={start-(dir*0.4),-0.1},endpos={start-(dir*0.4),0.1}})
+	table.insert(tbl,{shape="line",start={start-(dir*0.3),-0.2},endpos={start-(dir*0.3),0.2}})
+	table.insert(tbl,{shape="line",start={start-(dir*0.2),-0.1},endpos={start-(dir*0.2),0.1}})
+	table.insert(tbl,{shape="line",start={start-(dir*0.1),-0.2},endpos={start-(dir*0.1),0.2}})
+end
+local function LittleLineyThingThree(tbl,start,dir)
+	table.insert(tbl,{shape="line",start={-0.4,start},endpos={0.4,start},color=col})
+	table.insert(tbl,{shape="line",start={-0.1,start-(dir*0.4)},endpos={0.1,start-(dir*0.4)}})
+	table.insert(tbl,{shape="line",start={-0.2,start-(dir*0.3)},endpos={0.2,start-(dir*0.3)}})
+	table.insert(tbl,{shape="line",start={-0.1,start-(dir*0.2)},endpos={0.1,start-(dir*0.2)}})
+	table.insert(tbl,{shape="line",start={-0.2,start-(dir*0.1)},endpos={0.2,start-(dir*0.1)}})
+end
+LittleLineyThingTwo(tbl,-5,1)
+LittleLineyThingTwo(tbl,-6,-1)
+table.insert(tbl,{shape="line",start={-5.5,-0.3},endpos={-5.5,0.3}})
+LittleLineyThingTwo(tbl,6,1)
+LittleLineyThingTwo(tbl,5,-1)
+LittleLineyThingTwo(tbl,6,-1)
+table.insert(tbl,{shape="line",start={5.5,-0.3},endpos={5.5,0.3}})
+LittleLineyThingTwo(tbl,-6,1)
+LittleLineyThingThree(tbl,-3,1)
+LittleLineyThingThree(tbl,-4,1)
+LittleLineyThingThree(tbl,-4,-1)
+LittleLineyThingThree(tbl,-5,-1)
+table.insert(tbl,{shape="line",start={-0.3,-3.5},endpos={0.3,-3.5}})
+table.insert(tbl,{shape="line",start={-0.3,-4.5},endpos={0.3,-4.5}})
+local function LittleLineyThingSr(tbl,col,start,dir)
+	LittleLineyThingJr(tbl,col,start,dir)
+	table.insert(tbl,{shape="line",start={start-(dir*0.8),0},endpos={start-(dir*0.8),0.05},color=col})
+end
+LittleLineyThingJr(tbl,Color(255,0,0,255),1,1)
+LittleLineyThingJr(tbl,Color(255,0,0,255),-1,-1)
+for i=2,3 do
+	LittleLineyThingSr(tbl,Color(255,0,0,255),i,1)
+	LittleLineyThingSr(tbl,Color(255,0,0,255),-i,-1)
+end
+LittleLineyThingJr(tbl,nil,4,1)
+LittleLineyThingSr(tbl,nil,5,1)
+LittleLineyThingJr(tbl,nil,-4,-1)
+LittleLineyThingSr(tbl,nil,-5,-1)
+AddKswepReticle(tbl,"steiner_scr")
