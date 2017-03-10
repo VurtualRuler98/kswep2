@@ -45,6 +45,15 @@ tbl.club=10
 tbl.suitcoverage=1
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
+tbl.name="6Б3"
+tbl.front=KSWEP_ARMOR_III
+tbl.back=KSWEP_ARMOR_IIIi
+tbl.blast=20
+tbl.slash=30
+tbl.club=20
+tbl.suitcoverage=3
+KswepAddArmor(tbl)
+local tbl=table.Copy(def)
 tbl.name="Sunrise Suit w/ Gas Mask"
 tbl.front=KSWEP_ARMOR_I --like early flak vest
 tbl.back=KSWEP_ARMOR_I
