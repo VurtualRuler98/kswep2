@@ -1203,7 +1203,7 @@ function SWEP:DrawHUD()
 		surface.DrawText(rangetext)
 		end
 		if (self.ScopeReticle~=false) then
-			local pixmil=self.ScopeReticlePixMil
+			local pixmil=self.ScopeReticlePixMil*(self.ScopeRes/1024)
 			local retpix=self.ScopeReticlePix
 			local aspectratio=(oldW/oldH)/(4/3)
 			local retmag=self.ScopeZoom
@@ -1223,7 +1223,7 @@ function SWEP:DrawHUD()
 			if (self.ScopeLuaReticlePlane) then
 				fov=self.ScopeLuaReticlePlane
 			end
-			local scale=self.ScopeRes/(fov*3.6)
+			local scale=1024/(fov*3.6)
 			local aspectratio=(oldW/oldH)/(4/3)
 			scale=scale/aspectratio
 			local scalemod=oldH/oldW
