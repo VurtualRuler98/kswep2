@@ -1963,8 +1963,8 @@ function SWEP:Think()
 		end
 	end
 	if (self:GetNWFloat("CurRecoil")>0) then
-		--self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")-(FrameTime()*self.RecoilControl))
-		self:SetNWFloat("CurRecoil",Lerp(FrameTime()*self.RecoilControl/2,self:GetNWFloat("CurRecoil"),0))
+		--self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")-(engine.TickInterval()*self.RecoilControl))
+		self:SetNWFloat("CurRecoil",Lerp(engine.TickInterval()*self.RecoilControl/2,self:GetNWFloat("CurRecoil"),0))
 		if (self:GetNWFloat("CurRecoil")<0.01) then
 			self:SetNWFloat("CurRecoil",0)
 		end
@@ -2334,7 +2334,7 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	--[[if (self:GetNWBool("Chambered")==false or self:GetNWBool("Lowered")==true) then
 		if (self:GetNWBool("Lowered")==true) then self.lowerTime=0 end
 		self.lowerTime=self.lowerTime or 1
-		self.lowerTime=self.lowerTime-FrameTime()
+		self.lowerTime=self.lowerTime-engine.TickInterval()
 		if (self.lowerTime<0) then
 			self.lowerTime=0
 			ang=ang+Angle(self.HoldAngle,self.HoldAngle*2,0)
@@ -2389,8 +2389,8 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 		modpos=modpos+ironpos.z * ang:Up()
 	end
 	modpos = modpos - oldPos
-	self.smoothAng=LerpAngle(FrameTime()*30,self.smoothAng,ang)
-	self.smoothPos=LerpVector(FrameTime()*30,self.smoothPos,modpos)
+	self.smoothAng=LerpAngle(engine.TickInterval()*30,self.smoothAng,ang)
+	self.smoothPos=LerpVector(engine.TickInterval()*30,self.smoothPos,modpos)
 	self.VMModAng=self.smoothAng
 	return oldPos+self.smoothPos,ang
 end
@@ -2737,8 +2737,8 @@ function SWEP:FlyBulletStart(bullet)
 	while (drag_ticks>0 and drag_dist<zero*39.3701) do
 		drag_ticks=drag_ticks-1
 		drag_time=drag_time+1
-		drag_dist=drag_dist+drag_vector.x*12*FrameTime()
-		drag_vector=drag_vector+(-1*self:GetDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*FrameTime()+Vector(0,0,386*(engine.TickInterval()^2))
+		drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
+		drag_vector=drag_vector+(-1*self:GetDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval()+Vector(0,0,386*(engine.TickInterval()^2))
 		drop=drop+drag_vector.z
 	end	
 	local zerotime=drag_time --amount of frames it will take to fly the distance
@@ -2768,7 +2768,7 @@ function SWEP:FlyBullet(shot)
 	if (shot.dist~=nil) then
 		travel=shot.dist
 	else
-		travel = shot.pos + (shot.ang*shot.dragvector.x*12*FrameTime())+Vector(0,0,-1*shot.dragvector.z)
+		travel = shot.pos + (shot.ang*shot.dragvector.x*12*engine.TickInterval())+Vector(0,0,-1*shot.dragvector.z)
 	end
 	local tr=util.TraceLine( {
 		filter = self.Owner,
@@ -2800,13 +2800,13 @@ function SWEP:FlyBullet(shot)
 			fakebullet.Src = shot.pos
 			fakebullet.AmmoType="pistol"
 			fakebullet.Force = 0
-			fakebullet.Distance=(shot.dragvector:Length()*12*FrameTime())
+			fakebullet.Distance=(shot.dragvector:Length()*12*engine.TickInterval())
 			self:FireShot(fakebullet)
 		end
 	end
 	local oldspeed=shot.dragvector:Length()
 	local drag_bc=self.Ammo.coefficient or 0.25
-	shot.dragvector=shot.dragvector+(-1*self:GetDrag("G1",shot.dragvector:Length())/drag_bc)*shot.dragvector*FrameTime()+Vector(0,0,386*(engine.TickInterval()^2))
+	shot.dragvector=shot.dragvector+(-1*self:GetDrag("G1",shot.dragvector:Length())/drag_bc)*shot.dragvector*engine.TickInterval()+Vector(0,0,386*(engine.TickInterval()^2))
 	if (oldspeed-shot.dragvector:Length()>1125) then shot.dragvector=Vector(0,0,0) end
 	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.dragvector:Length()>100) then
 		shot.bullet.Src=shot.pos
@@ -2824,7 +2824,7 @@ function SWEP:FlyBullet(shot)
 			shot.pos=travel
 			shot.dist=nil
 		end
-			shot.time=CurTime()+FrameTime()
+			shot.time=CurTime()+engine.TickInterval()
 		if (shot.dragvector:Length()>100 and shot.ticks>0) then --TODO: better minimum lethal velocity
 			if (shot.dist~=nil) then
 			return self:FlyBullet(shot)
