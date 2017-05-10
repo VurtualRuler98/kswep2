@@ -98,36 +98,45 @@ function SWEP:Reload()
 end
 function SWEP:CalcDrop()
 		if (not self.HasGun) then return "no data" end
-		local drag_speed=self.Gun.Velocity
 		local drag_dist=0
 		local drag_time=0
 		local drag_bc=self.Gun.Coefficient
 		local drag_ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
+		local drag_vector=Vector(self.Gun.Velocity,0,0)
+		local drop=0
 		while (drag_ticks>0 and drag_dist<self.Gun.Zero*39.3701) do
 			drag_ticks=drag_ticks-1
 			drag_time=drag_time+1
-			drag_dist=drag_dist+drag_speed*12*FrameTime()
-			drag_speed=drag_speed+(-1*self:GetDrag("G1",drag_speed)/drag_bc)*drag_speed*FrameTime()
+			drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
+			drag_vector=drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval()+Vector(0,0,386*(engine.TickInterval()^2))
+			drop=drop+drag_vector.z
 		end
-		local drop=0.5*(386*(FrameTime()^2))*(drag_time^2)
 		local dropadj=math.atan(drop/(self.Gun.Zero*39.3701))
 		drag_ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 		drag_time=0
 		drag_dist=0
-		drag_speed=self.Gun.Velocity
+		drag_vector=Vector(self.Gun.Velocity,0,0)
+		drop=0
 		while (drag_ticks>0 and drag_dist<self.GunRange*39.3701) do
 			drag_ticks=drag_ticks-1
 			drag_time=drag_time+1
-			drag_dist=drag_dist+drag_speed*12*FrameTime()
-			drag_speed=drag_speed+(-1*self:GetDrag("G1",drag_speed)/drag_bc)*drag_speed*FrameTime()
+			drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
+			drag_vector=drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval()+Vector(0,0,386*(engine.TickInterval()^2))
+			drop=drop+drag_vector.z
 		end
-		drop=0.5*(386*(FrameTime()^2))*(drag_time^2)
 		dropadj=dropadj-math.atan(drop/(self.GunRange*39.3701))
 		local label="mils"
 		if (self.MOAMode) then dropadj=dropadj*3.43775 label="MOA" end
 		dropadj=math.floor(dropadj*10000)/10
 		if (dropadj~=dropadj) then return "no data" end
-		return ((dropadj)*-1).." "..label..", BC: "..(math.floor(self.Gun.Coefficient*1000)/1000).." G1, "..math.floor(self.Gun.Velocity).." FPS muzzle, "..math.floor(drag_speed).." FPS target"
+		return ((dropadj)*-1).." "..label..", BC: "..(math.floor(self.Gun.Coefficient*1000)/1000).." G1, "..math.floor(self.Gun.Velocity).." FPS muzzle, "..math.floor(drag_vector.x).." FPS target"
+end
+function SWEP:GetBetterDrag(func,speed)
+	local high=self:GetDrag(func,speed)
+	local low=self:GetDrag(func,speed-100)
+	local diff=high-low
+	local mod=((speed%100)/100)*diff
+	return low+mod
 end
 function SWEP:GetDrag(func,speed)
 	if (func~="G1") then func="G1" end --Always use G1 if nothing else, check to make sure it's not any other implemented function first though.

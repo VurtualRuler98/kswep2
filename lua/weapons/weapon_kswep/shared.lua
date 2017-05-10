@@ -2447,6 +2447,13 @@ function SWEP:DiscoverAnim(anim)
 	end
 	return nil
 end
+function SWEP:GetBetterDrag(func,speed)
+	local high=self:GetDrag(func,speed)
+	local low=self:GetDrag(func,speed-100)
+	local diff=high-low
+	local mod=((speed%100)/100)*diff
+	return low+mod
+end
 function SWEP:GetDrag(func,speed)
 	if (func~="G1") then func="G1" end --Always use G1 if nothing else, check to make sure it's not any other implemented function first though.
 	if (func=="G1") then
@@ -2721,19 +2728,20 @@ function SWEP:FlyBulletStart(bullet)
 		miladj=(zero/zdata.moa)/3.43775
 		zero=zdata.default
 	end
-	local drag_speed=zerovel
+	local drag_vector=Vector(zerovel,0,0)
 	local drag_dist=0
 	local drag_time=0
 	local drag_bc=self.Ammo.coefficient or 0.25
 	local drag_ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
+	local drop=0
 	while (drag_ticks>0 and drag_dist<zero*39.3701) do
 		drag_ticks=drag_ticks-1
 		drag_time=drag_time+1
-		drag_dist=drag_dist+drag_speed*12*FrameTime()
-		drag_speed=drag_speed+(-1*self:GetDrag("G1",drag_speed)/drag_bc)*drag_speed*FrameTime()
+		drag_dist=drag_dist+drag_vector.x*12*FrameTime()
+		drag_vector=drag_vector+(-1*self:GetDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*FrameTime()+Vector(0,0,386*(engine.TickInterval()^2))
+		drop=drop+drag_vector.z
 	end	
 	local zerotime=drag_time --amount of frames it will take to fly the distance
-	local drop=0.5*(386*(FrameTime()^2))*(zerotime^2) --386 inches per second squared gravity
 	drop=drop+self:GetSightHeight()
 	local dropadj=math.atan(drop/(zero*39.3701))
 	local scopeang=Vector(0,0,math.sin(dropadj-0.0005))
@@ -2743,7 +2751,7 @@ function SWEP:FlyBulletStart(bullet)
 	local shot = {}
 	shot.ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 	shot.pos=bullet.Src
-	shot.speed=self.Ammo.velocity*self.MuzzleVelMod*supmod
+	shot.dragvector=Vector(self.Ammo.velocity*self.MuzzleVelMod*supmod,0,0)
 	shot.ang=bullet.Dir+scopeang
 	shot.bullet=bullet
 	shot.bc=self.Ammo.coefficient or 0.25
@@ -2752,7 +2760,6 @@ function SWEP:FlyBulletStart(bullet)
 	shot.time = CurTime()
 	shot.crack=-1
 	shot.crackpos=shot.pos
-	shot.gravity=0
 	table.insert(self.Bullets,shot)
 end
 function SWEP:FlyBullet(shot)
@@ -2761,7 +2768,7 @@ function SWEP:FlyBullet(shot)
 	if (shot.dist~=nil) then
 		travel=shot.dist
 	else
-		travel = shot.pos + (shot.ang*shot.speed*12*FrameTime())-Vector(0,0,shot.gravity)
+		travel = shot.pos + (shot.ang*shot.dragvector.x*12*FrameTime())+Vector(0,0,-1*shot.dragvector.z)
 	end
 	local tr=util.TraceLine( {
 		filter = self.Owner,
@@ -2784,7 +2791,7 @@ function SWEP:FlyBullet(shot)
 		if (backwater.StartSolid) then backwater.Fraction=0 end
 		waterlength=tr.Fraction-water.Fraction-(backwater.Fraction*tr.Fraction)
 	end
-	local drag=self:GetDrag("G1",shot.speed)
+	local drag=self:GetBetterDrag("G1",shot.dragvector:Length())
 	if (waterlength>0) then
 		drag=drag+(drag*100*waterlength)
 		if (not water.StartSolid) then
@@ -2793,36 +2800,36 @@ function SWEP:FlyBullet(shot)
 			fakebullet.Src = shot.pos
 			fakebullet.AmmoType="pistol"
 			fakebullet.Force = 0
-			fakebullet.Distance=(shot.speed*12*FrameTime())
+			fakebullet.Distance=(shot.dragvector:Length()*12*FrameTime())
 			self:FireShot(fakebullet)
 		end
 	end
-	local oldspeed=shot.speed
-	shot.speed=shot.speed+(-1*drag/shot.bc)*shot.speed*FrameTime()
-	if (oldspeed-shot.speed>1125) then shot.speed=0 end
-	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.speed>100) then
+	local oldspeed=shot.dragvector:Length()
+	local drag_bc=self.Ammo.coefficient or 0.25
+	shot.dragvector=shot.dragvector+(-1*self:GetDrag("G1",shot.dragvector:Length())/drag_bc)*shot.dragvector*FrameTime()+Vector(0,0,386*(engine.TickInterval()^2))
+	if (oldspeed-shot.dragvector:Length()>1125) then shot.dragvector=Vector(0,0,0) end
+	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.dragvector:Length()>100) then
 		shot.bullet.Src=shot.pos
 		--self.Owner:SetPos(tr.HitPos)
-		shot.bullet.Damage=(shot.dmg/vurtual_ammodata[shot.bullet.AmmoType].velocity^2)*shot.speed^2
+		shot.bullet.Damage=(shot.dmg/vurtual_ammodata[shot.bullet.AmmoType].velocity^2)*shot.dragvector:Length()^2
 		self:FireShot(shot.bullet)
 	
 	end
 	if ((not tr.Hit or (not tr.HitSky)) and travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
 		if (tr.Hit) then
 			local armor=0
-			shot.speed, shot.pos, shot.dist=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
+			shot.dragvector, shot.pos, shot.dist=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
 		else
 			--386 inches per second also thanks justarandomgeek
-			shot.gravity=shot.gravity+(386*(FrameTime()^2))
 			shot.pos=travel
 			shot.dist=nil
 		end
 			shot.time=CurTime()+FrameTime()
-		if (shot.speed>100 and shot.ticks>0) then --TODO: better minimum lethal velocity
+		if (shot.dragvector:Length()>100 and shot.ticks>0) then --TODO: better minimum lethal velocity
 			if (shot.dist~=nil) then
 			return self:FlyBullet(shot)
 			else
-			if (SERVER and shot.speed>1125) then
+			if (SERVER and shot.dragvector:Length()>1125) then
 				for k,v in pairs(player.GetAll()) do
 				shot["crack"..v:EntIndex()]=shot["crack"..v:EntIndex()] or -1
 				shot["crackpos"..v:EntIndex()]=shot["crackpos"..v:EntIndex()] or shot.pos
@@ -2907,7 +2914,8 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		--local physpenetration=self:PhysMaterialPenetration(tr.Entity:GetPhysicsObject():GetMaterial())
 		--if (physpenetration~=0) then penetration=physpenetration end
 		end
-		local speed=shot.speed-(wallcost*barrier*penetration)
+		local oldspeed=shot.dragvector:Length()
+		local speed=shot.dragvector:Length()-(wallcost*barrier*penetration)
 		if (tex=="**empty**" or tex=="**displacement**") then speed=0 end
 		if (tr.Entity:IsNPC()) then speed = 0 end
 		if (speed>0 and not tr.AllSolid) then
@@ -2925,8 +2933,9 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		if (hitprop) then 
 			traveladj=propexit+(tr.Normal*10)
 		end
-		return speed,traveladj,dist--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
-	else return 0,travel,dist  end
+		local newvector=shot.dragvector*(speed/oldspeed)
+		return newvector,traveladj,dist--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
+	else return Vector(0,0,0),travel,dist  end print("YORK")
 end
 	--impact tseter
 		--[[if (SERVER) then
