@@ -146,3 +146,35 @@ LittleLineyThingSr(tbl,nil,5,1)
 LittleLineyThingJr(tbl,nil,-4,-1)
 LittleLineyThingSr(tbl,nil,-5,-1)
 AddKswepReticle(tbl,"steiner_scr")
+local tbl = {
+{shape="line",start={-200,0},endpos={200,0}},
+{shape="line",start={0,-200},endpos={0,200}},
+{shape="line",start={-0.5,0},endpos={0.5,0},color=Color(255,0,0,255)},
+{shape="line",start={0,-0.5},endpos={0,0.5},color=Color(255,0,0,255)},
+{shape="line",start={-1,-10},endpos={1,-10}},
+{shape="line",start={-1,10},endpos={1,10}},
+{shape="line",start={-10,-1},endpos={-10,1}},
+{shape="line",start={10,-1},endpos={10,1}},
+{shape="line",start={-1,-15},endpos={1,-15}},
+{shape="line",start={-1,15},endpos={1,15}},
+{shape="line",start={-15,-1},endpos={-15,1}},
+{shape="line",start={15,-1},endpos={15,1}},
+{shape="rect",start={-200,-0.25},endpos={-5,0.25}},
+{shape="rect",start={5,-0.25},endpos={200,0.25}},
+{shape="rect",start={-0.25,5},endpos={0.25,200}},
+{shape="rect",start={-0.25,-200},endpos={0.25,-5}}
+}
+for i=1,4 do
+	table.insert(tbl,{shape="circle",pos={-i,0},radius=0.1})
+	table.insert(tbl,{shape="circle",pos={i,0},radius=0.1})
+	table.insert(tbl,{shape="circle",pos={0,-i},radius=0.1})
+	table.insert(tbl,{shape="circle",pos={0,i},radius=0.1})
+end
+for i=1,5 do
+	local j=i-0.5
+	table.insert(tbl,{shape="circle",pos={-j,0},radius=0.05})
+	table.insert(tbl,{shape="circle",pos={j,0},radius=0.05})
+	table.insert(tbl,{shape="circle",pos={0,-j},radius=0.05})
+	table.insert(tbl,{shape="circle",pos={0,j},radius=0.05})
+end
+AddKswepReticle(tbl,"steiner_p3")
