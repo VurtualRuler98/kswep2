@@ -75,7 +75,6 @@ local function KSSuitHandler(ent,dmginfo)
 end
 local function KSDamageHandlerEnt(ent,dmginfo)
 	if (ent:IsPlayer()) then
-		print(dmginfo:GetDamageType())
 		dmginfo:ScaleDamage(KSSuitHandler(ent,dmginfo))
 	end
 end
