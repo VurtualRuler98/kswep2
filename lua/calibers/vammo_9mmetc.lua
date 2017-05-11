@@ -14,6 +14,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.wallbang = 4 --units of generic wall it can penetrate
 	tbl.recoil = 1 --recoil value
 	tbl.velocity =	1300 --115gr fmj fps
+	tbl.mass=115
 	AddAmmodata(tbl)
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_CRISAT
@@ -29,6 +30,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.wallbang = 5
 	tbl.recoil = 1.5
 	tbl.velocity =	1990 --110gr FMJ
+	tbl.mass=110
 	AddAmmodata(tbl)
 	
 	local tbl = {}
@@ -45,6 +47,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.wallbang = 4
 	tbl.recoil = 1
 	tbl.velocity = 1030 --makarov
+	tbl.mass=93
 	AddAmmodata(tbl)
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
@@ -59,6 +62,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.spreadscale = 1
 	tbl.wallbang = 6
 	tbl.recoil = 1
+	tbl.mass=55
 	tbl.velocity = 820 --makarov
 	AddAmmodata(tbl)
 	local tbl = {}
@@ -74,6 +78,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.spreadscale = 1
 	tbl.wallbang = 4
 	tbl.recoil = 1
+	tbl.mass=94 --verify
 	tbl.velocity = 840 --PPK
 	AddAmmodata(tbl)
 
@@ -90,6 +95,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.spreadscale = 1
 	tbl.wallbang = 4
 	tbl.recoil = 1.5
+	tbl.mass=125 --verify
 	tbl.velocity = 1000 --Model 10
 	AddAmmodata(tbl)
 	local tbl = {}
@@ -105,6 +111,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.wallbang = 2
 	tbl.spreadscale = 1
 	tbl.velocity = 1240 --116gr JHP
+	tbl.mass=116
 	tbl.recoil = 1
 	AddAmmodata(tbl)
 
@@ -119,6 +126,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.caliber = "vammo_9x19"
 	tbl.velocity = 1300 --same as regular for now
 	tbl.projectiles = 1
+	tbl.mass=115
 	tbl.wallbang = 4
 	tbl.spreadscale = 1
 	tbl.recoil = 1.1

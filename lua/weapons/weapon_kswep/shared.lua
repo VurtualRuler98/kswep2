@@ -2811,7 +2811,9 @@ function SWEP:FlyBullet(shot)
 	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.dragvector:Length()>100) then
 		shot.bullet.Src=shot.pos
 		--self.Owner:SetPos(tr.HitPos)
-		shot.bullet.Damage=(shot.dmg/vurtual_ammodata[shot.bullet.AmmoType].velocity^2)*shot.dragvector:Length()^2
+		local energybase=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].velocity^2
+		local energynew=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*shot.dragvector:Length()^2
+		shot.bullet.Damage=shot.dmg*(energynew/energybase)
 		self:FireShot(shot.bullet)
 	
 	end

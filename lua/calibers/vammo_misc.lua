@@ -16,6 +16,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.damagescale = 1
 	tbl.recoil = 15
 	tbl.velocity = 3260
+	tbl.mass=195 --random hornady ammo
 	tbl.wallbang = 6
 	AddAmmodata(tbl)
 	
@@ -34,6 +35,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.recoil = 12
 	tbl.wallbang = 6
 	tbl.velocity = 2733 --24 in barrel
+	tbl.mass=147
 	AddAmmodata(tbl)
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
@@ -50,6 +52,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.damagescale = 1
 	tbl.recoil = 5
 	tbl.velocity = 990 --24 in barrel
+	tbl.mass=175 --random google result
 	AddAmmodata(tbl)
 	
 	
@@ -68,6 +71,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.recoil = 12
 	tbl.wallbang = 4
 	tbl.velocity = 2700
+	tbl.mass=152
 	AddAmmodata(tbl)
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
@@ -82,6 +86,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 12
+	tbl.mass=152
 	tbl.wallbang = 4
 	tbl.velocity = 2800
 	AddAmmodata(tbl)
@@ -99,6 +104,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.damagescale = 1
 	tbl.recoil = 12
 	tbl.wallbang = 4
+	tbl.mass=174
 	tbl.velocity = 2441
 	AddAmmodata(tbl)
 	local tbl = {}
@@ -115,6 +121,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.damagescale = 1
 	tbl.recoil = 12
 	tbl.wallbang = 4
+	tbl.mass=198
 	tbl.velocity = 2493
 	AddAmmodata(tbl)
 	local tbl = {}
@@ -129,6 +136,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.mass=125
 	tbl.recoil = 6
 	tbl.wallbang = 4
 	tbl.velocity = 2250
@@ -145,6 +153,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.mass=165
 	tbl.recoil = 12
 	tbl.wallbang = 10
 	tbl.velocity = 2715
@@ -163,6 +172,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.damagescale = 1
 	tbl.recoil = 0.5
 	tbl.wallbang = 0
+	tbl.mass=20 --idk
 	tbl.velocity = 1000
 	AddAmmodata(tbl)
 	local tbl = {}
@@ -178,6 +188,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.wallbang = 12
+	tbl.mass=126.6
 	tbl.velocity = 2985 
 	tbl.recoil = 12
 	AddAmmodata(tbl)
@@ -211,6 +222,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 0.5
 	tbl.damagescale = 1
 	tbl.recoil = 10
+	tbl.mass=173
 	tbl.wallbang = 5
 	tbl.velocity = 2452 --real life ~m40a1 velocity divided by the muzzle mod of the m40a1 itself
 	AddAmmodata(tbl)
@@ -228,6 +240,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.wallbang = 0
 	tbl.recoil = 0.8
+	tbl.mass=20
 	tbl.velocity =	1000 --tranq
 	AddAmmodata(tbl)
 	local tbl = {}
@@ -244,6 +257,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.recoil = 1.2
 	tbl.wallbang = 4
 	tbl.velocity = 825 --1911
+	tbl.mass=230
 	AddAmmodata(tbl)
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_II
@@ -258,6 +272,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.recoil = 1.4
 	tbl.wallbang = 4
+	tbl.mass=86
 	tbl.velocity = 1400 --C96
 	AddAmmodata(tbl)
 	local tbl = {}
@@ -273,6 +288,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.wallbang = 2
 	tbl.recoil = 0.2
+	tbl.mass=40
 	tbl.velocity =	1200 --kinda 5 inch barrel? TODO make this better
 	AddAmmodata(tbl)
 	tbl.vestpenetration=KSWEP_ARMOR_I
@@ -287,6 +303,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.wallbang = 2
 	tbl.recoil = 0.25
+	tbl.mass=32
 	tbl.velocity =	1640
 	AddAmmodata(tbl)
 	local tbl = {}
@@ -302,6 +319,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.wallbang = 5
 	tbl.recoil = 1.5
+	tbl.mass=110
 	tbl.velocity =	1100 --110gr FMJ
 	AddAmmodata(tbl)
 	local tbl = {}
@@ -317,6 +335,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.wallbang = 3
 	tbl.recoil = 1.5
+	tbl.mass=110
 	tbl.velocity =	1100 --estimated
 	AddAmmodata(tbl)
 
@@ -333,6 +352,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.wallbang = 5
+	tbl.mass=147
 	tbl.velocity = 2733 --like M80
 	tbl.recoil = 12
 	AddAmmodata(tbl)
@@ -350,6 +370,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 3
 	tbl.recoil = 15
 	tbl.wallbang = 3
+	tbl.mass=60
 	tbl.velocity = 1200 --00buck
 	AddAmmodata(tbl)
 
@@ -366,6 +387,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 18
+	tbl.mass=300
 	tbl.velocity = 1800
 	tbl.wallbang = 7
 	AddAmmodata(tbl)
@@ -386,6 +408,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.damagescale = 1
 	tbl.wallbang = 4
 	tbl.velocity = 891
+	tbl.mass=98
 	tbl.recoil = 1
 	AddAmmodata(tbl)
 

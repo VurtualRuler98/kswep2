@@ -15,6 +15,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.damagescale = 1
 	tbl.coefficient=0.25
 	tbl.recoil = 4
+	tbl.mass=55
 	tbl.velocity = 3165 --20" barrel
 	tbl.wallbang = 4
 	AddAmmodata(tbl)
@@ -32,6 +33,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 4
+	tbl.mass=62
 	tbl.velocity = 3100 -- 20"
 	tbl.wallbang = 6
 	AddAmmodata(tbl)
@@ -48,6 +50,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 4
+	tbl.mass=52
 	tbl.coefficient=0.304 --copied M855
 	tbl.wallbang = 12
 	tbl.velocity = 3324 --20" barrel I think?
@@ -66,6 +69,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.damagescale = 1
 	tbl.wallbang = 4
 	tbl.recoil = 4
+	tbl.mass=77
 	tbl.coefficient=0.340
 	tbl.velocity = 2750 --might be for a 16 or 18
 	AddAmmodata(tbl)

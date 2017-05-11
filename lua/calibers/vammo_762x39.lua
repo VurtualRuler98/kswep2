@@ -14,6 +14,7 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	tbl.spreadscale = 0.95
 	tbl.coefficient=0.252
 	tbl.damagescale = 1
+	tbl.mass=123
 	tbl.wallbang = 6
 	tbl.velocity = 2346 --AKM muzzle velocity
 	tbl.recoil = 6
@@ -33,6 +34,7 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.wallbang = 5
+	tbl.mass=123
 	tbl.velocity = 2363 --16in barrel, roughly yugo spec
 	tbl.recoil = 6
 	AddAmmodata(tbl)
@@ -47,6 +49,7 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	tbl.coefficient = 0.3 --TODO figure this out!
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.mass=193
 	tbl.damagescale = 1
 	tbl.wallbang = 6.5
 	tbl.velocity = 936 --285m/s roughly
