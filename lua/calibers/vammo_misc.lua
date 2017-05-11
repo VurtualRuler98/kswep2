@@ -206,6 +206,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.spreadscale = 0.5
 	tbl.damagescale = 1
 	tbl.recoil = 10
+	tbl.mass=175
 	tbl.wallbang = 5
 	tbl.velocity = 2580 --M118LR is the same projectile
 	AddAmmodata(tbl)
