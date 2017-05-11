@@ -80,15 +80,16 @@ function SWEP:Reload()
 						if (zdata.moa) then self.MOAMode=true else self.MOAMode=false end
 						local bc=zdata.bc
 						if (zdata.bc==-1) then bc=v.Ammo.coefficient or 0.25 end
-						cbox:AddChoice(v.PrintName,Vector(v.Ammo.velocity*v.MuzzleVelMod,zdata.default,bc))
+						cbox:AddChoice(v.PrintName,{v.Ammo.velocity*v.MuzzleVelMod,zdata.default,bc,v:GetSightHeight()})
 					end
 				end
 			end
 				
 			function cbox:OnSelect(index,value,data)
-				wep.Gun.Velocity=data.x
-				wep.Gun.Zero=data.y
-				wep.Gun.Coefficient=data.z
+				wep.Gun.Velocity=data[1]
+				wep.Gun.Zero=data[2]
+				wep.Gun.Coefficient=data[3]
+				wep.Gun.SightHeight=data[4]
 				wep.HasGun=true
 				RangeInputLabel:SetText(wep:CalcDrop())
 			end
@@ -108,9 +109,10 @@ function SWEP:CalcDrop()
 			drag_ticks=drag_ticks-1
 			drag_time=drag_time+1
 			drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
-			drag_vector=drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval()+Vector(0,0,386*(engine.TickInterval()^2))
-			drop=drop+drag_vector.z
+			drag_vector=drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval()-Vector(0,0,(386/12)*(engine.TickInterval()))
+			drop=drop-drag_vector.z*12*engine.TickInterval()
 		end
+		drop=drop+self.Gun.SightHeight
 		local dropadj=math.atan(drop/(self.Gun.Zero*39.3701))
 		drag_ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 		drag_time=0
@@ -121,9 +123,10 @@ function SWEP:CalcDrop()
 			drag_ticks=drag_ticks-1
 			drag_time=drag_time+1
 			drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
-			drag_vector=drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval()+Vector(0,0,386*(engine.TickInterval()^2))
-			drop=drop+drag_vector.z
+			drag_vector=drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval()-Vector(0,0,(386/12)*(engine.TickInterval()))
+			drop=drop-drag_vector.z*12*engine.TickInterval()
 		end
+		drop=drop+self.Gun.SightHeight
 		dropadj=dropadj-math.atan(drop/(self.GunRange*39.3701))
 		local label="mils"
 		if (self.MOAMode) then dropadj=dropadj*3.43775 label="MOA" end
@@ -132,8 +135,8 @@ function SWEP:CalcDrop()
 		return ((dropadj)*-1).." "..label..", BC: "..(math.floor(self.Gun.Coefficient*1000)/1000).." G1, "..math.floor(self.Gun.Velocity).." FPS muzzle, "..math.floor(drag_vector.x).." FPS target"
 end
 function SWEP:GetBetterDrag(func,speed)
-	local high=self:GetDrag(func,speed)
-	local low=self:GetDrag(func,speed-100)
+	local high=self:GetDrag(func,speed+50)
+	local low=self:GetDrag(func,speed-50)
 	local diff=high-low
 	local mod=((speed%100)/100)*diff
 	return low+mod

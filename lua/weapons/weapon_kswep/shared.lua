@@ -1949,9 +1949,7 @@ function SWEP:Think()
 		self:SetNWFloat("CurRecoil",self.MaxRecoil)
 	end
 	for k,v in pairs(self.Bullets) do
-		if (v.time<CurTime()) then
-			self.Bullets[k]=self:FlyBullet(v)
-		end
+		self.Bullets[k]=self:FlyBullet(v)
 	end
 	if (self.ReloadAnimTime~=0 and CurTime()>self.ReloadAnimTime and self:GetNWBool("CurrentlyReloading")==true) then
 		if (self.ClipReload) then
@@ -2448,8 +2446,8 @@ function SWEP:DiscoverAnim(anim)
 	return nil
 end
 function SWEP:GetBetterDrag(func,speed)
-	local high=self:GetDrag(func,speed)
-	local low=self:GetDrag(func,speed-100)
+	local high=self:GetDrag(func,speed+50)
+	local low=self:GetDrag(func,speed-50)
 	local diff=high-low
 	local mod=((speed%100)/100)*diff
 	return low+mod
@@ -2719,6 +2717,9 @@ function SWEP:FlyBulletStart(bullet)
 	if (self.ScopeName~="Default" and self.ScopeZeroVelocity>0) then
 		zerovel=self.ScopeZeroVelocity
 	end
+	if (self.ScopeName~="Default" and self.ScopeZeroVelocity==-1337) then
+		zerovel=self.Ammo.velocity*self.MuzzleVelMod*supmod
+	end
 	local miladj=0
 	if (zdata.mils) then
 		miladj=zero/zdata.mils
@@ -2738,8 +2739,8 @@ function SWEP:FlyBulletStart(bullet)
 		drag_ticks=drag_ticks-1
 		drag_time=drag_time+1
 		drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
-		drag_vector=drag_vector+(-1*self:GetDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval()+Vector(0,0,386*(engine.TickInterval()^2))
-		drop=drop+drag_vector.z
+		drag_vector=drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval()-Vector(0,0,(386/12)*(engine.TickInterval()))
+		drop=drop-drag_vector.z*12*engine.TickInterval()
 	end	
 	local zerotime=drag_time --amount of frames it will take to fly the distance
 	drop=drop+self:GetSightHeight()
@@ -2751,13 +2752,11 @@ function SWEP:FlyBulletStart(bullet)
 	local shot = {}
 	shot.ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 	shot.pos=bullet.Src
-	shot.dragvector=Vector(self.Ammo.velocity*self.MuzzleVelMod*supmod,0,0)
-	shot.ang=bullet.Dir+scopeang
+	shot.dragvector=(bullet.Dir+scopeang)*(self.Ammo.velocity*self.MuzzleVelMod*supmod)
 	shot.bullet=bullet
 	shot.bc=self.Ammo.coefficient or 0.25
 	shot.dmg=bullet.Damage
 	shot.dist = nil
-	shot.time = CurTime()
 	shot.crack=-1
 	shot.crackpos=shot.pos
 	table.insert(self.Bullets,shot)
@@ -2768,7 +2767,8 @@ function SWEP:FlyBullet(shot)
 	if (shot.dist~=nil) then
 		travel=shot.dist
 	else
-		travel = shot.pos + (shot.ang*shot.dragvector.x*12*engine.TickInterval())+Vector(0,0,-1*shot.dragvector.z)
+		travel = shot.pos + (shot.dragvector*12*engine.TickInterval())
+		--self.Owner:SetPos(travel)
 	end
 	local tr=util.TraceLine( {
 		filter = self.Owner,
@@ -2791,7 +2791,7 @@ function SWEP:FlyBullet(shot)
 		if (backwater.StartSolid) then backwater.Fraction=0 end
 		waterlength=tr.Fraction-water.Fraction-(backwater.Fraction*tr.Fraction)
 	end
-	local drag=self:GetBetterDrag("G1",shot.dragvector:Length())
+	local drag=self:GetBetterDrag("G1",shot.dragvector:Length())/shot.bc
 	if (waterlength>0) then
 		drag=drag+(drag*100*waterlength)
 		if (not water.StartSolid) then
@@ -2805,8 +2805,7 @@ function SWEP:FlyBullet(shot)
 		end
 	end
 	local oldspeed=shot.dragvector:Length()
-	local drag_bc=self.Ammo.coefficient or 0.25
-	shot.dragvector=shot.dragvector+(-1*self:GetDrag("G1",shot.dragvector:Length())/drag_bc)*shot.dragvector*engine.TickInterval()+Vector(0,0,386*(engine.TickInterval()^2))
+	shot.dragvector=shot.dragvector+(-1*drag)*shot.dragvector*engine.TickInterval()-Vector(0,0,(386/12)*(engine.TickInterval()))
 	if (oldspeed-shot.dragvector:Length()>1125) then shot.dragvector=Vector(0,0,0) end
 	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.dragvector:Length()>100) then
 		shot.bullet.Src=shot.pos
@@ -2814,6 +2813,7 @@ function SWEP:FlyBullet(shot)
 		local energybase=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].velocity^2
 		local energynew=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*shot.dragvector:Length()^2
 		shot.bullet.Damage=shot.dmg*(energynew/energybase)
+		shot.bullet.Dir=shot.dragvector:GetNormalized()
 		self:FireShot(shot.bullet)
 	
 	end
@@ -2826,7 +2826,6 @@ function SWEP:FlyBullet(shot)
 			shot.pos=travel
 			shot.dist=nil
 		end
-			shot.time=CurTime()+engine.TickInterval()
 		if (shot.dragvector:Length()>100 and shot.ticks>0) then --TODO: better minimum lethal velocity
 			if (shot.dist~=nil) then
 			return self:FlyBullet(shot)
@@ -2924,7 +2923,7 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 			local fakebullet=table.Copy(shot.bullet)
 			fakebullet.Damage = 0
 			fakebullet.Dir=Vector()
-			fakebullet.Dir:Set(shot.bullet.Dir)
+			fakebullet.Dir:Set(shot.dragvector:GetNormalized())
 			fakebullet.Src = hitpos+((travel-hitpos)*tr.FractionLeftSolid)+(tr.Normal*10)
 			fakebullet.Dir:Rotate(Angle(0,180,0))
 			fakebullet.Force =0
