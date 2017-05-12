@@ -258,6 +258,12 @@ function SWEP:Initialize()
 	if (self.DefaultZeroTable) then
 		self.ZeroTable=self.DefaultZeroTable
 	end
+	if (self.DefaultZeroTableStrings) then
+		self.ZeroTableStrings=self.DefaultZeroTableStrings
+	end
+	if (self.DefaultZeroTableStringsAlt) then
+		self.ZeroTableStringsAlt=self.DefaultZeroTableStringsAlt
+	end
 	if (self.DefaultZeroTableAlt) then
 		self.ZeroTableAlt=self.DefaultZeroTableAlt
 	end
@@ -805,6 +811,10 @@ function SWEP:InsOptic(name)
 		self.Zero=self.Zerodata.default
 		self.ZerodataAlt=scopedata.zeroalt
 		self.ZeroAlt=self.ZerodataAlt.default
+		self.ZeroTable=scopedata.ztable
+		self.ZeroTableAlt=scopedata.ztablealt
+		self.ZeroTableStrings=scopedata.ztablestr
+		self.ZeroTableStringsAlt=scopedata.ztablestralt
 		if (self.Zerodata.mils or self.Zerodata.moa) then
 			self.Zero=0
 		end
@@ -812,16 +822,6 @@ function SWEP:InsOptic(name)
 			self.ZeroAlt=0
 		end
 		scopemodel=scopedata.model
-		if (scopedata.zerotable) then
-			self.ZeroTable=scopedata.zerotable
-		else
-			self.ZeroTable=nil
-		end
-		if (scopedata.zerotablealt) then
-			self.ZeroTableAlt=scopedata.zerotablealt
-		else
-			self.ZeroTableAlt=nil
-		end
 	else
 		scopemodel=self.DefaultSight
 		self.Zerodata=self.DefaultZerodata
@@ -830,6 +830,8 @@ function SWEP:InsOptic(name)
 		self.ZeroAlt=self.ZerodataAlt.default
 		self.ZeroTable=self.DefaultZeroTable
 		self.ZeroTableAlt=self.DefaultZeroTableAlt
+		self.ZeroTableStrings=self.DefaultZeroTableStrings
+		self.ZeroTableStringsAlt=self.DefaultZeroTableStringsAlt
 		if (self.DefaultSight==nil and self.optic) then
 			self.optic:Remove()
 			self.optic=nil
@@ -1176,6 +1178,12 @@ function SWEP:DrawHUD()
 	end
 	if (zdata.moa) then
 		zerostring=zero/zdata.moa.." MOA"
+	end
+	if (not self:GetNWBool("AltIrons") and self.ZeroTableStrings) then
+		zerostring=self.ZeroTableStrings[zero]
+	end
+	if (self:GetNWBool("AltIrons") and self.ZeroTableStringsAlt) then
+		zerostring=self.ZeroTableStringsAlt[zero]
 	end
 	if (self.SingleReload and not self.OpenBolt) then
 		ammo =self.ChamberAmmo.printname
