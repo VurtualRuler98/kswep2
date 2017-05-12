@@ -2917,6 +2917,7 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		end
 		local oldspeed=shot.dragvector:Length()
 		local speed=shot.dragvector:Length()-(wallcost*barrier*penetration)
+		local newvector=Vector()
 		if (tex=="**empty**" or tex=="**displacement**") then speed=0 end
 		if (tr.Entity:IsNPC()) then speed = 0 end
 		if (speed>0 and not tr.AllSolid) then
@@ -2929,12 +2930,13 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 			fakebullet.Force =0
 			self:FireShot(fakebullet)
 			dist=travel
+			newvector=shot.dragvector*(speed/oldspeed)
 		end
 		local traveladj=hitpos+((travel-hitpos)*tr.FractionLeftSolid)+(tr.Normal*10)
 		if (hitprop) then 
 			traveladj=propexit+(tr.Normal*10)
 		end
-		local newvector=shot.dragvector*(speed/oldspeed)
+		print(newvector)
 		return newvector,traveladj,dist--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
 	else return Vector(0,0,0),travel,dist  end
 end
