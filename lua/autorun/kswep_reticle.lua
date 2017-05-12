@@ -18,6 +18,15 @@ local tbl = {
 }
 AddKswepReticle(tbl,"duplex")
 local tbl = {
+{shape="rect",start={-200,-0.1},endpos={200,0.1}},
+{shape="rect",start={-0.1,-200},endpos={0.1,200}},
+{shape="rect",start={-200,-0.5},endpos={-10,0.5}},
+{shape="rect",start={10,-0.5},endpos={200,0.5}},
+{shape="rect",start={-0.5,10},endpos={0.5,200}},
+{shape="rect",start={-0.5,-200},endpos={0.5,-10}}
+}
+AddKswepReticle(tbl,"duplex_cheap")
+local tbl = {
 {shape="line",start={-5,0},endpos={5,0}},
 {shape="line",start={0,-5},endpos={0,5}},
 {shape="line",start={-5,-0.25},endpos={-5,0.25}},
