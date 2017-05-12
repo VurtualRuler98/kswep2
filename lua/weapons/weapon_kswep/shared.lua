@@ -2944,7 +2944,6 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		if (hitprop) then 
 			traveladj=propexit+(tr.Normal*10)
 		end
-		print(newvector)
 		return newvector,traveladj,dist--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
 	else return Vector(0,0,0),travel,dist  end
 end
