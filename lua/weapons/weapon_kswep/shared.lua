@@ -2813,7 +2813,7 @@ function SWEP:FlyBullet(shot)
 		local energybase=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].velocity^2
 		local energynew=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*shot.dragvector:Length()^2
 		shot.bullet.Damage=shot.dmg*(energynew/energybase)
-		shot.bullet.Dir=shot.dragvector:GetNormalized()
+		shot.bullet.Dir=shot.dragvector
 		self:FireShot(shot.bullet)
 	
 	end
