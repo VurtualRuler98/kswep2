@@ -2936,7 +2936,7 @@ function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		end
 		local newvector=shot.dragvector*(speed/oldspeed)
 		return newvector,traveladj,dist--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
-	else return Vector(0,0,0),travel,dist  end print("YORK")
+	else return Vector(0,0,0),travel,dist  end
 end
 	--impact tseter
 		--[[if (SERVER) then
@@ -2945,9 +2945,18 @@ end
 		ono:Spawn()
 		ono:GetPhysicsObject():EnableMotion(false)
 		end]] 
-
+net.Receive("kswepfirebulletclient",function()
+	LocalPlayer():FireBullets(net.ReadTable())
+end)
 function SWEP:FireShot(bullet)
-	self.Owner:FireBullets(bullet)
+	if (SERVER or game.SinglePlayer()) then
+		if (not game.SinglePlayer()) then
+		net.Start("kswepfirebulletclient")
+		net.WriteTable(bullet)
+		net.Send(self.Owner)
+		end
+		self.Owner:FireBullets(bullet)
+	end
 end
 function SWEP:MaterialPenetration(mat)
 	local penetration = 0
