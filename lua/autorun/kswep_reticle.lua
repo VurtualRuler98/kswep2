@@ -76,6 +76,13 @@ for k,v in pairs(steps) do
 end
 AddKswepReticle(tbl,"leupold_spr")
 local tbl = {
+	{shape="rect",start={-0.3,7},endpos={0.3,8.2}},
+	{shape="rect",start={-0.3,8.2},endpos={0.3,200},color=Color(0,0,0,255)},
+	{shape="circle",pos={0,0},radius=0.3},
+	{shape="ring",pos={0,0},radius=3}
+}
+AddKswepReticle(tbl,"trijicon_mini")
+local tbl = {
 {shape="poly",poly={{x=-0.3,y=0},{x=0.3,y=0},{x=0.75,y=60},{x=-0.75,y=60}}}
 }
 AddKswepReticle(tbl,"m82")
