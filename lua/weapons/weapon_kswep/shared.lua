@@ -1226,93 +1226,109 @@ function SWEP:DrawHUD()
 			local scalemod=oldH/oldW
 			surface.DrawTexturedRectUV((oldW-scale)/2,(oldH-scale*scalemod)/2,scale,scale*scalemod,0,0,1,1)
 		end
-		if (self.ScopeLuaReticle~=false) then
-			local fov=self.ScopeFOV
-			if (self.ScopeLuaReticlePlane) then
-				fov=self.ScopeLuaReticlePlane
-			end
-			local scale=1024/(fov*3.6)
-			local aspectratio=(oldW/oldH)/(4/3)
-			scale=scale/aspectratio
-			local scalemod=oldH/oldW
-			draw.NoTexture()
-			for k,v in pairs(kswep_reticles[self.ScopeLuaReticle]) do
-				if (v.shape=="line") then
-					if (v.color) then surface.SetDrawColor(v.color) else 
-						surface.SetDrawColor(self.ScopeReticleColor)
-					end
-					local x1=(v.start[1]*scale)+0.5*oldW
-					local y1=(v.start[2]*scale*scalemod)+0.5*oldH
-					local x2=(v.endpos[1]*scale)+0.5*oldW
-					local y2=(v.endpos[2]*scale*scalemod)+0.5*oldH
-					surface.DrawLine(x1,y1,x2,y2)
-				end
-				if (v.shape=="ring") then
-					local x=(v.pos[1]*scale)+0.5*oldW
-					local y=(v.pos[2]*scale*scalemod)+0.5*oldH
-					local radiusx=v.radius*scale
-					local radiusy=v.radius*scale*scalemod
-					if (v.color) then surface.SetDrawColor(v.color) else 
-						surface.SetDrawColor(self.ScopeReticleColor)
-					end
-					local lastpoint={x=x,y=y+radiusy}
-					for i=0,32 do
-						local a=math.rad((i/32)*-360)
-						local point={x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy}
-						surface.DrawLine(point.x,point.y,lastpoint.x,lastpoint.y)
-						lastpoint=point
-					end
-					--local a=math.rad(0)
-					--table.insert(circle,{x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy})
-				end
-				if (v.shape=="poly") then
-					local poly=table.Copy(v.poly)
-					for l,m in pairs(poly) do
-						m.x=m.x*scale+0.5*oldW
-						m.y=m.y*scale*scalemod+0.5*oldH
-					end
-					table.insert(poly,poly[1])
-					if (v.color) then surface.SetDrawColor(v.color) else 
-						surface.SetDrawColor(self.ScopeReticleColor)
-					end
-					surface.DrawPoly(poly)
-				end
-				if (v.shape=="circle") then
-					local circle={}
-					local x=(v.pos[1]*scale)+0.5*oldW
-					local y=(v.pos[2]*scale*scalemod)+0.5*oldH
-					local radiusx=v.radius*scale
-					local radiusy=v.radius*scale*scalemod
-					if (v.color) then surface.SetDrawColor(v.color) else 
-						surface.SetDrawColor(self.ScopeReticleColor)
-					end
-					table.insert(circle,{x=x,y=y})
-					for i=0,32 do
-						local a=math.rad((i/32)*-360)
-						table.insert(circle,{x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy})
-					end
-					local a=math.rad(0)
-					table.insert(circle,{x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy})
-					surface.DrawPoly(circle)
-				end
-				if (v.shape=="rect") then
-					local x1=(v.start[1]*scale)+0.5*oldW
-					local y1=(v.start[2]*scale*scalemod)+0.5*oldH
-					local x2=(v.endpos[1]*scale)+0.5*oldW
-					local y2=(v.endpos[2]*scale*scalemod)+0.5*oldH
-					local box={{x=x1,y=y1},{x=x2,y=y1},{x=x2,y=y2},{x=x1,y=y2}}
-					if (v.color) then surface.SetDrawColor(v.color) else 
-						surface.SetDrawColor(self.ScopeReticleColor)
-					end
-					surface.DrawPoly(box)
-				end
-					
-			end
+	if (self.ScopeLuaReticle~=false) then
+		local fov=self.ScopeFOV
+		if (self.ScopeLuaReticlePlane) then
+			fov=self.ScopeLuaReticlePlane
 		end
+		local scale=1024/(fov*3.6)
+		self:DrawLuaReticle(self.ScopeLuaReticle,fov,self.ScopeReticleColor,oldW,oldH,scale,oldH/oldW)
+	end
 		render.SetViewPort(0,0,oldW,oldH)
 		render.PopRenderTarget()
 	end
+	if (self.AimLuaReticle~=nil) then
+		if (self:GetNWBool("Sight")) then
+			local fov=self.Owner:GetFOV()
+			if (self.AimLuaReticlePlane~=nil) then
+				fov=self.AimLuaReticlePlane
+			end
+			local col=color_black
+			if (self.AimLuaReticleColor~=nil) then
+				col=self.AimLuaReticleColor
+			end
+			local scale=ScrW()/(fov*18)
+			self:DrawLuaReticle(self.AimLuaReticle,fov,col,ScrW(),ScrH(),scale,1)
+		end
+	end
 end 
+function SWEP:DrawLuaReticle(reticle,fov,retcol,width,height,scale,scalemod)
+		local aspectratio=(width/height)/(4/3)
+		scale=scale/aspectratio
+		draw.NoTexture()
+		for k,v in pairs(kswep_reticles[reticle]) do
+			if (v.shape=="line") then
+				if (v.color) then surface.SetDrawColor(v.color) else 
+					surface.SetDrawColor(retcol)
+				end
+				local x1=(v.start[1]*scale)+0.5*width
+				local y1=(v.start[2]*scale*scalemod)+0.5*height
+				local x2=(v.endpos[1]*scale)+0.5*width
+				local y2=(v.endpos[2]*scale*scalemod)+0.5*height
+				surface.DrawLine(x1,y1,x2,y2)
+			end
+			if (v.shape=="ring") then
+				local x=(v.pos[1]*scale)+0.5*width
+				local y=(v.pos[2]*scale*scalemod)+0.5*height
+				local radiusx=v.radius*scale
+				local radiusy=v.radius*scale*scalemod
+				if (v.color) then surface.SetDrawColor(v.color) else 
+					surface.SetDrawColor(retcol)
+				end
+				local lastpoint={x=x,y=y+radiusy}
+				for i=0,32 do
+					local a=math.rad((i/32)*-360)
+					local point={x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy}
+					surface.DrawLine(point.x,point.y,lastpoint.x,lastpoint.y)
+					lastpoint=point
+				end
+				--local a=math.rad(0)
+				--table.insert(circle,{x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy})
+			end
+			if (v.shape=="poly") then
+				local poly=table.Copy(v.poly)
+				for l,m in pairs(poly) do
+					m.x=m.x*scale+0.5*width
+					m.y=m.y*scale*scalemod+0.5*height
+				end
+				table.insert(poly,poly[1])
+				if (v.color) then surface.SetDrawColor(v.color) else 
+					surface.SetDrawColor(retcol)
+				end
+				surface.DrawPoly(poly)
+			end
+			if (v.shape=="circle") then
+				local circle={}
+				local x=(v.pos[1]*scale)+0.5*width
+				local y=(v.pos[2]*scale*scalemod)+0.5*height
+				local radiusx=v.radius*scale
+				local radiusy=v.radius*scale*scalemod
+				if (v.color) then surface.SetDrawColor(v.color) else 
+					surface.SetDrawColor(retcol)
+				end
+				table.insert(circle,{x=x,y=y})
+				for i=0,32 do
+					local a=math.rad((i/32)*-360)
+					table.insert(circle,{x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy})
+				end
+				local a=math.rad(0)
+				table.insert(circle,{x=x+math.sin(a)*radiusx,y=y+math.cos(a)*radiusy})
+				surface.DrawPoly(circle)
+			end
+			if (v.shape=="rect") then
+				local x1=(v.start[1]*scale)+0.5*width
+				local y1=(v.start[2]*scale*scalemod)+0.5*height
+				local x2=(v.endpos[1]*scale)+0.5*width
+				local y2=(v.endpos[2]*scale*scalemod)+0.5*height
+				local box={{x=x1,y=y1},{x=x2,y=y1},{x=x2,y=y2},{x=x1,y=y2}}
+				if (v.color) then surface.SetDrawColor(v.color) else 
+					surface.SetDrawColor(retcol)
+				end
+				surface.DrawPoly(box)
+			end
+				
+		end
+end
 function SWEP:MagWeight(reloadweight,magsize)
 	local weightratio=reloadweight/magsize
 	if (weightratio>0.8) then
@@ -1903,6 +1919,9 @@ hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think2()
 end
 function SWEP:Think()
+	if (self.AimNoModel) then
+		self.Owner:DrawViewModel(not self:GetNWBool("Sight"))
+	end
 	if (self:IsRunning() and self.RunTimer==0) then
 		self.RunTimer=CurTime()
 	end
