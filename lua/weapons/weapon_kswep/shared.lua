@@ -3031,7 +3031,7 @@ function SWEP:ShootEffects()
 	self.Owner:SetAnimation(PLAYER_ATTACK1)
 end
 function SWEP:Recoil(recoil)
-	self:SetNWFloat("CurRecoil",self:GetNWFloat("CurRecoil")+recoil)
+	self:SetNWFloat("CurRecoil",self:GetNWFloat("CurRecoil")+recoil*0.2)
 	if (self:GetNWFloat("CurRecoil")>self.MaxRecoil) then
 		self:SetNWFloat("CurRecoil",self.MaxRecoil)
 	end
