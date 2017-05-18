@@ -57,6 +57,40 @@ for i=1,4 do
 end
 AddKswepReticle(tbl,"leupold_mil")
 local tbl = {
+{shape="line",start={-5,0},endpos={-0.05,0}},
+{shape="line",start={0,-5},endpos={0,-0.05}},
+{shape="line",start={5,0},endpos={0.05,0}},
+{shape="line",start={0,5},endpos={0,0.05}},
+{shape="rect",start={-200,-0.2},endpos={-5.1,0.2},color=color_black},
+{shape="rect",start={5.1,-0.2},endpos={200,0.2},color=color_black},
+{shape="rect",start={-0.2,5.1},endpos={0.2,200},color=color_black},
+{shape="rect",start={-0.2,-200},endpos={0.2,-5.1},color=color_black},
+{shape="line",start={-10,-0.5},endpos={-10,0.5},color=color_black},
+{shape="line",start={10,-0.5},endpos={10,0.5},color=color_black},
+{shape="line",start={-0.5,-10},endpos={0.5,-10},color=color_black},
+{shape="line",start={-0.5,10},endpos={0.5,10},color=color_black}
+}
+for i=1,5 do
+	table.insert(tbl,{shape="line",start={-i,-0.2},endpos={-i,0.2}})
+	table.insert(tbl,{shape="line",start={i,-0.2},endpos={i,0.2}})
+	table.insert(tbl,{shape="line",start={-0.2,-i},endpos={0.2,-i}})
+	table.insert(tbl,{shape="line",start={-0.2,i},endpos={0.2,i}})
+end
+for i=1,4 do
+	table.insert(tbl,{shape="line",start={-i+0.5,-0.075},endpos={-i+0.5,0.075}})
+	table.insert(tbl,{shape="line",start={i-0.5,-0.075},endpos={i-0.5,0.075}})
+	table.insert(tbl,{shape="line",start={-0.075,-i+0.5},endpos={0.075,-i+0.5}})
+	table.insert(tbl,{shape="line",start={-0.075,i-0.5},endpos={0.075,i-0.5}})
+end
+for j=1,4 do
+	local i=4.5+0.2*j
+	table.insert(tbl,{shape="line",start={-i+0.5,-0.075},endpos={-i+0.5,0.075}})
+	table.insert(tbl,{shape="line",start={i-0.5,-0.075},endpos={i-0.5,0.075}})
+	table.insert(tbl,{shape="line",start={-0.075,-i+0.5},endpos={0.075,-i+0.5}})
+	table.insert(tbl,{shape="line",start={-0.075,i-0.5},endpos={0.075,i-0.5}})
+end
+AddKswepReticle(tbl,"leupold_tmr")
+local tbl = {
 {shape="line",start={-15,0},endpos={15,0},color=Color(255,0,0,255)},
 {shape="line",start={0,-15},endpos={0,15},color=Color(255,0,0,255)},
 {shape="rect",start={-200,-0.25},endpos={-15.5,0.25}},
