@@ -314,7 +314,7 @@ function SWEP:Initialize()
 		end
 		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
 		
-		self.ScopeRTMaterial=Material("kswep/scope.png","noclamp smooth")
+		self.ScopeRTMaterial=Material(self.ScopeMat)
 		self.ScopeRTMaterial:SetTexture("$basetexture",self.RenderTarget)
 	end
 	if (self:GetNWBool("Chambered")==false and self:Clip1()>0 and self.OpenBolt==false) then
@@ -354,7 +354,7 @@ function SWEP:InitMergeParts()
 			self.MergeParts[k]:SetNoDraw(true)
 		end
 	end
-	if (self.UseInsHands) then
+	if (self.InsAttachments) then
 		self.MergeAddons.AT_HANDS=kswep_hands[LocalPlayer():GetNWString("KswepInsHands")].model
 	end
 	if (self.CurrentSight~=nil) then
@@ -807,9 +807,8 @@ function SWEP:InsOptic(name)
 	end
 	if (CLIENT and self.Owner==LocalPlayer() and scopedata.rtscope) then
 		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
-		local mat
-		mat = Material(self.ScopeMat)
-		mat:SetTexture("$basetexture",self.RenderTarget)
+		self.ScopeRTMaterial=Material(self.ScopeMat)
+		self.ScopeRTMaterial:SetTexture("$basetexture",self.RenderTarget)
 	end
 	self.Collimator=scopedata.collimator
 	self.CollimatorTex=scopedata.coltex
@@ -1178,7 +1177,7 @@ function SWEP:DrawHUD()
 	if (self.ReloadMessage > CurTime()) then
 		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
 	end
-	if ((self.RTRanger or self.ScopeReticle or self.ScopeLuaReticle) and self:GetNWBool("Sight")) then
+	if ((self.RTRanger or self.ScopeReticle or self.ScopeLuaReticle or self.AimLuaReticle) and self:GetNWBool("Sight")) then
 		local oldW,oldH=ScrW(),ScrH()
 		render.PushRenderTarget(self.RenderTarget)
 		render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)
@@ -1218,45 +1217,45 @@ function SWEP:DrawHUD()
 			fov=self.ScopeLuaReticlePlane
 		end
 		local scale=1024/(fov*3.6)
-		self:DrawLuaReticle(self.ScopeLuaReticle,fov,self.ScopeReticleColor,oldW,oldH,scale,oldH/oldW)
+		self:DrawLuaReticle(self.ScopeLuaReticle,self.ScopeReticleColor,oldW,oldH,scale,oldH/oldW)
 	end
-		if (self.AimLuaReticle~=nil) then
-			if (self:GetNWBool("Sight")) then
-				local fov=self.Owner:GetFOV()
-				if (self.AimLuaReticlePlane~=nil) then
-					fov=self.AimLuaReticlePlane
-				end
-				local col=color_black
-				if (self.LuaReticleColor~=nil) then
-					col=self.LuaReticleColor
-				end
-				local scale=ScrW()/(fov*18)
-				self:DrawLuaReticle(self.AimLuaReticle,fov,col,ScrW(),ScrH(),scale,1)
-			end
+	if (self.AimLuaReticle~=false) then
+		local fov=self.ScopeFOV
+		if (self.AimLuaReticlePlane~=nil) then
+			fov=self.AimLuaReticlePlane
 		end
+		local scale=1024/(fov*3.6)
+		self:DrawLuaReticle(self.AimLuaReticle,self.ScopeReticleColor,oldW,oldH,scale,oldH/oldW)
+	end
 		render.SetViewPort(0,0,oldW,oldH)
 		render.PopRenderTarget()
 	end
 	if (self.AimLuaReticle~=nil) then
 		if (self:GetNWBool("Sight")) then
-			surface.SetMaterial(self.ScopeRTMaterial)
-			local circle={}
 			local x=0.5*ScrW()
 			local y=0.5*ScrH()
 			local radius=ScrW()/5
+			draw.NoTexture()
+			surface.SetDrawColor(color_black)
+			self:DrawViewScope(x,y,radius)
+			surface.SetMaterial(self.ScopeRTMaterial)
 			surface.SetDrawColor(color_white)
-			table.insert(circle,{x=x,y=y,u=0.5,v=0.5})
-			for i=0,32 do
-				local a=math.rad((i/32)*-360)
-				table.insert(circle,{x=x+math.sin(a)*radius,y=y+math.cos(a)*radius,u=0.5+math.sin(a)*0.5,v=0.5+math.cos(a)*0.5})
-			end
-			local a=math.rad(0)
-			table.insert(circle,{x=x+math.sin(a)*radius,y=y+math.cos(a)*radius})
-			surface.DrawPoly(circle)
+			self:DrawViewScope(x,y,radius)
 		end
 	end
-end 
-function SWEP:DrawLuaReticle(reticle,fov,retcol,width,height,scale,scalemod)
+end
+function SWEP:DrawViewScope(x,y,radius)
+	local circle={}
+	table.insert(circle,{x=x,y=y,u=0.5,v=0.5})
+	for i=0,128 do
+		local a=math.rad((i/128)*-360)
+		table.insert(circle,{x=x+math.sin(a)*radius,y=y+math.cos(a)*radius,u=0.5+math.sin(a)*0.5,v=0.5+math.cos(a)*0.5})
+	end
+	local a=math.rad(0)
+	table.insert(circle,{x=x+math.sin(a)*radius,y=y+math.cos(a)*radius})
+	surface.DrawPoly(circle)
+end
+function SWEP:DrawLuaReticle(reticle,retcol,width,height,scale,scalemod)
 		local aspectratio=(width/height)/(4/3)
 		scale=scale/aspectratio
 		draw.NoTexture()
