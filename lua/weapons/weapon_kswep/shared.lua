@@ -130,6 +130,7 @@ SWEP.Anims.CrawlAnimEmpty=ACT_VM_CRAWL_EMPTY
 SWEP.ShowViewModel=0
 SWEP.DidLowerAnim=false
 SWEP.MergeAttachments = nil
+SWEP.MergeAddons={}
 SWEP.ReloadMessage=0
 SWEP.ReloadWeight=0
 SWEP.InsNoSafetySound=false
@@ -282,20 +283,14 @@ function SWEP:Initialize()
 		end)
 	end
 	self:SetHoldType(self.HoldType)
-	if (CLIENT and self.Owner==LocalPlayer()) then
-		self.MergeParts={}
-		if (self.MergeAttachments~=nil) then
-			for k,v in pairs(self.MergeAttachments) do
-				self.MergeParts[k]=ClientsideModel(v)
-				self.MergeParts[k]:SetNoDraw(true)
-			end
-		end
-	end
-	self.Ammo = vurtual_ammodata[self.Caliber]
-	self.Caliber=self.Ammo.caliber
 	if (self.InsAttachments and self.DefaultSight) then
 		self.CurrentSight=self.DefaultSight
 	end
+	if (CLIENT and self.Owner==LocalPlayer()) then
+		self:InitMergeParts()
+	end
+	self.Ammo = vurtual_ammodata[self.Caliber]
+	self.Caliber=self.Ammo.caliber
 	if (self.SingleReload) then
 		self.MagTable = {}
 		for i=1,self.MagSize do
@@ -322,24 +317,7 @@ function SWEP:Initialize()
 		self:TakePrimaryAmmo(1)
 		self:SetDeploySpeed(1)
 	end
-	if (self.OpticMountModel and CLIENT and self.Owner==LocalPlayer()) then
-		self.opticmount=ClientsideModel(self.OpticMountModel)
-		self.opticmount:SetNoDraw(true)
-	end
-	if (self.NotOpticMountModel and CLIENT and self.Owner==LocalPlayer()) then
-		self.notopticmount=ClientsideModel(self.NotOpticMountModel)
-		self.notopticmount:SetNoDraw(true)
-	end
-	if (self.NotSuppressorModel and CLIENT and self.Owner==LocalPlayer()) then
-		self.notsuppressor=ClientsideModel(self.NotSuppressorModel)
-		self.notsuppressor:SetNoDraw(true)
-	end
-	if (self.CurrentSight and CLIENT and self.Owner==LocalPlayer()) then
-		self.optic=ClientsideModel(self.CurrentSight)
-		self.optic:SetNoDraw(true)
-	end
 	if (CLIENT and self.Owner==LocalPlayer() and self.InsAttachments and self.Owner:IsPlayer()) then
-		self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
 	end
 	self.CurrentMagSize=self.MagSize
 end
@@ -362,6 +340,35 @@ function SWEP:DiscoverModelAnimsDone()
 end	
 function SWEP:OnDrop()
 	self:Remove()
+end
+function SWEP:InitMergeParts()
+	self.MergeParts={}
+	if (self.MergeAttachments~=nil) then
+		for k,v in pairs(self.MergeAttachments) do
+			self.MergeParts[k]=ClientsideModel(v)
+			self.MergeParts[k]:SetNoDraw(true)
+		end
+	end
+	self.MergeAddons.AT_HANDS=kswep_hands[LocalPlayer():GetNWString("KswepInsHands")].model
+	if (self.CurrentSight~=nil) then
+		self.MergeAddons.AT_OPTIC=self.CurrentSight
+	end
+	if (self.OpticMountModel and self.CurrentSight~=self.DefaultSight) then
+		self.MergeAddons.AT_OPTIC_MOUNT=self.OpticMountModel
+	end
+	if (self.NotOpticMountModel and self.CurrentSight==self.DefaultSight) then
+		self.MergeAddons.AT_OPTIC_MOUNT=self.NotOpticMountModel
+	end
+	if (self.NotSuppressorModel and not self.Suppressed) then
+		self.MergeAddons.AT_SUPPRESSOR=self.NotSuppressorModel
+	end
+	if (self.MergeAddons~=nil) then
+		for k,v in pairs(self.MergeAddons) do
+			self.MergeParts[k]=ClientsideModel(v)
+			self.MergeParts[k]:SetNoDraw(true)
+		end
+	end
+	self.RefreshMerge=false
 end
 function SWEP:Melee()
 	local hit=false
@@ -695,11 +702,6 @@ function SWEP:Deploy()
 		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.Anims.IdleAnim)
 		self.InitialDraw=false
 	else
-		if (SERVER) then
-			net.Start("kswep_sethands")
-			net.WriteEntity(self)
-			net.Send(self.Owner)
-		end
 		local anim=self.Anims.UnstowAnim
 		local anim2=self.Anims.IdleAnim
 		if (self:IsWeaponEmpty()) then
@@ -833,19 +835,16 @@ function SWEP:InsOptic(name)
 		self.ZeroTableStrings=self.DefaultZeroTableStrings
 		self.ZeroTableStringsAlt=self.DefaultZeroTableStringsAlt
 		if (self.DefaultSight==nil and self.optic) then
-			self.optic:Remove()
-			self.optic=nil
+		self.MergeAddons.AT_OPTIC=nil
+		self.RefreshMerge=true
 		end
 	end
 	self.CurrentSight=scopemodel
 	self.MaxSensitivity=scopedata.sensitivity
 	self.MinSensitivity=scopedata.minsensitivity
 	if (CLIENT and self.Owner==LocalPlayer() and self.CurrentSight~=nil) then
-		if(self.optic) then
-			self.optic:Remove()
-		end
-		self.optic=ClientsideModel(scopemodel)
-		self.optic:SetNoDraw(true)
+		self.MergeAddons.AT_OPTIC=scopemodel
+		self.RefreshMerge=true
 	end
 	self.ScopeFOV=scopedata.fov
 	self.ScopeFOVMin=scopedata.fovmin
@@ -920,16 +919,8 @@ function SWEP:AddAttachment(item,attach)
 end
 net.Receive("kswep_sethands",function()
 	local self=net.ReadEntity()
-	self:AddMergePart("hands",kswep_hands[self.Owner:GetNWString("KswepInsHands")].model)
+	self.RefreshMerge=true
 end)
-function SWEP:AddMergePart(key,model)
-	if (self.MergeParts[key]~=nil and self.MergeParts[key]:GetModel()==model) then return end
-	if (self.MergeParts[key]~=nil) then
-		self.MergeParts[key]:Remove()
-	end
-	self.MergeParts[key]=ClientsideModel(model)
-	self.MergeParts[key]:SetNoDraw(true)
-end
 function SWEP:Reload()
 	if (self:GetNWBool("Sight")) then return end
 	if (self.ChainReload and not self:GetNWBool("CurrentlyReloading")) then
@@ -997,18 +988,6 @@ net.Receive("kswep_reloadmessage",function(len)
 	self.ReloadWeight=net.ReadInt(8)
 	self.ReloadMessage=CurTime()+2
 end)
-net.Receive("kswep_suppress",function(len,ply)
-	local self=net.ReadEntity()
-	local sup=net.ReadBool()
-	self.Suppressed=sup
-	if (sup) then
-		self.MergeParts.suppressor=ClientsideModel(self.SuppressorModel)
-		self.MergeParts.suppressor:SetNoDraw(true)
-	else
-		self.MergeParts.suppressor:Remove()
-		self.MergeParts.suppressor=nil
-	end
-end)
 net.Receive("kswep_attach_cl",function(len,ply)
 	local self=net.ReadEntity()
 	local item=net.ReadString()
@@ -1016,55 +995,46 @@ net.Receive("kswep_attach_cl",function(len,ply)
 	if (item=="bayonet") then
 		self.Bayonet=attach
 		if (attach) then
-			self.MergeParts.bayonet=ClientsideModel(self.BayonetModel)
-			self.MergeParts.bayonet:SetNoDraw(true)
+			self.MergeAddons.AT_BAYONET=self.BayonetModel
 		else
-			self.MergeParts.bayonet:Remove()
-			self.MergeParts.bayonet=nil
+			self.MergeAddons.AT_BAYONET=nil
 		end
 	end
 	if (item=="suppressor") then
 		self.Suppressed=attach
 		if (attach) then
-			self.MergeParts.suppressor=ClientsideModel(self.SuppressorModel)
-			self.MergeParts.suppressor:SetNoDraw(true)
+			self.MergeAddons.AT_MUZZLE=self.SuppressorModel
 		else
-			self.MergeParts.suppressor:Remove()
-			self.MergeParts.suppressor=nil
+			self.MergeAddons.AT_MUZZLE=nil
 		end
 	end
 	if (item=="flashlight") then
 		self.HasFlashlight=attach
 		if (attach) then
-			self.MergeParts.flashlight=ClientsideModel(self.FlashlightModel)
-			self.MergeParts.flashlight:SetNoDraw(true)
+			self.MergeAddons.AT_LAM=self.FlashlightModel
 		else
 			self:EnableFlashlight(false)
-			self.MergeParts.flashlight:Remove()
-			self.MergeParts.flashlight=nil
+			self.MergeAddons.AT_LAM=nil
 		end
 	end
 	if (item=="laser") then
 		self.HasLaser=attach
 		if (attach) then
-			self.MergeParts.laser=ClientsideModel(self.LaserModel)
-			self.MergeParts.laser:SetNoDraw(true)
+			self.MergeAddons.AT_LAM=self.LaserModel
 		else
+			self.MergeAddons.AT_LAM=nil
 			self:EnableLaser(false)
-			self.MergeParts.laser:Remove()
-			self.MergeParts.laser=nil
 		end
 	end
 	if (item=="ranger") then
 		self.HasRanger=attach
 		if (attach) then
-			self.MergeParts.ranger=ClientsideModel(self.LaserModel)
-			self.MergeParts.ranger:SetNoDraw(true)
+			self.MergeAddons.AT_LAM=self.LaserModel
 		else
-			self.MergeParts.ranger:Remove()
-			self.MergeParts.ranger=nil
+			self.MergeAddons.AT_LAM=nil
 		end
 	end
+	self.RefreshMerge=true
 end)
 net.Receive("kswep_chamberammo",function(len,ply)
 	self=net.ReadEntity()
@@ -1919,6 +1889,9 @@ hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think2()
 end
 function SWEP:Think()
+	if (CLIENT and LocalPlayer()==self.Owner and self.RefreshMerge) then
+		self:InitMergeParts()
+	end
 	if (self.AimNoModel) then
 		self.Owner:DrawViewModel(not self:GetNWBool("Sight"))
 	end
@@ -2165,24 +2138,12 @@ function SWEP:LowerHolster(lower)
 end
 
 function SWEP:PostDrawViewModel()
-	if (self.CurrentSight~=nil) then
-		self.optic:SetParent(self.Owner:GetViewModel())
-		self.optic:SetPos(self.Owner:GetViewModel():GetPos())
-		self.optic:SetAngles(self.Owner:GetViewModel():GetAngles())
-		self.optic:AddEffects(EF_BONEMERGE)
-		self.optic:DrawModel()
-	end
 	for k,v in pairs(self.MergeParts) do
-		self:AttachModel(v)
-	end
-	if (self.opticmount~=nil and self.CurrentSight~=self.DefaultSight) then
-		self:AttachModel(self.opticmount)
-	end
-	if (self.notopticmount~=nil and self.CurrentSight==self.DefaultSight) then
-		self:AttachModel(self.notopticmount)
-	end
-	if (self.notsuppressor~=nil and not self.Suppressed) then
-		self:AttachModel(self.notsuppressor)
+		if (IsValid(v)) then
+			self:AttachModel(v)
+		else
+			self.RefreshMerge=true
+		end
 	end
 	if (self.RTScope) then
 	local oldW, oldH = ScrW(),ScrH()
@@ -2298,15 +2259,6 @@ function SWEP:OnRemove()
 	self:EnableLaser(false)
 	if (CLIENT and self.superlight) then
 			self.superlight:Remove()
-	end
-	if (CLIENT and self.optic) then
-		self.optic:Remove()
-	end
-	if (CLIENT and self.opticmount) then
-		self.opticmount:Remove()
-	end
-	if (CLIENT and self.notopticmount) then
-		self.opticmount:Remove()
 	end
 	if (CLIENT && IsValid(self.MergeParts)) then
 		for k,v in pairs(self.MergeParts) do
