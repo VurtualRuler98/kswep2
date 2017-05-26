@@ -208,6 +208,8 @@ SWEP.ScopeReticle=false
 SWEP.ScopeLuaReticle=false
 SWEP.ScopeLuaReticlePlane=false
 SWEP.ScopeReticleColor=color_black
+SWEP.SwitchedBrightness=false
+SWEP.ScopeReticleIllumination=false
 SWEP.ScopeReticlePix=1024
 SWEP.ScopeReticlePixMil=20
 SWEP.ScopeReticleOverride=false
@@ -780,6 +782,7 @@ function SWEP:InsOptic(name)
 	self.ScopeReticlePix=scopedata.retpix
 	self.ScopeReticlePixMil=scopedata.retpixmil
 	self.ScopeReticleColor=scopedata.retcolor
+	self.ScopeReticleIllumination=scopedata.retillum
 	self.ScopeReticleZoom=scopedata.retzoom
 	self.ScopeReticleZoomMax=scopedata.retzoommax
 	self.ScopeReticleZoomMin=scopedata.retzoommin
@@ -922,6 +925,13 @@ net.Receive("kswep_sethands",function()
 	self.RefreshMerge=true
 end)
 function SWEP:Reload()
+	if (CLIENT and not self.SwitchedBrightness and self:GetNWBool("Sight") and self.Owner:KeyDown(IN_WALK) and self.ScopeReticleIllumination) then
+		self.SwitchedBrightness=true
+		local color=self.ScopeReticleColor
+		self.ScopeReticleColor=self.ScopeReticleIllumination
+		self.ScopeReticleIllumination=color
+		return
+	end
 	if (self:GetNWBool("Sight")) then return end
 	if (self.ChainReload and not self:GetNWBool("CurrentlyReloading")) then
 		local anim=self.Anims.MidReloadAnim
@@ -1889,6 +1899,9 @@ hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think2()
 end
 function SWEP:Think()
+	if (CLIENT and self.SwitchedBrightness and not self.Owner:KeyDown(IN_RELOAD)) then
+		self.SwitchedBrightness=false
+	end
 	if (CLIENT and LocalPlayer()==self.Owner and self.RefreshMerge) then
 		self:InitMergeParts()
 	end
