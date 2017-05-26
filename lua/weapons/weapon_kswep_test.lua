@@ -61,6 +61,7 @@ SWEP.ViewModelFlip = false
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
+SWEP.ScopeMat="models/weapons/optics/lense_rt"
 SWEP.RecoilMassModifier=0.15
 SWEP.HandlingModifier=200
 SWEP.InsAnims=true
@@ -87,6 +88,8 @@ SWEP.AimNoModel=true
 SWEP.AimLuaReticle="nightforce_milr"
 SWEP.AimLuaReticleColor=Color(255,0,0,255)
 SWEP.ScopeZoom=10
+SWEP.RTScope=true
+SWEP.ScopeFOV=3.6
 SWEP.MergeAttachments = {
 	--foregrip = "models/weapons/upgrades/a_standard_akm.mdl"
  }

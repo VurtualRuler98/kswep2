@@ -308,11 +308,14 @@ function SWEP:Initialize()
 	self.Primary.ClipSize = self.MagSize
 
 	self.LastBurst=self.Burst
-	if (CLIENT and self.Owner==LocalPlayer() and self.RTScope) then
+	if (CLIENT and self.Owner==LocalPlayer()) then
+		if (self.ScopeReticle) then 
+			self.ScopeReticleMaterial=Material(self.ScopeReticle)
+		end
 		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
-		local mat
-		mat = Material(self.ScopeMat)
-		mat:SetTexture("$basetexture",self.RenderTarget)
+		
+		self.ScopeRTMaterial=Material("kswep/scope.png","noclamp smooth")
+		self.ScopeRTMaterial:SetTexture("$basetexture",self.RenderTarget)
 	end
 	if (self:GetNWBool("Chambered")==false and self:Clip1()>0 and self.OpenBolt==false) then
 		self:SetNWBool("Chambered",true)
@@ -351,7 +354,9 @@ function SWEP:InitMergeParts()
 			self.MergeParts[k]:SetNoDraw(true)
 		end
 	end
-	self.MergeAddons.AT_HANDS=kswep_hands[LocalPlayer():GetNWString("KswepInsHands")].model
+	if (self.UseInsHands) then
+		self.MergeAddons.AT_HANDS=kswep_hands[LocalPlayer():GetNWString("KswepInsHands")].model
+	end
 	if (self.CurrentSight~=nil) then
 		self.MergeAddons.AT_OPTIC=self.CurrentSight
 	end
@@ -1127,6 +1132,7 @@ function SWEP:ReloadTube()
 end
 
 function SWEP:DrawHUD()
+	self:DrawRTScope()
 	if (self.ShowViewModel>CurTime()) then
 		self.Owner:GetViewModel():SetNoDraw(true)
 	else
@@ -1201,7 +1207,7 @@ function SWEP:DrawHUD()
 			--local scale=(retpix/pixmil)*oldW/(retmag*18)
 			local scale=retpix*(self.ScopeRes/(self.ScopeFOV*18))/pixmil
 			surface.SetDrawColor(self.ScopeReticleColor)
-			surface.SetMaterial(Material(self.ScopeReticle,"noclamp smooth"))
+			surface.SetMaterial(self.ScopeReticleMaterial)
 			scale=scale/aspectratio
 			local scalemod=oldH/oldW
 			surface.DrawTexturedRectUV((oldW-scale)/2,(oldH-scale*scalemod)/2,scale,scale*scalemod,0,0,1,1)
@@ -1214,21 +1220,39 @@ function SWEP:DrawHUD()
 		local scale=1024/(fov*3.6)
 		self:DrawLuaReticle(self.ScopeLuaReticle,fov,self.ScopeReticleColor,oldW,oldH,scale,oldH/oldW)
 	end
+		if (self.AimLuaReticle~=nil) then
+			if (self:GetNWBool("Sight")) then
+				local fov=self.Owner:GetFOV()
+				if (self.AimLuaReticlePlane~=nil) then
+					fov=self.AimLuaReticlePlane
+				end
+				local col=color_black
+				if (self.LuaReticleColor~=nil) then
+					col=self.LuaReticleColor
+				end
+				local scale=ScrW()/(fov*18)
+				self:DrawLuaReticle(self.AimLuaReticle,fov,col,ScrW(),ScrH(),scale,1)
+			end
+		end
 		render.SetViewPort(0,0,oldW,oldH)
 		render.PopRenderTarget()
 	end
 	if (self.AimLuaReticle~=nil) then
 		if (self:GetNWBool("Sight")) then
-			local fov=self.Owner:GetFOV()
-			if (self.AimLuaReticlePlane~=nil) then
-				fov=self.AimLuaReticlePlane
+			surface.SetMaterial(self.ScopeRTMaterial)
+			local circle={}
+			local x=0.5*ScrW()
+			local y=0.5*ScrH()
+			local radius=ScrW()/5
+			surface.SetDrawColor(color_white)
+			table.insert(circle,{x=x,y=y,u=0.5,v=0.5})
+			for i=0,32 do
+				local a=math.rad((i/32)*-360)
+				table.insert(circle,{x=x+math.sin(a)*radius,y=y+math.cos(a)*radius,u=0.5+math.sin(a)*0.5,v=0.5+math.cos(a)*0.5})
 			end
-			local col=color_black
-			if (self.AimLuaReticleColor~=nil) then
-				col=self.AimLuaReticleColor
-			end
-			local scale=ScrW()/(fov*18)
-			self:DrawLuaReticle(self.AimLuaReticle,fov,col,ScrW(),ScrH(),scale,1)
+			local a=math.rad(0)
+			table.insert(circle,{x=x+math.sin(a)*radius,y=y+math.cos(a)*radius})
+			surface.DrawPoly(circle)
 		end
 	end
 end 
@@ -2158,6 +2182,20 @@ function SWEP:PostDrawViewModel()
 			self.RefreshMerge=true
 		end
 	end
+	if (self.Collimator and self:GetNWBool("Sight")) then
+		local pos=self.Owner:GetShootPos()+(self.Owner:GetAimVector()*4)
+		local glare=self.CollimatorGlare*64
+		local shake=self.AimShake+Angle(self:GetNWFloat("CurRecoil")*-0.2,0,0)
+		if (LocalPlayer():HasWeapon("kswep_nvg") and LocalPlayer():GetWeapon("kswep_nvg"):GetNWBool("Active")) then
+			render.SetMaterial(Material("sprites/light_glow02_add"))
+			render.DrawSprite(pos,self.CollimatorSize*4,self.CollimatorSize*4,Color(glare,glare,glare))
+		end
+		local mat=Material(self.CollimatorTex)
+		render.SetMaterial(mat)
+		render.DrawSprite(pos-Vector(shake:Right().x,shake:Right().y+1,shake:Right().z),self.CollimatorSize,self.CollimatorSize,Color(255,255,255,255))
+	end
+end
+function SWEP:DrawRTScope()
 	if (self.RTScope) then
 	local oldW, oldH = ScrW(),ScrH()
 	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
@@ -2245,18 +2283,6 @@ function SWEP:PostDrawViewModel()
 	end
 	render.PopRenderTarget()
 	render.SetViewPort(0,0,oldW,oldH)
-	end
-	if (self.Collimator and self:GetNWBool("Sight")) then
-		local pos=self.Owner:GetShootPos()+(self.Owner:GetAimVector()*4)
-		local glare=self.CollimatorGlare*64
-		local shake=self.AimShake+Angle(self:GetNWFloat("CurRecoil")*-0.2,0,0)
-		if (LocalPlayer():HasWeapon("kswep_nvg") and LocalPlayer():GetWeapon("kswep_nvg"):GetNWBool("Active")) then
-			render.SetMaterial(Material("sprites/light_glow02_add"))
-			render.DrawSprite(pos,self.CollimatorSize*4,self.CollimatorSize*4,Color(glare,glare,glare))
-		end
-		local mat=Material(self.CollimatorTex)
-		render.SetMaterial(mat)
-		render.DrawSprite(pos-Vector(shake:Right().x,shake:Right().y+1,shake:Right().z),self.CollimatorSize,self.CollimatorSize,Color(255,255,255,255))
 	end
 end
 function SWEP:AttachModel(model)
