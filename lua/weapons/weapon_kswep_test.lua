@@ -91,6 +91,8 @@ SWEP.ScopeFOV=1.394
 SWEP.ScopeFOVMin=1.394
 SWEP.ScopeFOVMax=6.875
 SWEP.ScopeFOVSteps=12
+SWEP.MinSensitivity=3
+SWEP.MaxSensitivity=15
 SWEP.MergeAttachments = {
 	--foregrip = "models/weapons/upgrades/a_standard_akm.mdl"
  }
