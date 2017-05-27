@@ -36,11 +36,11 @@ SWEP.Primary.Spread = 0.004
 SWEP.Spawnable = true
 SWEP.DrawOnce=false
 SWEP.DefaultZerodata= {
-	mils=false,
+	mils=10,
 	bc=-1,
-	min=100,
-	max=100,
-	step=0,
+	min=0,
+	max=150,
+	step=1,
 	default=100,
 	battlesight=false
 }
@@ -61,7 +61,7 @@ SWEP.ViewModelFlip = false
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
-SWEP.ScopeMat="kswep/scope_base.png"
+SWEP.ScopeMat="kswep/kswep_scope"
 SWEP.RecoilMassModifier=0.15
 SWEP.HandlingModifier=200
 SWEP.InsAnims=true
@@ -85,14 +85,12 @@ SWEP.IronSightsPos = Vector()
 SWEP.IronSightsAng = Vector()
 SWEP.InsNoIronAnim=false
 SWEP.AimNoModel=true
-SWEP.AimLuaReticle="nightforce_milr"
-SWEP.AimLuaReticleColor=Color(255,0,0,255)
-SWEP.ScopeZoom=10
+SWEP.AimLuaReticle="steiner_scr"
 SWEP.RTScope=true
-SWEP.ScopeFOV=9
-SWEP.ScopeFOVMin=1
-SWEP.ScopeFOVMax=9
-SWEP.ScopeFOVSteps=8
+SWEP.ScopeFOV=1.394
+SWEP.ScopeFOVMin=1.394
+SWEP.ScopeFOVMax=6.875
+SWEP.ScopeFOVSteps=12
 SWEP.MergeAttachments = {
 	--foregrip = "models/weapons/upgrades/a_standard_akm.mdl"
  }
@@ -103,6 +101,9 @@ SWEP.InsAttachments=false
 SWEP.Anims.InitialDrawAnim=ACT_VM_READY
 SWEP.CanFlashlight=false
 function SWEP:ReloadAct(force)
+end
+function SWEP:Initialize2()
+	self.ScopeReticleIllumination=Color(255,0,0,255)
 end
 function SWEP:PrimaryFire()
 	self:FiremodeFire()

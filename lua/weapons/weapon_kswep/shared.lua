@@ -152,7 +152,7 @@ end
 end
 SWEP.SuperScope=false
 SWEP.NPCAttackAnimWait=1
-SWEP.ScopeMat = nil
+SWEP.ScopeMat = "kswep/scope.png"
 SWEP.MuzzleVelMod = 1
 SWEP.MuzzleVelModSup = 1
 SWEP.Bullets={}
@@ -228,7 +228,10 @@ SWEP.RunTimer=0
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
+function SWEP:Initialize2()
+end
 function SWEP:Initialize()
+	self:Initialize2()
         self:SetNWBool("Raised",true)
 	self:SetNWBool("Sight",false)
 	self:SetNWBool("FiringPin",true)
@@ -1236,8 +1239,6 @@ function SWEP:DrawHUD()
 			local y=0.5*ScrH()
 			local radius=ScrW()/5
 			draw.NoTexture()
-			surface.SetDrawColor(color_black)
-			self:DrawViewScope(x,y,radius)
 			surface.SetMaterial(self.ScopeRTMaterial)
 			surface.SetDrawColor(color_white)
 			self:DrawViewScope(x,y,radius)
@@ -2212,7 +2213,7 @@ function SWEP:DrawRTScope()
 	scopeview.angles=EyeAngles()+self.AimShake*0.2
 	scopeview.drawviewmodel = false
 	scopeview.drawhud = false
-	scopeview.dopostprocess=false
+	scopeview.dopostprocess=true
 	scopeview.fov = self.ScopeFOV
 	if (self.SuperScope) then
 		render.SetLightingMode(1)
