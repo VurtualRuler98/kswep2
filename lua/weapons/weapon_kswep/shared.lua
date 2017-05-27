@@ -152,7 +152,7 @@ end
 end
 SWEP.SuperScope=false
 SWEP.NPCAttackAnimWait=1
-SWEP.ScopeMat = "kswep/scope.png"
+SWEP.ScopeMat = "kswep/kswep_scope"
 SWEP.MuzzleVelMod = 1
 SWEP.MuzzleVelModSup = 1
 SWEP.Bullets={}
@@ -209,6 +209,7 @@ SWEP.ScopeLuaReticle=false
 SWEP.ScopeLuaReticlePlane=false
 SWEP.ScopeReticleColor=color_black
 SWEP.SwitchedBrightness=false
+SWEP.AimLuaReticle=false
 SWEP.ScopeReticleIllumination=false
 SWEP.ScopeReticlePix=1024
 SWEP.ScopeReticlePixMil=20
@@ -1135,10 +1136,12 @@ end
 
 function SWEP:DrawHUD()
 	self:DrawRTScope()
-	if (self.ShowViewModel>CurTime()) then
-		self.Owner:GetViewModel():SetNoDraw(true)
-	else
-		self.Owner:GetViewModel():SetNoDraw(false)
+	if (IsValid(self.Owner:GetViewModel())) then
+		if (self.ShowViewModel>CurTime())then
+			self.Owner:GetViewModel():SetNoDraw(true)
+		else
+			self.Owner:GetViewModel():SetNoDraw(false)
+		end
 	end
 	local ammo = "none"
 	if (self.Ammo) then ammo=self.Ammo.printname end
@@ -1233,13 +1236,13 @@ function SWEP:DrawHUD()
 		render.SetViewPort(0,0,oldW,oldH)
 		render.PopRenderTarget()
 	end
-	if (self.AimLuaReticle~=nil) then
+	if (self.AimLuaReticle~=false) then
 		if (self:GetNWBool("Sight")) then
 			local x=0.5*ScrW()
 			local y=0.5*ScrH()
-			local radius=ScrW()/5
+			local radius=16*ScrH()/self.IronZoom
 			draw.NoTexture()
-			surface.SetMaterial(self.ScopeRTMaterial)
+			surface.SetTexture(surface.GetTextureID(self.ScopeMat))
 			surface.SetDrawColor(color_white)
 			self:DrawViewScope(x,y,radius)
 		end
@@ -1929,7 +1932,7 @@ function SWEP:Think()
 	if (CLIENT and LocalPlayer()==self.Owner and self.RefreshMerge) then
 		self:InitMergeParts()
 	end
-	if (self.AimNoModel) then
+	if (self.AimNoModel and SERVER) then
 		self.Owner:DrawViewModel(not self:GetNWBool("Sight"))
 	end
 	if (self:IsRunning() and self.RunTimer==0) then
@@ -1970,16 +1973,18 @@ function SWEP:Think()
 			self.superlight:Remove()
 		end
 		local vm=self.Owner:GetViewModel()
-		local att=vm:GetAttachment(vm:LookupAttachment("laser"))
-			if (self:GetNWBool("Sight") and self.HasLaser) then
-				att.Pos=self.Owner:GetShootPos()+self.Owner:GetAimVector()*(self.Length+4)
-				att.Ang=self.Owner:GetAimVector():Angle()
+		if (IsValid(vm)) then
+			local att=vm:GetAttachment(vm:LookupAttachment("laser"))
+				if (self:GetNWBool("Sight") and self.HasLaser) then
+					att.Pos=self.Owner:GetShootPos()+self.Owner:GetAimVector()*(self.Length+4)
+					att.Ang=self.Owner:GetAimVector():Angle()
+				end
+			if (self.Flashlight and att) then
+				KswepDrawLight(self,att)
 			end
-		if (self.Flashlight and att) then
-			KswepDrawLight(self,att)
-		end
-		if (self.Laser and att) then
-			KswepDrawLaser(self,att)
+			if (self.Laser and att) then
+				KswepDrawLaser(self,att)
+			end
 		end
 	end
 	if (not self.Owner:OnGround()) then
@@ -2226,7 +2231,9 @@ function SWEP:DrawRTScope()
 		end
 		render.SetLightingMode(0)
 	end
+	render.OverrideAlphaWriteEnable(true,true)
 	render.RenderView(scopeview)
+	render.OverrideAlphaWriteEnable(false)
 	if (self.SuperScope) then
 		--DON'T LET ME COLOMOD PROPERLY WILL YOU
 		local aperture=0
