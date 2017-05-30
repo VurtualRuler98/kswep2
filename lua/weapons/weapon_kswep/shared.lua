@@ -218,6 +218,8 @@ SWEP.ScopeReticleZoom=0
 SWEP.ScopeReticleZoomMax=0
 SWEP.ScopeReticleZoomMin=0
 SWEP.Scope2DBorderRatio=1
+SWEP.Scope2DWheelElevation=false
+SWEP.Scope2DWheelWindage=false
 SWEP.ReloadFullClipazineOnly=false
 SWEP.BaseRecoilPain=0 -- was 0.01
 SWEP.Breathing=false
@@ -1161,25 +1163,7 @@ function SWEP:DrawHUD()
 	if (self:GetNWBool("AltIrons") and self.ZeroTableAlt) then
 		zero=self.ZeroTableAlt[zero]
 	end
-	local zerostring=zero.."m"
-	if (zero==-1337) then
-		zerostring="<RANGER>"
-	end
-	if (zdata.mils) then
-		zerostring=zero/zdata.mils.." mils"
-	end
-	if (zdata.moa) then
-		zerostring=zero/zdata.moa.." MOA"
-	end
-	if (not self:GetNWBool("AltIrons") and self.ZeroTableStrings) then
-		zerostring=self.ZeroTableStrings[zero]
-	end
-	if (self:GetNWBool("AltIrons") and self.ZeroTableStringsAlt) then
-		zerostring=self.ZeroTableStringsAlt[zero]
-	end
-	if (self.SingleReload and not self.OpenBolt) then
-		ammo =self.ChamberAmmo.printname
-	end
+	local zerostring=self:GetZeroString(true)
 	draw.DrawText(self:FiremodeName() .. " ".. zerostring .." " .. ammo,"HudHintTextLarge",ScrW()/1.15,ScrH()/1.11,Color(255, 255, 0,255))
 	if (self.ReloadMessage > CurTime()) then
 		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
@@ -1253,12 +1237,55 @@ function SWEP:DrawHUD()
 			local a=math.rad(0)
 			table.insert(circle,{x=x+math.sin(a)*radius,y=y+math.cos(a)*radius})
 			surface.DrawPoly(circle)
-			local radius=16*ScrH()/self.IronZoom
-			surface.SetTexture(surface.GetTextureID(self.ScopeMat))
-			surface.SetDrawColor(color_white)
-			self:DrawViewScope(x,y,radius)
-		end
+			if (self.Scope2DWheelElevation) then
+				local x1=x*(1-(0.05*(90/self.IronZoom)))
+				local x2=x*(1+(0.05*(90/self.IronZoom)))
+				local y1=y-radius-(y*(0.08*(90/self.IronZoom)))
+				local y2=y
+				local box={{x=x1,y=y1},{x=x2,y=y1},{x=x2,y=y2},{x=x1,y=y2}}
+				surface.DrawPoly(box)
+				surface.SetFont("DermaDefault")
+				surface.SetTextColor(255,255,255,255)
+				surface.SetTextPos(x,y1*1.02)
+				surface.DrawText(self:GetZeroString(false))
+						end
+						local radius=16*ScrH()/self.IronZoom
+						surface.SetTexture(surface.GetTextureID(self.ScopeMat))
+						surface.SetDrawColor(color_white)
+						self:DrawViewScope(x,y,radius)
+					end
+				end
+end
+function SWEP:GetZeroString(dosuffix)
+	local zero=self.Zero
+	local zdata=self.Zerodata
+	if (self:GetNWBool("AltIrons")) then
+		zero=self.ZeroAlt
+		zdata=self.ZerodataAlt
 	end
+	if (zero==0 and not zdata.mils and not zdata.moa) then
+		zero=zdata.battlesight
+	end
+	if (not self:GetNWBool("AltIrons") and self.ZeroTable) then 
+		zero=self.ZeroTable[zero]
+	end
+	if (self:GetNWBool("AltIrons") and self.ZeroTableAlt) then
+		zero=self.ZeroTableAlt[zero]
+	end
+	local zerostring=zero
+	if (dosuffix) then zerostring=zerostring.."m" end
+	if (zero==-1337) then
+		zerostring="<RANGER>"
+	end
+	if (zdata.mils) then
+		zerostring=zero/zdata.mils
+		if (dosuffix) then zerostring=zerostring.." mils" end
+	end
+	if (zdata.moa) then
+		zerostring=zero/zdata.moa
+		if (dosuffix) then zerostring=zerostring.." MOA" end
+	end
+	return zerostring
 end
 function SWEP:DrawViewScope(x,y,radius)
 	local circle={}

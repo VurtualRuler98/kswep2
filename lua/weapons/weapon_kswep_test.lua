@@ -94,6 +94,7 @@ SWEP.ScopeFOVSteps=12
 SWEP.MinSensitivity=3
 SWEP.MaxSensitivity=15
 SWEP.Scope2DBorderRatio=1.05
+SWEP.Scope2DWheelElevation=true
 SWEP.MergeAttachments = {
 	--foregrip = "models/weapons/upgrades/a_standard_akm.mdl"
  }
