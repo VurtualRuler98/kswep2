@@ -217,6 +217,7 @@ SWEP.ScopeReticleOverride=false
 SWEP.ScopeReticleZoom=0
 SWEP.ScopeReticleZoomMax=0
 SWEP.ScopeReticleZoomMin=0
+SWEP.Scope2DBorderRatio=1
 SWEP.ReloadFullClipazineOnly=false
 SWEP.BaseRecoilPain=0 -- was 0.01
 SWEP.Breathing=false
@@ -1240,8 +1241,19 @@ function SWEP:DrawHUD()
 		if (self:GetNWBool("Sight")) then
 			local x=0.5*ScrW()
 			local y=0.5*ScrH()
-			local radius=16*ScrH()/self.IronZoom
+			local radius=16*ScrH()/self.IronZoom*self.Scope2DBorderRatio
 			draw.NoTexture()
+			surface.SetDrawColor(color_black)
+			local circle={}
+			table.insert(circle,{x=x,y=y,u=0.5,v=0.5})
+			for i=0,128 do
+				local a=math.rad((i/128)*-360)
+				table.insert(circle,{x=x+math.sin(a)*radius,y=y+math.cos(a)*radius,u=0.5+math.sin(a)*0.5,v=0.5+math.cos(a)*0.5})
+			end
+			local a=math.rad(0)
+			table.insert(circle,{x=x+math.sin(a)*radius,y=y+math.cos(a)*radius})
+			surface.DrawPoly(circle)
+			local radius=16*ScrH()/self.IronZoom
 			surface.SetTexture(surface.GetTextureID(self.ScopeMat))
 			surface.SetDrawColor(color_white)
 			self:DrawViewScope(x,y,radius)
