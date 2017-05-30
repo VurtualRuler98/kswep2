@@ -64,7 +64,7 @@ SWEP.ReloadAnimTime=0
 SWEP.ScopeMat="kswep/kswep_scope"
 SWEP.RecoilMassModifier=0.15
 SWEP.HandlingModifier=200
-SWEP.InsAnims=true
+SWEP.InsAnims=false
 SWEP.Auto=false
 SWEP.Firemode=true
 SWEP.HoldType="ar2"
@@ -93,6 +93,7 @@ SWEP.ScopeFOVMax=6.875
 SWEP.ScopeFOVSteps=12
 SWEP.MinSensitivity=3
 SWEP.MaxSensitivity=15
+SWEP.Scope2DBorderRatio=1.05
 SWEP.MergeAttachments = {
 	--foregrip = "models/weapons/upgrades/a_standard_akm.mdl"
  }
@@ -102,6 +103,7 @@ SWEP.NoDefaultSightModel=true
 SWEP.InsAttachments=false
 SWEP.Anims.InitialDrawAnim=ACT_VM_READY
 SWEP.CanFlashlight=false
+SWEP.NoLowerAnim=true
 function SWEP:ReloadAct(force)
 end
 function SWEP:Initialize2()
@@ -110,6 +112,4 @@ end
 function SWEP:PrimaryFire()
 	self:FiremodeFire()
 	self:SetClip1(10)
-end
-function SWEP:DiscoverModelAnims()
 end
