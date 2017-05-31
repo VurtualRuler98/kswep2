@@ -1263,7 +1263,6 @@ function SWEP:DrawHUD()
 			local radius=ScrH()*self.Scope2DBorderRatio
 			local scale=self.AimLuaMagnification/self.Owner:GetFOV()
 			radius=radius*scale
-			if (radius*2>ScrH()*self.Scope2DBorderRatio) then radius=(ScrH()*self.Scope2DBorderRatio)/2-1 end
 			draw.NoTexture()
 			surface.SetDrawColor(color_black)
 			local circle={}
@@ -1292,7 +1291,6 @@ function SWEP:DrawHUD()
 			if (self.ScopeFOVMin) then fov=self.ScopeFOVMin end
 			local scale=self.AimLuaMagnification/self.Owner:GetFOV()
 			radius=radius*scale
-			if (radius*2>ScrH()) then radius=ScrH()/2-1 end
 			surface.SetTexture(surface.GetTextureID(self.ScopeMat))
 			surface.SetDrawColor(color_white)
 			self:DrawViewScope(x,y,radius)
@@ -1333,12 +1331,34 @@ end
 function SWEP:DrawViewScope(x,y,radius)
 	local circle={}
 	table.insert(circle,{x=x,y=y,u=0.5,v=0.5})
+	local ypos=y+radius
+	local vpos=0.5
+	if (ypos>ScrH()-1) then
+		local ypos2=ScrH()-1
+		vpos=0.5*((ypos2/2)/radius)
+		print(ypos2)
+		ypos=ypos2
+	end
+	vpos=vpos+0.5
+	table.insert(circle,{x=x,y=ypos,u=0.5,v=vpos})
 	for i=0,128 do
 		local a=math.rad((i/128)*-360)
-		table.insert(circle,{x=x+math.sin(a)*radius,y=y+math.cos(a)*radius,u=0.5+math.sin(a)*0.5,v=0.5+math.cos(a)*0.5})
+		local xpos=x+math.sin(a)*radius
+		local ypos=y+math.cos(a)*radius
+		if (xpos>0 and xpos<ScrW()-1 and ypos>0 and ypos<ScrH()-1) then
+			table.insert(circle,{x=xpos,y=ypos,u=0.5+math.sin(a)*0.5,v=0.5+math.cos(a)*0.5})
+		end
 	end
-	local a=math.rad(0)
-	table.insert(circle,{x=x+math.sin(a)*radius,y=y+math.cos(a)*radius})
+	local ypos=y+radius
+	local vpos=0.5
+	if (ypos>ScrH()-1) then
+		local ypos2=ScrH()-1
+		vpos=0.5*((ypos2/2)/radius)
+		print(ypos2)
+		ypos=ypos2
+	end
+	vpos=vpos+0.5
+	table.insert(circle,{x=x,y=ypos,u=0.5,v=vpos})
 	surface.DrawPoly(circle)
 end
 function SWEP:DrawLuaReticle(reticle,retcol,width,height,scale,scalemod)
