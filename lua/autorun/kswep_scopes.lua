@@ -97,5 +97,7 @@ tbl.fovsteps=5
 tbl.luareticle="schmidt_p3"
 tbl.retillum=Color(255,0,0,255)
 tbl.sensitivity=12
+tbl.scope_border=1.07
+tbl.scope_ewheel=true
 tbl.minsensitivity=3
 AddKswep2DScope(tbl)
