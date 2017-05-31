@@ -1260,9 +1260,10 @@ function SWEP:DrawHUD()
 		if (self:GetNWBool("Sight")) then
 			local x=0.5*ScrW()
 			local y=0.5*ScrH()
-			local radius=32*ScrH()/self.IronZoom*self.Scope2DBorderRatio
+			local radius=ScrH()*self.Scope2DBorderRatio
 			local scale=self.AimLuaMagnification/self.Owner:GetFOV()
 			radius=radius*scale
+			if (radius*2>ScrH()*self.Scope2DBorderRatio) then radius=(ScrH()*self.Scope2DBorderRatio)/2-1 end
 			draw.NoTexture()
 			surface.SetDrawColor(color_black)
 			local circle={}
@@ -1286,11 +1287,12 @@ function SWEP:DrawHUD()
 				surface.SetTextPos(x,y1*1.02)
 				surface.DrawText(self:GetZeroString(false))
 			end
-			local radius=32*ScrH()/self.IronZoom
+			local radius=ScrH()
 			local fov=self.ScopeFOV
 			if (self.ScopeFOVMin) then fov=self.ScopeFOVMin end
 			local scale=self.AimLuaMagnification/self.Owner:GetFOV()
 			radius=radius*scale
+			if (radius*2>ScrH()) then radius=ScrH()/2-1 end
 			surface.SetTexture(surface.GetTextureID(self.ScopeMat))
 			surface.SetDrawColor(color_white)
 			self:DrawViewScope(x,y,radius)
