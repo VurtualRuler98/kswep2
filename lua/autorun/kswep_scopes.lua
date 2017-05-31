@@ -44,6 +44,7 @@ def.retcolor=color_black
 def.luareticle="duplex"
 def.luaretsfp=false
 def.retillum=nil
+def.aimmag=40
 --def.repix=512
 --def.retzoom=0
 --def.retzoommax=0
@@ -71,6 +72,7 @@ tbl.scope_border=1.1
 tbl.scope_ewheel=true
 tbl.luareticle="steiner_scr"
 tbl.retillum=Color(255,0,0,255)
+tbl.aimmag=15*1.394
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Trijicon ACOG 1.5x16S Compact"
@@ -78,6 +80,7 @@ tbl.fov=7.4
 tbl.luareticle="trijicon_mini"
 tbl.retcolor=Color(255,255,0,255)
 tbl.sensitivity=1.5
+tbl.aimmag=1.5*7.4
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Schmidt & Bender 3-12x50 PM II"
@@ -100,4 +103,5 @@ tbl.sensitivity=12
 tbl.scope_border=1.07
 tbl.scope_ewheel=true
 tbl.minsensitivity=3
+tbl.aimmag=1.94*12
 AddKswep2DScope(tbl)

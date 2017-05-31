@@ -210,6 +210,7 @@ SWEP.ScopeLuaReticlePlane=false
 SWEP.ScopeReticleColor=color_black
 SWEP.SwitchedBrightness=false
 SWEP.AimLuaReticleMode=false
+SWEP.AimLuaMagnification=1 --scope FOV times magnfiication
 SWEP.ScopeReticleIllumination=false
 SWEP.ScopeReticlePix=1024
 SWEP.ScopeReticlePixMil=20
@@ -787,6 +788,7 @@ function SWEP:SetOptic2D(name)
 		net.SendToServer()
 	end
 	self.ScopeName=scopedata.name
+	self.AimLuaMagnification=scopedata.aimmag
 	self.ScopeLuaReticle=scopedata.luareticle
 	self.ScopeLuaReticlePlane=scopedata.luaretsfp
 	self.ScopeReticleColor=scopedata.retcolor
@@ -1258,7 +1260,9 @@ function SWEP:DrawHUD()
 		if (self:GetNWBool("Sight")) then
 			local x=0.5*ScrW()
 			local y=0.5*ScrH()
-			local radius=16*ScrH()/self.IronZoom*self.Scope2DBorderRatio
+			local radius=32*ScrH()/self.IronZoom*self.Scope2DBorderRatio
+			local scale=self.AimLuaMagnification/self.Owner:GetFOV()
+			radius=radius*scale
 			draw.NoTexture()
 			surface.SetDrawColor(color_black)
 			local circle={}
@@ -1281,13 +1285,17 @@ function SWEP:DrawHUD()
 				surface.SetTextColor(255,255,255,255)
 				surface.SetTextPos(x,y1*1.02)
 				surface.DrawText(self:GetZeroString(false))
-						end
-						local radius=16*ScrH()/self.IronZoom
-						surface.SetTexture(surface.GetTextureID(self.ScopeMat))
-						surface.SetDrawColor(color_white)
-						self:DrawViewScope(x,y,radius)
-					end
-				end
+			end
+			local radius=32*ScrH()/self.IronZoom
+			local fov=self.ScopeFOV
+			if (self.ScopeFOVMin) then fov=self.ScopeFOVMin end
+			local scale=self.AimLuaMagnification/self.Owner:GetFOV()
+			radius=radius*scale
+			surface.SetTexture(surface.GetTextureID(self.ScopeMat))
+			surface.SetDrawColor(color_white)
+			self:DrawViewScope(x,y,radius)
+		end
+	end
 end
 function SWEP:GetZeroString(dosuffix)
 	local zero=self.Zero
