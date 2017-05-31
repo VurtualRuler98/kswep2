@@ -1334,10 +1334,8 @@ function SWEP:DrawViewScope(x,y,radius)
 	local ypos=y+radius
 	local vpos=0.5
 	if (ypos>ScrH()-1) then
-		local ypos2=ScrH()-1
-		vpos=0.5*((ypos2/2)/radius)
-		print(ypos2)
-		ypos=ypos2
+		ypos=ScrH()-1
+		vpos=0.5*((ypos/2)/radius)
 	end
 	vpos=vpos+0.5
 	table.insert(circle,{x=x,y=ypos,u=0.5,v=vpos})
@@ -1352,13 +1350,18 @@ function SWEP:DrawViewScope(x,y,radius)
 	local ypos=y+radius
 	local vpos=0.5
 	if (ypos>ScrH()-1) then
-		local ypos2=ScrH()-1
-		vpos=0.5*((ypos2/2)/radius)
-		print(ypos2)
-		ypos=ypos2
+		ypos=ScrH()-1
+		vpos=0.5*((ypos/2)/radius)
 	end
 	vpos=vpos+0.5
 	table.insert(circle,{x=x,y=ypos,u=0.5,v=vpos})
+	if (radius*2>ScrW()) then --TODO vertical monitor support
+		local sc1x=0.5+(ScrW()/(radius*2))/2
+		local sc2x=1-sc1x
+		local sc1y=0.5+(ScrH()/(radius*2))/2
+		local sc2y=1-sc1y
+		circle={{x=0,y=0,u=sc2x,v=sc2y},{x=ScrW(),y=0,u=sc1x,v=sc2y},{x=ScrW(),y=ScrH(),u=sc1x,v=sc1y},{x=0,y=ScrH(),u=sc2x,v=sc1y}}
+	end
 	surface.DrawPoly(circle)
 end
 function SWEP:DrawLuaReticle(reticle,retcol,width,height,scale,scalemod)
