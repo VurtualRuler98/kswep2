@@ -131,7 +131,7 @@ function ENT:ShowEquipmentAddonMenu()
 		end
 end
 	
-function ENT:ClUseBox(wep,mags,canmag,canoptic)
+function ENT:ClUseBox(wep,mags,canmag,canoptic,can2doptic)
 	local menuwidth=200
 	local menuheight=400
 	local ammoframe = vgui.Create("DFrame")
@@ -161,6 +161,18 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic)
 			dbutton.DoClick = function()
 				if (LocalPlayer():GetActiveWeapon()==wep) then
 					self:ClUseOpticBox(wep)
+				end
+				ammoframe:Close()
+			end
+	elseif (can2doptic and self:GetNWBool("GiveOptics")) then
+		local dbutton=vgui.Create("DButton")
+			dbutton:SetParent(ammoframe)
+			dbutton:SetPos(20,80)
+			dbutton:SetSize(180,40)
+			dbutton:SetText("Optics")
+			dbutton.DoClick = function()
+				if (LocalPlayer():GetActiveWeapon()==wep) then
+					self:ClUse2DOpticBox(wep)
 				end
 				ammoframe:Close()
 			end
@@ -325,6 +337,27 @@ function ENT:ClUseOpticBox(wep)
 		end
 		function scrollmenu:OnClickLine(line,selected)
 			wep:InsOptic(line:GetValue(1))
+			ammoframe:Close()
+		end
+
+end 
+function ENT:ClUse2DOpticBox(wep)
+	local menuwidth=200
+	local menuheight=200
+	local ammoframe = vgui.Create("DFrame")
+		ammoframe:SetPos((ScrW()/2)-(menuwidth/2),(ScrH()/2)-(menuheight/2))
+		ammoframe:SetSize(menuwidth,menuheight)
+		ammoframe:SetTitle("Optics")
+		ammoframe:MakePopup()
+	local scrollmenu = vgui.Create("DListView",ammoframe)
+		scrollmenu:SetPos(16,32)
+		scrollmenu:SetSize(menuwidth-32,menuheight-32)
+		scrollmenu:AddColumn("Scopes")
+		for k,v in pairs(kswep_2dscopes) do
+			scrollmenu:AddLine(v.name)
+		end
+		function scrollmenu:OnClickLine(line,selected)
+			wep:SetOptic2D(line:GetValue(1))
 			ammoframe:Close()
 		end
 

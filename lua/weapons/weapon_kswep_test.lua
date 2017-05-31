@@ -85,7 +85,8 @@ SWEP.IronSightsPos = Vector()
 SWEP.IronSightsAng = Vector()
 SWEP.InsNoIronAnim=false
 SWEP.AimNoModel=true
-SWEP.AimLuaReticle="steiner_scr"
+--SWEP.AimLuaReticle="steiner_scr"
+SWEP.AimLuaReticleMode=true
 SWEP.RTScope=true
 SWEP.ScopeFOV=1.394
 SWEP.ScopeFOVMin=1.394
@@ -98,9 +99,6 @@ SWEP.Scope2DWheelElevation=true
 SWEP.MergeAttachments = {
 	--foregrip = "models/weapons/upgrades/a_standard_akm.mdl"
  }
-SWEP.OpticMountModel = nil
-SWEP.DefaultSight=nil
-SWEP.NoDefaultSightModel=true
 SWEP.InsAttachments=false
 SWEP.Anims.InitialDrawAnim=ACT_VM_READY
 SWEP.CanFlashlight=false
@@ -109,6 +107,7 @@ function SWEP:ReloadAct(force)
 end
 function SWEP:Initialize2()
 	self.ScopeReticleIllumination=Color(255,0,0,255)
+	if (CLIENT) then self:SetOptic2D("Default") end
 end
 function SWEP:PrimaryFire()
 	self:FiremodeFire()

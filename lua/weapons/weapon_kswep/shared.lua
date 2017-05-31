@@ -209,7 +209,7 @@ SWEP.ScopeLuaReticle=false
 SWEP.ScopeLuaReticlePlane=false
 SWEP.ScopeReticleColor=color_black
 SWEP.SwitchedBrightness=false
-SWEP.AimLuaReticle=false
+SWEP.AimLuaReticleMode=false
 SWEP.ScopeReticleIllumination=false
 SWEP.ScopeReticlePix=1024
 SWEP.ScopeReticlePixMil=20
@@ -777,6 +777,47 @@ function SWEP:Holster(wep)
 	end
 	
 end
+function SWEP:SetOptic2D(name)
+	local scopedata
+	scopedata=kswep_2dscopes[name]
+	if (CLIENT and self.Owner==LocalPlayer()) then
+		net.Start("kswep_2dscopesetup")
+		net.WriteEntity(self)	
+		net.WriteString(name)
+		net.SendToServer()
+	end
+	self.ScopeName=scopedata.name
+	self.ScopeLuaReticle=scopedata.luareticle
+	self.ScopeLuaReticlePlane=scopedata.luaretsfp
+	self.ScopeReticleColor=scopedata.retcolor
+	self.Scope2DBorderRatio=scopedata.scope_border
+	self.Scope2DWheelElevation=scopedata.scope_ewheel
+	self.ScopeReticleIllumination=scopedata.retillum
+	self.RTRanger=scopedata.rtranger
+	self.RTRangerX=scopedata.rtrangerx
+	self.RTRangerY=scopedata.rtrangery
+	self.ScopeZeroVelocity=scopedata.zerovel
+	self.Zerodata=scopedata.zero
+	self.Zero=self.Zerodata.default
+	self.ZerodataAlt=scopedata.zeroalt
+	self.ZeroAlt=self.ZerodataAlt.default
+	self.ZeroTable=scopedata.ztable
+	self.ZeroTableAlt=scopedata.ztablealt
+	self.ZeroTableStrings=scopedata.ztablestr
+	self.ZeroTableStringsAlt=scopedata.ztablestralt
+	if (self.Zerodata.mils or self.Zerodata.moa) then
+		self.Zero=0
+	end
+	if (self.ZerodataAlt.mils or self.Zerodata.moa) then
+		self.ZeroAlt=0
+	end
+	self.MaxSensitivity=scopedata.sensitivity
+	self.MinSensitivity=scopedata.minsensitivity
+	self.ScopeFOV=scopedata.fov
+	self.ScopeFOVMin=scopedata.fovmin
+	self.ScopeFOVMax=scopedata.fovmax
+	self.ScopeFOVSteps=scopedata.fovsteps
+end
 function SWEP:InsOptic(name)
 	local scopedata
 	scopedata=kswep_optics[name]
@@ -1168,7 +1209,7 @@ function SWEP:DrawHUD()
 	if (self.ReloadMessage > CurTime()) then
 		draw.DrawText(self:MagWeight(self.ReloadWeight,self.MagSize),"HudHintTextLarge",ScrW()/1.11,ScrH()/1.02,Color(255, 255, 0,255))
 	end
-	if ((self.RTRanger or self.ScopeReticle or self.ScopeLuaReticle or self.AimLuaReticle) and self:GetNWBool("Sight")) then
+	if ((self.RTRanger or self.ScopeReticle or self.ScopeLuaReticle) and self:GetNWBool("Sight")) then
 		local oldW,oldH=ScrW(),ScrH()
 		render.PushRenderTarget(self.RenderTarget)
 		render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)
@@ -1210,18 +1251,10 @@ function SWEP:DrawHUD()
 		local scale=1024/(fov*3.6)
 		self:DrawLuaReticle(self.ScopeLuaReticle,self.ScopeReticleColor,oldW,oldH,scale,oldH/oldW)
 	end
-	if (self.AimLuaReticle~=false) then
-		local fov=self.ScopeFOV
-		if (self.AimLuaReticlePlane~=nil) then
-			fov=self.AimLuaReticlePlane
-		end
-		local scale=1024/(fov*3.6)
-		self:DrawLuaReticle(self.AimLuaReticle,self.ScopeReticleColor,oldW,oldH,scale,oldH/oldW)
-	end
 		render.SetViewPort(0,0,oldW,oldH)
 		render.PopRenderTarget()
 	end
-	if (self.AimLuaReticle~=false) then
+	if (self.AimLuaReticleMode~=false) then
 		if (self:GetNWBool("Sight")) then
 			local x=0.5*ScrW()
 			local y=0.5*ScrH()

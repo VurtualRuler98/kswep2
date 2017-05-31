@@ -227,7 +227,26 @@ for i=1,5 do
 	table.insert(tbl,{shape="circle",pos={0,-j},radius=0.05,color=color_black})
 	table.insert(tbl,{shape="circle",pos={0,j},radius=0.05,color=color_black})
 end
-AddKswepReticle(tbl,"steiner_p3")
+AddKswepReticle(tbl,"not_p3")
+local tbl = {
+{shape="rect",start={-200,-0.035},endpos={-1,0.035},color=color_black},
+{shape="rect",start={1,-0.035},endpos={200,0.035},color=color_black},
+{shape="rect",start={-0.035,-200},endpos={0.035,-1},color=color_black},
+{shape="rect",start={-0.035,1},endpos={0.035,200},color=color_black},
+{shape="rect",start={-0.8,-0.035},endpos={0.8,0.035}},
+{shape="rect",start={-0.035,-0.8},endpos={0.035,0.8}},
+{shape="rect",start={-200,-0.25},endpos={-5,0.25},color=color_black},
+{shape="rect",start={5,-0.25},endpos={200,0.25},color=color_black},
+{shape="rect",start={-0.25,5},endpos={0.25,200},color=color_black},
+{shape="rect",start={-0.25,-200},endpos={0.25,-5},color=color_black}
+}
+for i=1,4 do
+	table.insert(tbl,{shape="circle",pos={-i,0},radius=0.1,color=color_black})
+	table.insert(tbl,{shape="circle",pos={i,0},radius=0.1,color=color_black})
+	table.insert(tbl,{shape="circle",pos={0,-i},radius=0.1,color=color_black})
+	table.insert(tbl,{shape="circle",pos={0,i},radius=0.1,color=color_black})
+end
+AddKswepReticle(tbl,"schmidt_p3")
 local tbl = {
 {shape="line",start={-0.5,0},endpos={0.5,0}},
 {shape="line",start={0,-0.5},endpos={0,0.5}},

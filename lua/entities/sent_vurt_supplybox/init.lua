@@ -73,6 +73,10 @@ function ENT:UseBox( activator, caller )
 			if ((wep.DefaultSight or wep.NoDefaultSightModel) and not wep.NoOpticMounting) then
 				canoptic=true
 			end
+			local can2doptic=false
+			if (wep.AimLuaReticleMode) then
+				can2doptic=true
+			end
 			if (canmag or canoptic) then
 				net.Start("kswep_supplybox")
 				net.WriteEntity(self)
@@ -80,6 +84,7 @@ function ENT:UseBox( activator, caller )
 				net.WriteTable(vurtual_ammodata)
 				net.WriteBool(canmag)
 				net.WriteBool(canoptic)
+				net.WriteBool(can2doptic)
 				net.WriteTable(self.GunList)
 				net.Send(activator)
 			end
