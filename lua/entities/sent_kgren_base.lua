@@ -303,21 +303,55 @@ function ENT:DetFrag()
 		Num=self.FragClusterSize
 	}
 	if (SERVER) then
-	timer.Simple(0.1,function()
-		self:Remove()
-		if (self.FragClusters>0) then
-			for i=1,self.FragClusters do
-				self:FireBullets(bullet)
-			end
-		end
-		if (self.SuperFragClusters>0) then
+		if (GetConVar("kswep_phys"):GetBool()) then
+			local fragger=ents.Create("sent_kbgren_shrapnel")
+			fragger:Spawn()
+			fragger:SetPos(self:GetPos())
+			bullet.Num=1
+			local num_bullets=self.FragClusterSize*self.FragClusters
+			self:MakeShrapnel(fragger,bullet,num_bullets)
+			num_bullets=self.FragClusterSize*self.SuperFragClusters
 			bullet.Damage=self.SuperFragDamage
-			bullet.Distance=self.SuperFragRadius
-			for i=1,self.SuperFragClusters do
-				self:FireBullets(bullet)
-			end
+			self:MakeShrapnel(fragger,bullet,num_bullets)
+			fragger:Activate()
+			self:Remove()
+		else
+			timer.Simple(0.1,function()
+				self:Remove()
+				if (self.FragClusters>0) then
+					for i=1,self.FragClusters do
+						self:FireBullets(bullet)
+					end
+				end
+				if (self.SuperFragClusters>0) then
+					bullet.Damage=self.SuperFragDamage
+					bullet.Distance=self.SuperFragRadius
+					for i=1,self.SuperFragClusters do
+						self:FireBullets(bullet)
+					end
+				end
+			end)
 		end
-	end)
+	end
+end
+function ENT:MakeShrapnel(fragger,bullet,num_bullets)
+	for i=1,num_bullets do
+		local tbl=table.Copy(bullet)
+		tbl.Spread = Vector()
+		tbl.Dir=VectorRand()
+		local shot={}
+		shot.ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
+		shot.pos=bullet.Src
+		shot.basevelocity=math.random(800,1500)
+		shot.mass=10 --TODO add shrapnel mass
+		shot.dragvector=tbl.Dir*shot.basevelocity --TODO implement shrapenl velocity
+		shot.bullet=tbl
+		shot.bc=math.Rand(0.1,0.4) --TODO better estimate
+		shot.dmg=bullet.Damage
+		shot.dist = nil
+		shot.crack=-1
+		shot.crackpos=shot.pos
+		table.insert(fragger.Shrapnel,shot)
 	end
 end
 function ENT:Use(activator,caller,usetype,value)
