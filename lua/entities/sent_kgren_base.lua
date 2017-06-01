@@ -22,6 +22,11 @@ ENT.BurnTimer=0
 ENT.BurnEffectDelay=0.05
 ENT.Detonated=false
 ENT.BurnEffectTimer=0
+ENT.PhysFragVelocityMin=3500
+ENT.PhysFragVelocityMax=4200
+ENT.PhysFragMassMin=30 --TODO get better values
+ENT.PhysFragMassMax=120
+ENT.PhysFragCountMultiplier=1
 ENT.IsRemoved=false
 ENT.MolotovFlames=10
 ENT.CSGasTimer=0
@@ -308,9 +313,9 @@ function ENT:DetFrag()
 			fragger:Spawn()
 			fragger:SetPos(self:GetPos())
 			bullet.Num=1
-			local num_bullets=self.FragClusterSize*self.FragClusters
+			local num_bullets=self.FragClusterSize*self.FragClusters*self.PhysFragCountMultiplier
 			self:MakeShrapnel(fragger,bullet,num_bullets)
-			num_bullets=self.FragClusterSize*self.SuperFragClusters
+			num_bullets=self.FragClusterSize*self.SuperFragClusters*self.PhysFragCountMultiplier
 			bullet.Damage=self.SuperFragDamage
 			self:MakeShrapnel(fragger,bullet,num_bullets)
 			fragger:Activate()
@@ -341,12 +346,13 @@ function ENT:MakeShrapnel(fragger,bullet,num_bullets)
 		tbl.Dir=VectorRand()
 		local shot={}
 		shot.ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
+		shot.startticks=shot.ticks
 		shot.pos=bullet.Src
-		shot.basevelocity=math.random(800,1500)
-		shot.mass=10 --TODO add shrapnel mass
-		shot.dragvector=tbl.Dir*shot.basevelocity --TODO implement shrapenl velocity
+		shot.basevelocity=self.PhysFragVelocityMin
+		shot.mass=math.random(self.PhysFragMassMin,self.PhysFragMassMax)
+		shot.dragvector=tbl.Dir*math.random(self.PhysFragVelocityMin,self.PhysFragVelocityMax)
 		shot.bullet=tbl
-		shot.bc=math.Rand(0.1,0.4) --TODO better estimate
+		shot.bc=math.Rand(0.05,0.2) --TODO better estimate
 		shot.dmg=bullet.Damage
 		shot.dist = nil
 		shot.crack=-1
