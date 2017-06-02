@@ -2037,7 +2037,7 @@ function SWEP:Think()
 	if (CLIENT and LocalPlayer()==self.Owner and self.RefreshMerge) then
 		self:InitMergeParts()
 	end
-	if (self.AimNoModel and SERVER) then
+	if (self.AimNoModel and SERVER and self.Owner:IsPlayer()) then
 		self.Owner:DrawViewModel(not self:GetNWBool("Sight"))
 	end
 	if (self:IsRunning() and self.RunTimer==0) then
