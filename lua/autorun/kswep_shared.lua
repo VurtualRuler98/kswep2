@@ -6,8 +6,8 @@ end
 sound.Add({
 	name="kswep.supersonic",
 	volume = 0.8,
-	pitch = {195,205},
-	sound = "npc/sniper/sniper1.wav",
+	pitch = {175,205},
+	sound = "weapons/scout/scout_fire-1.wav",
 	level = 140,
 	channel = CHAN_WEAPON
 })
