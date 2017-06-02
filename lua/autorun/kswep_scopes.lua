@@ -31,7 +31,7 @@ def.zeroalt={
 	min=100,
 	max=100,
 	step=0,
-	default=100,
+	default=-1,
 	battlesight=false
 }
 def.rtranger=false
@@ -104,4 +104,32 @@ tbl.scope_border=1.07
 tbl.scope_ewheel=true
 tbl.minsensitivity=3
 tbl.aimmag=1.94*12
+AddKswep2DScope(tbl)
+local tbl=table.Copy(def)
+tbl.name="Leupold Mark 4 3.5-10x40mm  LR/T M3 TMR"
+tbl.fov=2.12
+tbl.zero={
+	mils=false,
+	moa=1,
+	bc=-1,
+	min=-1,
+	max=40,
+	step=1,
+	default=100,
+	battlesight=false
+}
+tbl.fovmax=5.73
+tbl.fovmin=2.12
+tbl.fovsteps=5
+tbl.luareticle="leupold_tmr"
+tbl.retillum=Color(255,0,0,255)
+tbl.sensitivity=10
+tbl.scope_border=1.07
+tbl.scope_ewheel=true
+tbl.minsensitivity=3.5
+tbl.aimmag=2.12*9.5
+AddKswep2DScope(tbl)
+local tbl=table.Copy(tbl)
+tbl.name="Leupold Mark 4 3.5-10x40mm  LR/T M3 Mil-dot"
+tbl.luareticle="leupold_mil"
 AddKswep2DScope(tbl)
