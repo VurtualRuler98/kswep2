@@ -321,7 +321,7 @@ net.Receive("kswep_opticbox", function()
 	box:ClUseOpticBox(wep)
 end)
 function ENT:ClUseOpticBox(wep)
-	local menuwidth=200
+	local menuwidth=400
 	local menuheight=200
 	local ammoframe = vgui.Create("DFrame")
 		ammoframe:SetPos((ScrW()/2)-(menuwidth/2),(ScrH()/2)-(menuheight/2))
@@ -342,7 +342,7 @@ function ENT:ClUseOpticBox(wep)
 
 end 
 function ENT:ClUse2DOpticBox(wep)
-	local menuwidth=200
+	local menuwidth=400
 	local menuheight=200
 	local ammoframe = vgui.Create("DFrame")
 		ammoframe:SetPos((ScrW()/2)-(menuwidth/2),(ScrH()/2)-(menuheight/2))
