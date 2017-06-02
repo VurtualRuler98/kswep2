@@ -122,6 +122,7 @@ tbl.fovmax=5.73
 tbl.fovmin=2.12
 tbl.fovsteps=5
 tbl.luareticle="leupold_tmr"
+tbl.luaretsfp=2.12
 tbl.retillum=Color(255,0,0,255)
 tbl.sensitivity=10
 tbl.scope_border=1.07
