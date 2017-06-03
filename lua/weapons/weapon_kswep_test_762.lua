@@ -22,7 +22,7 @@ if (SERVER) then
 end
 
 if (CLIENT) then
-	SWEP.PrintName = "Kswep2 TEST 5.56"
+	SWEP.PrintName = "Kswep2 TEST 7.62"
 	SWEP.Author = "vurtual"
 	SWEP.Slot = 3
 	SWEP.SlotPos = 0
@@ -45,24 +45,24 @@ SWEP.DefaultZerodata= {
 	battlesight=false
 }
 SWEP.AdminSpawnable = true
-SWEP.MagClass="STANAG"
-SWEP.ViewModel = "models/weapons/cstrike/c_snip_sg550.mdl"
+SWEP.MagClass="BattleRifle"
+SWEP.ViewModel = "models/weapons/cstrike/c_snip_g3sg1.mdl"
 --SWEP.WorldModel = "models/weapons/w_mk18.mdl"
-SWEP.WorldModel = "models/weapons/w_snip_sg550.mdl"
+SWEP.WorldModel = "models/weapons/w_snip_g3sg1.mdl"
 SWEP.LoweredOffset = 2
 SWEP.UseHands = true
 SWEP.MuzzleVelMod=1
-SWEP.MagSize = 30
+SWEP.MagSize = 20
 SWEP.Primary.ClipSize = SWEP.MagSize
-SWEP.Caliber = "vammo_556x45_m193"
-SWEP.Primary.Sound = Sound("weapon_kswep.single")
+SWEP.Caliber = "vammo_762x51_m80"
+SWEP.Primary.Sound = Sound("weapon_kswep_test.single762")
 SWEP.Primary.SoundSup = Sound("Weapon_kswep.singlesilenced")
 SWEP.ViewModelFlip = false
 SWEP.Secondary.Ammo = ""
 SWEP.CurrentlyReloading=0
 SWEP.ReloadAnimTime=0
 SWEP.ScopeMat="kswep/kswep_scope"
-SWEP.RecoilMassModifier=0.15
+SWEP.RecoilMassModifier=0.10
 SWEP.HandlingModifier=200
 SWEP.InsAnims=false
 SWEP.Auto=false
@@ -72,15 +72,14 @@ SWEP.HoldOpen=false
 SWEP.Length=40
 SWEP.LengthSup=10
 SWEP.Suppressable=false
-SWEP.SuppressorModel="models/weapons/upgrades/a_suppressor_pistol.mdl"
 SWEP.MuzzleVelModSup= 1.01
 SWEP.RecoilModSup=0.9
 SWEP.SpreadModSup=-0.0005
 SWEP.IdleType="passive"
 SWEP.SelectFire=true
-SWEP.MagType="Test"
+SWEP.MagType="Test762"
 SWEP.HKBurst=true
-SWEP.Firemodes={{auto=false,name="SEMI"},{auto=true,name="BURST",burst=3},{auto=true,name="AUTO"}}
+SWEP.Firemodes={{auto=false,name="SEMI"},{auto=true,name="AUTO"}}
 SWEP.IronSightsPos = Vector()
 SWEP.IronSightsAng = Vector()
 SWEP.InsNoIronAnim=false
