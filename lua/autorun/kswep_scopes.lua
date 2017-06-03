@@ -5,7 +5,7 @@ local function AddKswep2DScope(tbl)
 end
 local def = {}
 def.name = "Default"
-def.fov = 10
+def.fov = 40
 def.fovmin = nil
 def.fovmax = nil
 def.fovsteps = nil
@@ -19,10 +19,10 @@ def.scopeheight=1
 def.zero={
 	mils=false,
 	bc=-1,
-	min=100,
-	max=100,
+	min=300,
+	max=300,
 	step=0,
-	default=100,
+	default=300,
 	battlesight=false
 }
 def.zeroalt={
@@ -41,10 +41,10 @@ def.scope_border=1.02
 def.scope_ewheel=false
 def.retcolor=color_black
 --def.reticle=false
-def.luareticle="duplex"
-def.luaretsfp=false
+def.luareticle="irons"
+def.luaretsfp=5
 def.retillum=nil
-def.aimmag=40
+def.aimmag=20
 --def.repix=512
 --def.retzoom=0
 --def.retzoommax=0
