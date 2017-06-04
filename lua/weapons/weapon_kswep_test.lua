@@ -104,6 +104,7 @@ SWEP.Anims.InitialDrawAnim=ACT_VM_READY
 SWEP.CanFlashlight=false
 SWEP.NoLowerAnim=true
 function SWEP:ReloadAct(force)
+	self:ReloadMag(force)
 end
 function SWEP:Initialize2()
 	self.ScopeReticleIllumination=Color(255,0,0,255)
