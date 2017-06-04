@@ -12,6 +12,10 @@ local tbl = { --for
 {shape="rect",start={-8.5,12.375},endpos={8.5,99},color=color_black}
 }
 AddKswepReticle(tbl,"irons")
+local tbl = { 
+{shape="circle",pos={0,0},radius=1}
+}
+AddKswepReticle(tbl,"reddot")
 local tbl = {
 {shape="line",start={-200,0},endpos={200,0}},
 {shape="line",start={0,-200},endpos={0,200}}
