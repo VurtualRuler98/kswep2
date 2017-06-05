@@ -32,6 +32,7 @@ ENT.MolotovFlames=10
 ENT.CSGasTimer=0
 ENT.CSGasEffectDelay=0.3
 ENT.LastCough=0
+ENT.ShrapnelAmmoType="buckshot" --bad approximation
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -301,7 +302,7 @@ function ENT:DetFrag()
 		Damage=self.FragDamage,
 		Distance=self.FragRadius,
 		Tracer=0,
-		AmmoType="pistol",
+		AmmoType=self.ShrapnelAmmoType,
 		Src=self:GetPos(),
 		Dir=Vector(0,0,1),
 		Spread=Vector(10,10,10),
