@@ -1,5 +1,5 @@
 function ENT:ClKSimpleBox()
-	local menuwidth=200
+	local menuwidth=400
 	local menuheight=200
 	local ammoframe = vgui.Create("DFrame")
 		ammoframe:SetPos((ScrW()/2)-(menuwidth/2),(ScrH()/2)-(menuheight/2))

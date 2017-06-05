@@ -45,9 +45,42 @@ tbl.club=10
 tbl.suitcoverage=1
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
+tbl.name="Interceptor Body Armor/Helmet (SAPI)"
+tbl.front=KSWEP_ARMOR_III
+tbl.back=KSWEP_ARMOR_III
+tbl.side=KSWEP_ARMOR_IIIA
+tbl.helmet=KSWEP_ARMOR_IIIA
+tbl.blast=25
+tbl.slash=20
+tbl.club=10
+tbl.suitcoverage=11
+KswepAddArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="Interceptor Body Armor/Helmet (ESAPI/ESBI)"
+tbl.front=KSWEP_ARMOR_IV
+tbl.back=KSWEP_ARMOR_IV
+tbl.side=KSWEP_ARMOR_IV
+tbl.helmet=KSWEP_ARMOR_IIIA
+tbl.blast=28
+tbl.slash=20
+tbl.club=10
+tbl.suitcoverage=11
+KswepAddArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="Interceptor Body Armor/Helmet (ESAPI/ESBI/DAPS)"
+tbl.front=KSWEP_ARMOR_IV
+tbl.back=KSWEP_ARMOR_IV
+tbl.side=KSWEP_ARMOR_IV
+tbl.helmet=KSWEP_ARMOR_IIIA
+tbl.blast=35
+tbl.slash=25
+tbl.club=12
+tbl.suitcoverage=15
+KswepAddArmor(tbl)
+local tbl=table.Copy(def)
 tbl.name="6Б3"
 tbl.front=KSWEP_ARMOR_III
-tbl.back=KSWEP_ARMOR_IIIi
+tbl.back=KSWEP_ARMOR_III
 tbl.blast=20
 tbl.slash=30
 tbl.club=20
