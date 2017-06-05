@@ -236,7 +236,6 @@ end
 function SWEP:Initialize2()
 end
 function SWEP:Initialize()
-	self:Initialize2()
         self:SetNWBool("Raised",true)
 	self:SetNWBool("Sight",false)
 	self:SetNWBool("FiringPin",true)
@@ -333,6 +332,7 @@ function SWEP:Initialize()
 	if (CLIENT and self.Owner==LocalPlayer() and self.InsAttachments and self.Owner:IsPlayer()) then
 	end
 	self.CurrentMagSize=self.MagSize
+	self:Initialize2()
 end
 function SWEP:DiscoverModelAnims()
 end
@@ -780,7 +780,11 @@ function SWEP:Holster(wep)
 end
 function SWEP:SetOptic2D(name)
 	local scopedata
-	scopedata=kswep_2dscopes[name]
+	if (self.DefaultScopeData and name=="Default") then
+		scopedata=self.DefaultScopeData
+	else
+		scopedata=kswep_2dscopes[name]
+	end
 	if (CLIENT and self.Owner==LocalPlayer()) then
 		net.Start("kswep_2dscopesetup")
 		net.WriteEntity(self)	
@@ -1300,9 +1304,11 @@ end
 function SWEP:GetZeroString(dosuffix)
 	local zero=self.Zero
 	local zdata=self.Zerodata
+	local zstr=self.ZeroTableStrings
 	if (self:GetNWBool("AltIrons")) then
 		zero=self.ZeroAlt
 		zdata=self.ZerodataAlt
+		zstr=self.ZeroTableStringsAlt
 	end
 	if (zero==0 and not zdata.mils and not zdata.moa) then
 		zero=zdata.battlesight
@@ -1325,6 +1331,9 @@ function SWEP:GetZeroString(dosuffix)
 	if (zdata.moa) then
 		zerostring=zero/zdata.moa
 		if (dosuffix) then zerostring=zerostring.." MOA" end
+	end
+	if (zstr) then
+		zerostring=zstr[zero]
 	end
 	return zerostring
 end
