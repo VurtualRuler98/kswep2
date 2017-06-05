@@ -10,6 +10,7 @@ ENT.Category	= "Vurtual's base"
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
 ENT.Shrapnel={}
+ENT.Impacts={}
 if (CLIENT) then
 function ENT:Draw()
 end
@@ -33,7 +34,19 @@ function ENT:Think()
 	for k,v in pairs(self.Shrapnel) do
 		self.Shrapnel[k]=self:FlyShrapnel(v)
 	end
-	if (#self.Shrapnel==0) then self:Remove() end
+	if (#self.Shrapnel==0) then 
+	if (GetConVar("kswep_test_shrapnel"):GetBool()) then
+		local longest=0
+		for k,v in pairs(self.Impacts) do
+			local ent=ents.Create("sent_kbgren_donothing")
+			ent:SetPos(v)
+			ent:Spawn()
+			ent:Activate()
+			if (v:Distance(self:GetPos())>longest) then longest=v:Distance(self:GetPos()) end
+		end
+		print(longest/39.3701)
+	end
+	self:Remove() end
 	self:NextThink(CurTime())
 	return true
 end
@@ -107,6 +120,9 @@ function ENT:FlyShrapnel(shot)
 			return shot
 			end
 		else
+			if (GetConVar("kswep_test_shrapnel"):GetBool()) then
+				table.insert(self.Impacts,shot.pos)
+			end
 			return nil
 		end
 	else
@@ -240,9 +256,9 @@ function ENT:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 end
 function ENT:MaterialPenetration(mat)
 	local penetration = 0
-	if (mat==MAT_WOOD or mat==MAT_PLASTIC or mat==MAT_GRATE or mat==MAT_GLASS or mat==MAT_TILE) then
+	if (mat==MAT_WOOD or mat==MAT_PLASTIC or mat==MAT_GRATE or mat==MAT_GLASS or mat==MAT_TILE or mat==MAT_DIRT or mat==MAT_FOLIAGE) then
 		penetration = 0.1
-	elseif (mat==MAT_GRASS or mat==MAT_DIRT or mat==MAT_FLESH or mat==MAT_SNOW or mat==MAT_SAND or mat==MAT_SLOSH or mat==MAT_BLOODYFLESH or mat==MAT_ALIENFLESH or mat==MAT_ANTLION or mat==MAT_CONCRETE or mat==MAT_VENT) then
+	elseif (mat==MAT_GRASS or mat==MAT_FLESH or mat==MAT_SNOW or mat==MAT_SAND or mat==MAT_SLOSH or mat==MAT_BLOODYFLESH or mat==MAT_ALIENFLESH or mat==MAT_ANTLION or mat==MAT_CONCRETE or mat==MAT_VENT) then
 		penetration = 1
 	elseif (mat==MAT_METAL ) then
 		penetration = 2
