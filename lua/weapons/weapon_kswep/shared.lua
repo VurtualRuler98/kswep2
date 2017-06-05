@@ -3100,9 +3100,9 @@ function SWEP:FireShot(bullet)
 end
 function SWEP:MaterialPenetration(mat)
 	local penetration = 0
-	if (mat==MAT_WOOD or mat==MAT_PLASTIC or mat==MAT_GRATE or mat==MAT_GLASS or mat==MAT_TILE) then
-		penetration = 0.1
-	elseif (mat==MAT_GRASS or mat==MAT_DIRT or mat==MAT_FLESH or mat==MAT_SNOW or mat==MAT_SAND or mat==MAT_SLOSH or mat==MAT_BLOODYFLESH or mat==MAT_ALIENFLESH or mat==MAT_ANTLION or mat==MAT_CONCRETE or mat==MAT_VENT) then
+	if (mat==MAT_WOOD or MAT_DIRT or mat==MAT_PLASTIC or mat==MAT_GRATE or mat==MAT_GLASS or mat==MAT_FOLIAGE or mat==MAT_TILE) then
+		penetration = 0.1 --added MAT_DIRT for plaset walls. Dirt barriers should be thick anyway.
+	elseif (mat==MAT_GRASS or mat==MAT_FLESH or mat==MAT_SNOW or mat==MAT_SAND or mat==MAT_SLOSH or mat==MAT_BLOODYFLESH or mat==MAT_ALIENFLESH or mat==MAT_ANTLION or mat==MAT_CONCRETE or mat==MAT_VENT) then
 		penetration = 1
 	elseif (mat==MAT_METAL ) then
 		penetration = 2
