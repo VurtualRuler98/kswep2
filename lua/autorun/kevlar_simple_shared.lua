@@ -4,6 +4,7 @@ end
 CreateConVar("kevlar_debug","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kevlar_enabled","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_test_shrapnel","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
+CreateConVar("kswep_bleeding","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 KSWEP_ARMOR_I=5
 KSWEP_ARMOR_IIA=10
 KSWEP_ARMOR_II=15

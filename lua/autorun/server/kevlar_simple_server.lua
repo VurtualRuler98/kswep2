@@ -78,7 +78,69 @@ local function KSDamageHandlerEnt(ent,dmginfo)
 		dmginfo:ScaleDamage(KSSuitHandler(ent,dmginfo))
 	end
 end
-function KSDamageHandler(ent,hitgroup,dmginfo)
+local function KSBleedingHandler(ent,hitgroup,dmginfo,crit)
+	local tgt
+	if (not KswepBleedingEntities[ent:EntIndex()]) then
+		tgt={}
+		KswepBleedingEntities[ent:EntIndex()]=tgt
+		tgt.kswep_bloodloss=0
+		tgt.kswep_bleeding=0
+		tgt.kswep_lastbleed=0
+		tgt.kswep_lastbleedmsg=0
+		tgt.nextbleed=CurTime()+1
+	else
+		tgt=KswepBleedingEntities[ent:EntIndex()]
+	end
+	local hit=math.random(1,100)
+	if (hitgroup==HITGROUP_HEAD) then
+		if (hit>90) then --critical
+			tgt.kswep_bleeding=tgt.kswep_bleeding+20
+		elseif (hit>75) then
+			tgt.kswep_bleeding=tgt.kswep_bleeding+8 --upper head+eye hit
+		elseif (hit>50) then --upper head hit
+			tgt.kswep_bleeding=tgt.kswep_bleeding+5
+		elseif (hit>20) then --minor facial/neck trauma
+			tgt.kswep_bleeding=tgt.kswep_bleeding+0.2
+		elseif (hit>4) then --airway injury
+			tgt.kswep_bleeding=tgt.kswep_bleeding+1
+		else --critical neck hit
+			tgt.kswep_bleeding=tgt.kswep_bleeding+30
+		end
+	elseif (hitgroup==HITGROUP_CHEST) then
+		if (crit) then
+			tgt.kswep_bleeding=tgt.kswep_bleeding+50
+		elseif (hit>80) then --critical lung-area
+			tgt.kswep_bleeding=tgt.kswep_bleeding+10
+		elseif (hit>70) then --less-critical lung-area
+			tgt.kswep_bleeding=tgt.kswep_bleeding+4
+		else --other chest
+			tgt.kswep_bleeding=tgt.kswep_bleeding+1
+		end
+	elseif (hitgroup==HITGROUP_STOMACH) then
+		if (hit>90) then --bad guts hit
+			tgt.kswep_bleeding=tgt.kswep_bleeding+4
+		elseif (hit>70) then --less bad guts hit
+			tgt.kswep_bleeding=tgt.kswep_bleeding+1
+		else --still bad but not for a while
+			tgt.kswep_bleeding=tgt.kswep_bleeding+0.2
+		end
+	elseif (hitgroup==HITGROUP_LEFTARM or hitgroup==HITGROUP_RIGHTARM) then
+		if (hit>90) then --important part of arm?
+			tgt.kswep_bleeding=tgt.kswep_bleeding+1
+		else --whatever
+			tgt.kswep_bleeding=tgt.kswep_bleeding+0.2
+		end
+	else
+		if (hit>90) then --leg crit
+			tgt.kswep_bleeding=tgt.kswep_bleeding+10
+		elseif (hit>50) then --bad muscle bleedy hit
+			tgt.kswep_bleeding=tgt.kswep_bleeding+4
+		else
+			tgt.kswep_bleeding=tgt.kswep_bleeding+0.2
+		end
+	end	
+end
+local function KSDamageHandler(ent,hitgroup,dmginfo)
 	if (GetConVar("kevlar_enabled"):GetBool()==false) then return end
 	local armor=-1
 	if (ent:IsPlayer() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
@@ -98,9 +160,14 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 		if (scale>1) then
 			local bone=ent:LookupBone("ValveBiped.Bip01_Spine4")
 			local bonevec=Vector(2,0,2)
+			local crit=false
 			bonevec:Rotate(ent:GetAngles())
 			if (bone and hitgroup==HITGROUP_CHEST and (ent:GetBonePosition(bone)+bonevec):Distance(dmginfo:GetDamagePosition())<8) then
 				dmginfo:ScaleDamage(10)
+				crit=true
+			end
+			if (GetConVar("kswep_bleeding")) then
+				KSBleedingHandler(ent,hitgroup,dmginfo,crit)
 			end
 		end
 	end
@@ -108,8 +175,7 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 		dmginfo:ScaleDamage(0.2)
 	end
 end	
-	
-function KSScaleDamage(armor,dmginfo,ent)
+local function KSScaleDamage(armor,dmginfo,ent)
 	local bullet=vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())]
 	if (not bullet) then
 		bullet=vurtual_ammodata["Pistol"]
@@ -130,7 +196,7 @@ function KSScaleDamage(armor,dmginfo,ent)
 	end
 	return 1
 end
-function KSGetArmorNPC(npc,hitgroup)
+local function KSGetArmorNPC(npc,hitgroup)
 	local class=npc:GetClass()
 	if (class=="npc_metropolice" or class=="nz_metro_zombie") then
 		if (hitgroup==HITGROUP_CHEST) then
@@ -186,7 +252,7 @@ function KSGetArmorNPC(npc,hitgroup)
 	return -1
 end
 		
-function KSGetArmorVest(ply,dmgangle)
+local function KSGetArmorVest(ply,dmgangle)
 	local dir=0
         if ((dmgangle>105 and dmgangle<165) or (dmgangle>285 and dmgangle<345)) then
                 dir=2
@@ -209,3 +275,40 @@ hook.Add("EntityTakeDamage","KSDamageHandler",KSDamageHandlerEnt)
 hook.Add("ScaleNPCDamage","KSDamageHandler",KSDamageHandler)
 kevlardebugprint("Kevlar simple loaded.")
 
+KswepBleedingEntities={}
+local function KSBleedEntities()
+	for k,v in pairs(KswepBleedingEntities) do
+		if (v.nextbleed<CurTime()) then
+			v.nextbleed=CurTime()+1
+			v.kswep_bloodloss=v.kswep_bloodloss+v.kswep_bleeding
+			if (v.kswep_bloodloss>2000) then
+			Entity(k):TakeDamage(10)
+			end
+			if (v.kswep_bleeding>0) then
+				v.kswep_lastbleed=v.kswep_lastbleed+v.kswep_bleeding
+				v.kswep_bleeding=v.kswep_bleeding-0.001
+			end
+			if (v.kswep_bleeding>1 and Entity(k):IsPlayer() and v.kswep_lastbleedmsg<v.kswep_bleeding) then
+				if (v.kswep_bleeding>10) then
+					v.kswep_lastbleedmsg=2000
+					Entity(k):ChatPrint("You are severely bleeding.")
+				elseif (v.kswep_bleeding>1) then
+					v.kswep_lastbleedmsg=10
+					Entity(k):ChatPrint("You are bleeding.")
+				end
+			end
+			if (v.kswep_bleeding<0) then
+				v.kswep_bleeding=0
+				v.kswep_lastbleedmsg=0
+			end
+			if (v.kswep_lastbleed>50) then
+			local decal="Blood"
+			util.Decal(decal,Entity(k):GetPos(),Entity(k):GetPos()-Vector(0,0,100),Entity(k))
+			end		
+			if (Entity(k):Health()<1) then
+				KswepBleedingEntities[k]=nil
+			end
+		end
+	end
+end
+hook.Add("Think","KSBleedEntities",KSBleedEntities)
