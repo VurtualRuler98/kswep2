@@ -175,7 +175,7 @@ local function KSDamageHandler(ent,hitgroup,dmginfo)
 		dmginfo:ScaleDamage(0.2)
 	end
 end	
-local function KSScaleDamage(armor,dmginfo,ent)
+function KSScaleDamage(armor,dmginfo,ent)
 	local bullet=vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())]
 	if (not bullet) then
 		bullet=vurtual_ammodata["Pistol"]
@@ -196,7 +196,7 @@ local function KSScaleDamage(armor,dmginfo,ent)
 	end
 	return 1
 end
-local function KSGetArmorNPC(npc,hitgroup)
+function KSGetArmorNPC(npc,hitgroup)
 	local class=npc:GetClass()
 	if (class=="npc_metropolice" or class=="nz_metro_zombie") then
 		if (hitgroup==HITGROUP_CHEST) then
@@ -252,7 +252,7 @@ local function KSGetArmorNPC(npc,hitgroup)
 	return -1
 end
 		
-local function KSGetArmorVest(ply,dmgangle)
+function KSGetArmorVest(ply,dmgangle)
 	local dir=0
         if ((dmgangle>105 and dmgangle<165) or (dmgangle>285 and dmgangle<345)) then
                 dir=2
