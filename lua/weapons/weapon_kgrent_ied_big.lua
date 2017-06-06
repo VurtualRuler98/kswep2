@@ -9,7 +9,7 @@ if (CLIENT) then
 end
 SWEP.Base="weapon_kgren_base"
 SWEP.Category = "KSwep TEST Grenades"
-SWEP.Spawnable = true
+SWEP.Spawnable = false
 SWEP.AdminSpawnable = true
 SWEP.ViewModel = "models/weapons/cstrike/c_c4.mdl"
 SWEP.UseHands=true
