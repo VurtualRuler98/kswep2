@@ -279,34 +279,38 @@ KswepBleedingEntities={}
 local function KSBleedEntities()
 	for k,v in pairs(KswepBleedingEntities) do
 		if (v.nextbleed<CurTime()) then
-			v.nextbleed=CurTime()+1
-			v.kswep_bloodloss=v.kswep_bloodloss+v.kswep_bleeding
-			if (v.kswep_bloodloss>2000) then
-			Entity(k):TakeDamage(10)
-			end
-			if (v.kswep_bleeding>0) then
-				v.kswep_lastbleed=v.kswep_lastbleed+v.kswep_bleeding
-				v.kswep_bleeding=v.kswep_bleeding-0.001
-			end
-			if (v.kswep_bleeding>1 and Entity(k):IsPlayer() and v.kswep_lastbleedmsg<v.kswep_bleeding) then
-				if (v.kswep_bleeding>10) then
-					v.kswep_lastbleedmsg=2000
-					Entity(k):ChatPrint("You are severely bleeding.")
-				elseif (v.kswep_bleeding>1) then
-					v.kswep_lastbleedmsg=10
-					Entity(k):ChatPrint("You are bleeding.")
-				end
-			end
-			if (v.kswep_bleeding<0) then
-				v.kswep_bleeding=0
-				v.kswep_lastbleedmsg=0
-			end
-			if (v.kswep_lastbleed>50) then
-			local decal="Blood"
-			util.Decal(decal,Entity(k):GetPos(),Entity(k):GetPos()-Vector(0,0,100),Entity(k))
-			end		
-			if (Entity(k):Health()<1) then
+			if (Entity(k):Health()>=Entity(k):GetMaxHealth()) then
 				KswepBleedingEntities[k]=nil
+			else
+				v.nextbleed=CurTime()+1
+				v.kswep_bloodloss=v.kswep_bloodloss+v.kswep_bleeding
+				if (v.kswep_bloodloss>2000) then
+				Entity(k):TakeDamage(10)
+				end
+				if (v.kswep_bleeding>0) then
+					v.kswep_lastbleed=v.kswep_lastbleed+v.kswep_bleeding
+					v.kswep_bleeding=v.kswep_bleeding-0.001
+				end
+				if (v.kswep_bleeding>1 and Entity(k):IsPlayer() and v.kswep_lastbleedmsg<v.kswep_bleeding) then
+					if (v.kswep_bleeding>10) then
+						v.kswep_lastbleedmsg=2000
+						Entity(k):ChatPrint("You are severely bleeding.")
+					elseif (v.kswep_bleeding>1) then
+						v.kswep_lastbleedmsg=10
+						Entity(k):ChatPrint("You are bleeding.")
+					end
+				end
+				if (v.kswep_bleeding<0) then
+					v.kswep_bleeding=0
+					v.kswep_lastbleedmsg=0
+				end
+				if (v.kswep_lastbleed>50) then
+				local decal="Blood"
+				util.Decal(decal,Entity(k):GetPos(),Entity(k):GetPos()-Vector(0,0,100),Entity(k))
+				end		
+				if (Entity(k):Health()<1) then
+					KswepBleedingEntities[k]=nil
+				end
 			end
 		end
 	end
