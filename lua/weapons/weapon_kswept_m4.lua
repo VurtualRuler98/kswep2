@@ -24,7 +24,7 @@ end
 if (CLIENT) then
 	SWEP.PrintName = "TEST M4 Carbine"
 	SWEP.Author = "vurtual"
-	SWEP.Slot = 3
+	SWEP.Slot = 2
 	SWEP.SlotPos = 0
 end
 SWEP.Anims = SWEP.Anims or {}
