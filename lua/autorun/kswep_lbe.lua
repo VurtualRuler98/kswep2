@@ -12,12 +12,17 @@ tbl.slots = {{STANAG=6,BattleRifle=4}}
 tbl.addon="ALICE"
 KswepAddLBE(tbl)
 local tbl={}
-tbl.name="MOLLE II Rifleman"
+tbl.name="PALS 3x Double Mag"
 tbl.slots = {{STANAG=6,BattleRifle=3}}
 tbl.addon="PALS"
 KswepAddLBE(tbl)
 local tbl={}
-tbl.name="MOLLE II Machinegunner"
+tbl.name="PALS 6x Bolt Mag"
+tbl.slots = {{BoltMag=6}}
+tbl.addon="PALS"
+KswepAddLBE(tbl)
+local tbl={}
+tbl.name="PALS 2x Drum"
 tbl.slots = {{Drum=2}}
 tbl.addon="PALS"
 KswepAddLBE(tbl)

@@ -36,6 +36,14 @@ sound.Add({
 	channel=CHAN_STATIC
 })
 sound.Add({
+	name="weapon_kswept_awm.single",
+	volume=1.0,
+	pitch={195,205},
+	sound="weapons/awp/awp1.wav",
+	level=155,
+	channel=CHAN_STATIC
+})
+sound.Add({
 	name="weapon_kswep.singlesilenced",
 	volume=1,
 	pitch={245,255},
