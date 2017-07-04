@@ -184,7 +184,7 @@ tbl.sensitivity=8
 tbl.scope_border=1.06
 tbl.scope_ewheel=true
 tbl.minsensitivity=3.5
-tbl.aimmag=2.597*8
+tbl.aimmag=2.597*8.7
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Leupold Mark 4 3.5-10x40mm  LR/T M3 TMR"
