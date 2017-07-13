@@ -2499,7 +2499,7 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 		ironang=self.IronSightsAng+self.IronOffsetAng+scopeang
 	end
 	if (not self.InsAnims) then
-	if (self:GetNWBool("Lowered")==true) then
+	if (self:GetNWBool("Lowered") or not self:GetNWBool("Raised")) then
 		ang=ang+Angle(self.HoldAngle,self.HoldAngle*2,0)
 		modpos=modpos+Vector(0,0,self.LoweredOffset)
 	elseif (self:GetNWBool("Sight")==true) then
