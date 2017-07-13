@@ -42,7 +42,7 @@ def.ztablestr = {}
 for i=-5,25 do def.ztablestr[i]=i end
 def.ztablestr[0]="0: 300m"
 def.ztablestr[2]="2: Zero"
-def.ztablestr[6]="0: 400m"
+def.ztablestr[6]="6: 400m"
 def.ztablestr[14]="14: 500m"
 def.ztablestr[24]="24: 600m"
 def.sensitivity=1
