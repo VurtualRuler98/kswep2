@@ -13,6 +13,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.dmgvitalmax=6
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.diameter=0.183
 	tbl.velocity = 2200 --DM31
 	tbl.mass=31
 	AddAmmodata(tbl)
@@ -26,6 +27,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.diameter=0.355
 	tbl.velocity = 1300 --115gr fmj
 	tbl.mass=115
 	AddAmmodata(tbl)
@@ -39,6 +41,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.projectiles = 7
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.diameter=0.33
 	tbl.velocity = 1200 --00buck
 	tbl.mass=60
 	AddAmmodata(tbl)
@@ -52,6 +55,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.diameter=0.4 --it's not even a physical projectile anyway
 	tbl.velocity = 1125 --speed of sound because why not
 	tbl.mass=100 --idk
 	AddAmmodata(tbl)
@@ -65,6 +69,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
+	tbl.diameter=0.357 --obviously
 	tbl.velocity = 1395 --ARMOR II test round
 	tbl.mass=158 --random google result
 	AddAmmodata(tbl)

@@ -11,6 +11,7 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	tbl.printname = "7.62x39mm M43"
 	tbl.caliber = "vammo_762x39"
 	tbl.projectiles = 1
+	tbl.diameter=0.312
 	tbl.spreadscale = 0.95
 	tbl.coefficient=0.252
 	tbl.damagescale = 1
@@ -29,6 +30,7 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	tbl.name = "vammo_762x39_m67"
 	tbl.printname = "7.62x39mm M67"
 	tbl.caliber = "vammo_762x39"
+	tbl.diameter=0.312
 	tbl.projectiles = 1
 	tbl.coefficient=0.3 --WILD GUESS
 	tbl.spreadscale = 1
@@ -46,6 +48,7 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	tbl.name = "vammo_762x39_us"
 	tbl.printname = "7.62x39mm US"
 	tbl.caliber = "vammo_762x39"
+	tbl.diameter=0.312
 	tbl.coefficient = 0.3 --TODO figure this out!
 	tbl.projectiles = 1
 	tbl.spreadscale = 1

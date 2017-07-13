@@ -163,7 +163,7 @@ local function KSDamageHandler(ent,hitgroup,dmginfo)
 			local crit=false
 			bonevec:Rotate(ent:GetAngles())
 			if (bone and hitgroup==HITGROUP_CHEST and (ent:GetBonePosition(bone)+bonevec):Distance(dmginfo:GetDamagePosition())<8) then
-				dmginfo:ScaleDamage(10)
+				dmginfo:ScaleDamage(3)
 				crit=true
 			end
 			if (GetConVar("kswep_bleeding")) then

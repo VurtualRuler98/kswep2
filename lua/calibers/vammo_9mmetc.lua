@@ -5,6 +5,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.name = "vammo_9x19_FMJ" --unique name of ammo
 	tbl.printname = "9x19mm FMJ" --printname we show
 	tbl.caliber = "vammo_9x19" --caliber group 
+	tbl.diameter=0.355 --diameter of projectile in inches
 	tbl.projectiles = 1 --ONE bullet
 	tbl.dmgbase = 5 --how much hp to do when hitting a vest, "energy" of a round
 	tbl.dmgvitalmin = 5 --Damage multiplier done with an unarmored headshot/chest shot, halved for NPCs
@@ -25,6 +26,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.name = "vammo_30car_FMJ"
 	tbl.printname = ".30 Carbine FMJ"
 	tbl.caliber = "vammo_30car"
+	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.wallbang = 5
@@ -42,6 +44,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.name = "vammo_9x18_FMJ"
 	tbl.printname = "9x18mm FMJ"
 	tbl.caliber = "vammo_9x18"
+	tbl.diameter=0.365
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.wallbang = 4
@@ -58,6 +61,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.name = "vammo_9x18_PBM"
 	tbl.printname = "9x18mm PBM"
 	tbl.caliber = "vammo_9x18"
+	tbl.diameter=0.365
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.wallbang = 6
@@ -77,6 +81,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.wallbang = 4
+	tbl.diameter=0.355
 	tbl.recoil = 1
 	tbl.mass=94 --verify
 	tbl.velocity = 840 --PPK
@@ -91,6 +96,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.name = "vammo_38special_FMJ"
 	tbl.printname = ".38 Special FMJ"
 	tbl.caliber = "vammo_38special"
+	tbl.diameter=0.357
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.wallbang = 4
@@ -107,6 +113,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.name = "vammo_9x19_JHP"
 	tbl.printname = "9x19mm JHP"
 	tbl.caliber = "vammo_9x19"
+	tbl.diameter=0.355
 	tbl.projectiles = 1
 	tbl.wallbang = 2
 	tbl.spreadscale = 1
@@ -124,6 +131,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.name = "vammo_9x19_plusP_FMJ"
 	tbl.printname = "9x19mm +P FMJ"
 	tbl.caliber = "vammo_9x19"
+	tbl.diameter=0.355
 	tbl.velocity = 1300 --same as regular for now
 	tbl.projectiles = 1
 	tbl.mass=115

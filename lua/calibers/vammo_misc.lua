@@ -10,6 +10,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_300wm"
 	tbl.printname = ".300 Winchester Magnum"
 	tbl.caliber = "vammo_300wm"
+	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.coefficient = 0.408
 	tbl.spreadscale = 1
@@ -28,6 +29,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_762x51_m80"
 	tbl.printname = "7.62x51mm NATO M80"
 	tbl.caliber = "vammo_762x51"
+	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.coefficient = 0.393
 	tbl.spreadscale = 1
@@ -45,6 +47,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_762x51_sub"
 	tbl.printname = "7.62x51mm NATO Subsonic"
 	tbl.caliber = "vammo_762x51"
+	tbl.diameter=0.308
 	tbl.coefficient=0.648
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
@@ -65,6 +68,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_762x54_7n1"
 	tbl.printname = "7.62x54mm 7N1"
 	tbl.caliber = "vammo_762x54"
+	tbl.diameter=0.312
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -82,6 +86,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_3006_ball"
 	tbl.printname = ".30-06 M2 ball"
 	tbl.caliber = "vammo_3006"
+	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -99,6 +104,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_303_ball"
 	tbl.printname = ".303 British ball"
 	tbl.caliber = "vammo_303"
+	tbl.diameter=0.312
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -116,6 +122,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_792x57_ball"
 	tbl.printname = "7.92x57mm ball"
 	tbl.caliber = "vammo_792x57"
+	tbl.diameter=0.324
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -133,6 +140,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_792x33_ball"
 	tbl.printname = "7.92x33mm ball"
 	tbl.caliber = "vammo_792x33"
+	tbl.diameter=0.324
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -150,6 +158,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.printname = ".30-06 M2 AP"
 	tbl.coefficient = 0.405 --TODO find actual M2AP coefficient
 	tbl.caliber = "vammo_3006"
+	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -167,6 +176,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_762x54t"
 	tbl.printname = "7.62x54mm Tranq."
 	tbl.caliber = "vammo_762x54t"
+	tbl.diameter=0.312
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -184,6 +194,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_762x51_m993"
 	tbl.printname = "7.62x51mm NATO M993 AP"
 	tbl.caliber = "vammo_762x51"
+	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -202,6 +213,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_762x51_mk316mod0"
 	tbl.printname = "7.62x51mm NATO Mk316 Mod 0"
 	tbl.caliber = "vammo_762x51"
+	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 0.5
 	tbl.damagescale = 1
@@ -219,6 +231,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_762x51_m118"
 	tbl.printname = "7.62x51mm NATO M118"
 	tbl.caliber = "vammo_762x51"
+	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 0.5
 	tbl.damagescale = 1
@@ -237,6 +250,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_9x19t"
 	tbl.printname = "9x19mm Tranq."
 	tbl.caliber = "vammo_9x19t"
+	tbl.diameter=0.355
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.wallbang = 0
@@ -253,6 +267,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_45acp_FMJ"
 	tbl.printname = ".45 ACP FMJ"
 	tbl.caliber = "vammo_45acp"
+	tbl.diameter=0.451
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.recoil = 1.2
@@ -269,6 +284,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_763x25_FMJ"
 	tbl.printname = "7.63x25mm FMJ"
 	tbl.caliber = "vammo_763x25"
+	tbl.diameter=0.309
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.recoil = 1.4
@@ -285,6 +301,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_22_lead"
 	tbl.printname = ".22 LR Lead"
 	tbl.caliber = "vammo_22"
+	tbl.diameter=0.223
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.wallbang = 2
@@ -300,6 +317,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_22_stinger"
 	tbl.printname = ".22 LR CCI Stinger"
 	tbl.caliber = "vammo_22"
+	tbl.diameter=0.223
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.wallbang = 2
@@ -316,6 +334,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_10mm_FMJ"
 	tbl.printname = "10mm Auto FMJ"
 	tbl.caliber = "vammo_10mm"
+	tbl.diameter=0.4
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.wallbang = 5
@@ -332,6 +351,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_10mm_JHP"
 	tbl.printname = "10mm Auto JHP"
 	tbl.caliber = "vammo_10mm"
+	tbl.diameter=0.4
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.wallbang = 3
@@ -349,6 +369,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_rifle"
 	tbl.printname = "Rifle Ammo"
 	tbl.caliber = "vammo_rifle"
+	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
@@ -363,6 +384,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.printname = "12 Gauge 00 Buck"
 	tbl.caliber = "vammo_12gauge"
 	tbl.coefficient=0.05
+	tbl.diameter=0.33
 	tbl.vestpenetration=0
 	tbl.dmgbase=3
 	tbl.dmgvitalmin=5
@@ -379,6 +401,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name="vammo_12gauge_slug"
 	tbl.printname = "12 Gauge Slug"
 	tbl.caliber = "vammo_12gauge"
+	tbl.diameter=0.308
 	tbl.coefficient=0.2
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=27
@@ -404,6 +427,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.name = "vammo_762x38"
 	tbl.printname = "7.62x38mm FMJ Commercial"
 	tbl.caliber = "vammo_762x38"
+	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1

@@ -14,6 +14,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.coefficient=0.25
+	tbl.diameter=0.224
 	tbl.recoil = 4
 	tbl.mass=55
 	tbl.velocity = 3165 --20" barrel
@@ -30,6 +31,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.caliber = "vammo_556x45"
 	tbl.coefficient=0.304
 	tbl.projectiles = 1
+	tbl.diameter=0.224
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 4
@@ -47,6 +49,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.printname = "5.56x45mm M995 AP"
 	tbl.caliber = "vammo_556x45"
 	tbl.projectiles = 1
+	tbl.diameter=0.224
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 4
@@ -69,9 +72,10 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.damagescale = 1
 	tbl.wallbang = 4
 	tbl.recoil = 4
+	tbl.diameter=0.224
 	tbl.mass=77
 	tbl.coefficient=0.340
-	tbl.velocity = 2750 --might be for a 16 or 18
+	tbl.velocity = 2850 --might be for a 16 or 18
 	AddAmmodata(tbl)
 
 end)
