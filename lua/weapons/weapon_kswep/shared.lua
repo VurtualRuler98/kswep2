@@ -2958,6 +2958,7 @@ function SWEP:FlyBullet(shot)
 		local energynew=(vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].diameter*shot.dragvector:Length())/7000
 		shot.bullet.Damage=shot.dmg*(energynew/energybase)
 		shot.bullet.Dir=shot.dragvector
+		shot.bullet.DamageCustom=self:CalcReducedArmorPen(vurtual_ammodata[shot.bullet.AmmoType].vestpenetration,energynew/energybase)
 		self:FireShot(shot.bullet)
 	
 	end
@@ -3010,6 +3011,43 @@ function SWEP:CalcHearingLoss(sndrange,start,ply)
 			ply.KHearingRing=ply.KHearingRing+db-130-ply.KEarPro
 		end
 end
+function SWEP:CalcReducedArmorPen(rating,ratio) --mostly made up for now
+	local testvel=9999
+	if (rating==KSWEP_ARMOR_I) then
+		testvel=850
+	elseif (rating==KSWEP_ARMOR_IIA) then
+		testvel=1090
+	elseif (rating==KSWEP_ARMOR_II) then
+		testvel=1175
+	elseif (rating==KSWEP_ARMOR_IIIA) then
+		testvel=1400
+	elseif (rating==KSWEP_ARMOR_CRISAT) then --random
+		testvel=1650
+	elseif (rating==KSWEP_ARMOR_III) then --energy comparison, 308 and  SUPER FAST 9mm
+		testvel=3000
+	elseif (rating==KSWEP_ARMOR_IV) then --more fast
+		testvel=4000
+	end
+	testvel=testvel*ratio*0.95
+	local newpen=0
+	if (testvel<850) then
+		newpen=KSWEP_ARMOR_I
+	elseif (testvel<1090) then
+		newpen=KSWEP_ARMOR_IIA
+	elseif (testvel<1175) then
+		newpen=KSWEP_ARMOR_II
+	elseif (testvel<1400) then
+		newpen=KSWEP_ARMOR_IIIA
+	elseif (testvel<1650) then
+		newpen=KSWEP_ARMOR_CRISAT
+	elseif (testvel<3000) then
+		newpen=KSWEP_ARMOR_III
+	elseif (testvel<4000) then
+		newpen=KSWEP_ARMOR_IV
+	end
+	return 55645+newpen
+end
+
 function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
 	local tr = util.TraceLine( {
 		filter = self.Owner,
@@ -3100,7 +3138,13 @@ function SWEP:FireShot(bullet)
 		net.WriteTable(bullet)
 		net.Send(self.Owner)
 		end
+		if (bullet.DamageCustom) then
+			bullet.Callback=function(attacker,tr,dmginfo)
+				dmginfo:SetDamageCustom(bullet.DamageCustom)
+			end
+		end
 		self.Owner:FireBullets(bullet)
+		bullet.Callback=nil
 	end
 end
 function SWEP:MaterialPenetration(mat)

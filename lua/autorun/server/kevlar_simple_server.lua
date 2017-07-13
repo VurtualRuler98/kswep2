@@ -180,7 +180,12 @@ function KSScaleDamage(armor,dmginfo,ent)
 	if (not bullet) then
 		bullet=vurtual_ammodata["Pistol"]
 	end
-	if (bullet.vestpenetration>armor) then
+	local penetration=bullet.vestpenetration
+	local custpen=dmginfo:GetDamageCustom()
+	if (custpen>55644 and custpen<55645+50) then --PROBABLY kswep data
+		penetration=custpen-55645
+	end
+	if (penetration>armor) then
 		if (ent:IsPlayer()) then
 			return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)
 		else
@@ -278,7 +283,8 @@ kevlardebugprint("Kevlar simple loaded.")
 KswepBleedingEntities={}
 local function KSBleedEntities()
 	for k,v in pairs(KswepBleedingEntities) do
-		if (v.nextbleed<CurTime()) then
+		if (not Entity(k):IsValid()) then KswepBleedingEntities[k]=nil
+		elseif (v.nextbleed<CurTime()) then
 			if (Entity(k):Health()>=Entity(k):GetMaxHealth()) then
 				KswepBleedingEntities[k]=nil
 			else
