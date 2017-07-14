@@ -1097,7 +1097,7 @@ function SWEP:OpenRangeCard()
 		if (drag_dist/39.701>lastrange+self.ScopeRangeCard) then
 			local droprange=math.floor((drag_dist/39.701)/self.ScopeRangeCard)*self.ScopeRangeCard
 			lastrange=droprange
-			local newdropadj=math.atan(drop/(zero*39.3701))-basedropadj
+			local newdropadj=math.atan((drop+self:GetSightHeight())/drag_dist)-basedropadj
 			if (newdropadj*1000<maxdropadj) then
 				if (moamode) then
 					newdropadj=newdropadj*3.43775
@@ -3000,7 +3000,6 @@ function SWEP:FlyBulletStart(bullet)
 	local zerotime=drag_time --amount of frames it will take to fly the distance
 	drop=drop+self:GetSightHeight()
 	local dropadj=math.atan(drop/(zero*39.3701))
-	print(dropadj)
 	--local scopeang=Vector(0,0,math.sin(dropadj-0.0005))
 	local scopeang=Angle(math.deg(-1*(dropadj-0.0005)),0,0)
 	--local scopeang=Angle(math.sin(dropadj-0.0005),0,0)
@@ -3009,7 +3008,6 @@ function SWEP:FlyBulletStart(bullet)
 		scopeang=scopeang-Angle(math.deg(miladj/1000),0,0)
 	end
 	local shot = {}
-	--print(miladj,scopeang,math.acos(scopedot))
 	local bulletang=bullet.Dir:Angle()
 	bulletang=bulletang+scopeang
 	bullet.Dir=bulletang:Forward()
