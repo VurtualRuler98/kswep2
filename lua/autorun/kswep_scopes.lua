@@ -102,6 +102,8 @@ tbl.zero={
 }
 tbl.scope_border=1.1
 tbl.scope_ewheel=true
+tbl.scope_cwheel=true
+tbl.scope_range=true
 tbl.luareticle="steiner_scr"
 tbl.retillum=Color(255,0,0,255)
 tbl.aimmag=15*1.394
@@ -130,6 +132,31 @@ tbl.fovmax=6.3
 tbl.fovmin=1.94
 tbl.fovsteps=5
 tbl.luareticle="schmidt_p3"
+tbl.retillum=Color(255,0,0,255)
+tbl.sensitivity=12
+tbl.scope_border=1.07
+tbl.scope_ewheel=true
+tbl.scope_cwheel=true
+tbl.scope_range=true
+tbl.minsensitivity=3
+tbl.aimmag=1.94*12
+AddKswep2DScope(tbl)
+local tbl=table.Copy(def)
+tbl.name="EZ Scope"
+tbl.fov=1.94
+tbl.zero={
+	mils=false,
+	bc=-1,
+	min=100,
+	max=1000,
+	step=100,
+	default=100,
+	battlesight=false
+}
+tbl.fovmax=6.3
+tbl.fovmin=1.94
+tbl.fovsteps=5
+tbl.luareticle="duplex"
 tbl.retillum=Color(255,0,0,255)
 tbl.sensitivity=12
 tbl.scope_border=1.07
@@ -185,6 +212,11 @@ tbl.scope_border=1.06
 tbl.scope_ewheel=true
 tbl.minsensitivity=3.5
 tbl.aimmag=2.597*8.7
+AddKswep2DScope(tbl)
+local tbl=table.Copy(tbl)
+tbl.name="Leupold TS30-A2 (ACI)"
+tbl.scope_cwheel=true
+tbl.scope_range=true
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Leupold Mark 4 3.5-10x40mm  LR/T M3 TMR"

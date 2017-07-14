@@ -220,6 +220,8 @@ SWEP.ScopeReticleZoomMax=0
 SWEP.ScopeReticleZoomMin=0
 SWEP.Scope2DBorderRatio=1
 SWEP.Scope2DWheelElevation=false
+SWEP.Scope2DWheelCosine=false
+SWEP.ScopeRangeCard=false
 SWEP.Scope2DWheelWindage=false
 SWEP.ReloadFullClipazineOnly=false
 SWEP.BaseRecoilPain=0 -- was 0.01
@@ -798,6 +800,8 @@ function SWEP:SetOptic2D(name)
 	self.ScopeReticleColor=scopedata.retcolor
 	self.Scope2DBorderRatio=scopedata.scope_border
 	self.Scope2DWheelElevation=scopedata.scope_ewheel
+	self.Scope2DWheelCosine=scopedata.scope_cwheel
+	self.ScopeRangeCard=scopedata.scope_range
 	self.ScopeReticleIllumination=scopedata.retillum
 	self.RTRanger=scopedata.rtranger
 	self.RTRangerX=scopedata.rtrangerx
@@ -1292,6 +1296,18 @@ function SWEP:DrawHUD()
 				surface.SetTextColor(255,255,255,255)
 				surface.SetTextPos(x,y1*1.02)
 				surface.DrawText(self:GetZeroString(false))
+			end
+			if (self.Scope2DWheelCosine) then
+				local y1=y*(1-(0.05*(90/self.IronZoom)))
+				local y2=y*(1+(0.05*(90/self.IronZoom)))
+				local x1=x-radius-(y*(0.08*(90/self.IronZoom)))
+				local x2=x
+				local box={{x=x1,y=y1},{x=x2,y=y1},{x=x2,y=y2},{x=x1,y=y2}}
+				surface.DrawPoly(box)
+				surface.SetFont("DermaDefault")
+				surface.SetTextColor(255,255,255,255)
+				surface.SetTextPos(x1*1.02,y)
+				surface.DrawText(math.Round(math.abs(math.cos(math.rad(self.Owner:EyeAngles().p))*100)))
 			end
 			local radius=ScrH()
 			local fov=self.ScopeFOV
@@ -2881,20 +2897,28 @@ function SWEP:FlyBulletStart(bullet)
 		drag_ticks=drag_ticks-1
 		drag_time=drag_time+1
 		drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
-		drag_vector=drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval()-Vector(0,0,(386/12)*(engine.TickInterval()))
+		drag_vector=(drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
 		drop=drop-drag_vector.z*12*engine.TickInterval()
 	end	
 	local zerotime=drag_time --amount of frames it will take to fly the distance
 	drop=drop+self:GetSightHeight()
 	local dropadj=math.atan(drop/(zero*39.3701))
-	local scopeang=Vector(0,0,math.sin(dropadj-0.0005))
+	print(dropadj)
+	--local scopeang=Vector(0,0,math.sin(dropadj-0.0005))
+	local scopeang=Angle(math.deg(-1*(dropadj-0.0005)),0,0)
+	--local scopeang=Angle(math.sin(dropadj-0.0005),0,0)
 	if (zdata.mils or zdata.moa) then
-		scopeang=scopeang+Vector(0,0,math.sin(miladj/1000))
+		--scopeang=scopeang+Vector(0,0,math.sin(miladj/1000))
+		scopeang=scopeang-Angle(math.deg(miladj/1000),0,0)
 	end
 	local shot = {}
+	--print(miladj,scopeang,math.acos(scopedot))
+	local bulletang=bullet.Dir:Angle()
+	bulletang=bulletang+scopeang
+	bullet.Dir=bulletang:Forward()
 	shot.ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 	shot.pos=bullet.Src
-	shot.dragvector=(bullet.Dir+scopeang)*(self.Ammo.velocity*self.MuzzleVelMod*supmod)
+	shot.dragvector=(bullet.Dir)*(self.Ammo.velocity*self.MuzzleVelMod*supmod)
 	shot.bullet=bullet
 	shot.bc=self.Ammo.coefficient or 0.25
 	shot.dmg=bullet.Damage
