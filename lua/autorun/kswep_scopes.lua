@@ -187,6 +187,7 @@ tbl.retillum=Color(255,0,0,255)
 tbl.sensitivity=10
 tbl.scope_border=1.06
 tbl.scope_ewheel=true
+tbl.scope_range=100
 tbl.minsensitivity=2.5
 tbl.aimmag=1.95*10
 AddKswep2DScope(tbl)
@@ -212,13 +213,13 @@ tbl.retillum=Color(255,0,0,255)
 tbl.sensitivity=8
 tbl.scope_border=1.06
 tbl.scope_ewheel=true
+tbl.scope_range=100
 tbl.minsensitivity=3.5
 tbl.aimmag=2.597*8.7
 AddKswep2DScope(tbl)
 local tbl=table.Copy(tbl)
 tbl.name="Leupold TS30-A2 (ACI)"
 tbl.scope_cwheel=true
-tbl.scope_range=100
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Leupold Mark 4 3.5-10x40mm  LR/T M3 TMR"
@@ -242,6 +243,7 @@ tbl.retillum=Color(255,0,0,255)
 tbl.sensitivity=10
 tbl.scope_border=1.07
 tbl.scope_ewheel=true
+tbl.scope_range=100
 tbl.minsensitivity=3.5
 tbl.aimmag=2.12*9.5
 AddKswep2DScope(tbl)
