@@ -67,9 +67,9 @@ local tbl=table.Copy(def)
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Aimpoint CompM4 3x flip magnifier"
-tbl.fov=30
-tbl.fovmin=10
-tbl.fovmax=30
+tbl.fov=15
+tbl.fovmin=5
+tbl.fovmax=15
 tbl.fovsteps=1
 tbl.zero={
 	mils=false,
@@ -83,7 +83,7 @@ tbl.luareticle="reddot"
 tbl.retcolor=Color(255,0,0,255)
 tbl.sensitivity=3
 tbl.minsensitivity=1
-tbl.aimmag=20
+tbl.aimmag=10
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Steiner T5Xi 3-15x50"
