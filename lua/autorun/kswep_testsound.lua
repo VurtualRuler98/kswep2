@@ -51,4 +51,20 @@ sound.Add({
 	level=120,
 	channel=CHAN_STATIC
 })
+sound.Add({
+	name="weapon_kswept_scout.single",
+	volume=1.0,
+	pitch={75,80},
+	sound="weapons/scout/scout_fire-1.wav",
+	level=155,
+	channel=CHAN_STATIC
+})
+sound.Add({
+	name="weapon_kswept_scout_556.single",
+	volume=1.0,
+	pitch={95,105},
+	sound="weapons/scout/scout_fire-1.wav",
+	level=155,
+	channel=CHAN_STATIC
+})
 	

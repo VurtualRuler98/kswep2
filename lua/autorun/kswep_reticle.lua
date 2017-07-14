@@ -40,6 +40,15 @@ local tbl = {
 }
 AddKswepReticle(tbl,"duplex_cheap")
 local tbl = {
+{shape="rect",start={-200,-0.237},endpos={200,0.237}},
+{shape="rect",start={-0.237,-200},endpos={0.237,200}},
+{shape="rect",start={-200,-0.64},endpos={-3.64,0.64}},
+{shape="rect",start={3.64,-0.64},endpos={200,0.64}},
+{shape="rect",start={-0.64,3.64},endpos={0.64,200}},
+{shape="rect",start={-0.64,-200},endpos={0.64,-3.64}}
+}
+AddKswepReticle(tbl,"leupold_heavy_duplex")
+local tbl = {
 {shape="line",start={-5,0},endpos={5,0}},
 {shape="line",start={0,-5},endpos={0,5}},
 {shape="line",start={-5,-0.25},endpos={-5,0.25}},

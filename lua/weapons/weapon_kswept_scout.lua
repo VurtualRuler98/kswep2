@@ -22,7 +22,7 @@ if (SERVER) then
 end
 
 if (CLIENT) then
-	SWEP.PrintName = "TEST Arctic Warfare Magnum"
+	SWEP.PrintName = "TEST Steyr Scout 7.62x51mm"
 	SWEP.Author = "vurtual"
 	SWEP.Slot = 2
 	SWEP.SlotPos = 0
@@ -35,27 +35,39 @@ SWEP.Primary.Delay = 1.4
 SWEP.Primary.Spread = 0.01
 SWEP.Spawnable = true
 SWEP.DrawOnce=false
-SWEP.DefaultZerodata= {
-	mils=10,
+SWEP.DefaultScopeData = {}
+local def=SWEP.DefaultScopeData
+def.fov=4.2
+def.name = "Default"
+def.sensitivity=2.3
+def.minsensitivity=1
+def.scopeheight=0
+def.scope_border=1.08
+def.retcolor=color_black
+def.luareticle="leupold_heavy_duplex"
+def.aimmag=2.3*4.2
+def.zero= {
+	mils=false,
 	bc=-1,
-	min=0,
-	max=150,
-	step=1,
+	min=100,
+	max=100,
+	step=0,
 	default=100,
 	battlesight=false
 }
+def.zeroalt={default=-1}
 SWEP.AdminSpawnable = true
 SWEP.MagClass="BoltMag"
-SWEP.ViewModel = "models/weapons/cstrike/c_snip_awp.mdl"
+SWEP.ViewModel = "models/weapons/cstrike/c_snip_scout.mdl"
 --SWEP.WorldModel = "models/weapons/w_mk18.mdl"
-SWEP.WorldModel = "models/weapons/w_snip_awp.mdl"
+SWEP.WorldModel = "models/weapons/w_snip_scout.mdl"
 SWEP.LoweredOffset = 2
 SWEP.UseHands = true
 SWEP.MuzzleVelMod=1
-SWEP.MagSize = 5
+SWEP.MagSize = 10
 SWEP.Primary.ClipSize = SWEP.MagSize
-SWEP.Caliber = "vammo_300wm"
-SWEP.Primary.Sound = Sound("weapon_kswept_awm.single")
+SWEP.Caliber = "vammo_762x51_m118"
+SWEP.Primary.Sound = Sound("weapon_kswept_scout.single")
 SWEP.Primary.SoundSup = Sound("Weapon_kswep.singlesilenced")
 SWEP.ViewModelFlip = false
 SWEP.Secondary.Ammo = ""
@@ -77,7 +89,7 @@ SWEP.RecoilModSup=0.9
 SWEP.SpreadModSup=-0.0005
 SWEP.IdleType="passive"
 SWEP.SelectFire=false
-SWEP.MagType="AWM300"
+SWEP.MagType="SCOUT308"
 SWEP.HKBurst=true
 SWEP.IronSightsPos = Vector()
 SWEP.IronSightsAng = Vector()
@@ -105,8 +117,7 @@ function SWEP:ReloadAct(force)
 	self:ReloadMag(force)
 end
 function SWEP:Initialize2()
-	self.ScopeReticleIllumination=Color(255,0,0,255)
-	if (CLIENT) then self:SetOptic2D("Schmidt & Bender 3-12x50 PM II") end
+	if (CLIENT) then self:SetOptic2D("Default") end
 end
 function SWEP:PrimaryFire()
 	self:NormalFire()
