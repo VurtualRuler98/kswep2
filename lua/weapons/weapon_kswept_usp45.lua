@@ -84,7 +84,7 @@ SWEP.IronSightsPos = Vector(-5.8, 2, 2.6)
 SWEP.IronSightsAng = Vector(0.8,-0.1,0)
 SWEP.ManualHands="models/weapons/v_hands_sec_m.mdl"
 SWEP.EmptyAnims=true
-SWEP.MagType="Glock9"
+SWEP.MagType="USP45"
 function SWEP:ReloadAct(force)
 	self:ReloadMag(force)	
 end
