@@ -987,7 +987,11 @@ net.Receive("kswep_sethands",function()
 	self.RefreshMerge=true
 end)
 function SWEP:Reload()
-	if (CLIENT and not self.SwitchedBrightness and self:GetNWBool("Sight") and self.Owner:KeyDown(IN_WALK) and self.ScopeReticleIllumination) then
+	if (CLIENT and not self.SwitchedBrightness and self:GetNWBool("Sight") and self.Owner:KeyDown(IN_WALK) and self.Owner:KeyDown(IN_SPEED) and self.ScopeRangeCard) then
+		self.SwitchedBrightness=true
+		self:OpenRangeCard()
+	end
+	if (CLIENT and not self.SwitchedBrightness and self:GetNWBool("Sight") and self.Owner:KeyDown(IN_WALK) and not self.Owner:KeyDown(IN_SPEED) and self.ScopeReticleIllumination) then
 		self.SwitchedBrightness=true
 		local color=self.ScopeReticleColor
 		self.ScopeReticleColor=self.ScopeReticleIllumination
@@ -1019,7 +1023,100 @@ function SWEP:CanReload()
 	if (self:GetNWInt("MagazineCount")==0) then return false end
 	return true
 end
-
+function SWEP:OpenRangeCard()
+	if (not self.ScopeRangeCard) then return end
+	local frame = vgui.Create("DFrame")
+	frame:SetPos(ScrW()/2-200,ScrH()/2-300)
+	frame:SetSize(400,600)
+	frame:SetTitle("Range Card")
+	frame:SetVisible(true)
+	frame:SetDraggable(false)
+	frame:ShowCloseButton(true)
+	frame:MakePopup()
+	local zero=self.Zero
+	local zdata=self.Zerodata
+	if (zero==0 and not zdata.mils and not zdata.moa) then
+		zero=zdata.battlesight
+		if (zdata.battlesight==0) then
+			zero=1
+		end
+	end
+	if (self.ZeroTable) then 
+		zero=self.ZeroTable[zero]
+	end
+	local zerovel=self.Ammo.velocity*self.MuzzleVelMod
+	if (self.ScopeName=="Default" and self.ZeroVelocity>0) then
+		zerovel=self.ZeroVelocity
+	end
+	if (self.ScopeName~="Default" and self.ScopeZeroVelocity>0) then
+		zerovel=self.ScopeZeroVelocity
+	end
+	local miladj=0
+	if (zdata.mils or zdata.moa) then
+		zero=zdata.default
+	end
+	local drag_vector=Vector(zerovel,0,0)
+	local drag_dist=0
+	local drag_time=0
+	local drag_bc=self.Ammo.coefficient or 0.25
+	local drag_ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
+	local drop=0
+	while (drag_ticks>0 and drag_dist<zero*39.3701) do
+		drag_ticks=drag_ticks-1
+		drag_time=drag_time+1
+		drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
+		drag_vector=(drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
+		drop=drop-drag_vector.z*12*engine.TickInterval()
+	end
+	drop=drop+self:GetSightHeight()
+	local basedropadj=math.atan(drop/(zero*39.3701))
+	local dropdata="Zero: "..zero.."m, Zero Velocity: "..zerovel.." FPS, BC: "..drag_bc.."\n"
+	local maxdropadj=0
+	local moamode=false
+	local canadjust=false
+	if (zdata.mils) then
+		maxdropadj=zdata.max/zdata.mils
+		canadjust=true
+	elseif (zdata.moa) then
+		maxdropadj=zdata.max/zdata.moa/3.43775
+		moamode=true
+		canadjust=true
+	end
+	local lastrange=zero
+	drop=0
+	drag_time=0
+	drag_dist=0
+	drag_ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
+	drag_vector=Vector(zerovel,0,0)
+	while (drag_ticks>0 and canadjust) do
+		drag_ticks=drag_ticks-1
+		drag_time=drag_time+1
+		drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
+		drag_vector=(drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
+		drop=drop-drag_vector.z*12*engine.TickInterval()
+		if (drag_dist/39.701>lastrange+self.ScopeRangeCard) then
+			local droprange=math.floor((drag_dist/39.701)/self.ScopeRangeCard)*self.ScopeRangeCard
+			lastrange=droprange
+			local newdropadj=math.atan(drop/(zero*39.3701))-basedropadj
+			if (newdropadj*1000<maxdropadj) then
+				if (moamode) then
+					newdropadj=newdropadj*3.43775
+				end
+				newdropadj=math.floor(newdropadj*10000)/10
+				local label="mils"
+				if (moamode) then label="moa" end
+				dropdata=dropdata..droprange.."m: "..newdropadj.." "..label..", "..math.floor(drag_vector:Length()).." FPS, "..(math.floor(drag_time*engine.TickInterval()*10)/10).."seconds \n"
+			else
+				canadjust=false
+			end
+		end
+	end
+	local label=vgui.Create("DLabel",frame)
+	label:SetText(dropdata)
+	label:SetPos(10,10)
+	label:SetSize(390,590)
+	
+end
 function SWEP:SendWeaponAnimIdles(anim,idle)
 	idle = idle or ACT_VM_IDLE
 	self.Weapon:SendWeaponAnim(anim)
