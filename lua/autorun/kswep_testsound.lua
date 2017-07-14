@@ -28,6 +28,22 @@ sound.Add({
 	channel=CHAN_STATIC
 })
 sound.Add({
+	name="weapon_kswept_mp5.single",
+	volume=1.0,
+	pitch={185,195},
+	sound="weapons/mp5navy/mp5-1.wav",
+	level=140,
+	channel=CHAN_STATIC
+})
+sound.Add({
+	name="weapon_kswept_mp510.single",
+	volume=1.0,
+	pitch={175,185},
+	sound="weapons/mp5navy/mp5-1.wav",
+	level=140,
+	channel=CHAN_STATIC
+})
+sound.Add({
 	name="weapon_kswep_test.single762",
 	volume=1.0,
 	pitch={125,135},
