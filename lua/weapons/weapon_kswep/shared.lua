@@ -139,6 +139,7 @@ SWEP.RTRanger=false
 SWEP.RTRangerX=0
 SWEP.RTRangerY=0
 SWEP.ReloadTwoClips=false
+SWEP.LAMAttachment="muzzle" --"laser" for ins2
 if (CLIENT) then
 local calcres=0
 if (ConVarExists("kswep_cl_scoperes")) then
@@ -2204,7 +2205,7 @@ function SWEP:Think()
 		end
 		local vm=self.Owner:GetViewModel()
 		if (IsValid(vm)) then
-			local att=vm:GetAttachment(vm:LookupAttachment("laser"))
+			local att=vm:GetAttachment(vm:LookupAttachment(self.LAMAttachment))
 				if (self:GetNWBool("Sight") and self.HasLaser) then
 					att.Pos=self.Owner:GetShootPos()+self.Owner:GetAimVector()*(self.Length+4)
 					att.Ang=self.Owner:GetAimVector():Angle()
