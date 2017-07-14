@@ -16,6 +16,8 @@ def.ztablestralt=nil
 def.sensitivity=1
 def.minsensitivity=1
 def.scopeheight=1
+def.scope_range=nil
+def.scope_cwheel=nil
 def.zero={
 	mils=false,
 	bc=-1,
@@ -103,7 +105,7 @@ tbl.zero={
 tbl.scope_border=1.1
 tbl.scope_ewheel=true
 tbl.scope_cwheel=true
-tbl.scope_range=true
+tbl.scope_range=100
 tbl.luareticle="steiner_scr"
 tbl.retillum=Color(255,0,0,255)
 tbl.aimmag=15*1.394
@@ -137,7 +139,7 @@ tbl.sensitivity=12
 tbl.scope_border=1.07
 tbl.scope_ewheel=true
 tbl.scope_cwheel=true
-tbl.scope_range=true
+tbl.scope_range=100
 tbl.minsensitivity=3
 tbl.aimmag=1.94*12
 AddKswep2DScope(tbl)
@@ -216,7 +218,7 @@ AddKswep2DScope(tbl)
 local tbl=table.Copy(tbl)
 tbl.name="Leupold TS30-A2 (ACI)"
 tbl.scope_cwheel=true
-tbl.scope_range=true
+tbl.scope_range=100
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Leupold Mark 4 3.5-10x40mm  LR/T M3 TMR"
