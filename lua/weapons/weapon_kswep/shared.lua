@@ -487,7 +487,7 @@ function SWEP:PrimaryAttack()
 		end
 		if (self.Anims.SafetyAnim) then
 			local anim = self.Anims.SafetyAnim
-			local anim2=ACT_VM_IDLE
+			local anim2=self.Anims.IdleAnim
 			if (self:GetNWBool("Sight")) then 
 				anim = self.Anims.IronSafetyAnim
 				anim2 =self.Anims.IronAnim
@@ -532,7 +532,7 @@ function SWEP:FireRocket()
 			self:NextIdle(CurTime()+self.Primary.Delay,self.Anims.IdleAnimEmpty)
 			self:SetNWBool("Chambered",false)
 		else
-			self:NextBolt(CurTime()+self.Primary.Delay,ACT_VM_IDLE,self.Anims.ReloadAnim)
+			self:NextBolt(CurTime()+self.Primary.Delay,self.Anims.IdleAnim,self.Anims.ReloadAnim)
 		end
 	end
 end
@@ -601,7 +601,7 @@ function SWEP:NormalFire()
 		self:SetNWBool("Chambered",false)
 	end
 	self:ShootBullet(ammo.dmgbase, ammo.projectiles, ammo.spreadscale*(self.Primary.Spread+spreadsup),ammo.name)
-	local anim=ACT_VM_IDLE
+	local anim=self.Anims.IdleAnim
 	local animbolt = self.Anims.BoltAnim
 	if (self:GetNWBool("Sight")) then
 		animbolt = self.Anims.BoltAnimIron
@@ -650,7 +650,7 @@ end
 function SWEP:ShotgunFire()
 	if (not self:TryPrimaryAttack()) then return end
 	if (not self:GetNWBool("Chambered")) then
-		local anim=ACT_VM_IDLE
+		local anim=self.Anims.IdleAnim
 		if (self:GetNWBool("Sight")) then
 			anim=self.Anims.IronAnim
 		end
@@ -1119,7 +1119,7 @@ function SWEP:OpenRangeCard()
 	
 end
 function SWEP:SendWeaponAnimIdles(anim,idle)
-	idle = idle or ACT_VM_IDLE
+	idle = idle or self.Anims.IdleAnim
 	self.Weapon:SendWeaponAnim(anim)
 	self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),idle)
 end
@@ -1822,7 +1822,7 @@ function SWEP:FinishReloadSingle()
 	if (#self.Magazines==0) then
 	self:SetNWBool("CurrentlyReloading",false)
 	if (self.Anims.StartReloadAnim) then
-		self:NextBolt(CurTime(),ACT_VM_IDLE,self.Anims.EndReloadAnim)
+		self:NextBolt(CurTime(),self.Anims.IdleAnim,self.Anims.EndReloadAnim)
 	end
 	return
 	end
@@ -2174,7 +2174,7 @@ function SWEP:Think()
 	end
 	if (self.GrenadeLauncher and IsFirstTimePredicted() and not self:GetNWBool("Chambered") and self:GetNWInt("numgrenades")>0) then
 		self:SetNWBool("Chambered",true)
-		self:NextBolt(CurTime()+self.Primary.Delay,ACT_VM_IDLE,self.Anims.ReloadAnim)
+		self:NextBolt(CurTime()+self.Primary.Delay,self.Anims.IdleAnim,self.Anims.ReloadAnim)
 	end
 	if (SERVER and self:GetNWFloat("DropAfter")>0 and self:GetNWFloat("DropAfter")<CurTime()) then
 		self:Remove()
@@ -2326,7 +2326,7 @@ function SWEP:LowerDo(lower,anim,anim2,canfire)
 			local delay=self.Owner:GetViewModel():SequenceDuration()
 			self:SetNextSecondaryFire(CurTime()+delay)
 		elseif (self.InsAnims) then
-			self.Weapon:SendWeaponAnim(ACT_VM_IDLE)
+			self.Weapon:SendWeaponAnim(self.Anims.IdleAnim)
 		end
 	else
 		if (self.InsAnims and not self.NoLowerAnim) then
@@ -2342,7 +2342,7 @@ end
 function SWEP:Lower(lower)
 	self:SetNWBool("Raised",not lower)
 	local anim=self.Anims.LowerAnim
-	local anim2=ACT_VM_IDLE
+	local anim2=self.Anims.IdleAnim
 	if (self:IsWeaponEmpty() and self.EmptyAnims) then	
 		anim=self.Anims.LowerAnimEmpty
 		anim2=self.Anims.IdleAnimEmpty
@@ -2352,7 +2352,7 @@ end
 function SWEP:LowerWall(lower)
 	self:SetNWBool("Lowered",lower)
 	local anim=self.Anims.LowerAnim
-	local anim2=ACT_VM_IDLE
+	local anim2=self.Anims.IdleAnim
 	if (not self:GetNWBool("Raised")) then
 		anim2=self.Anims.LowerAnim
 	end
@@ -2374,7 +2374,7 @@ function SWEP:LowerRun(lower)
 	if (self.Bayonet and self.Anims.RunBayonet) then
 		anim=self.Anims.RunBayonet
 	end
-	local anim2=ACT_VM_IDLE
+	local anim2=self.Anims.IdleAnim
 	if (not self:GetNWBool("Raised")) then
 		anim2=self.Anims.LowerAnim
 	end
