@@ -99,7 +99,8 @@ SWEP.MergeAttachments = {
  }
 SWEP.InsAttachments=false
 SWEP.Anims.InitialDrawAnim=ACT_VM_READY
-SWEP.CanFlashlight=false
+SWEP.CanFlashlight=true
+SWEP.LAMAttachment="1"
 SWEP.NoLowerAnim=true
 function SWEP:ReloadAct(force)
 	self:ReloadMag(force)
