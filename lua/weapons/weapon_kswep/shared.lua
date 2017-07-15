@@ -988,18 +988,6 @@ net.Receive("kswep_sethands",function()
 	self.RefreshMerge=true
 end)
 function SWEP:Reload()
-	if (CLIENT and not self.SwitchedBrightness and self:GetNWBool("Sight") and self.Owner:KeyDown(IN_WALK) and self.Owner:KeyDown(IN_SPEED) and self.ScopeRangeCard and IsFirstTimePredicted()) then
-		self.SwitchedBrightness=true
-		self:OpenRangeCard()
-		return
-	end
-	if (CLIENT and not self.SwitchedBrightness and self:GetNWBool("Sight") and self.Owner:KeyDown(IN_WALK) and not self.Owner:KeyDown(IN_SPEED) and self.ScopeReticleIllumination and IsFirstTimePredicted()) then
-		self.SwitchedBrightness=true
-		local color=self.ScopeReticleColor
-		self.ScopeReticleColor=self.ScopeReticleIllumination
-		self.ScopeReticleIllumination=color
-		return
-	end
 	if (self:GetNWBool("Sight")) then return end
 	if (self.ChainReload and not self:GetNWBool("CurrentlyReloading")) then
 		local anim=self.Anims.MidReloadAnim
@@ -2104,6 +2092,17 @@ function SWEP.DetectScroll(ply,bind,pressed)
 				end
 				return true
 			end
+			if (wep:GetNWBool("Sight") and wep.Owner:KeyDown(IN_RELOAD)) then
+				if (bind=="slot1") then
+					if (wep.ScopeReticleIllumination) then
+						local color=wep.ScopeReticleColor
+						wep.ScopeReticleColor=wep.ScopeReticleIllumination
+						wep.ScopeReticleIllumination=color
+					end
+				elseif (bind=="slot2") then
+					wep:OpenRangeCard()
+				end
+			end
 		end
 	end
 end
@@ -2158,9 +2157,6 @@ hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think2()
 end
 function SWEP:Think()
-	if (CLIENT and self.SwitchedBrightness and not self.Owner:KeyDown(IN_RELOAD) and IsFirstTimePredicted()) then
-		self.SwitchedBrightness=false
-	end
 	if (CLIENT and LocalPlayer()==self.Owner and self.RefreshMerge) then
 		self:InitMergeParts()
 	end
