@@ -12,7 +12,7 @@ sound.Add({
 	channel = CHAN_WEAPON
 })
 
-kswep_kspawnergrenades = {
+kswep_kspawnergrenades = {--[[
 	weapon_kgreni2_m67={name="M67 Frag Grenade",effect=1},
 	weapon_kgreni2_m68={name="M68 Impact Grenade",effect=1},
 	weapon_kgreni2_f1={name="F1 Grenade",effect=1},
@@ -28,11 +28,21 @@ kswep_kspawnergrenades = {
 	weapon_kgreni2_m18_violet={name="M18 Violet Smoke Grenade",effect=0},
 	weapon_kgreni2_m7a2={name="M7A2 CS Grenade",effect=0},
 	weapon_kgreni2_m84={name="M84 Stun Grenade",effect=0},
-	weapon_ksweps_grenadetrap={name="Grenade Trap",effect=0},
 	weapon_kgreni2_molotov={name="Molotov",effect=0},
 	weapon_kgreni2_m106={name="M106 Fast Obscurant Grenade",effect=0},
 	weapon_kswepd_panzerfaust={name="Panzerfaust",effect=1},
-	weapon_frag={name="HL2 Grenade",effect=1}
+	]]--
+	--weapon_frag={name="HL2 Grenade",effect=1}
+	weapon_kgrent_smoke={name="TEST Smoke White Grenade",effect=0},
+	weapon_kgrent_smoke_violet={name="TEST Smoke Violet Grenade",effect=0},
+	weapon_kgrent_smoke_fog={name="TEST Smoke FOG Grenade",effect=0},
+	weapon_kgrent_thermite={name="TEST Thermite Grenade",effect=2},
+	weapon_kgrent_flashbang={name="TEST Stun Grenade",effect=0},
+	weapon_kgrent_csgas={name="TEST CS Gas Grenade",effect=0},
+	weapon_kgrent_ied={name="TEST IED",effect=1},
+	weapon_kgrent_frag={name="TEST Frag Grenade",effect=1},
+	weapon_kgrent_conc={name="TEST Concussion Grenade",effect=1},
+	weapon_ksweps_grenadetrap={name="Grenade Trap",effect=0}
 }
 kswep_validitems= {
 	"primaryammo",
