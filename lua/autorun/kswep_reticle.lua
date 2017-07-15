@@ -6,7 +6,7 @@ end
 local tbl = { --for 
 {shape="rect",start={-11.5,4.5},endpos={-8.5,99},color=color_black},
 {shape="rect",start={8.5,4.5},endpos={11.5,99},color=color_black},
-{shape="rect",start={-1.75,0},endpos={1.75,12.375},color=color_black},
+{shape="rect",start={-1.6,0},endpos={1.6,12.375},color=color_black}, --FSP for rifle length gas
 {shape="poly",poly={{x=-13,y=-4.875},{x=-10,y=-4.875},{x=-8.5,y=4.5},{x=-11.5,y=4.5}},color=color_black},
 {shape="poly",poly={{x=10,y=-4.875},{x=13,y=-4.875},{x=11.5,y=4.5},{x=8.5,y=4.5}},color=color_black},
 {shape="rect",start={-8.5,12.375},endpos={8.5,99},color=color_black}

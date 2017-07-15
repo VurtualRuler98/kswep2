@@ -37,7 +37,7 @@ SWEP.Spawnable = true
 SWEP.DrawOnce=false
 SWEP.DefaultScopeData = {}
 local def=SWEP.DefaultScopeData
-def.fov=20
+def.fov=11
 def.ztablestr = {}
 for i=-5,25 do def.ztablestr[i]=i end
 def.ztablestr[0]="0: 300m"
@@ -62,12 +62,12 @@ def.zero = {
 def.zeroalt = {
 	default=-1
 }
-def.scope_border=1.04
+def.scope_border=1.1
 def.scope_ewheel=false
 def.retcolor=color_black
 def.luareticle="irons"
-def.luaretsfp=2.5
-def.aimmag=10
+def.luaretsfp=11*0.825
+def.aimmag=6.5
 SWEP.AdminSpawnable = true
 SWEP.MagClass="STANAG"
 SWEP.ViewModel = "models/weapons/cstrike/c_rif_m4a1.mdl"
