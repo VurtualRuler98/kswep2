@@ -2464,6 +2464,10 @@ function SWEP:DrawRTScope()
 	end
 	render.OverrideAlphaWriteEnable(true,true)
 	render.RenderView(scopeview)
+	if (self:GetNWFloat("CurRecoil")>0.04) then
+		local recblur=self:GetNWFloat("CurRecoil")*5
+		render.BlurRenderTarget(self.RenderTarget,recblur,recblur,4)
+	end
 	render.OverrideAlphaWriteEnable(false)
 	if (self.SuperScope) then
 		--DON'T LET ME COLOMOD PROPERLY WILL YOU
@@ -3351,6 +3355,9 @@ function SWEP:ToggleAim(unhold)
                 --Start using sight
 		if (not self:GetNWBool("Raised")) then self:SetNWBool("HoldAim",true) end
                 self:ServeNWBool("Sight",true)
+		if (self:GetNWFloat("CurRecoil")<self.MaxRecoil/3) then
+			self:SetNWFloat("CurRecoil",self.MaxRecoil/3)
+		end
 		if (self.InsAnims) then
 			local anim=self.Anims.IronInAnim
 			local anim2=self.Anims.IronAnim
