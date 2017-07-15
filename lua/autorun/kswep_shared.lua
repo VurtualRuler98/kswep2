@@ -42,7 +42,7 @@ kswep_kspawnergrenades = {--[[
 	weapon_kgrent_ied={name="TEST IED",effect=1},
 	weapon_kgrent_frag={name="TEST Frag Grenade",effect=1},
 	weapon_kgrent_conc={name="TEST Concussion Grenade",effect=1},
-	weapon_ksweps_grenadetrap={name="Grenade Trap",effect=0}
+	weapon_kweps_grenadetrap={name="Grenade Trap",effect=0}
 }
 kswep_validitems= {
 	"primaryammo",
