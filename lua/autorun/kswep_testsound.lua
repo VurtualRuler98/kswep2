@@ -107,4 +107,12 @@ sound.Add({
 	level=110,
 	channel=CHAN_STATIC
 })
+sound.Add({
+	name="weapon_kswept_300blk.single_sup",
+	volume=0.6,
+	pitch={185,190},
+	sound="weapons/m4a1/m4a1_unsil-1.wav",
+	level=110,
+	channel=CHAN_STATIC
+})
 	
