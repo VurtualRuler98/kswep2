@@ -102,6 +102,7 @@ SWEP.MergeAttachments = {
  }
 SWEP.InsAttachments=false
 SWEP.CanFlashlight=true
+SWEP.LAMAttachment="1"
 function SWEP:ReloadAct(force)
 	self:ReloadMag(force)	
 end
