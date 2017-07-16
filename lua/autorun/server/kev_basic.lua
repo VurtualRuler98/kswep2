@@ -15,6 +15,7 @@ util.AddNetworkString("kswep_sethands")
 util.AddNetworkString("kswep_flashlight")
 util.AddNetworkString("kswep_flashlight_cl")
 util.AddNetworkString("kswep_zero")
+util.AddNetworkString("kswep_zerowindage")
 util.AddNetworkString("kswep_scopesetup")
 util.AddNetworkString("kswep_2dscopesetup")
 util.AddNetworkString("kswep_weaponrange")
@@ -120,6 +121,24 @@ net.Receive("kswep_zero",function(len,pl)
 		wep.ZeroAlt=zero
 	else
 		wep.Zero=zero
+	end
+end)
+net.Receive("kswep_zerowindage",function(len,pl)
+	local wep=net.ReadEntity()
+	local zalt=net.ReadBool()
+	local zero=net.ReadInt(16)
+	if (not IsValid(wep)) then return end
+	if (wep.Owner~=pl) then return end
+	local zdata=wep.Windagedata
+	if (zalt) then zdata=wep.WindagedataAlt end
+	if (zero>zdata.max) then zero=zdata.max end
+	if (zero<zdata.max*-1) then
+		zero=zdata.max*-1
+	end
+	if (zalt) then
+		wep.WindageAlt=zero
+	else
+		wep.Windage=zero
 	end
 end)
 net.Receive("kswep_weaponrange",function(len,pl)

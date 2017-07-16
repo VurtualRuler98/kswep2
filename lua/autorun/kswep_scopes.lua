@@ -27,6 +27,16 @@ def.zero={
 	default=300,
 	battlesight=false
 }
+def.windage={
+	mils=false,
+	max=0,
+	step=0 --zero means no windage
+}
+def.windagealt={
+	mils=false,
+	max=0,
+	step=0 --zero means no windage
+}
 def.zeroalt={
 	mils=false,
 	bc=-1,
@@ -41,6 +51,7 @@ def.rtrangerx=0
 def.rtrangery=0
 def.scope_border=1.02
 def.scope_ewheel=false
+def.scope_wwheel=false
 def.retcolor=color_black
 --def.reticle=false
 def.luareticle="irons"
@@ -102,8 +113,10 @@ tbl.zero={
 	default=100,
 	battlesight=false
 }
+tbl.windage={mils=10,max=150,step=1}
 tbl.scope_border=1.1
 tbl.scope_ewheel=true
+tbl.scope_wwheel=true
 tbl.scope_cwheel=true
 tbl.scope_range=100
 tbl.luareticle="steiner_scr"

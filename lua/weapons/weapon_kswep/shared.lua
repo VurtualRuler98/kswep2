@@ -192,6 +192,16 @@ SWEP.DefaultZerodata = {
 	default=100,
 	battlesight=false
 }
+SWEP.DefaultWindagedata = {
+	mils=false,
+	max=0,
+	step=0
+}
+SWEP.DefaultWindagedataAlt = {
+	mils=false,
+	max=0,
+	step=0
+}
 SWEP.DefaultZerodataAlt = table.Copy(SWEP.DefaultZerodata)
 SWEP.DefaultZerodataAlt.default=-1
 SWEP.UseDelayForBolt=false
@@ -264,6 +274,10 @@ function SWEP:Initialize()
 	self.Zero=self.Zerodata.default
 	self.ZerodataAlt = self.DefaultZerodataAlt
 	self.ZeroAlt=self.ZerodataAlt.default
+	self.Windagedata=self.DefaultWindagedata
+	self.Windage=0
+	self.WindagedataAlt = self.DefaultWindagedataAlt
+	self.WindageAlt=0
 	if (self.Anims.RunAnim==nil) then
 		self.Anims.RunAnim=self.Anims.LowerAnim
 		self.Anims.RunAnimEmpty=self.Anims.LowerAnimEmpty
@@ -801,6 +815,7 @@ function SWEP:SetOptic2D(name)
 	self.ScopeReticleColor=scopedata.retcolor
 	self.Scope2DBorderRatio=scopedata.scope_border
 	self.Scope2DWheelElevation=scopedata.scope_ewheel
+	self.Scope2DWheelWindage=scopedata.scope_wwheel
 	self.Scope2DWheelCosine=scopedata.scope_cwheel
 	self.ScopeRangeCard=scopedata.scope_range
 	self.ScopeReticleIllumination=scopedata.retillum
@@ -812,6 +827,10 @@ function SWEP:SetOptic2D(name)
 	self.Zero=self.Zerodata.default
 	self.ZerodataAlt=scopedata.zeroalt
 	self.ZeroAlt=self.ZerodataAlt.default
+	self.Windagedata=scopedata.windage
+	self.Windage=0
+	self.WindagedataAlt=scopedata.windagealt
+	self.WindageAlt=0
 	self.ZeroTable=scopedata.ztable
 	self.ZeroTableAlt=scopedata.ztablealt
 	self.ZeroTableStrings=scopedata.ztablestr
@@ -1396,6 +1415,18 @@ function SWEP:DrawHUD()
 				surface.SetTextPos(x1*1.02,y)
 				surface.DrawText(math.Round(math.abs(math.cos(math.rad(self.Owner:EyeAngles().p))*100)))
 			end
+			if (self.Scope2DWheelWindage) then
+				local y1=y*(1-(0.05*(90/self.IronZoom)))
+				local y2=y*(1+(0.05*(90/self.IronZoom)))
+				local x2=x+radius+(y*(0.08*(90/self.IronZoom)))
+				local x1=x
+				local box={{x=x1,y=y1},{x=x2,y=y1},{x=x2,y=y2},{x=x1,y=y2}}
+				surface.DrawPoly(box)
+				surface.SetFont("DermaDefault")
+				surface.SetTextColor(255,255,255,255)
+				surface.SetTextPos(x2*0.98,y)
+				surface.DrawText(self:GetWindageString(false))
+			end
 			local radius=ScrH()
 			local fov=self.ScopeFOV
 			if (self.ScopeFOVMin) then fov=self.ScopeFOVMin end
@@ -1440,6 +1471,26 @@ function SWEP:GetZeroString(dosuffix)
 	end
 	if (zstr) then
 		zerostring=zstr[zero]
+	end
+	return zerostring
+end
+function SWEP:GetWindageString(dosuffix)
+	local zero=self.Windage
+	local zdata=self.Windagedata
+	local right="R"
+	if (zero<0) then right="L " end
+	if (self:GetNWBool("AltIrons")) then
+		zero=self.WindageAlt
+		zdata=self.WindagedataAlt
+	end
+	local zerostring=zero..right
+	if (zdata.mils) then
+		zerostring=(zero/zdata.mils)..right
+		if (dosuffix) then zerostring=zerostring..right.." mils" end
+	end
+	if (zdata.moa) then
+		zerostring=(zero/zdata.moa)..right
+		if (dosuffix) then zerostring=zerostring..right.." MOA" end
 	end
 	return zerostring
 end
@@ -1981,7 +2032,65 @@ function SWEP.DetectScroll(ply,bind,pressed)
 		local wep=ply:GetActiveWeapon()
 		if (IsValid(wep) and string.find(wep:GetClass(),"weapon_kswep")) then
 			if (bind=="invnext" and wep:GetNWBool("Sight")) then
-				if (wep.Owner:KeyDown(IN_WALK) and wep.ScopeFOVSteps~=nil) then
+				if (wep.Owner:KeyDown(IN_RELOAD)) then
+					if (wep.Owner:KeyDown(IN_WALK)) then
+						local zdata
+						local zalt=false
+						local zero=wep.Windage
+						if (wep:GetNWBool("AltIrons")) then
+							zdata=wep.WindagedataAlt
+							zalt=true
+							zero=wep.WindageAlt
+						else
+							zdata=wep.Windagedata
+						end
+						if (zdata.step>0) then
+							zero=zero-zdata.step
+							if (zero<zdata.max*-1) then
+								zero=zdata.max*-1
+							end
+							if (zalt) then
+								wep.WindageAlt=zero
+							else
+								wep.Windage=zero
+							end
+							net.Start("kswep_zerowindage")
+							net.WriteEntity(wep)
+							net.WriteBool(zalt)
+							net.WriteInt(zero,16)
+							net.SendToServer()
+						end
+					else
+						local zdata
+						local zalt=false
+						local zero=wep.Zero
+						if (wep.ZerodataAlt.default~=false and wep:GetNWBool("AltIrons")) then
+							zdata=wep.ZerodataAlt
+							zalt=true
+							zero=wep.ZeroAlt
+						else
+							zdata=wep.Zerodata
+						end
+						zero=zero-zdata.step
+						if (zero<zdata.min) then
+							if (zdata.battlesight) then
+								zero=0
+							else
+								zero=zdata.min
+							end
+						end
+						if (zalt) then
+							wep.ZeroAlt=zero
+						else
+							wep.Zero=zero
+						end
+						net.Start("kswep_zero")
+						net.WriteEntity(wep)
+						net.WriteBool(zalt)
+						net.WriteInt(zero,16)
+						net.SendToServer()
+					end
+				elseif (wep.Owner:KeyDown(IN_WALK) and wep.ScopeFOVSteps~=nil) then
 					wep.ScopeFOV=wep.ScopeFOV+((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
 					if (wep.ScopeReticleZoomMax>0) then
 						wep.ScopeReticleZoom=wep.ScopeReticleZoom-((1/wep.ScopeFOVSteps)*(wep.ScopeReticleZoomMax-wep.ScopeReticleZoomMin))
@@ -1992,42 +2101,70 @@ function SWEP.DetectScroll(ply,bind,pressed)
 							wep.ScopeReticleZoom=wep.ScopeReticleZoomMin
 						end
 					 end
-				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
-					local zdata
-					local zalt=false
-					local zero=wep.Zero
-					if (wep.ZerodataAlt.default~=false and wep:GetNWBool("AltIrons")) then
-						zdata=wep.ZerodataAlt
-						zalt=true
-						zero=wep.ZeroAlt
-					else
-						zdata=wep.Zerodata
-					end
-					zero=zero-zdata.step
-					if (zero<zdata.min) then
-						if (zdata.battlesight) then
-							zero=0
-						else
-							zero=zdata.min
-						end
-					end
-					if (zalt) then
-						wep.ZeroAlt=zero
-					else
-						wep.Zero=zero
-					end
-					net.Start("kswep_zero")
-					net.WriteEntity(wep)
-					net.WriteBool(zalt)
-					net.WriteInt(zero,16)
-					net.SendToServer()
 				else
 					wep.IronZoom=wep.IronZoom+5
 					if (wep.IronZoom>wep:IronZoomMin()) then wep.IronZoom=wep:IronZoomMin() end
 					wep.ViewModelFOV=wep.VMSmallFOV+(wep.VMLargeFOV-wep.VMSmallFOV)*(wep:IronZoomMin()-wep.IronZoom)/(wep:IronZoomMin()-wep:IronZoomMax())
 				end
 			elseif (bind=="invprev" and wep:GetNWBool("Sight")) then
-				if (wep.Owner:KeyDown(IN_WALK) and wep.ScopeFOVSteps~=nil) then
+				if (wep.Owner:KeyDown(IN_RELOAD)) then
+					if (wep.Owner:KeyDown(IN_WALK)) then
+						local zdata
+						local zalt=false
+						local zero=wep.Windage
+						if (wep:GetNWBool("AltIrons")) then
+							zdata=wep.WindagedataAlt
+							zalt=true
+							zero=wep.WindageAlt
+						else
+							zdata=wep.Windagedata
+						end
+						if (zdata.step>0) then
+							zero=zero+zdata.step
+							if (zero>zdata.max) then
+								zero=zdata.max
+							end
+							if (zalt) then
+								wep.WindageAlt=zero
+							else
+								wep.Windage=zero
+							end
+							net.Start("kswep_zerowindage")
+							net.WriteEntity(wep)
+							net.WriteBool(zalt)
+							net.WriteInt(zero,16)
+							net.SendToServer()
+						end
+					else
+						local zdata
+						local zalt=false
+						local zero=wep.Zero
+						if (wep.ZerodataAlt.default~=false and wep:GetNWBool("AltIrons")) then
+							zdata=wep.ZerodataAlt
+							zalt=true
+							zero=wep.ZeroAlt
+						else
+							zdata=wep.Zerodata
+						end
+						zero=zero+zdata.step
+						if (zero>zdata.max) then
+							zero=zdata.max
+						end
+						if (zero<zdata.min) then
+							zero=zdata.min
+						end
+						if (zalt) then
+							wep.ZeroAlt=zero
+						else
+							wep.Zero=zero
+						end
+						net.Start("kswep_zero")
+						net.WriteEntity(wep)
+						net.WriteBool(zalt)
+						net.WriteInt(wep.Zero,16)
+						net.SendToServer()
+					end
+				elseif (wep.Owner:KeyDown(IN_WALK) and wep.ScopeFOVSteps~=nil) then
 					wep.ScopeFOV=wep.ScopeFOV-((1/wep.ScopeFOVSteps)*(wep.ScopeFOVMax-wep.ScopeFOVMin))
 					if (wep.ScopeReticleZoomMax>0) then
 						wep.ScopeReticleZoom=wep.ScopeReticleZoom+((1/wep.ScopeFOVSteps)*(wep.ScopeReticleZoomMax-wep.ScopeReticleZoomMin))
@@ -2038,34 +2175,6 @@ function SWEP.DetectScroll(ply,bind,pressed)
 							wep.ScopeReticleZoom=wep.ScopeReticleZoomMax
 						end
 					end
-				elseif (wep.Owner:KeyDown(IN_RELOAD)) then
-					local zdata
-					local zalt=false
-					local zero=wep.Zero
-					if (wep.ZerodataAlt.default~=false and wep:GetNWBool("AltIrons")) then
-						zdata=wep.ZerodataAlt
-						zalt=true
-						zero=wep.ZeroAlt
-					else
-						zdata=wep.Zerodata
-					end
-					zero=zero+zdata.step
-					if (zero>zdata.max) then
-						zero=zdata.max
-					end
-					if (zero<zdata.min) then
-						zero=zdata.min
-					end
-					if (zalt) then
-						wep.ZeroAlt=zero
-					else
-						wep.Zero=zero
-					end
-					net.Start("kswep_zero")
-					net.WriteEntity(wep)
-					net.WriteBool(zalt)
-					net.WriteInt(wep.Zero,16)
-					net.SendToServer()
 				else
 					wep.IronZoom=wep.IronZoom-5 --flabbis
 					if (wep.IronZoom<wep:IronZoomMax()) then wep.IronZoom=wep:IronZoomMax() end
@@ -2948,9 +3057,13 @@ function SWEP:FlyBulletStart(bullet)
 	local supmod=1
 	local zero=self.Zero
 	local zdata=self.Zerodata
+	local windage=self.Windage
+	local wdata=self.Windagedata
 	if (self:GetNWBool("AltIrons")) then
 		zero=self.ZeroAlt
 		zdata=self.ZerodataAlt
+		windage=self.WindageAlt
+		wdata=self.WindagedataAlt
 	end
 	if (zero==0 and not zdata.mils and not zdata.moa) then
 		zero=zdata.battlesight
@@ -3019,6 +3132,16 @@ function SWEP:FlyBulletStart(bullet)
 	if (zdata.mils or zdata.moa) then
 		--scopeang=scopeang+Vector(0,0,math.sin(miladj/1000))
 		scopeang=scopeang-Angle(math.deg(miladj/1000),0,0)
+	end
+	if (wdata.step>0) then
+		local windadj
+			if (wdata.mils) then
+				windadj=windage/wdata.mils
+			end
+			if (wdata.moa) then
+				windadj=(windage/wdata.mils)/3.43775
+			end
+		scopeang=scopeang-Angle(0,math.deg(windadj/1000),0)
 	end
 	local shot = {}
 	local bulletang=bullet.Dir:Angle()
