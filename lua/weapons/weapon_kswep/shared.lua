@@ -2233,7 +2233,7 @@ function SWEP:Think()
 			self:FinishReload()
 		end
 	end
-	if (self:GetNWFloat("CurRecoil")>0) then
+	if (self:GetNWFloat("CurRecoil")>0 and self:GetNWFloat("NextPrimaryAttack")<CurTime()) then
 		--self:SetNWFloat("Recoil",self:GetNWFloat("Recoil")-(engine.TickInterval()*self.RecoilControl))
 		self:SetNWFloat("CurRecoil",Lerp(engine.TickInterval()*self.RecoilControl/2,self:GetNWFloat("CurRecoil"),0))
 		if (self:GetNWFloat("CurRecoil")<0.01) then
