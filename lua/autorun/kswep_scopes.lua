@@ -113,7 +113,7 @@ tbl.zero={
 	default=100,
 	battlesight=false
 }
-tbl.windage={mils=10,max=150,step=1}
+tbl.windage={mils=10,max=75,step=1}
 tbl.scope_border=1.1
 tbl.scope_ewheel=true
 tbl.scope_wwheel=true
@@ -150,7 +150,9 @@ tbl.luareticle="schmidt_p3"
 tbl.retillum=Color(255,0,0,255)
 tbl.sensitivity=12
 tbl.scope_border=1.07
+tbl.windage={mils=10,max=60,step=1}
 tbl.scope_ewheel=true
+tbl.scope_wwheel=true
 tbl.scope_cwheel=true
 tbl.scope_range=100
 tbl.minsensitivity=3
@@ -191,6 +193,7 @@ tbl.zero={
 	default=100,
 	battlesight=false
 }
+tbl.windage={mils=10,max=75,step=1}
 tbl.fovmax=7.7
 tbl.fovmin=1.95
 tbl.fovsteps=9
@@ -200,6 +203,7 @@ tbl.retillum=Color(255,0,0,255)
 tbl.sensitivity=10
 tbl.scope_border=1.06
 tbl.scope_ewheel=true
+tbl.scope_wwheel=true
 tbl.scope_range=100
 tbl.minsensitivity=2.5
 tbl.aimmag=1.95*10
@@ -217,6 +221,7 @@ tbl.zero={
 	default=100,
 	battlesight=false
 }
+tbl.windage={mils=false,moa=2,max=90,step=1}
 tbl.fovmax=6.78
 tbl.fovmin=2.597
 tbl.fovsteps=5
@@ -226,6 +231,7 @@ tbl.retillum=Color(255,0,0,255)
 tbl.sensitivity=8
 tbl.scope_border=1.06
 tbl.scope_ewheel=true
+tbl.scope_wwheel=true
 tbl.scope_range=100
 tbl.minsensitivity=3.5
 tbl.aimmag=2.597*8.7
@@ -247,6 +253,7 @@ tbl.zero={
 	default=100,
 	battlesight=false
 }
+tbl.windage={mils=false,moa=2,max=65,step=1}
 tbl.fovmax=5.73
 tbl.fovmin=2.12
 tbl.fovsteps=5
@@ -256,6 +263,7 @@ tbl.retillum=Color(255,0,0,255)
 tbl.sensitivity=10
 tbl.scope_border=1.07
 tbl.scope_ewheel=true
+tbl.scope_wwheel=true
 tbl.scope_range=100
 tbl.minsensitivity=3.5
 tbl.aimmag=2.12*9.5

@@ -55,6 +55,8 @@ def.zero= {
 	default=100,
 	battlesight=false
 }
+def.windage={mils=false,max=0,step=0}
+def.windagealt=def.windage
 def.zeroalt={default=-1}
 SWEP.AdminSpawnable = true
 SWEP.MagClass="BoltMag"

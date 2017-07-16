@@ -62,6 +62,8 @@ def.zero = {
 def.zeroalt = {
 	default=-1
 }
+def.windage={mils=false,max=0,step=0}
+def.windagealt=def.windage
 def.scope_border=1.1
 def.scope_ewheel=false
 def.retcolor=color_black
