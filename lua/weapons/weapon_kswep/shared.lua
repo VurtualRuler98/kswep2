@@ -2163,6 +2163,9 @@ function SWEP:Think()
 	if (self.AimNoModel and SERVER and self.Owner:IsPlayer()) then
 		self.Owner:DrawViewModel(not self:GetNWBool("Sight"))
 	end
+	if (self.NoViewModel and SERVER and self.Owner:IsPlayer()) then
+		self.Owner:DrawViewModel(false)
+	end
 	if (self:IsRunning() and self.RunTimer==0) then
 		self.RunTimer=CurTime()
 	end
