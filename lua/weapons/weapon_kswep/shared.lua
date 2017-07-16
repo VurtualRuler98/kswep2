@@ -2872,6 +2872,9 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 			recoil=recoil*1.5
 		end
 	end
+	if (self.AimLuaMagnification) then
+		recoil=recoil+recoil*0.25*(self.AimLuaMagnification/self.ScopeFOV)
+	end
         local bullet = {}
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()+Vector(0,0,self:GetSightHeight()*-1)                      -- Source
