@@ -2466,7 +2466,11 @@ function SWEP:DrawRTScope()
 	render.RenderView(scopeview)
 	if (self:GetNWFloat("CurRecoil")>0.04) then
 		local recblur=self:GetNWFloat("CurRecoil")*5
-		render.BlurRenderTarget(self.RenderTarget,recblur,recblur,4)
+		local blur=4
+		if (self.AimLuaMagnification) then
+			blur=self.AimLuaMagnification/self.ScopeFOV
+		end
+		render.BlurRenderTarget(self.RenderTarget,recblur,recblur,blur)
 	end
 	render.OverrideAlphaWriteEnable(false)
 	if (self.SuperScope) then
