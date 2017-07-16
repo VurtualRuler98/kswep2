@@ -2982,7 +2982,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 		end
 	end
 	local returnrecoil=recoil
-	if (self.AimLuaMagnification) then
+	if (self.AimLuaMagnification>1) then
 		returnrecoil=recoil+recoil*0.25*(self.AimLuaMagnification/self.ScopeFOV)
 	end
         local bullet = {}
