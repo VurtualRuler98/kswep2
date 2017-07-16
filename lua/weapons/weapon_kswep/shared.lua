@@ -2872,8 +2872,9 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 			recoil=recoil*1.5
 		end
 	end
+	local returnrecoil=recoil
 	if (self.AimLuaMagnification) then
-		recoil=recoil+recoil*0.25*(self.AimLuaMagnification/self.ScopeFOV)
+		returnrecoil=recoil+recoil*0.25*(self.AimLuaMagnification/self.ScopeFOV)
 	end
         local bullet = {}
         bullet.Num              = num_bullets
@@ -2898,7 +2899,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 			if (self.Owner:IsPlayer()) then
 				bullet.Dir=self:GenerateBulletDir(recoil,aimPenalty,aimcone)
 			else
-				tbl.Dir=self.Owner:GetAimVector()+(0.005*recoil*VectorRand()*aimPenalty)+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
+				tbl.Dir=self.Owner:GetAimVector()+(0.005*returnrecoil*VectorRand()*aimPenalty)+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
 			end
 			self:FlyBulletStart(tbl)
 		end
