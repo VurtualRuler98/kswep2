@@ -3284,7 +3284,7 @@ function SWEP:CalcReducedArmorPen(rating,ratio) --mostly made up for now
 		testvel=4000
 	end
 	testvel=testvel*ratio*0.95
-	local newpen=0
+	local newpen=KSWEP_ARMOR_IV+1
 	if (testvel<850) then
 		newpen=KSWEP_ARMOR_I
 	elseif (testvel<1090) then
