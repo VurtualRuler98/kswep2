@@ -3139,7 +3139,7 @@ function SWEP:FlyBulletStart(bullet)
 				windadj=windage/wdata.mils
 			end
 			if (wdata.moa) then
-				windadj=(windage/wdata.mils)/3.43775
+				windadj=(windage/wdata.moa)/3.43775
 			end
 		scopeang=scopeang-Angle(0,math.deg(windadj/1000),0)
 	end
