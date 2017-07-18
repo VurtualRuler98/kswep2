@@ -1364,7 +1364,7 @@ function SWEP:DrawHUD()
 		if (self.ScopeLuaReticlePlane) then
 			fov=self.ScopeLuaReticlePlane
 		end
-		local scale=self.ScopeRes/(fov*3.6)
+		local scale=oldW/(fov*18)
 		self:DrawLuaReticle(self.ScopeLuaReticle,self.ScopeReticleColor,oldW,oldH,scale,oldH/oldW)
 	end
 		render.SetViewPort(0,0,oldW,oldH)
@@ -1532,7 +1532,7 @@ function SWEP:DrawViewScope(x,y,radius)
 end
 function SWEP:DrawLuaReticle(reticle,retcol,width,height,scale,scalemod)
 		local aspectratio=(width/height)/(4/3)
-		scale=scale/aspectratio
+		--scale=scale/aspectratio
 		draw.NoTexture()
 		for k,v in pairs(kswep_reticles[reticle]) do
 			if (v.shape=="line") then
