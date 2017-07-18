@@ -272,3 +272,25 @@ local tbl=table.Copy(tbl)
 tbl.name="Leupold Mark 4 3.5-10x40mm  LR/T M3 Mil-dot"
 tbl.luareticle="leupold_mil"
 AddKswep2DScope(tbl)
+local tbl=table.Copy(def)
+tbl.name="Leupold VX-1 Rimfire 2-7x28mm"
+tbl.fov=3.32
+tbl.fovmax=8.6
+tbl.fovmin=3.32
+tbl.fovsteps=5
+tbl.zero={
+	mils=false,
+	bc=-1,
+	min=50,
+	max=50,
+	step=0,
+	default=50,
+	battlesight=false
+}
+tbl.luareticle="duplex"
+tbl.luaretsfp=3.32 --I dunno
+tbl.sensitivity=7
+tbl.minsensitivity=2
+tbl.scope_border=1.02
+tbl.aimmag=3.32*6.7
+AddKswep2DScope(tbl)
