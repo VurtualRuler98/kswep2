@@ -1364,7 +1364,7 @@ function SWEP:DrawHUD()
 		if (self.ScopeLuaReticlePlane) then
 			fov=self.ScopeLuaReticlePlane
 		end
-		local scale=1024/(fov*3.6)
+		local scale=self.ScopeRes/(fov*3.6)
 		self:DrawLuaReticle(self.ScopeLuaReticle,self.ScopeReticleColor,oldW,oldH,scale,oldH/oldW)
 	end
 		render.SetViewPort(0,0,oldW,oldH)

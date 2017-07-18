@@ -210,7 +210,7 @@ tbl.aimmag=1.95*10
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Leupold TS30-A2"
-tbl.fov=2.12
+tbl.fov=2.597
 tbl.zero={
 	mils=false,
 	moa=2,
