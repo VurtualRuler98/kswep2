@@ -2679,13 +2679,13 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	else
 		if (ConVarExists("prone_bindkey_enabled") and not self.Owner:IsProne()) then
 			if (self.Owner:Crouching()) then
-				aimShake=0.05
-			else
 				aimShake=0.1
+			else
+				aimShake=0.5
 			end
 		elseif (not ConVarExists("prone_bindkey_enabled")) then
 			if (not self.Owner:Crouching()) then
-				aimShake=0.1
+				aimShake=0.5
 			end
 		end
 	end
@@ -2916,22 +2916,20 @@ function SWEP:IsWallBlocked()
 end
 function SWEP:IsResting()
 	if (not self.Owner:IsPlayer()) then return false end
-	if (not self:GetNWBool("Bipod")) then return false end
+	--if (not self:GetNWBool("Bipod")) then return false end
 	local length = self.Length
 	if (self.Suppressed) then
 		length = length+self.LengthSup
 	end
-	local bipodpos=self.Owner:GetAimVector()
-	bipodpos:Rotate(Angle(0,0,-90))
-	bipodpos=bipodpos*25
-	local tr = util.TraceLine( {
+	local tr = util.TraceHull( {
 		filter = self.Owner,
-		start = self.Owner:GetShootPos()+bipodpos,
-		endpos = self.Owner:GetShootPos()+(self.Owner:GetAimVector()*length)+bipodpos,
+		start = self.Owner:GetShootPos(),
+		endpos = self.Owner:GetShootPos()+(self.Owner:GetAimVector()*length),
+		mins=Vector(-10,-10,-20),
+		maxs=Vector(10,10,10),
 		mask = MASK_SOLID
 		})
         if (tr.Hit) then
-		if (SERVER) then print(tr.Entity) end
                 return true
         else
                 return false
