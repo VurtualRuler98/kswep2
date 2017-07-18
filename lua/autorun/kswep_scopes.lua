@@ -216,12 +216,12 @@ tbl.zero={
 	moa=2,
 	bc=-1,
 	min=-1,
-	max=80,
+	max=56,
 	step=1,
 	default=100,
 	battlesight=false
 }
-tbl.windage={mils=false,moa=2,max=90,step=1}
+tbl.windage={mils=false,moa=2,max=30,step=1}
 tbl.fovmax=6.78
 tbl.fovmin=2.597
 tbl.fovsteps=5
