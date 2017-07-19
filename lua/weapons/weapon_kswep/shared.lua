@@ -112,6 +112,7 @@ SWEP.Anims.StowAnim=ACT_VM_HOLSTER
 SWEP.Anims.UnstowAnim=ACT_VM_DRAW
 SWEP.Anims.NextIdleAnim=ACT_VM_IDLE
 SWEP.EmptyAnims=false
+SWEP.BipodHeight=0
 SWEP.Anims.IdleAnimEmpty=ACT_VM_IDLE
 SWEP.Anims.IronInAnimEmpty=ACT_VM_IIN
 SWEP.Anims.IronOutAnimEmpty=ACT_VM_IOUT
@@ -2673,19 +2674,30 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 	self.LastShake=self.LastShake or Angle()
 	self.ShakeTimer=self.ShakeTimer or 0
 	local modpos=oldPos
-	local aimShake=0.025
+	local aimShake=0.1
 	if (self.RestingCached) then
-		aimShake=0.01
-	else
+		aimShake=0.0125
 		if (ConVarExists("prone_bindkey_enabled") and not self.Owner:IsProne()) then
 			if (self.Owner:Crouching()) then
-				aimShake=0.1
+				aimShake=0.025
 			else
-				aimShake=0.5
+				aimShake=0.05
 			end
 		elseif (not ConVarExists("prone_bindkey_enabled")) then
 			if (not self.Owner:Crouching()) then
-				aimShake=0.5
+				aimShake=0.05
+			end
+		end
+	else
+		if (ConVarExists("prone_bindkey_enabled") and not self.Owner:IsProne()) then
+			if (self.Owner:Crouching()) then
+				aimShake=0.2
+			else
+				aimShake=0.4
+			end
+		elseif (not ConVarExists("prone_bindkey_enabled")) then
+			if (not self.Owner:Crouching()) then
+				aimShake=0.4
 			end
 		end
 	end
@@ -2696,7 +2708,7 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 		self.AimShake=LerpAngle(0.99,self.LastShake,self.AimShake)
 		if (self.ShakeTimer<CurTime()) then
 		self.LastShake=Angle(math.Rand(-aimShake,aimShake),math.Rand(-aimShake,aimShake),math.Rand(-aimShake,aimShake))
-		self.ShakeTimer=CurTime()+math.Rand(0.01,0.1)
+		self.ShakeTimer=CurTime()+math.Rand(0.1,0.2)
 		end
 		ang=oldAng+Angle(self:GetNWFloat("CurRecoil")*-0.2,0,0)+self.AimShake
 	else
@@ -2787,6 +2799,9 @@ function SWEP:AdjustMouseSensitivity()
 			scopesens=self.MaxSensitivity
 		end
 		scopesens=1+(scopesens+self.MinSensitivity-1)*((self:IronZoomMin()-self.IronZoom)/(self:IronZoomMin()-self:IronZoomMax()))
+		if (self.Owner:KeyDown(IN_SPEED)) then
+			scopesens=scopesens*4
+		end
 		return 1/scopesens/self.ScopeZoom
 	else
                 return 1
@@ -2925,8 +2940,8 @@ function SWEP:IsResting()
 		filter = self.Owner,
 		start = self.Owner:GetShootPos(),
 		endpos = self.Owner:GetShootPos()+(self.Owner:GetAimVector()*length),
-		mins=Vector(-10,-10,-20),
-		maxs=Vector(10,10,10),
+		mins=Vector(-15,-15,-15-self.BipodHeight),
+		maxs=Vector(15,15,15),
 		mask = MASK_SOLID
 		})
         if (tr.Hit) then
