@@ -61,6 +61,7 @@ def.retcolor=color_black
 def.luareticle="irons"
 def.fov=11
 def.aimmag=6.5
+SWEP.BipodHeight=9
 SWEP.AdminSpawnable = true
 SWEP.MagClass="STANAG"
 SWEP.ViewModel = "models/weapons/cstrike/c_rif_m4a1.mdl"
@@ -124,7 +125,7 @@ function SWEP:ReloadAct(force)
 	self:ReloadMag(force)
 end
 function SWEP:Initialize2()
-	if (CLIENT) then self:SetOptic2D("Default") end
+	if (CLIENT) then self:SetOptic2D("Leupold TS30-A2") end
 end
 function SWEP:PrimaryFire()
 	self:FiremodeFire()
