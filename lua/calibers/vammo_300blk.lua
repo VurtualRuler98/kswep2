@@ -31,7 +31,7 @@ hook.Add("VurtualAmmotypes","vammo_300blk", function()
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
 	tbl.damagescale = 1
-	tbl.coefficient=0.1
+	tbl.coefficient=1
 	tbl.diameter=0.308
 	tbl.recoil = 0.5
 	tbl.mass=20

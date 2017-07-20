@@ -172,7 +172,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.dmgbase=0
 	tbl.dmgvitalmin=0
 	tbl.dmgvitalmax=0
-	tbl.coefficient=0.1
+	tbl.coefficient=1
 	tbl.name = "vammo_762x54t"
 	tbl.printname = "7.62x54mm Tranq."
 	tbl.caliber = "vammo_762x54t"
@@ -243,7 +243,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 
 	local tbl = {}
 	tbl.vestpenetration=0
-	tbl.coefficient=0.1
+	tbl.coefficient=1
 	tbl.dmgbase=0
 	tbl.dmgvitalmin=0
 	tbl.dmgvitalmax=0
