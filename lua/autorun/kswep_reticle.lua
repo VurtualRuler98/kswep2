@@ -13,7 +13,7 @@ local tbl = { --for
 }
 AddKswepReticle(tbl,"irons")
 local tbl = { 
-{shape="circle",pos={0,0},radius=1}
+{shape="circle",pos={0,0},radius=0.5} --now a 1 mil dot
 }
 AddKswepReticle(tbl,"reddot")
 local tbl = {

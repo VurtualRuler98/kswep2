@@ -219,6 +219,8 @@ SWEP.RestingCached=false
 SWEP.ScopeReticle=false
 SWEP.ScopeLuaReticle=false
 SWEP.ScopeLuaReticlePlane=false
+SWEP.ScopeLuaReticleScale=false
+SWEP.ScopeLuaReticleHolo=false
 SWEP.ScopeReticleColor=color_black
 SWEP.SwitchedBrightness=false
 SWEP.AimLuaReticleMode=false
@@ -813,6 +815,8 @@ function SWEP:SetOptic2D(name)
 	self.AimLuaMagnification=scopedata.aimmag
 	self.ScopeLuaReticle=scopedata.luareticle
 	self.ScopeLuaReticlePlane=scopedata.luaretsfp
+	self.ScopeLuaReticleScale=scopedata.luaretscale
+	self.ScopeLuaReticleHolo=scopedata.luaretholo
 	self.ScopeReticleColor=scopedata.retcolor
 	self.Scope2DBorderRatio=scopedata.scope_border
 	self.Scope2DWheelElevation=scopedata.scope_ewheel
@@ -863,6 +867,8 @@ function SWEP:InsOptic(name)
 	self.ScopeReticle=scopedata.reticle
 	self.ScopeLuaReticle=scopedata.luareticle
 	self.ScopeLuaReticlePlane=scopedata.luaretsfp
+	self.ScopeLuaReticleScale=scopedata.luaretscale
+	self.ScopeLuaReticleHolo=scopedata.luaretholo
 	self.ScopeReticlePix=scopedata.retpix
 	self.ScopeReticlePixMil=scopedata.retpixmil
 	self.ScopeReticleColor=scopedata.retcolor
@@ -1364,6 +1370,12 @@ function SWEP:DrawHUD()
 		local fov=self.ScopeFOV
 		if (self.ScopeLuaReticlePlane) then
 			fov=self.ScopeLuaReticlePlane
+		end
+		if (self.ScopeLuaReticleScale) then
+			fov=fov/self.ScopeLuaReticleScale
+		end
+		if (self.ScopeLuaReticleHolo) then
+			fov=fov/(self.IronZoom/self:IronZoomMax())
 		end
 		local scale=oldW/(fov*18)
 		self:DrawLuaReticle(self.ScopeLuaReticle,self.ScopeReticleColor,oldW,oldH,scale,oldH/oldW)
