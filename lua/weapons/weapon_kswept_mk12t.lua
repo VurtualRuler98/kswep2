@@ -135,5 +135,5 @@ function SWEP:PrimaryFire()
 	self:NormalFire()
 end
 function SWEP:Initialize2()
-	if (CLIENT) then self:SetOptic2D("Leupold TS30-A2") end
+	if (CLIENT) then self:SetOptic2D("Nightforce 2.5-10x24 NXS Compact") end
 end
