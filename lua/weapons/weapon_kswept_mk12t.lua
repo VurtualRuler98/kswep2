@@ -72,6 +72,7 @@ def.retcolor=color_black
 def.luareticle="irons"
 def.fov=11
 def.aimmag=6.5
+SWEP.OverrideScopeRange=10
 SWEP.BipodHeight=9
 SWEP.AdminSpawnable = true
 SWEP.MagClass="STANAG"

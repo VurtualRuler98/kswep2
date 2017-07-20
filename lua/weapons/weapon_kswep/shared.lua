@@ -1077,6 +1077,10 @@ function SWEP:OpenRangeCard()
 	local drag_bc=self.Ammo.coefficient or 0.25
 	local drag_ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 	local drop=0
+	local scoperange=self.ScopeRangeCard
+	if (self.OverrideScopeRange and self.OverrideScopeRange>0) then
+		scoperange=self.OverrideScopeRange
+	end
 	while (drag_ticks>0 and drag_dist<zero*39.3701) do
 		drag_ticks=drag_ticks-1
 		drag_time=drag_time+1
@@ -1110,8 +1114,8 @@ function SWEP:OpenRangeCard()
 		drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
 		drag_vector=(drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
 		drop=drop-drag_vector.z*12*engine.TickInterval()
-		if (drag_dist/39.701>lastrange+self.ScopeRangeCard) then
-			local droprange=math.floor((drag_dist/39.701)/self.ScopeRangeCard)*self.ScopeRangeCard
+		if (drag_dist/39.701>lastrange+scoperange) then
+			local droprange=math.floor((drag_dist/39.701)/scoperange)*scoperange
 			lastrange=droprange
 			local newdropadj=math.atan((drop+self:GetSightHeight())/drag_dist)-basedropadj
 			if (newdropadj*1000<maxdropadj) then
