@@ -208,7 +208,7 @@ tbl.minsensitivity=3
 tbl.aimmag=1.94*12
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
-tbl.name="Nightforce 2.5-20x24 NXS Compact"
+tbl.name="Nightforce 2.5-10x24 NXS Compact"
 tbl.fov=7.7
 tbl.zero={
 	mils=10,
