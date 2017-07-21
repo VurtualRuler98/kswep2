@@ -20,7 +20,24 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.velocity = 3165 --20" barrel
 	tbl.wallbang = 4
 	AddAmmodata(tbl)
-
+	local tbl = {}
+	tbl.vestpenetration=0
+	tbl.dmgbase = 0
+	tbl.dmgvitalmin = 0
+	tbl.dmgvitalmax = 0
+	tbl.name = "vammo_556x45_m200_blank"
+	tbl.caliber = "vammo_556x45"
+	tbl.printname = "5.56x45mm M200 Blank"
+	tbl.projectiles = 0
+	tbl.spreadscale = 1
+	tbl.damagescale = 1
+	tbl.coefficient=0
+	tbl.diameter=0.224
+	tbl.recoil = 2
+	tbl.mass=0
+	tbl.velocity = 3165 --20" barrel
+	tbl.wallbang = 0
+	AddAmmodata(tbl)
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase = 10
