@@ -2282,6 +2282,13 @@ end
 hook.Add("PlayerBindPress","kswep_detectscroll",SWEP.DetectScroll)
 function SWEP:Think2()
 end
+function SWEP:DrawWorldModel()
+	if (self.GhostGun) then
+		return
+	else
+		self:DrawModel()
+	end
+end
 function SWEP:Think()
 	if (CLIENT and LocalPlayer()==self.Owner and self.RefreshMerge) then
 		self:InitMergeParts()
