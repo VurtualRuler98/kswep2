@@ -543,7 +543,7 @@ function SWEP:FireRocket()
 	end
 	if (self.RocketSingleShot) then
 		if (self:GetNWInt("numgrenades")<1) then self:SetNWFloat("DropAfter",CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(self:GetShootAnim()))) end
-		self:NextBolt(CurTime()+self.Primary.Delay,ACT_VM_READY,self.Anims.TossAnim)
+		self:NextBolt(CurTime()+self.Primary.Delay,self.Anims.InitialDrawAnim,self.Anims.TossAnim)
 	else
 		if (self:GetNWInt("numgrenades")<1) then
 			self:NextIdle(CurTime()+self.Primary.Delay,self.Anims.IdleAnimEmpty)
