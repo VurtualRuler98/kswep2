@@ -58,6 +58,7 @@ function AddKswepHands(tbl)
 	kswep_hands[tbl.name]=table.Copy(tbl)
 end
 CreateConVar("kswep_slow",0,FCVAR_REPLICATED )
+CreateConVar("kswep_npc_wander",0,FCVAR_REPLICATED )
 CreateConVar("kswep_phys",1,FCVAR_REPLICATED )
 CreateConVar("kswep_earpro",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_max_flighttime",10,FCVAR_REPLICATED )
