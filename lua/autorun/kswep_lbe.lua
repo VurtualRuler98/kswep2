@@ -6,21 +6,12 @@ kswep_lbe={}
 local function KswepAddLBE(tbl)
 	kswep_lbe[tbl.name]=tbl
 end
-local tbl={}
-tbl.name="ALICE Rifleman"
-tbl.slots = {{STANAG=6,BattleRifle=4}}
-tbl.addon="ALICE"
-KswepAddLBE(tbl)
-local tbl={}
-tbl.name="PALS 3x Double Mag"
-tbl.slots = {{STANAG=6,BattleRifle=3}}
-tbl.addon="PALS"
-KswepAddLBE(tbl)
-local tbl={}
-tbl.name="PALS 6x Bolt Mag"
-tbl.slots = {{BoltMag=6}}
-tbl.addon="PALS"
-KswepAddLBE(tbl)
+kswep_lbeaddon={}
+local function KswepAddLBEAddon(tbl)
+	kswep_lbeaddon[tbl.name]=tbl
+end
+
+--BASE ONLY ITEM
 local tbl={}
 tbl.name="PALS 2x Drum"
 tbl.slots = {{Drum=2}}
@@ -81,3 +72,84 @@ tbl.name="Soviet Mosin Belt"
 tbl.slots = {{RifleClip=8,RifleClip2=4}}
 tbl.addon="SovietBelt"
 KswepAddLBE(tbl)
+
+--HYBID ITEM
+local tbl={}
+tbl.name="ALICE Rifleman"
+tbl.slots = {{STANAG=6,BattleRifle=4}}
+tbl.addon="ALICE"
+KswepAddLBE(tbl)
+KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="PALS 3x Double Mag"
+tbl.slots = {{STANAG=6,BattleRifle=3}}
+tbl.addon="PALS"
+KswepAddLBE(tbl)
+KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="PALS 3x Bolt Mag"
+tbl.slots = {{BoltMag=3,RifleClip=6,RifleClip2=3}}
+tbl.addon="PALS"
+KswepAddLBE(tbl)
+KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="MOLLE II Pistolman"
+tbl.slots = {{Pistol1=4,Pistol2=4,PistolCarbine=4}}
+tbl.addon="PALS"
+KswepAddLBE(tbl)
+KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="PALS Eagle Shotgun Pouches 2x"
+tbl.slots = {{Shotshell=48}}
+tbl.addon="PALS"
+KswepAddLBE(tbl)
+KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="PALS Utility Pouches"
+tbl.slots = {{Box=4},{Speedloader=4}}
+tbl.addon="PALS"
+KswepAddLBE(tbl)
+KswepAddLBEAddon(tbl)
+
+
+--ADDON ONLY ITEM
+local tbl={}
+tbl.name="None"
+tbl.slots = {}
+tbl.addon="none"
+KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="ALICE 1911 Mag Pouches 2x"
+tbl.slots = {{Pistol1=4}}
+tbl.addon="ALICE"
+KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="ALICE 9mm Mag Pouches 2x"
+tbl.slots = {{PistolCarbine=2,Pistol2=2,Pistol1=2}}
+tbl.addon="ALICE"
+KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="ALICE Shotgun Pouches 2x"
+tbl.slots = {{Shotshell=20}}
+tbl.addon="ALICE"
+KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="WWII Shotgun Pouches 2x"
+tbl.slots = {{Shotshell=24}}
+tbl.addon="WW2US"
+KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="Pattern 37 Pistol Mag Pouches 2x"
+tbl.slots = {{Pistol1=4,Pistol2=4}}
+tbl.addon="P37"
+KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="Pattern 37 Revolver Ammo Pouches"
+tbl.slots = {{Box=1}}
+tbl.addon="P37"
+KswepAddLBEAddon(tbl)
+local tbl={}
+tbl.name="Soviet Pistol Holster"
+tbl.slots = {{Pistol1=1}}
+tbl.addon="SovietBelt"
+KswepAddLBEAddon(tbl)
