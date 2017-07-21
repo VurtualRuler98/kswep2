@@ -12,6 +12,14 @@ sound.Add({
 	channel=CHAN_STATIC
 })
 sound.Add({
+	name="weapon_kswept_law.single",
+	volume=1.0,
+	pitch={55,60},
+	sound="weapons/357_fire2.wav",
+	level=165,
+	channel=CHAN_STATIC
+})
+sound.Add({
 	name="weapon_kswept_m4.single",
 	volume=1.0,
 	pitch={155,165},
