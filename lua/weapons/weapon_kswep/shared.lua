@@ -729,6 +729,9 @@ function SWEP:Deploy()
 	end
 	self:SetNWBool("Raised",true)
 	self:SetNWFloat("CurRecoil",self.MaxRecoil)
+	if (self.NoViewModel and SERVER and self.Owner:IsPlayer()) then
+		self.Owner:DrawViewModel(false)
+	end
 	if (self.InitialDraw) then
 		--self:DiscoverModelAnims()
 		self:SetClip1(self.MagSize)
