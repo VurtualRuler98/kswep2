@@ -67,7 +67,7 @@ function ENT:RunBehaviour()
 					gender="Female"
 					maxmodel=6
 					maxmodel=math.random(1,maxmodel)
-					if (maxmodel==6) then maxmodel=7 end
+					if (maxmodel==5) then maxmodel=7 end
 				else
 					maxmodel=math.random(1,maxmodel)
 				end
