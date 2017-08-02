@@ -170,7 +170,6 @@ function SWEP:Think()
 		self:SetNWInt("ThrowStep",0)
 		if (self:GetNWInt("numgrenades")<1) then
 			if (SERVER) then
-				print("REMOVE")
 				self:Remove()
 			end
 		end
