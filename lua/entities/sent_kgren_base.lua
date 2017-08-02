@@ -29,6 +29,7 @@ ENT.PhysFragMassMax=120
 ENT.PhysFragCountMultiplier=1
 ENT.IsRemoved=false
 ENT.MolotovFlames=10
+ENT.SmokeScale=100
 ENT.CSGasTimer=0
 ENT.CSGasEffectDelay=0.3
 ENT.LastCough=0
@@ -133,6 +134,7 @@ function ENT:ThinkSmokeCS()
 		effectdata:SetOrigin(self:GetPos())
 		effectdata:SetStart(self:GetNWVector("SmokeColor"))
 		effectdata:SetAngles(self:GetAngles())
+		effectdata:SetScale(self.SmokeScale)
 		util.Effect("kswep_csgas",effectdata,true,true)
 		self.BurnEffectTimer=CurTime()+self.BurnEffectDelay
 		end
@@ -177,6 +179,7 @@ function ENT:ThinkSmoke()
 		effectdata:SetOrigin(self:GetPos())
 		effectdata:SetStart(self:GetNWVector("SmokeColor"))
 		effectdata:SetAngles(self:GetAngles())
+		effectdata:SetScale(self.SmokeScale)
 		util.Effect("kswep_smoke",effectdata,true,true)
 		self.BurnEffectTimer=CurTime()+self.BurnEffectDelay
 		end
