@@ -166,10 +166,11 @@ function SWEP:Think()
 		self:SetNWInt("ThrowStep",2)
 	end
 	--READY FOR NEXT THROW
-	if (not self.Owner:KeyDown(self.ThrowType) and self:GetNWInt("ThrowStep")==2 and self:GetNWFloat("NextIdle")==0) then
+	if (not self.Owner:KeyDown(self.ThrowType) and self:GetNWInt("ThrowStep")==2 and self:GetNWFloat("NextIdle")==0 and self:GetNWFloat("FinalThrowTime")==0) then
 		self:SetNWInt("ThrowStep",0)
 		if (self:GetNWInt("numgrenades")<1) then
 			if (SERVER) then
+				print("REMOVE")
 				self:Remove()
 			end
 		end
