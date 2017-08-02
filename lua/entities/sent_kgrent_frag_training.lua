@@ -38,7 +38,9 @@ function ENT:Initialize()
 end
 end
 function ENT:Detonate()
-	self:EmitSound(self.DetonateSound)
+	if (IsFirstTimePredicted()) then
+		self:EmitSound(self.DetonateSound)
+	end
 	self:DetSmoke()
 end
 function ENT:Think2()
