@@ -267,8 +267,11 @@ function SWEP:Initialize2()
 end
 function SWEP:InitScopeData(scopedata)
 end
+function SWEP:InitAnims(tbl)
+end
 function SWEP:Initialize()
 	self:InitScopeData(self.DefaultScopedata)
+	self:InitAnims(self.Anims)
         self:SetNWBool("Raised",true)
 	self:SetNWBool("Sight",false)
 	self:SetNWBool("FiringPin",true)
