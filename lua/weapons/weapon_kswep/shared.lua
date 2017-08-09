@@ -266,12 +266,11 @@ end
 function SWEP:Initialize2()
 end
 function SWEP:InitScopeData(scopedata)
+	if (CLIENT) then self:SetOptic2D("Default") end
 end
 function SWEP:InitAnims(tbl)
 end
 function SWEP:Initialize()
-	self:InitScopeData(self.DefaultScopedata)
-	self:InitAnims(self.Anims)
         self:SetNWBool("Raised",true)
 	self:SetNWBool("Sight",false)
 	self:SetNWBool("FiringPin",true)
@@ -293,26 +292,9 @@ function SWEP:Initialize()
 	self:SetNWFloat("DropAfter",0)
 	self:SetNWBool("AltIrons",false)
 	self:SetNWBool("HoldAim",false)
-	self.Scopedata=self.DefaultScopedata
-	self.Scopeconfig.zero=self.Scopedata.zero.default
-	self.Scopeconfig.fov = self.Scopedata.fovmin
-	self.Scopeconfig.windage=0
-	self.ScopeconfigAlt.windage=0
 	if (self.Anims.RunAnim==nil) then
 		self.Anims.RunAnim=self.Anims.LowerAnim
 		self.Anims.RunAnimEmpty=self.Anims.LowerAnimEmpty
-	end
-	if (self.Scopedata.zero.mils or self.Scopedata.zero.moa) then
-		self.Scopeconfig.zero=0
-	end
-	self.ScopeconfigAlt.zero=0
-	if (self.Scopedata.altmode) then
-		self.ScopeconfigAlt.fov = self.Scopedata.altmode.fovmin
-		self.ScopeconfigAlt.retillum=self.Scopedata.altmode.retillum
-		self.ScopeconfigAlt.retcolor=self.Scopedata.altmode.retcolor
-		if (not self.Scopedata.altmode.zero.mils and not self.Scopedata.altmode.zero.moa) then
-			self.ScopeconfigAlt.zero=self.Scopedata.altmode.zero.default
-		end
 	end
 	if (self.Owner:IsNPC()) then
 		local weapon=self
@@ -364,6 +346,8 @@ function SWEP:Initialize()
 	end
 	self.CurrentMagSize=self.MagSize
 	self:Initialize2()
+	self:InitScopeData(self.DefaultScopedata)
+	self:InitAnims(self.Anims)
 end
 function SWEP:DiscoverModelAnims()
 end
@@ -1281,7 +1265,7 @@ function SWEP:DrawHUD()
 			fov=fov/(self.IronZoom/self:IronZoomMax())
 		end
 		local scale=oldW/(fov*18)
-		self:DrawLuaReticle(scopedata.luareticle,scopeconf.retcol,oldW,oldH,scale,oldH/oldW)
+		self:DrawLuaReticle(scopedata.luareticle,scopeconf.retcolor,oldW,oldH,scale,oldH/oldW)
 	end
 		render.SetViewPort(0,0,oldW,oldH)
 		render.PopRenderTarget()
@@ -1391,21 +1375,18 @@ function SWEP:GetZeroString(dosuffix)
 	return zerostring
 end
 function SWEP:GetWindageString(dosuffix)
-	local zero=self.Windage
-	local zdata=self.Scopedata.windage
+	local scopedata,scopeconf=self:GetScopeStuff()
+	local zero=scopeconf.windage
+	local zdata=scopedata.windage
 	local right="R"
-	if (zero<0) then right="L " end
-	if (self:GetNWBool("AltIrons")) then
-		zero=self.WindageAlt
-		zdata=self.Scopedata.windagealt
-	end
-	local zerostring=zero..right
+	if (zero<0) then right="L" end
+	local zerostring=math.abs(zero)..right
 	if (zdata.mils) then
-		zerostring=(zero/zdata.mils)..right
+		zerostring=math.abs(zero/zdata.mils)..right
 		if (dosuffix) then zerostring=zerostring..right.." mils" end
 	end
 	if (zdata.moa) then
-		zerostring=(zero/zdata.moa)..right
+		zerostring=math.abs(zero/zdata.moa)..right
 		if (dosuffix) then zerostring=zerostring..right.." MOA" end
 	end
 	return zerostring
@@ -1962,14 +1943,10 @@ function SWEP.DetectScroll(ply,bind,pressed)
 							if (zero<zdata.max*-1) then
 								zero=zdata.max*-1
 							end
-							if (zalt) then
-								wep.WindageAlt=zero
-							else
-								wep.Windage=zero
-							end
+							scopeconf.windage=zero
 							net.Start("kswep_zerowindage")
 							net.WriteEntity(wep)
-							net.WriteBool(zalt)
+							net.WriteBool(wep:GetNWBool("AltIrons"))
 							net.WriteInt(zero,16)
 							net.SendToServer()
 						end
@@ -1987,6 +1964,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 						scopeconf.zero=zero
 						net.Start("kswep_zero")
 						net.WriteEntity(wep)
+						net.WriteBool(wep:GetNWBool("AltIrons"))
 						net.WriteInt(zero,16)
 						net.SendToServer()
 					end
@@ -2012,7 +1990,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 							scopeconf.windage=zero
 							net.Start("kswep_zerowindage")
 							net.WriteEntity(wep)
-							net.WriteBool(zalt)
+							net.WriteBool(wep:GetNWBool("AltIrons"))
 							net.WriteInt(zero,16)
 							net.SendToServer()
 						end
@@ -2029,6 +2007,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 						scopeconf.zero=zero
 						net.Start("kswep_zero")
 						net.WriteEntity(wep)
+						net.WriteBool(wep:GetNWBool("AltIrons"))
 						net.WriteInt(zero,16)
 						net.SendToServer()
 					end
@@ -2416,10 +2395,14 @@ function SWEP:PostDrawViewModel()
 		render.DrawSprite(pos-Vector(shake:Right().x,shake:Right().y+1,shake:Right().z),self.CollimatorSize,self.CollimatorSize,Color(255,255,255,255))
 	end
 end
-function SWEP:GetScopeStuff()
+function SWEP:GetScopeStuff(force)
 	local scopedata=self.Scopedata
 	local scopeconf=self.Scopeconfig
-	if (self:GetNWBool("AltIrons")) then
+	local alt=self:GetNWBool("AltIrons")
+	if (force~=nil) then
+		alt=force
+	end
+	if (alt) then
 		scopedata=self.Scopedata.altmode
 		scopeconf=self.ScopeconfigAlt
 		if (scopedata.zerosync) then

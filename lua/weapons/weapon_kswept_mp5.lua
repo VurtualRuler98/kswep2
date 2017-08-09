@@ -102,9 +102,6 @@ function SWEP:InitScopeData(def)
 		default=75,
 		battlesight=false
 	}
-	def.zeroalt = {
-		default=-1
-	}
 	def.windage={mils=false,max=0,step=0}
 	def.windagealt=def.windage
 	def.scope_border=1.01

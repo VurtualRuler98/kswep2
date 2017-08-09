@@ -107,8 +107,8 @@ net.Receive("kswep_zero",function(len,pl)
 	local zero=net.ReadInt(16)
 	if (not IsValid(wep)) then return end
 	if (wep.Owner~=pl) then return end
-	local zdata=wep.Zerodata
-	if (zalt) then zdata=wep.ZerodataAlt end
+	local scopedata,scopeconf=wep:GetScopeStuff(zalt)
+	local zdata=scopedata.zero
 	if (zero>zdata.max) then zero=zdata.max end
 	if (zero<zdata.min) then
 		if (zdata.battlesight) then
@@ -117,11 +117,7 @@ net.Receive("kswep_zero",function(len,pl)
 			zero=zdata.min
 		end
 	end
-	if (zalt) then
-		wep.ZeroAlt=zero
-	else
-		wep.Zero=zero
-	end
+	scopeconf.zero=zero
 end)
 net.Receive("kswep_zerowindage",function(len,pl)
 	local wep=net.ReadEntity()
@@ -129,17 +125,13 @@ net.Receive("kswep_zerowindage",function(len,pl)
 	local zero=net.ReadInt(16)
 	if (not IsValid(wep)) then return end
 	if (wep.Owner~=pl) then return end
-	local zdata=wep.Windagedata
-	if (zalt) then zdata=wep.WindagedataAlt end
+	local scopedata,scopeconf=wep:GetScopeStuff(zalt)
+	local zdata=scopedata.windage
 	if (zero>zdata.max) then zero=zdata.max end
 	if (zero<zdata.max*-1) then
 		zero=zdata.max*-1
 	end
-	if (zalt) then
-		wep.WindageAlt=zero
-	else
-		wep.Windage=zero
-	end
+	scopeconf.windage=zero
 end)
 net.Receive("kswep_weaponrange",function(len,pl)
 	local wep=net.ReadEntity()

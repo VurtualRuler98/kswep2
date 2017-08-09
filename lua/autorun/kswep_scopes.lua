@@ -32,26 +32,14 @@ def.windage={
 	max=0,
 	step=0 --zero means no windage
 }
-def.windagealt={
-	mils=false,
-	max=0,
-	step=0 --zero means no windage
-}
-def.zeroalt={
-	mils=false,
-	bc=-1,
-	min=100,
-	max=100,
-	step=0,
-	default=-1,
-	battlesight=false
-}
 def.rtranger=false
 def.rtrangerx=0
 def.rtrangery=0
 def.scope_border=1.02
 def.scope_ewheel=false
 def.scope_wwheel=false
+def.style="aimlua"
+def.altmode=nil
 def.retcolor=color_black
 --def.reticle=false
 def.luareticle="irons"
