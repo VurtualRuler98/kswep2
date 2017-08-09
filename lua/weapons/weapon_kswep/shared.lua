@@ -2419,6 +2419,9 @@ function SWEP:GetScopeStuff()
 	if (self:GetNWBool("AltIrons")) then
 		scopedata=self.Scopedata.altmode
 		scopeconf=self.ScopeconfigAlt
+		if (scopedata.zerosync) then
+			scopeconf=self.Scopeconfig
+		end
 	end
 	return scopedata,scopeconf
 end

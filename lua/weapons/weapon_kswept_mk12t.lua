@@ -48,30 +48,6 @@ SWEP.Spawnable = true
 SWEP.DrawOnce=false
 SWEP.DefaultScopeData = {}
 local def=SWEP.DefaultScopeData
-def.sensitivity=1
-def.name="Default"
-def.minsensitivity=1
-def.scopeheight=0
-def.zero = {
-	mils=false,
-	bc=-1,
-	min=0,
-	max=0,
-	step=1,
-	default=300,
-	battlesight=false
-}
-def.zeroalt = {
-	default=-1
-}
-def.windage={mils=false,max=0,step=0}
-def.windagealt=def.windage
-def.scope_border=1.1
-def.scope_ewheel=false
-def.retcolor=color_black
-def.luareticle="irons"
-def.fov=11
-def.aimmag=6.5
 SWEP.OverrideScopeRange=25
 SWEP.BipodHeight=9
 SWEP.AdminSpawnable = true
@@ -109,18 +85,7 @@ SWEP.IdleType="passive"
 SWEP.MagType="AR300BLKT"
 SWEP.IronSightsPos = Vector()
 SWEP.IronSightsAng = Vector()
-SWEP.AimNoModel=true
 --SWEP.AimLuaReticle="steiner_scr"
-SWEP.AimLuaReticleMode=true
-SWEP.RTScope=true
-SWEP.ScopeFOV=1.394
-SWEP.ScopeFOVMin=1.394
-SWEP.ScopeFOVMax=6.875
-SWEP.ScopeFOVSteps=12
-SWEP.MinSensitivity=3
-SWEP.MaxSensitivity=15
-SWEP.Scope2DBorderRatio=1.05
-SWEP.Scope2DWheelElevation=true
 SWEP.MergeAttachments = {
 	--foregrip = "models/weapons/upgrades/a_standard_akm.mdl"
  }
@@ -134,6 +99,33 @@ end
 function SWEP:PrimaryFire()
 	self:NormalFire()
 end
-function SWEP:Initialize2()
+function SWEP:InitScopeData(def)
+	def.fovmin=11
+	def.fovmax=11
+	def.sensitivity=1
+	def.name="Default"
+	def.minsensitivity=1
+	def.scopeheight=0
+	def.zero = {
+		mils=false,
+		bc=-1,
+		min=0,
+		max=0,
+		step=0,
+		default=300,
+		battlesight=false
+	}
+	def.windage={mils=false,max=0,step=0}
+	def.windagealt=def.windage
+	def.scope_border=1.1
+	def.scope_ewheel=false
+	def.retcolor=color_black
+	def.luareticle="irons"
+	def.luaretsfp=2.5
+	def.aimmag=6.5
+	def.style="crosshair"
+	def.altmode = table.Copy(def)
+	def.altmode.style="aimlua"
+	def.altmode.zerosync=true
 	if (CLIENT) then self:SetOptic2D("Nightforce 2.5-10x24 NXS Compact") end
 end
