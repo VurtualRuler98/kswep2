@@ -36,36 +36,6 @@ SWEP.Primary.Damage = 10
 SWEP.Primary.Spread = 0.025 --idk
 SWEP.Spawnable = true
 SWEP.DrawOnce=false
-local def=SWEP.DefaultScopedata or {}
-def.fov=20
-def.sensitivity=1
-def.name="Default"
-def.minsensitivity=1
-def.scopeheight=0
-def.zero = {
-	mils=false,
-	bc=-1,
-	min=75,
-	max=75,
-	step=0,
-	default=75,
-	battlesight=false
-}
-def.zeroalt = {
-	default=-1
-}
-def.windage={mils=false,max=0,step=0}
-def.windagealt=def.windage
-def.scope_border=1.01
-def.scope_ewheel=false
-def.retcolor=color_black
-def.luareticle="irons"
-def.luaretsfp=2.5
-def.aimmag=10
-def.style="crosshair"
-def.altmode = table.Copy(def)
-def.altmode.style="aimlua"
-def.altmode.zerosync=true
 SWEP.AdminSpawnable = true
 SWEP.MagClass="Stick"
 SWEP.ViewModel = "models/weapons/cstrike/c_smg_mp5.mdl"
@@ -91,8 +61,8 @@ SWEP.AimLuaReticleMode=true
 SWEP.RTScope=true
 SWEP.Auto=false
 SWEP.Firemode=true
-SWEP.IronSightsPos = Vector()
-SWEP.IronSightsAng = Vector()
+SWEP.IronSightsPos = Vector(-5.325,-3,2.5)
+SWEP.IronSightsAng = Vector(-2,0,0)
 SWEP.HoldType="ar2"
 SWEP.HoldOpen=false
 SWEP.Length=22
@@ -116,6 +86,36 @@ end
 function SWEP:DiscoverModelAnims()
 	self:SetAnim("RunAnim",self:DiscoverAnim("ACT_VM_SPRINT"))
 end
-function SWEP:Initialize2()
+function SWEP:InitScopeData(def)
+	def.fovmin=20
+	def.fovmax=20
+	def.sensitivity=1
+	def.name="Default"
+	def.minsensitivity=1
+	def.scopeheight=0
+	def.zero = {
+		mils=false,
+		bc=-1,
+		min=75,
+		max=75,
+		step=0,
+		default=75,
+		battlesight=false
+	}
+	def.zeroalt = {
+		default=-1
+	}
+	def.windage={mils=false,max=0,step=0}
+	def.windagealt=def.windage
+	def.scope_border=1.01
+	def.scope_ewheel=false
+	def.retcolor=color_black
+	def.luareticle="irons"
+	def.luaretsfp=2.5
+	def.aimmag=10
+	def.style="crosshair"
+	def.altmode = table.Copy(def)
+	def.altmode.style="aimlua"
+	def.altmode.zerosync=true
 	if (CLIENT) then self:SetOptic2D("Default") end
 end

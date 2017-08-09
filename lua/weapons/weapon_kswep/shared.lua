@@ -199,7 +199,8 @@ def.zero = {
 	battlesight=false
 }
 def.name="Default"
-def.fov=nil
+def.fovmin=-1
+def.fovmax=-1
 def.sensitivity=1
 def.minsensitivity=1
 def.scopeheight=0
@@ -210,8 +211,10 @@ def.scope_cwheel=false
 def.retcolor=color_black
 def.aimmag=1
 def.luaretsfp=false
-def.luareticle="irons"
-def.style="crosshair"
+def.luaretholo=false
+def.luaretscale=1
+def.luareticle=false
+def.style="irons"
 def.windage = {
 	mils=false,
 	max=0,
@@ -236,8 +239,6 @@ SWEP.ScopeLuaReticleScale=false
 SWEP.ScopeLuaReticleHolo=false
 SWEP.ScopeReticleColor=color_black
 SWEP.SwitchedBrightness=false
-SWEP.AimLuaReticleMode=false
-SWEP.AimLuaMagnification=1 --scope FOV times magnfiication
 SWEP.ScopeReticleIllumination=false
 SWEP.ScopeReticlePix=1024
 SWEP.ScopeReticlePixMil=20
@@ -264,7 +265,10 @@ if (CLIENT) then
 end
 function SWEP:Initialize2()
 end
+function SWEP:InitScopeData(scopedata)
+end
 function SWEP:Initialize()
+	self:InitScopeData(self.DefaultScopedata)
         self:SetNWBool("Raised",true)
 	self:SetNWBool("Sight",false)
 	self:SetNWBool("FiringPin",true)
@@ -288,29 +292,21 @@ function SWEP:Initialize()
 	self:SetNWBool("HoldAim",false)
 	self.Scopedata=self.DefaultScopedata
 	self.Scopeconfig.zero=self.Scopedata.zero.default
+	self.Scopeconfig.fov = self.Scopedata.fovmin
 	self.Scopeconfig.windage=0
 	self.ScopeconfigAlt.windage=0
 	if (self.Anims.RunAnim==nil) then
 		self.Anims.RunAnim=self.Anims.LowerAnim
 		self.Anims.RunAnimEmpty=self.Anims.LowerAnimEmpty
 	end
-	if (self.DefaultZeroTable) then
-		self.Scopedata.ztable=self.DefaultZeroTable
-	end
-	if (self.DefaultZeroTableStrings) then
-		self.Scopedata.ztablestr=self.DefaultZeroTableStrings
-	end
-	if (self.DefaultZeroTableStringsAlt) then
-		self.Scopedata.ztablestralt=self.DefaultZeroTableStringsAlt
-	end
-	if (self.DefaultZeroTableAlt) then
-		self.Scopedata.ztablealt=self.DefaultZeroTableAlt
-	end
 	if (self.Scopedata.zero.mils or self.Scopedata.zero.moa) then
 		self.Scopeconfig.zero=0
 	end
 	self.ScopeconfigAlt.zero=0
 	if (self.Scopedata.altmode) then
+		self.ScopeconfigAlt.fov = self.Scopedata.altmode.fovmin
+		self.ScopeconfigAlt.retillum=self.Scopedata.altmode.retillum
+		self.ScopeconfigAlt.retcolor=self.Scopedata.altmode.retcolor
 		if (not self.Scopedata.altmode.zero.mils and not self.Scopedata.altmode.zero.moa) then
 			self.ScopeconfigAlt.zero=self.Scopedata.altmode.zero.default
 		end
@@ -827,7 +823,6 @@ function SWEP:SetOptic2D(name)
 		net.SendToServer()
 	end
 	self.Scopedata=scopedata
-	--BEPIS
 	self.Scopeconfig.zero=self.Scopedata.zero.default
 	self.Scopeconfig.windage=0
 	self.ScopeconfigAlt.windage=0
@@ -846,97 +841,6 @@ function SWEP:SetOptic2D(name)
 		end
 	end
 	self.Scopeconfig.fov=self.Scopedata.fovmin
-end
-function SWEP:InsOptic(name)
-	local scopedata
-	scopedata=kswep_optics[name]
-	if (CLIENT and self.Owner==LocalPlayer()) then
-		net.Start("kswep_scopesetup")
-		net.WriteEntity(self)	
-		net.WriteString(name)
-		net.SendToServer()
-	end
-	self.Scopedata.name=scopedata.name
-	self.ScopeMat=scopedata.rtmat
-	self.ScopeReticle=scopedata.reticle
-	self.Scopedata.luareticle=scopedata.luareticle
-	self.scopedata.luaretsfp=scopedata.luaretsfp
-	self.Scopedata.luaretscale=scopedata.luaretscale
-	self.Scopedata.luaretholo=scopedata.luaretholo
-	self.ScopeReticlePix=scopedata.retpix
-	self.ScopeReticlePixMil=scopedata.retpixmil
-	self.Scopedata.retcolor=scopedata.retcolor
-	self.Scopedata.retillum=scopedata.retillum
-	self.ScopeReticleZoom=scopedata.retzoom
-	self.ScopeReticleZoomMax=scopedata.retzoommax
-	self.ScopeReticleZoomMin=scopedata.retzoommin
-	self.ScopeReticleOverride=scopedata.retoverride
-	self.RTScope=scopedata.rtscope
-	self.RTScopeAlt=scopedata.rtscopealt
-	self.Scopedata.rtranger=scopedata.rtranger
-	self.Scopedata.rtrangerx=scopedata.rtrangerx
-	self.Scopedata.rtrangery=scopedata.rtrangery
-	self.SuperScope=scopedata.super
-	self.IronOffsetPos=scopedata.IronPos
-	self.IronOffsetAng=scopedata.IronAng
-	self.RTNV=scopedata.nv
-	self.Scopedata.zerovel=scopedata.zerovel
-	if (scopedata.zeroalt.default) then
-		self.AltIronOffsetPos=scopedata.AltIronPos
-		self.AltIronOffsetAng=scopedata.AltIronAng
-	end
-	if (CLIENT and self.Owner==LocalPlayer() and scopedata.rtscope) then
-		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
-		self.ScopeRTMaterial=Material(self.ScopeMat)
-		self.ScopeRTMaterial:SetTexture("$basetexture",self.RenderTarget)
-	end
-	self.Collimator=scopedata.collimator
-	self.CollimatorTex=scopedata.coltex
-	self.CollimatorSize=scopedata.colsize
-	self.CollimatorGlare=scopedata.colglare
-	local scopemodel
-	if (scopedata.model~=nil) then
-		self.Scopedata.zero=scopedata.zero
-		self.Zero=self.Scopedata.zero.default
-		self.scopedata.zeroalt=scopedata.zeroalt
-		self.ZeroAlt=self.scopedata.zeroalt.default
-		self.Scopedata.ztable=scopedata.ztable
-		self.Scopedata.ztablealt=scopedata.ztablealt
-		self.Scopedata.ztablestr=scopedata.ztablestr
-		self.Scopedata.ztablestralt=scopedata.ztablestralt
-		if (self.Scopedata.zero.mils or self.Scopedata.zero.moa) then
-			self.Zero=0
-		end
-		if (self.scopedata.zeroalt.mils or self.Scopedata.zero.moa) then
-			self.ZeroAlt=0
-		end
-		scopemodel=scopedata.model
-	else
-		scopemodel=self.DefaultSight
-		self.Scopedata.zero=self.DefaultZerodata
-		self.Zero=self.Scopedata.zero.default
-		self.scopedata.zeroalt = self.DefaultZerodataAlt
-		self.ZeroAlt=self.scopedata.zeroalt.default
-		self.Scopedata.ztable=self.DefaultZeroTable
-		self.Scopedata.ztablealt=self.DefaultZeroTableAlt
-		self.Scopedata.ztablestr=self.DefaultZeroTableStrings
-		self.Scopedata.ztablestralt=self.DefaultZeroTableStringsAlt
-		if (self.DefaultSight==nil and self.optic) then
-		self.MergeAddons.AT_OPTIC=nil
-		self.RefreshMerge=true
-		end
-	end
-	self.CurrentSight=scopemodel
-	self.Scopedata.sensitivity=scopedata.sensitivity
-	self.Scopedata.minsensitivity=scopedata.minsensitivity
-	if (CLIENT and self.Owner==LocalPlayer() and self.CurrentSight~=nil) then
-		self.MergeAddons.AT_OPTIC=scopemodel
-		self.RefreshMerge=true
-	end
-	self.ScopeFOV=scopedata.fov
-	self.Scopedata.fovmin=scopedata.fovmin
-	self.Scopedata.fovmax=scopedata.fovmax
-	self.Scopedata.fovsteps=scopedata.fovsteps
 end
 
 function SWEP:InsHands(name)
@@ -1302,12 +1206,7 @@ end
 
 function SWEP:DrawHUD()
 	self:DrawRTScope()
-	local scopedata=self.Scopedata
-	local scopeconf=self.Scopeconfig
-	if (self:GetNWBool("AltIrons")) then
-		scopedata=self.Scopedata.altmode
-		scopeconf=self.ScopeconfigAlt
-	end
+	local scopedata,scopeconf=self:GetScopeStuff()
 	if (IsValid(self.Owner:GetViewModel())) then
 		if (self.ShowViewModel>CurTime())then
 			self.Owner:GetViewModel():SetNoDraw(true)
@@ -1360,7 +1259,7 @@ function SWEP:DrawHUD()
 				retmag=self.ScopeReticleZoom
 			end
 			--local scale=(retpix/pixmil)*oldW/(retmag*18)
-			local scale=retpix*(self.ScopeRes/(self.ScopeFOV*18))/pixmil
+			local scale=retpix*(self.ScopeRes/(scopeconf.fov*18))/pixmil
 			surface.SetDrawColor(self.ScopeReticleColor)
 			surface.SetMaterial(self.ScopeReticleMaterial)
 			scale=scale/aspectratio
@@ -1368,9 +1267,9 @@ function SWEP:DrawHUD()
 			surface.DrawTexturedRectUV((oldW-scale)/2,(oldH-scale*scalemod)/2,scale,scale*scalemod,0,0,1,1)
 		end
 	if (scopedata.luareticle~=false) then
-		local fov=self.ScopeFOV
-		if (self.scopedata.luaretsfp) then
-			fov=self.scopedata.luaretsfp
+		local fov=scopeconf.fov
+		if (scopedata.luaretsfp) then
+			fov=scopedata.luaretsfp
 		end
 		if (scopedata.luaretscale) then
 			fov=fov/scopedata.luaretscale
@@ -1442,7 +1341,7 @@ function SWEP:DrawHUD()
 				surface.DrawText(self:GetWindageString(false))
 			end
 			local radius=ScrH()
-			local fov=self.ScopeFOV
+			local fov=scopeconf.fov
 			if (scopedata.fovmin) then fov=scopedata.fovmin end
 			local scale=scopedata.aimmag/self.Owner:GetFOV()
 			radius=radius*scale
@@ -1458,7 +1357,7 @@ function SWEP:GetZeroString(dosuffix)
 	local zstr=self.Scopedata.ztablestr
 	if (self:GetNWBool("AltIrons")) then
 		zero=self.ScopeconfigAlt.zero
-		zdata=self.scopedata.altmode.zero
+		zdata=self.Scopedata.altmode.zero
 		zstr=self.Scopedata.altmode.ztablestr
 	end
 	if (zero==0 and not zdata.mils and not zdata.moa) then
@@ -1833,6 +1732,10 @@ function SWEP:ServeNWFloat(var,float)
 end
 function SWEP:DoDrawCrosshair()
 	--return not self:GetNWBool("Raised")
+	scopedata=self:GetScopeStuff()
+	if (self:GetNWBool("Sight") and scopedata.style=="crosshair") then
+		return false
+	end
 	return true
 
 end
@@ -1980,7 +1883,7 @@ function SWEP:SecondaryAttack()
 	end
 	if ((self.Owner:KeyDown(IN_WALK)) and not self:GetNWBool("Sight")) then
 		self:ToggleZoom()
-	elseif (self.Owner:KeyDown(IN_WALK) and self.scopedata.zeroalt.default~=-1) then
+	elseif (self.Owner:KeyDown(IN_WALK) and self.Scopedata.altmode) then
 		self:SetNWBool("AltIrons",not self:GetNWBool("AltIrons"))
 	else
 		self:ToggleAim(false)
@@ -2045,12 +1948,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 	if (pressed) then
 		local wep=ply:GetActiveWeapon()
 		if (IsValid(wep) and string.find(wep:GetClass(),"weapon_kswep")) then
-			local scopedata=wep.Scopedata
-			local scopeconf=wep.Scopeconfig
-			if (wep:GetNWBool("AltIrons")) then
-				scopedata=wep.Scopedata.altmode
-				scopeconf=wep.ScopeconfigAlt
-			end
+			local scopedata,scopeconf=wep:GetScopeStuff()
 			if (bind=="invnext" and wep:GetNWBool("Sight")) then
 				if (wep.Owner:KeyDown(IN_RELOAD)) then
 					if (wep.Owner:KeyDown(IN_WALK)) then
@@ -2236,8 +2134,16 @@ function SWEP:Think()
 	if (CLIENT and LocalPlayer()==self.Owner and self.RefreshMerge) then
 		self:InitMergeParts()
 	end
-	if (self.AimNoModel and SERVER and self.Owner:IsPlayer()) then
-		self.Owner:DrawViewModel(not self:GetNWBool("Sight"))
+	if (SERVER and self.Owner:IsPlayer() and self:GetNWBool("Sight")) then
+		local drawmodel=true
+		local style=self.Scopedata.style
+		if (self:GetNWBool("AltIrons")) then
+			style=self.Scopedata.altmode.style
+		end
+		if (style=="zoomview") then
+			drawmodel=false
+		end
+		self.Owner:DrawViewModel(drawmodel)
 	end
 	if (self.NoViewModel and SERVER and self.Owner:IsPlayer()) then
 		self.Owner:DrawViewModel(false)
@@ -2507,8 +2413,24 @@ function SWEP:PostDrawViewModel()
 		render.DrawSprite(pos-Vector(shake:Right().x,shake:Right().y+1,shake:Right().z),self.CollimatorSize,self.CollimatorSize,Color(255,255,255,255))
 	end
 end
+function SWEP:GetScopeStuff()
+	local scopedata=self.Scopedata
+	local scopeconf=self.Scopeconfig
+	if (self:GetNWBool("AltIrons")) then
+		scopedata=self.Scopedata.altmode
+		scopeconf=self.ScopeconfigAlt
+	end
+	return scopedata,scopeconf
+end
+function SWEP:IsRTScopeStyle(style)
+	if (style=="aimlua") then
+		return true
+	end
+	return false
+end
 function SWEP:DrawRTScope()
-	if ((self.RTScope and not self:GetNWBool("AltIrons")) or (self.RTScopeAlt and self:GetNWBool("AltIrons"))) then
+	local scopedata,scopeconf=self:GetScopeStuff()
+	if (self:IsRTScopeStyle(scopedata.style)) then
 	local oldW, oldH = ScrW(),ScrH()
 	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
 	render.PushRenderTarget(self.RenderTarget)
@@ -2526,7 +2448,7 @@ function SWEP:DrawRTScope()
 	scopeview.drawviewmodel = false
 	scopeview.drawhud = false
 	scopeview.dopostprocess=true
-	scopeview.fov = self.ScopeFOV
+	scopeview.fov = scopeconf.fov
 	if (self.SuperScope) then
 		render.SetLightingMode(1)
 		render.RenderView(scopeview)
@@ -2543,8 +2465,8 @@ function SWEP:DrawRTScope()
 	if (self:GetNWFloat("CurRecoil")>0.04) then
 		local recblur=self:GetNWFloat("CurRecoil")*5
 		local blur=4
-		if (self.Scopedata.aimmag) then
-			blur=self.Scopedata.aimmag/self.ScopeFOV
+		if (scopedata.aimmag) then
+			blur=scopedata.aimmag/scopeconf.fov
 		end
 		render.BlurRenderTarget(self.RenderTarget,recblur,recblur,blur)
 	end
@@ -2757,14 +2679,15 @@ function SWEP:TranslateFOV(fov)
 end
 
 function SWEP:AdjustMouseSensitivity()
+	scopedata,scopeconf=self:GetScopeStuff()
         if (self:GetNWBool("sight")==true) then
 		local scopesens=1
-		if (self.Scopedata.fovsteps~=nil) then
-			scopesens=((self.Scopedata.sensitivity-1)*(-1*(self.ScopeFOV-self.Scopedata.fovmax)/(self.Scopedata.fovmax-self.Scopedata.fovmin)))
-		elseif (self.ScopeFOV~=nil) then
-			scopesens=self.Scopedata.sensitivity
+		if (scopedata.fovsteps~=nil) then
+			scopesens=((scopedata.sensitivity-1)*(-1*(scopeconf.fov-scopedata.fovmax)/(scopedata.fovmax-scopedata.fovmin)))
+		elseif (scopeconf.fov~=nil) then
+			scopesens=scopedata.sensitivity
 		end
-		scopesens=1+(scopesens+self.Scopedata.minsensitivity-1)*((self:IronZoomMin()-self.IronZoom)/(self:IronZoomMin()-self:IronZoomMax()))
+		scopesens=1+(scopesens+scopedata.minsensitivity-1)*((self:IronZoomMin()-self.IronZoom)/(self:IronZoomMin()-self:IronZoomMax()))
 		if (self.Owner:KeyDown(IN_SPEED)) then
 			scopesens=scopesens*4
 		end
@@ -2928,6 +2851,7 @@ function SWEP:GenerateBulletDir(recoil,aimPenalty,aimcone)
 	return dir
 end
 function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
+	local scopedata,scopeconf=self:GetScopeStuff()
 	local aimPenalty=1
 	if (not self:GetNWBool("Sight")) then
 		aimPenalty=1.2
@@ -2961,8 +2885,8 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 		end
 	end
 	local returnrecoil=recoil
-	if (self.Scopedata.aimmag>1) then
-		returnrecoil=recoil+recoil*0.25*(self.Scopedata.aimmag/self.ScopeFOV)
+	if (scopedata.aimmag>1) then
+		returnrecoil=recoil+recoil*0.25*(scopedata.aimmag/scopeconf.fov)
 	end
         local bullet = {}
         bullet.Num              = num_bullets
@@ -3033,15 +2957,10 @@ function SWEP:GetSightHeight()
 	return height
 end
 function SWEP:FlyBulletStart(bullet)
+	local scopedata,scopeconf=self:GetScopeStuff()
 	local supmod=1
-	local scopeconf=self.Scopeconfig
-	local zdata=self.Scopedata.zero
-	local wdata=self.Scopedata.windage
-	if (self:GetNWBool("AltIrons")) then
-		zdata=self.Scopedata.zeroalt
-		wdata=self.Scopedata.altmode.windage
-		scopeconf=self.ScopeconfigAlt
-	end
+	local zdata=scopedata.zero
+	local wdata=scopedata.windage
 	local zero=scopeconf.zero
 	local windage=scopeconf.windage
 	if (zero==0 and not zdata.mils and not zdata.moa) then
@@ -3063,21 +2982,18 @@ function SWEP:FlyBulletStart(bullet)
 		end
 		zero=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
 	end
-	if (not self:GetNWBool("AltIrons") and self.Scopedata.ztable) then 
-		zero=self.Scopedata.ztable[zero]
+	if (not self:GetNWBool("AltIrons") and scopedata.ztable) then 
+		zero=scopedata.ztable[zero]
 	end
-	if (self:GetNWBool("AltIrons") and self.Scopedata.ztablealt) then
-		zero=self.Scopedata.ztablealt[zero]
+	if (self:GetNWBool("AltIrons") and scopedata.ztablealt) then
+		zero=scopedata.ztablealt[zero]
 	end
 	if (self.Suppressed) then supmod=self.MuzzleVelModSup end
 	local zerovel=self.Ammo.velocity*self.MuzzleVelMod*supmod
-	if (self.Scopedata.name=="Default" and self.ZeroVelocity>0) then
-		zerovel=self.ZeroVelocity
+	if (scopedata.name~="Default" and scopedata.zerovel>0) then
+		zerovel=scopedata.zerovel
 	end
-	if (self.Scopedata.name~="Default" and self.Scopedata.zerovel>0) then
-		zerovel=self.Scopedata.zerovel
-	end
-	if (self.Scopedata.name~="Default" and self.Scopedata.zerovel==-1337) then
+	if (scopedata.name~="Default" and scopedata.zerovel==-1337) then
 		zerovel=self.Ammo.velocity*self.MuzzleVelMod*supmod
 	end
 	local miladj=0
