@@ -1718,7 +1718,53 @@ function SWEP:DoDrawCrosshair()
 	--return not self:GetNWBool("Raised")
 	scopedata=self:GetScopeStuff()
 	if (self:GetNWBool("Sight") and scopedata.style=="crosshair") then
-		return false
+		surface.DrawCircle(ScrW()/2,ScrH()/2,ScrW()/256,255,0,0)
+		surface.SetDrawColor(255,0,0,255)
+		local spreadsup = 0
+		if (self.Suppressed) then
+			spreadsup = self.SpreadModSup
+		end
+		local aimPenalty=1
+		if (not self:GetNWBool("Sight")) then
+			aimPenalty=1.2
+		end
+		if (not self:IsResting()) then
+		if (self.Owner:IsPlayer() and ConVarExists("prone_bindkey_enabled")) then
+			if (self.Owner:IsProne()) then
+				aimPenalty=aimPenalty+self.PenaltyProne
+			elseif (self.Owner:Crouching()) then
+				aimPenalty=aimPenalty+self.PenaltyKneel
+			else
+				aimPenalty=aimPenalty+self.PenaltyStand
+			end
+		else
+			if (not self.Owner:IsPlayer() or not self.Owner:Crouching()) then
+				aimPenalty=aimPenalty+self.PenaltyStand
+			end
+		end
+		end
+	
+		local recoil = self:GetNWFloat("CurRecoil")
+		if (self.Owner:IsPlayer() and ConVarExists("prone_bindkey_enabled") and not self.Owner:IsProne()) then
+			if (self.Owner:Crouching()) then
+				recoil=recoil*1.25
+			else
+				recoil=recoil*1.5
+			end
+		elseif (not ConVarExists("prone_bindkey_enabled")) then
+			if (not self.Owner:Crouching()) then
+				recoil=recoil*1.5
+			end
+		end
+		local recdiff=90-(Vector((0.005*recoil*aimPenalty)*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)),1,0):Angle().y)
+		local spread=self.Ammo.spreadscale*(self.Primary.Spread)*spreadsup+recdiff*16
+		local scale=ScrW()/(self.Owner:GetFOV()*18)
+		local linesize=ScrW()/256
+		surface.DrawLine((ScrW()/2)-spread*scale-linesize*1.5,ScrH()/2,ScrW()/2-spread*scale-linesize*0.25,ScrH()/2)
+		surface.DrawLine((ScrW()/2)+spread*scale+linesize*1.5,ScrH()/2,ScrW()/2+spread*scale+linesize*0.25,ScrH()/2)
+		surface.DrawLine(ScrW()/2,(ScrH()/2)-spread*scale-linesize*1.5,ScrW()/2,ScrH()/2-spread*scale-linesize*0.25)
+		surface.DrawLine(ScrW()/2,(ScrH()/2)+spread*scale+linesize*1.5,ScrW()/2,ScrH()/2+spread*scale+linesize*0.25)
+		return true
 	end
 	return true
 
