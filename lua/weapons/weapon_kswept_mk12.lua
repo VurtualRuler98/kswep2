@@ -28,14 +28,14 @@ if (CLIENT) then
 	SWEP.SlotPos = 0
 end
 
-SWEP.Category = "KSwep Auto"
-SWEP.Base = "weapon_kswep"
-SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
+SWEP.Base = "weapon_kswep"
+SWEP.Category = "KSwep Auto"
+SWEP.Spawnable = true
 
 
 --Barrel--
-SWEP.HandlingModifier=200
+SWEP.HandlingModifier=2
 SWEP.Length=38
 SWEP.Primary.Spread = 0.01 --AUTHENTIC
 SWEP.RecoilMassModifier=0.2
@@ -46,7 +46,6 @@ SWEP.Caliber = "vammo_556x45_mk262mod1"
 SWEP.MagClass="STANAG"
 SWEP.MagSize = 20
 SWEP.MagType="AR556"
-SWEP.Secondary.Ammo = ""
 function SWEP:ReloadAct(force)
 	self:ReloadMag(force)
 end
@@ -55,9 +54,9 @@ end
 --Rail--
 SWEP.BipodHeight=9
 SWEP.CanFlashlight=true
+SWEP.Has2DOptics=true
 SWEP.LAMAttachment="1"
 SWEP.Suppressable=false
-
 
 --Sight--
 SWEP.IronSightHeight=2.8
@@ -118,6 +117,7 @@ SWEP.Auto=false
 SWEP.Firemode=true
 SWEP.Firemodes={{auto=false,name="SEMI"},{auto=true,name="AUTO"}}
 SWEP.HKBurst=false
+SWEP.HoldOpen=true
 SWEP.Primary.Delay = 0.08
 SWEP.SelectFire=true
 function SWEP:PrimaryFire()

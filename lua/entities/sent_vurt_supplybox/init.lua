@@ -74,7 +74,7 @@ function ENT:UseBox( activator, caller )
 				canoptic=true
 			end
 			local can2doptic=false
-			if (wep.AimLuaReticleMode) then
+			if (wep.Has2DOptics) then
 				can2doptic=true
 			end
 			if (canmag or canoptic) then

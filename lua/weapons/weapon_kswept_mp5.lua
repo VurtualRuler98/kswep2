@@ -1,5 +1,5 @@
 --[[
-Copyright 2015 vurtual 
+Copyright 2017 vurtual 
 VurtualRuler98@gmail.com
 vurtual.org
 
@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ]]--
 
-
+--receiver--
 if (SERVER) then
 	AddCSLuaFile()
 end
@@ -27,65 +27,42 @@ if (CLIENT) then
 	SWEP.Slot = 2
 	SWEP.SlotPos = 0
 end
-SWEP.Anims = SWEP.Anims or {}
-SWEP.Category = "KSwep Auto"
-SWEP.IronSightHeight=2 --wild guess again
-SWEP.Base = "weapon_kswep"
-SWEP.Primary.Delay = 0.075
-SWEP.Primary.Damage = 10
-SWEP.Primary.Spread = 0.025 --idk
-SWEP.Spawnable = true
-SWEP.DrawOnce=false
+
 SWEP.AdminSpawnable = true
-SWEP.MagClass="Stick"
-SWEP.ViewModel = "models/weapons/cstrike/c_smg_mp5.mdl"
---SWEP.WorldModel = "models/weapons/w_mk18.mdl"
-SWEP.WorldModel = "models/weapons/w_smg_mp5.mdl"
-SWEP.LoweredOffset = 2
-SWEP.UseHands = true
-SWEP.MagazineCount = 4
-SWEP.MuzzleVelMod=1.1
-SWEP.MagSize = 30
-SWEP.Primary.ClipSize = SWEP.MagSize
-SWEP.Caliber = "vammo_9x19_FMJ"
-SWEP.Primary.Sound = Sound("Weapon_kswept_mp5.Single")
-SWEP.ViewModelFlip = false
-SWEP.Secondary.Ammo = ""
-SWEP.CurrentlyReloading=0
-SWEP.ReloadAnimTime=0
-SWEP.RecoilMassModifier=0.40
-SWEP.HandlingModifier=300
-SWEP.InsAnims=false
-SWEP.AimNoModel=true
-SWEP.AimLuaReticleMode=true
-SWEP.RTScope=true
-SWEP.Auto=false
-SWEP.Firemode=true
-SWEP.IronSightsPos = Vector(-5.325,-3,2.5)
-SWEP.IronSightsAng = Vector(-2,0,0)
-SWEP.HoldType="ar2"
-SWEP.HoldOpen=false
+SWEP.Base = "weapon_kswep"
+SWEP.Category = "KSwep Auto"
+SWEP.Spawnable = true
+
+
+--barrel--
+SWEP.HandlingModifier=4
 SWEP.Length=22
-SWEP.LengthSup=10
-SWEP.IdleType="passive"
-SWEP.SelectFire=true
+SWEP.Primary.Spread = 0.025 --idk
+SWEP.RecoilMassModifier=0.40
+SWEP.MuzzleVelMod=1.1
+
+
+--Magazine--
+SWEP.Caliber = "vammo_9x19_FMJ"
+SWEP.MagClass="Stick"
+SWEP.MagSize = 30
 SWEP.MagType="MP5"
-SWEP.HKBurst=true
-SWEP.Firemodes={{auto=false,name="SEMI"},{auto=true,name="BURST",burst=3},{auto=true,name="AUTO"}}
-SWEP.MergeAttachments = {
-	--foregrip = "models/weapons/upgrades/a_standard_akm.mdl"
- }
-SWEP.InsAttachments=false
-SWEP.CanFlashlight=true
 function SWEP:ReloadAct(force)
 	self:ReloadMag(force)	
 end
-function SWEP:PrimaryFire()
-	self:FiremodeFire()
-end
-function SWEP:DiscoverModelAnims()
-	self:SetAnim("RunAnim",self:DiscoverAnim("ACT_VM_SPRINT"))
-end
+
+
+--Rail--
+SWEP.CanFlashlight=true
+SWEP.Has2DOptics=true
+SWEP.LAMAttachment="1"
+
+
+--Sight--
+SWEP.IronSightHeight=2 --wild guess again
+SWEP.IronSightsPos = Vector(-5.325,-3,2.5)
+SWEP.IronSightsAng = Vector(-2,0,0)
+SWEP.InsAttachments=false
 function SWEP:InitScopeData(def)
 	def.fovmin=20
 	def.fovmax=20
@@ -115,4 +92,34 @@ function SWEP:InitScopeData(def)
 	def.altmode.style="aimlua"
 	def.altmode.zerosync=true
 	if (CLIENT) then self:SetOptic2D("Default") end
+end
+
+
+--Stock--
+SWEP.DrawOnce=false
+SWEP.HoldType="ar2"
+SWEP.IdleType="passive"
+SWEP.InsAnims=false
+SWEP.NoLowerAnim=true
+SWEP.LoweredOffset = 2
+SWEP.Primary.Sound = Sound("Weapon_kswept_mp5.Single")
+SWEP.UseHands = true
+SWEP.WorldModel = "models/weapons/w_smg_mp5.mdl"
+SWEP.ViewModel = "models/weapons/cstrike/c_smg_mp5.mdl"
+SWEP.ViewModelFlip = false
+function SWEP:InitAnims(tbl)
+	tbl.InitialDrawAnim=ACT_VM_READY
+end
+
+
+--Trigger--
+SWEP.Auto=false
+SWEP.Firemode=true
+SWEP.Firemodes={{auto=false,name="SEMI"},{auto=true,name="BURST",burst=3},{auto=true,name="AUTO"}}
+SWEP.HKBurst=true
+SWEP.HoldOpen=false
+SWEP.Primary.Delay = 0.075
+SWEP.SelectFire=true
+function SWEP:PrimaryFire()
+	self:FiremodeFire()
 end

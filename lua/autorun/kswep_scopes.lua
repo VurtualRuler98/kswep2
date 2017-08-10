@@ -48,6 +48,8 @@ def.luaretscale=false
 def.luaretholo=false
 def.retillum=nil
 def.aimmag=20
+def.handling=1
+def.accuracy=1
 --def.repix=512
 --def.retzoom=0
 --def.retzoommax=0
@@ -68,7 +70,6 @@ local tbl=table.Copy(def)
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Aimpoint CompM4 3x flip magnifier"
-tbl.fov=15
 tbl.fovmin=5
 tbl.fovmax=15
 tbl.fovsteps=1
@@ -90,7 +91,6 @@ tbl.luaretholo=true
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Aimpoint CompM2"
-tbl.fov=15
 tbl.fovmin=15
 tbl.fovmax=15
 tbl.fovsteps=1
@@ -112,7 +112,6 @@ tbl.luaretholo=true
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Steiner T5Xi 3-15x50"
-tbl.fov=1.394
 tbl.fovmin=1.394
 tbl.fovmax=6.875
 tbl.fovsteps=12
@@ -139,7 +138,7 @@ tbl.aimmag=15*1.394
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Trijicon ACOG 1.5x16S Compact"
-tbl.fov=7.4
+tbl.fovmin=7.4
 tbl.luareticle="trijicon_mini"
 tbl.retcolor=Color(255,255,0,255)
 tbl.sensitivity=1.5
@@ -147,7 +146,6 @@ tbl.aimmag=1.5*7.4
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Schmidt & Bender 3-12x50 PM II"
-tbl.fov=1.94
 tbl.zero={
 	mils=10,
 	bc=-1,
@@ -174,7 +172,6 @@ tbl.aimmag=1.94*12
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="EZ Scope"
-tbl.fov=1.94
 tbl.zero={
 	mils=false,
 	bc=-1,
@@ -197,7 +194,6 @@ tbl.aimmag=1.94*12
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Nightforce 2.5-10x24 NXS Compact"
-tbl.fov=7.7
 tbl.zero={
 	mils=10,
 	bc=-1,
@@ -224,7 +220,6 @@ tbl.aimmag=1.95*10
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Leupold TS30-A2"
-tbl.fov=2.597
 tbl.zero={
 	mils=false,
 	moa=2,
@@ -256,7 +251,6 @@ tbl.scope_cwheel=true
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Leupold Mark 4 3.5-10x40mm  LR/T M3 TMR"
-tbl.fov=2.12
 tbl.zero={
 	mils=false,
 	moa=1,
@@ -288,7 +282,6 @@ tbl.luareticle="leupold_mil"
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Leupold VX-1 Rimfire 2-7x28mm"
-tbl.fov=3.32
 tbl.fovmax=8.6
 tbl.fovmin=3.32
 tbl.fovsteps=5

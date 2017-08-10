@@ -221,6 +221,8 @@ def.windage = {
 	step=0
 }
 def.altmode=nil
+def.handling=1
+def.accuracy=1
 SWEP.UseDelayForBolt=false
 SWEP.WaitShot=false
 SWEP.WaitShotIron=false
@@ -486,13 +488,20 @@ function SWEP:Melee()
 	end
 	self:SetNextAttack(CurTime()+nextattack)
 end
+function SWEP:ModKeyDown()
+	if (self:GetNWBool("Sight")) then
+		return self.Owner:KeyDown(IN_RELOAD)
+	else
+		return self.Owner:KeyDown(IN_WALK)
+	end
+end
 function SWEP:PrimaryAttack()
 	if (self:CanPrimaryAttack()) then
 	if (self.Owner:IsPlayer() and not self:GetNWBool("Sight") and self.Owner:KeyDown(IN_SPEED)) then
 		self:Melee()
 		return
 	end
-	if (self.Owner:IsPlayer() and self.Owner:KeyDown(IN_WALK) and not self:GetNWBool("FiremodeSelected") and not self:GetNWBool("Lowered")) then
+	if (self.Owner:IsPlayer() and self:ModKeyDown() and not self:GetNWBool("FiremodeSelected") and not self:GetNWBool("Lowered")) then
 		self:SwitchFiremode()
 		self:SetNWBool("FiremodeSelected",true)
 		if (SERVER) then
@@ -589,6 +598,7 @@ function SWEP:NextIdle(idle,anim)
 	self.Anims.NextIdleAnim=anim
 end
 function SWEP:NormalFire()
+	local scopedata=self:GetScopeStuff()
 	if (self:IsRunning() or (not self:GetNWBool("Raised") and not self:GetNWBool("HoldAim")) or self:IsWallBlocked()) then return end
 	if (not self:TryPrimaryAttack() ) then return end
 	local snd=self.Primary.Sound
@@ -612,7 +622,7 @@ function SWEP:NormalFire()
 	else
 		self:SetNWBool("Chambered",false)
 	end
-	self:ShootBullet(ammo.dmgbase, ammo.projectiles, ammo.spreadscale*(self.Primary.Spread+spreadsup),ammo.name)
+	self:ShootBullet(ammo.dmgbase, ammo.projectiles, ammo.spreadscale*(self.Primary.Spread+spreadsup)*scopedata.accuracy,ammo.name)
 	local anim=self.Anims.IdleAnim
 	local animbolt = self.Anims.BoltAnim
 	if (self:GetNWBool("Sight")) then
@@ -798,6 +808,8 @@ function SWEP:Holster(wep)
 end
 function SWEP:SetOptic2D(name)
 	local scopedata
+	self:SetNWBool("Sight",false)
+	self:SetNWBool("AltIrons",false)
 	if (self.DefaultScopedata and name=="Default") then
 		scopedata=self.DefaultScopedata
 	else
@@ -815,6 +827,7 @@ function SWEP:SetOptic2D(name)
 	self.ScopeconfigAlt.windage=0
 	self.Scopeconfig.retillum=self.Scopedata.retillum
 	self.Scopeconfig.retcolor=self.Scopedata.retcolor
+	self.Scopeconfig.fov=self.Scopedata.fovmin
 	if (self.Scopedata.zero.mils or self.Scopedata.zero.moa) then
 		self.Scopeconfig.zero=0
 	end
@@ -827,7 +840,6 @@ function SWEP:SetOptic2D(name)
 			self.ScopeconfigAlt.zero=self.Scopedata.altmode.zero.default
 		end
 	end
-	self.Scopeconfig.fov=self.Scopedata.fovmin
 end
 
 function SWEP:InsHands(name)
@@ -1339,22 +1351,18 @@ function SWEP:DrawHUD()
 	end
 end
 function SWEP:GetZeroString(dosuffix)
-	local zero=self.Scopeconfig.zero
-	local zdata=self.Scopedata.zero
-	local zstr=self.Scopedata.ztablestr
-	if (self:GetNWBool("AltIrons")) then
-		zero=self.ScopeconfigAlt.zero
-		zdata=self.Scopedata.altmode.zero
-		zstr=self.Scopedata.altmode.ztablestr
-	end
+	local scopedata,scopeconf=self:GetScopeStuff()
+	local zero=scopeconf.zero
+	local zdata=scopedata.zero
+	local zstr=scopedata.ztablestr
 	if (zero==0 and not zdata.mils and not zdata.moa) then
 		zero=zdata.battlesight
 	end
 	if (not self:GetNWBool("AltIrons") and self.Scopedata.ztable) then 
-		zero=self.Scopedata.ztable[zero]
+		zero=scopedata.ztable[zero]
 	end
-	if (self:GetNWBool("AltIrons") and self.Scopedata.ztablealt) then
-		zero=self.Scopedata.ztablealt[zero]
+	if (self:GetNWBool("AltIrons") and scopedata.ztablealt) then
+		zero=scopedata.ztablealt[zero]
 	end
 	local zerostring=zero
 	if (dosuffix) then zerostring=zerostring.."m" end
@@ -1756,8 +1764,8 @@ function SWEP:DoDrawCrosshair()
 				recoil=recoil*1.5
 			end
 		end
-		local recdiff=90-(Vector((0.005*recoil*aimPenalty)*(1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)),1,0):Angle().y)
-		local spread=self.Ammo.spreadscale*(self.Primary.Spread)*spreadsup+recdiff*16
+		local recdiff=90-(Vector((0.005*recoil*aimPenalty)+((self.Owner:GetVelocity():Length()/(self.HandlingModifier*1000*scopedata.handling))),1,0):Angle().y)
+		local spread=self.Ammo.spreadscale*(self.Primary.Spread)*spreadsup+recdiff*16*scopedata.accuracy
 		local scale=ScrW()/(self.Owner:GetFOV()*18)
 		local linesize=ScrW()/256
 		surface.DrawLine((ScrW()/2)-spread*scale-linesize*1.5,ScrH()/2,ScrW()/2-spread*scale-linesize*0.25,ScrH()/2)
@@ -2879,10 +2887,11 @@ function SWEP:SharedVectorRand()
 end
 
 function SWEP:GenerateBulletDir(recoil,aimPenalty,aimcone)
+	local scopedata=self:GetScopeStuff()
 	local dir
 	local spray=Vector(util.SharedRandom("randbulletone",-aimcone,aimcone,CurTime()),util.SharedRandom("randbullettwo",-aimcone,aimcone,CurTime()),0)
-	local handling=1+(self.Owner:GetVelocity():Length()/self.HandlingModifier)
-	dir=self.Owner:GetAimVector()+spray+(0.005*recoil*aimPenalty*self:SharedVectorRand()*handling)
+	local handling=(self.Owner:GetVelocity():Length()/(self.HandlingModifier*1000*scopedata.handling))
+	dir=self.Owner:GetAimVector()+spray+(0.005*recoil*aimPenalty*self:SharedVectorRand())+VectorRand()*handling
 	return dir
 end
 function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
