@@ -201,6 +201,7 @@ def.zero = {
 def.name="Default"
 def.fovmin=-1
 def.fovmax=-1
+def.fovsteps=nil
 def.sensitivity=1
 def.minsensitivity=1
 def.scopeheight=0
@@ -2007,23 +2008,25 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					else
 						local zdata=scopedata.zero
 						local zero=scopeconf.zero
-						zero=zero-zdata.step
-						if (zero<zdata.min) then
-							if (zdata.battlesight) then
-								zero=0
-							else
-								zero=zdata.min
+						if (zdata.step>0) then
+							zero=zero-zdata.step
+							if (zero<zdata.min) then
+								if (zdata.battlesight) then
+									zero=0
+								else
+									zero=zdata.min
+								end
 							end
+							scopeconf.zero=zero
+							net.Start("kswep_zero")
+							net.WriteEntity(wep)
+							net.WriteBool(wep:GetNWBool("AltIrons"))
+							net.WriteInt(zero,16)
+							net.SendToServer()
 						end
-						scopeconf.zero=zero
-						net.Start("kswep_zero")
-						net.WriteEntity(wep)
-						net.WriteBool(wep:GetNWBool("AltIrons"))
-						net.WriteInt(zero,16)
-						net.SendToServer()
 					end
-				elseif (wep.Owner:KeyDown(IN_WALK) and wep.ScopeFOVSteps~=nil) then
-					scopeconf.fov=scopeconf.fov+((1/scopedata.fovstep)*(scopedata.fovmax-scopedata.fovmin))
+				elseif (wep.Owner:KeyDown(IN_WALK) and scopedata.fovsteps~=nil) then
+					scopeconf.fov=scopeconf.fov+((1/scopedata.fovsteps)*(scopedata.fovmax-scopedata.fovmin))
 					if (scopeconf.fov>scopedata.fovmax) then --QEPIS FIX
 						scopeconf.fov=scopedata.fovmax
 					 end
@@ -2051,19 +2054,21 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					else
 						local zdata=scopedata.zero
 						local zero=scopeconf.zero
-						zero=zero+zdata.step
-						if (zero>zdata.max) then
-							zero=zdata.max
+						if (zdata.step>0) then
+							zero=zero+zdata.step
+							if (zero>zdata.max) then
+								zero=zdata.max
+							end
+							if (zero<zdata.min) then
+								zero=zdata.min
+							end
+							scopeconf.zero=zero
+							net.Start("kswep_zero")
+							net.WriteEntity(wep)
+							net.WriteBool(wep:GetNWBool("AltIrons"))
+							net.WriteInt(zero,16)
+							net.SendToServer()
 						end
-						if (zero<zdata.min) then
-							zero=zdata.min
-						end
-						scopeconf.zero=zero
-						net.Start("kswep_zero")
-						net.WriteEntity(wep)
-						net.WriteBool(wep:GetNWBool("AltIrons"))
-						net.WriteInt(zero,16)
-						net.SendToServer()
 					end
 				elseif (wep.Owner:KeyDown(IN_WALK) and scopedata.fovsteps~=nil) then
 					scopeconf.fov=-((1/scopedata.fovsteps)*(scopedata.fovmax-scopedata.fovmin))
@@ -2097,10 +2102,10 @@ function SWEP.DetectScroll(ply,bind,pressed)
 			end
 			if (wep:GetNWBool("Sight") and wep.Owner:KeyDown(IN_RELOAD)) then
 				if (bind=="slot1") then
-					if (wep.ScopeReticleIllumination) then
-						local color=wep.ScopeReticleColor
-						wep.ScopeReticleColor=wep.ScopeReticleIllumination
-						wep.ScopeReticleIllumination=color
+					if (scopeconf.retillum) then
+						local color=scopeconf.retcolor
+						scopeconf.retcolor=scopeconf.retillum
+						scopeconf.retillum=color
 					end
 				elseif (bind=="slot2") then
 					wep:OpenRangeCard()

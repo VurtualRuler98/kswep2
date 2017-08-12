@@ -1,5 +1,5 @@
 --[[
-Copyright 2015 vurtual 
+Copyright 2017 vurtual 
 VurtualRuler98@gmail.com
 vurtual.org
 
@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ]]--
 
-
+--Receiver--
 if (SERVER) then
 	AddCSLuaFile()
 end
@@ -27,78 +27,45 @@ if (CLIENT) then
 	SWEP.Slot = 2
 	SWEP.SlotPos = 0
 end
-SWEP.Anims = SWEP.Anims or {}
-SWEP.Anims.IdleAnim=ACT_VM_IDLE_SILENCED
-SWEP.Anims.IdleAnimEmpty=ACT_VM_IDLE_SILENCED
-SWEP.Anims.NextIdleAnim=ACT_VM_IDLE_SILENCED
-SWEP.Anims.InitialDrawAnim=ACT_VM_DRAW_SILENCED
-SWEP.Anims.UnstowAnim=ACT_VM_DRAW_SILENCED
-SWEP.Anims.UnstowAnimEmpty=ACT_VM_DRAW_SILENCED
-SWEP.Anims.StowAnim=ACT_VM_HOLSTER_SILENCED
-SWEP.Anims.StowAnimEmpty=ACT_VM_HOLSTER_SILENCED
-SWEP.Anims.ReloadAnim=ACT_VM_RELOAD_SILENCED
-SWEP.Anims.DryfireAnim=ACT_VM_DRYFIRE_SILENCED
-SWEP.Anims.ShootAnim=ACT_VM_PRIMARYATTACK_SILENCED
-SWEP.Category = "KSwep Primary"
-SWEP.IronSightHeight=2.8
-SWEP.Base = "weapon_kswep_tranqbase"
-SWEP.Primary.Delay = 0.08
-SWEP.Primary.Spread = 0.01 --AUTHENTIC
-SWEP.Spawnable = true
-SWEP.DrawOnce=false
-SWEP.DefaultScopeData = {}
-local def=SWEP.DefaultScopeData
-SWEP.OverrideScopeRange=25
-SWEP.BipodHeight=9
+
 SWEP.AdminSpawnable = true
-SWEP.MagClass="STANAG"
-SWEP.ViewModel = "models/weapons/cstrike/c_rif_m4a1.mdl"
---SWEP.WorldModel = "models/weapons/w_mk18.mdl"
-SWEP.WorldModel = "models/weapons/w_rif_m4a1.mdl"
-SWEP.LoweredOffset = 2
-SWEP.UseHands = true
-SWEP.MuzzleVelMod=1
-SWEP.MagSize = 20
-SWEP.Primary.ClipSize = SWEP.MagSize
-SWEP.Caliber = "vammo_300blkt"
-SWEP.Primary.Sound = Sound("weapon_kswep.singlesilenced")
-SWEP.Primary.SoundSup = Sound("Weapon_kswep.singlesilenced")
-SWEP.ViewModelFlip = false
-SWEP.Secondary.Ammo = ""
-SWEP.CurrentlyReloading=0
-SWEP.ReloadAnimTime=0
-SWEP.ScopeMat="kswep/kswep_scope"
-SWEP.RecoilMassModifier=0.1
-SWEP.HandlingModifier=200
-SWEP.InsAnims=false
-SWEP.Auto=false
-SWEP.Firemode=true
-SWEP.HoldType="ar2"
-SWEP.HoldOpen=false
-SWEP.TranqMultiplier=1.4
+SWEP.Base = "weapon_kswep_tranqbase"
+SWEP.Category = "KSwep Primary"
+SWEP.Spawnable = true
+
+
+--Barrel--
+SWEP.HandlingModifier=2
 SWEP.Length=44
-SWEP.LengthSup=10
-SWEP.Suppressable=false
-SWEP.RecoilModSup=0.9
-SWEP.SpreadModSup=-0.0005
-SWEP.IdleType="passive"
+SWEP.Primary.Spread = 0.01 --AUTHENTIC
+SWEP.RecoilMassModifier=0.2
+SWEP.MuzzleVelMod=1
+SWEP.TranqMultiplier=1.4
+
+--Magazine--
+SWEP.Caliber = "vammo_300blkt"
+SWEP.MagClass="STANAG"
+SWEP.MagSize = 20
 SWEP.MagType="AR300BLKT"
-SWEP.IronSightsPos = Vector()
-SWEP.IronSightsAng = Vector()
---SWEP.AimLuaReticle="steiner_scr"
-SWEP.MergeAttachments = {
-	--foregrip = "models/weapons/upgrades/a_standard_akm.mdl"
- }
-SWEP.InsAttachments=false
-SWEP.CanFlashlight=true
-SWEP.LAMAttachment="1"
-SWEP.NoLowerAnim=true
 function SWEP:ReloadAct(force)
 	self:ReloadMag(force)
 end
-function SWEP:PrimaryFire()
-	self:NormalFire()
-end
+
+
+--Rail--
+SWEP.BipodHeight=9
+SWEP.CanFlashlight=true
+SWEP.Has2DOptics=true
+SWEP.LAMAttachment="1"
+SWEP.Suppressable=false
+
+--Sight--
+SWEP.IronSightHeight=2.8
+SWEP.IronSightsPos = Vector(-7.88,-2,0.2)
+SWEP.IronSightsAng = Vector(2,-1.5,-3)
+SWEP.InsAttachments=false
+SWEP.OverrideScopeRange=25
+SWEP.ScopeMat="kswep/kswep_scope"
 function SWEP:InitScopeData(def)
 	def.fovmin=11
 	def.fovmax=11
@@ -112,7 +79,7 @@ function SWEP:InitScopeData(def)
 		min=0,
 		max=0,
 		step=0,
-		default=300,
+		default=50,
 		battlesight=false
 	}
 	def.windage={mils=false,max=0,step=0}
@@ -129,3 +96,45 @@ function SWEP:InitScopeData(def)
 	def.altmode.zerosync=true
 	if (CLIENT) then self:SetOptic2D("Nightforce 2.5-10x24 NXS Compact") end
 end
+
+
+--Stock--
+SWEP.DrawOnce=false
+SWEP.HoldType="ar2"
+SWEP.IdleType="passive"
+SWEP.InsAnims=false
+SWEP.NoLowerAnim=true
+SWEP.LoweredOffset = 2
+SWEP.Primary.Sound = Sound("weapon_kswep.singlesilenced")
+SWEP.UseHands = true
+SWEP.WorldModel = "models/weapons/w_rif_m4a1.mdl"
+SWEP.ViewModel = "models/weapons/cstrike/c_rif_m4a1.mdl"
+SWEP.ViewModelFlip = false
+function SWEP:InitAnims(tbl)
+	tbl.IdleAnim=ACT_VM_IDLE_SILENCED
+	tbl.IdleAnimEmpty=ACT_VM_IDLE_SILENCED
+	tbl.NextIdleAnim=ACT_VM_IDLE_SILENCED
+	tbl.InitialDrawAnim=ACT_VM_DRAW_SILENCED
+	tbl.UnstowAnim=ACT_VM_DRAW_SILENCED
+	tbl.UnstowAnimEmpty=ACT_VM_DRAW_SILENCED
+	tbl.StowAnim=ACT_VM_HOLSTER_SILENCED
+	tbl.StowAnimEmpty=ACT_VM_HOLSTER_SILENCED
+	tbl.ReloadAnim=ACT_VM_RELOAD_SILENCED
+	tbl.DryfireAnim=ACT_VM_DRYFIRE_SILENCED
+	tbl.ShootAnim=ACT_VM_PRIMARYATTACK_SILENCED
+end
+
+
+--Trigger--
+SWEP.Auto=false
+SWEP.Firemode=true
+SWEP.Firemodes={{auto=false,name="SEMI"},{auto=true,name="AUTO"}}
+SWEP.HKBurst=false
+SWEP.HoldOpen=true
+SWEP.Primary.Delay = 0.08
+SWEP.SelectFire=true
+function SWEP:PrimaryFire()
+	self:NormalFire()
+end
+
+

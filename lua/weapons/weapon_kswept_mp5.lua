@@ -35,7 +35,7 @@ SWEP.Spawnable = true
 
 
 --barrel--
-SWEP.HandlingModifier=4
+SWEP.HandlingModifier=10
 SWEP.Length=22
 SWEP.Primary.Spread = 0.025 --idk
 SWEP.RecoilMassModifier=0.40

@@ -60,8 +60,8 @@ SWEP.Suppressable=false
 
 --Sight--
 SWEP.IronSightHeight=2.8
-SWEP.IronSightsPos = Vector()
-SWEP.IronSightsAng = Vector()
+SWEP.IronSightsPos = Vector(-7.88,-2,0.2)
+SWEP.IronSightsAng = Vector(2,-1.5,-3)
 SWEP.InsAttachments=false
 SWEP.ScopeMat="kswep/kswep_scope"
 function SWEP:InitScopeData(def)
