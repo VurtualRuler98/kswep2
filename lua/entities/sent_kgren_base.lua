@@ -109,6 +109,9 @@ function ENT:DetFlash()
 				if (self:LookingAtMe(v) or self:GetPos():Distance(v:GetPos())<128) then
 					v:ScreenFade(SCREENFADE.IN,color_white,1,4.5)
 					v:SetDSP(35,false)
+					local ang=AngleRand()
+					ang.r=0
+					v:SetEyeAngles(ang)
 				end
 			end
 		end
