@@ -145,6 +145,12 @@ SWEP.RTRangerX=0
 SWEP.RTRangerY=0
 SWEP.ReloadTwoClips=false
 SWEP.LAMAttachment="muzzle" --"laser" for ins2
+SWEP.NPCBurstMin=1
+SWEP.NPCBurstMax=3
+SWEP.NPCBurstTimeMin=0.2
+SWEP.NPCBurstTimeMax=0.3
+SWEP.NPCBurstCount=-1
+SWEP.NPCBurstDist=1024
 if (CLIENT) then
 local calcres=0
 if (ConVarExists("kswep_cl_scoperes")) then
@@ -511,6 +517,14 @@ function SWEP:PrimaryAttack()
 	if (SERVER and self.Owner:IsNPC() and self.Owner:GetCurrentWeaponProficiency()<5) then
 		self.Owner:SetCurrentWeaponProficiency(5)
 	end
+	if (SERVER and self.Owner:IsNPC() and self.NPCBurstCount<0 and self.Owner:GetEnemy() and self.Owner:GetEnemy():GetPos():Distance(self.Owner:GetPos())<self.NPCBurstDist) then
+		self.NPCBurstCount=math.random(self.NPCBurstMin,self.NPCBurstMax)-1
+		self.NPCBurstTime=CurTime()+math.Rand(self.NPCBurstTimeMin,self.NPCBurstTimeMax)
+	end
+	if (self.NPCBurstCount>0) then
+		self.NPCBurstTime=CurTime()+math.Rand(self.NPCBurstTimeMin,self.NPCBurstTimeMax)
+	end
+	if (self.NPCBurstCount==0) then self.NPCBurstCount=-1 end
 	if (self.Owner:IsPlayer() and self:ModKeyDown() and not self:GetNWBool("FiremodeSelected") and not self:GetNWBool("Lowered")) then
 		self:SwitchFiremode()
 		self:SetNWBool("FiremodeSelected",true)
@@ -529,8 +543,8 @@ function SWEP:PrimaryAttack()
 		else
 			self:SetNextAttack(CurTime()+0.5)
 		end
-		else
-			self:PrimaryFire()
+	else
+		self:PrimaryFire()
 	end
 	end
 end
@@ -924,6 +938,16 @@ net.Receive("kswep_sethands",function()
 	self.RefreshMerge=true
 end)
 function SWEP:Reload()
+	if (self.Owner:IsNPC()) then
+		self:SetClip1(self.MagSize)
+		self.Owner:SetAnimation(self.ActivityTranslateAI[ACT_RELOAD])
+		self:SetNextAttack(CurTime()+2)
+		if (self:GetNWBool("Chambered")==false and self.OpenBolt==false) then
+			self:SetNWBool("Chambered",true)
+			self:TakePrimaryAmmo(1)
+		end
+		return
+	end
 	if (self:GetNWBool("Sight")) then return end
 	if (self.ChainReload and not self:GetNWBool("CurrentlyReloading")) then
 		local anim=self.Anims.MidReloadAnim
@@ -1892,6 +1916,7 @@ function SWEP:FinishReloadSingle()
 end
 
 function SWEP:CanPrimaryAttack()
+	if (self.NPCBurstCount>0 and self.NPCBurstTime<CurTime()) then return true end
 	if ( not self:GetNWBool("Raised") and not self:GetNWBool("HoldAim")) then return false end
 	if ( CLIENT and self.Owner==LocalPlayer() and self.NextPrimaryAttack>CurTime()) then return false end
 	if ( self:GetNWFloat("NextPrimaryAttack")>CurTime()) then return false  end
@@ -1901,7 +1926,7 @@ function SWEP:CanPrimaryAttack()
         return true
 end
 function SWEP:TryPrimaryAttack()
-	if (not self:CanPrimaryAttack()) then return false end
+	if (not self:CanPrimaryAttack() and self.NPCBurstCount<1) then return false end
 	if ( self.Weapon:Clip1() <= 0 and not self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 and self.OpenBolt==true) then
 		if (self:GetNWBool("FiringPin")==true or self.DoubleAction) then
 			if (not self.HoldOpen) then
@@ -2188,6 +2213,10 @@ function SWEP:Think()
 	if (SERVER and self.Owner:IsNPC()) then
 		if ( self.Weapon:Clip1() <= 0 and not self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 and self.OpenBolt==true) then
 			self:Reload()
+		end
+		if (self.NPCBurstCount>0 and self.NPCBurstCount>-1 and self.NPCBurstTime<CurTime()) then
+			self.NPCBurstCount=self.NPCBurstCount-1
+			self:PrimaryAttack()
 		end
 	end
 	if (CLIENT and LocalPlayer()==self.Owner and self.RefreshMerge) then

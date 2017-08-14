@@ -118,6 +118,11 @@ SWEP.Firemode=true
 SWEP.Firemodes={{auto=false,name="SEMI"},{auto=true,name="BURST",burst=3},{auto=true,name="AUTO"}}
 SWEP.HKBurst=true
 SWEP.HoldOpen=false
+SWEP.NPCBurstMin=3
+SWEP.NPCBurstMax=5
+SWEP.NPCBurstTimeMin= 0.075
+SWEP.NPCBurstTimeMax = 0.075
+SWEP.NPCBustDist=1024
 SWEP.Primary.Delay = 0.075
 SWEP.SelectFire=true
 function SWEP:PrimaryFire()
