@@ -299,6 +299,7 @@ function SWEP:Initialize()
 		self.Anims.RunAnim=self.Anims.LowerAnim
 		self.Anims.RunAnimEmpty=self.Anims.LowerAnimEmpty
 	end
+	self:SetHoldType(self.HoldType)
 	if (self.Owner:IsNPC()) then
 		local weapon=self
 		hook.Add("Think","KswepThink"..tostring(self),function()
@@ -306,8 +307,12 @@ function SWEP:Initialize()
 				weapon:Think()
 			end
 		end)
+		if (self.Owner:GetClass()=="npc_metropolice" and self.HoldType=="ar2") then 
+			self:SetNWString("HoldType","smg")
+			self:SetNWString("IdleType","smg")
+			self:SetHoldType("smg")
+		end
 	end
-	self:SetHoldType(self.HoldType)
 	if (self.InsAttachments and self.DefaultSight) then
 		self.CurrentSight=self.DefaultSight
 	end
@@ -351,6 +356,7 @@ function SWEP:Initialize()
 	self:Initialize2()
 	self:InitScopeData(self.DefaultScopedata)
 	self:InitAnims(self.Anims)
+	if (self.Owner:IsNPC() and SERVER) then self:SetOptic2D("Default") end
 end
 function SWEP:DiscoverModelAnims()
 end
@@ -501,6 +507,9 @@ function SWEP:PrimaryAttack()
 	if (self.Owner:IsPlayer() and not self:GetNWBool("Sight") and self.Owner:KeyDown(IN_SPEED)) then
 		self:Melee()
 		return
+	end
+	if (SERVER and self.Owner:IsNPC() and self.Owner:GetCurrentWeaponProficiency()<5) then
+		self.Owner:SetCurrentWeaponProficiency(5)
 	end
 	if (self.Owner:IsPlayer() and self:ModKeyDown() and not self:GetNWBool("FiremodeSelected") and not self:GetNWBool("Lowered")) then
 		self:SwitchFiremode()
@@ -705,10 +714,12 @@ function SWEP:TakePrimaryAmmo(num)
 				self.Weapon:SetClip1(#self.MagTable)
 				if (SERVER) then
 					self:SetNWInt("MagRounds",#self.MagTable)
-					net.Start("kswep_magtable")
-					net.WriteEntity(self)
-					net.WriteTable(self.MagTable)
-					net.Send(self.Owner)
+					if (self.Owner:IsPlayer()) then
+						net.Start("kswep_magtable")
+						net.WriteEntity(self)
+						net.WriteTable(self.MagTable)
+						net.Send(self.Owner)
+					end
 					if (self.SingleReload and #self.MagTable>0) then 
 						self.Ammo=vurtual_ammodata[self.MagTable[#self.MagTable].caliber]
 					end
@@ -1683,10 +1694,12 @@ function SWEP:FinishReload()
 			table.Empty(table.GetLastValue(self.Magazines))
 		end
 		self.ReloadWeight=self:Clip1()
-		net.Start("kswep_reloadmessage")
-		net.WriteEntity(self)
-		net.WriteInt(self.ReloadWeight,8)
-		net.Send(self.Owner)
+		if (self.Owner:IsPlayer()) then
+			net.Start("kswep_reloadmessage")
+			net.WriteEntity(self)
+			net.WriteInt(self.ReloadWeight,8)
+			net.Send(self.Owner)
+		end
 	end
 	if (#self.Magazines>0 and self.Magazines[1].num==0) then
 		table.Empty(self.Magazines[1])
@@ -2172,6 +2185,11 @@ function SWEP:DrawWorldModel()
 	end
 end
 function SWEP:Think()
+	if (SERVER and self.Owner:IsNPC()) then
+		if ( self.Weapon:Clip1() <= 0 and not self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 and self.OpenBolt==true) then
+			self:Reload()
+		end
+	end
 	if (CLIENT and LocalPlayer()==self.Owner and self.RefreshMerge) then
 		self:InitMergeParts()
 	end
@@ -3332,7 +3350,7 @@ net.Receive("kswepfirebulletclient",function()
 end)
 function SWEP:FireShot(bullet)
 	if (SERVER or game.SinglePlayer()) then
-		if (not game.SinglePlayer()) then
+		if (not game.SinglePlayer() and self.Owner:IsPlayer()) then
 		net.Start("kswepfirebulletclient")
 		net.WriteTable(bullet)
 		net.Send(self.Owner)
