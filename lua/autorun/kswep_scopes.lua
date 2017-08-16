@@ -219,6 +219,13 @@ tbl.scope_range=100
 tbl.minsensitivity=2.5
 tbl.aimmag=1.95*10
 AddKswep2DScope(tbl)
+local tbl=table.Copy(tbl)
+tbl.name="Nightforce 2.5-10x24 NXS Compact (PVS-30)"
+tbl.nv=3
+tbl.altmode=table.Copy(tbl)
+tbl.altmode.zerosync=true
+tbl.altmode.nv=false
+AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Leupold TS30-A2"
 tbl.zero={
@@ -254,6 +261,9 @@ local tbl=table.Copy(tbl)
 tbl.name="Leupold TS30-A2 (PVS-22)"
 tbl.scope_cwheel=false
 tbl.nv=4
+tbl.altmode=table.Copy(tbl)
+tbl.altmode.zerosync=true
+tbl.altmode.nv=false
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Leupold Mark 4 3.5-10x40mm  LR/T M3 TMR"
