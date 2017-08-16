@@ -151,6 +151,7 @@ SWEP.NPCBurstTimeMin=0.2
 SWEP.NPCBurstTimeMax=0.3
 SWEP.NPCBurstCount=-1
 SWEP.NPCBurstDist=1024
+SWEP.NPCAimDistDelay=-1
 if (CLIENT) then
 local calcres=0
 if (ConVarExists("kswep_cl_scoperes")) then
@@ -516,6 +517,21 @@ function SWEP:PrimaryAttack()
 	end
 	if (SERVER and self.Owner:IsNPC() and self.Owner:GetCurrentWeaponProficiency()<5) then
 		self.Owner:SetCurrentWeaponProficiency(5)
+	end
+	if (SERVER and self.Owner:IsNPC()) then
+		if (self.NPCAimDistDelay==-1) then
+			local tgt=self.Owner:GetEnemy()
+			local delay=0.4
+			if (tgt and tgt:GetPos():Distance(self.Owner:GetPos())>self.NPCBurstDist) then
+				delay=tgt:GetPos():Distance(self.Owner:GetPos())/2048
+				if (delay<0.4) then delay=0.4 end
+				if (delay>2) then delay=2 end
+			end
+			self.NPCAimDistDelay=CurTime()+delay
+			return
+		elseif (self.NPCAimDistDelay>CurTime()) then
+			return
+		end
 	end
 	if (SERVER and self.Owner:IsNPC() and self.NPCBurstCount<0 and self.Owner:GetEnemy() and self.Owner:GetEnemy():GetPos():Distance(self.Owner:GetPos())<self.NPCBurstDist) then
 		self.NPCBurstCount=math.random(self.NPCBurstMin,self.NPCBurstMax)-1
@@ -2211,13 +2227,17 @@ function SWEP:DrawWorldModel()
 end
 function SWEP:Think()
 	if (SERVER and self.Owner:IsNPC()) then
+		if (not self.Owner:GetEnemy()) then
+			self.NPCAimDistDelay=-1
+		end
 		if ( self.Weapon:Clip1() <= 0 and not self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 and self.OpenBolt==true) then
 			self:Reload()
 		end
-		if (self.NPCBurstCount>0 and self.NPCBurstCount>-1 and self.NPCBurstTime<CurTime()) then
+		if ( self.Owner:GetEnemy() and self.NPCBurstCount>0 and self.NPCBurstCount>-1 and self.NPCBurstTime<CurTime()) then
 			self.NPCBurstCount=self.NPCBurstCount-1
 			self:PrimaryAttack()
 		end
+		if (not self.Owner:GetEnemy()) then self.NPCBurstCount=-1 end
 	end
 	if (CLIENT and LocalPlayer()==self.Owner and self.RefreshMerge) then
 		self:InitMergeParts()
@@ -2526,6 +2546,20 @@ end
 function SWEP:DrawRTScope()
 	local scopedata,scopeconf=self:GetScopeStuff()
 	if (self:IsRTScopeStyle(scopedata.style)) then
+	if (scopedata.nv) then
+		if (not IsValid(self.superlight)) then
+			self.superlight=ProjectedTexture()
+		end
+		if (self.superlight) then
+			self.superlight:SetTexture("effects/flashlight/hard")
+			self.superlight:SetPos(self.Owner:GetShootPos()+self.Owner:GetAimVector()*4)
+			self.superlight:SetAngles(self.Owner:GetAimVector():Angle())
+			self.superlight:SetFOV(scopeconf.fov*1.5)
+			self.superlight:SetBrightness(5)
+			self.superlight:SetFarZ(31500)
+			self.superlight:Update()
+		end
+	end
 	local oldW, oldH = ScrW(),ScrH()
 	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
 	render.PushRenderTarget(self.RenderTarget)
@@ -2566,6 +2600,54 @@ function SWEP:DrawRTScope()
 		render.BlurRenderTarget(self.RenderTarget,recblur,recblur,blur)
 	end
 	render.OverrideAlphaWriteEnable(false)
+	if (scopedata.nv) then
+		local aperture=math.max(render.ComputeLighting(EyePos(),EyeAngles():Forward()).x,render.ComputeDynamicLighting(EyePos(),EyeAngles():Forward()).x)
+		aperture=aperture^2
+		if (aperture>2) then aperture=2 end
+		self.nv_brightness=self.nv_brightness or 0
+		self.nv_brightness=Lerp(0.02,self.nv_brightness,aperture)
+		aperture=math.max(self.nv_brightness,aperture)
+		local tab = {
+			[ "$pp_colour_addr" ] = 0,
+			[ "$pp_colour_addg" ] = 0,
+			[ "$pp_colour_addb" ] = 0,
+			[ "$pp_colour_brightness" ] = 0,
+			[ "$pp_colour_contrast" ] = 0.5+(10*aperture)*0.2,
+			[ "$pp_colour_colour" ] = 0,
+			[ "$pp_colour_mulr" ] = 0,
+			[ "$pp_colour_mulg" ] = 1,
+			[ "$pp_colour_mulb" ] = 0,
+		}
+		local mat=Material("pp/colour")
+		mat:SetTexture("$fbtexture",self.RenderTarget)
+		for k,v in pairs(tab) do
+			mat:SetFloat(k,v)
+		end
+		render.SetMaterial(mat)
+		render.DrawScreenQuad()
+		--mat:SetTexture("$fbtexture",render.GetScreenEffectTexture())
+		--render.SetViewPort(0,0,oldW,oldH)
+		--PORTED BLOOM CODE HERE
+		--DrawBloom(0,4-aperture,1,0.5,0.5,1,0.5,1,0.5)
+		if (render.SupportsPixelShaders_2_0()) then
+			render.UpdateScreenEffectTexture()
+			local mat_ds=Material("pp/downsample")
+			mat_ds:SetTexture("$fbtexture",render.GetScreenEffectTexture())
+			local mat_bl=Material("pp/bloom")
+			local tex_bl=render.GetBloomTex0()
+			mat_bl:SetFloat("$levelr",0.5)
+			mat_bl:SetFloat("$levelg",2)
+			mat_bl:SetFloat("$levelb",0.5)
+			mat_bl:SetFloat("$colormul",1)
+			mat_bl:SetTexture("$basetexture",self.RenderTarget)
+			render.SetMaterial(mat_bl)
+			render.DrawScreenQuad()
+			local blur=scopedata.nv/scopeconf.fov
+			render.BlurRenderTarget(self.RenderTarget,blur,blur,1)
+			mat_bl:SetTexture("$fbtexture",tex_bl)
+		end
+		--render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
+	end
 	if (self.SuperScope) then
 		--DON'T LET ME COLOMOD PROPERLY WILL YOU
 		local aperture=0
@@ -2622,6 +2704,10 @@ function SWEP:DrawRTScope()
 	end
 	render.PopRenderTarget()
 	render.SetViewPort(0,0,oldW,oldH)
+	if (self.superlight) then
+		self.superlight:SetBrightness(0)
+		self.superlight:Update()
+	end
 	end
 end
 function SWEP:AttachModel(model)

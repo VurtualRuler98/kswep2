@@ -47,6 +47,7 @@ def.luaretsfp=false
 def.luaretscale=false
 def.luaretholo=false
 def.retillum=nil
+def.nv=nil
 def.aimmag=20
 def.handling=1
 def.accuracy=1
@@ -248,6 +249,11 @@ AddKswep2DScope(tbl)
 local tbl=table.Copy(tbl)
 tbl.name="Leupold TS30-A2 (ACI)"
 tbl.scope_cwheel=true
+AddKswep2DScope(tbl)
+local tbl=table.Copy(tbl)
+tbl.name="Leupold TS30-A2 (PVS-22)"
+tbl.scope_cwheel=false
+tbl.nv=4
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Leupold Mark 4 3.5-10x40mm  LR/T M3 TMR"

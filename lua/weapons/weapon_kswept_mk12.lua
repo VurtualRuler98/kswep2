@@ -32,7 +32,7 @@ SWEP.AdminSpawnable = true
 SWEP.Base = "weapon_kswep"
 SWEP.Category = "KSwep Auto"
 SWEP.Spawnable = true
-
+list.Add("NPCUsableWeapons", { class = "weapon_kswept_mp5", title = "TEST MP5" } )
 
 --Barrel--
 SWEP.HandlingModifier=2
@@ -117,6 +117,11 @@ SWEP.Auto=false
 SWEP.Firemode=true
 SWEP.Firemodes={{auto=false,name="SEMI"},{auto=true,name="AUTO"}}
 SWEP.HKBurst=false
+SWEP.NPCBustDist=2048
+SWEP.NPCBurstMax=4
+SWEP.NPCBurstMin=1
+SWEP.NPCBurstTimeMin= 0.08
+SWEP.NPCBurstTimeMax = 0.08
 SWEP.HoldOpen=true
 SWEP.Primary.Delay = 0.08
 SWEP.SelectFire=true
