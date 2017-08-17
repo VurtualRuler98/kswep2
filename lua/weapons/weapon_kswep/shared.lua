@@ -2125,7 +2125,7 @@ function SWEP.DetectScroll(ply,bind,pressed)
 						end
 					end
 				elseif (wep.Owner:KeyDown(IN_WALK) and scopedata.fovsteps~=nil) then
-					scopeconf.fov=-((1/scopedata.fovsteps)*(scopedata.fovmax-scopedata.fovmin))
+					scopeconf.fov=scopeconf.fov-((1/scopedata.fovsteps)*(scopedata.fovmax-scopedata.fovmin))
 					if (scopeconf.fov<scopedata.fovmin) then
 						scopeconf.fov=scopedata.fovmin
 					end

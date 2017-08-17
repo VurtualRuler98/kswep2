@@ -22,7 +22,7 @@ if (SERVER) then
 end
 
 if (CLIENT) then
-	SWEP.PrintName = "TEST 'Mk12 SPR'"
+	SWEP.PrintName = "TEST Mk12 SPR"
 	SWEP.Author = "vurtual"
 	SWEP.Slot = 2
 	SWEP.SlotPos = 0
@@ -32,7 +32,7 @@ SWEP.AdminSpawnable = true
 SWEP.Base = "weapon_kswep"
 SWEP.Category = "KSwep Auto"
 SWEP.Spawnable = true
-list.Add("NPCUsableWeapons", { class = "weapon_kswept_mp5", title = "TEST MP5" } )
+list.Add("NPCUsableWeapons", { class = "weapon_kswept_mk12", title = "TEST Mk12 SPR" } )
 
 --Barrel--
 SWEP.HandlingModifier=2

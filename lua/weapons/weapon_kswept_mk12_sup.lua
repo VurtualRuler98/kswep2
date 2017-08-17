@@ -27,6 +27,7 @@ if (CLIENT) then
 	SWEP.Slot = 2
 	SWEP.SlotPos = 0
 end
+list.Add("NPCUsableWeapons", { class = "weapon_kswept_mk12_sup", title = "TEST Mk12 Suppressed" } )
 SWEP.Category = "KSwep Auto"
 SWEP.Base = "weapon_kswept_mk12"
 SWEP.Spawnable = true

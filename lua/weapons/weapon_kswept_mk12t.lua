@@ -27,6 +27,7 @@ if (CLIENT) then
 	SWEP.Slot = 2
 	SWEP.SlotPos = 0
 end
+list.Add("NPCUsableWeapons", { class = "weapon_kswept_mk12t", title = "TEST Mk12-T" } )
 
 SWEP.AdminSpawnable = true
 SWEP.Base = "weapon_kswep_tranqbase"

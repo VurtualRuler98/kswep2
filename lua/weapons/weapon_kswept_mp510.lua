@@ -31,6 +31,7 @@ SWEP.Base = "weapon_kswept_mp5"
 SWEP.Category = "KSwep Auto"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
+list.Add("NPCUsableWeapons", { class = "weapon_kswept_mp510", title = "TEST MP5/10" } )
 
 
 --Barrel--
