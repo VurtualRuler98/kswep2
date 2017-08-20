@@ -78,6 +78,16 @@ tbl.club=12
 tbl.suitcoverage=15
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
+tbl.name="Interceptor Body Armor"
+tbl.front=KSWEP_ARMOR_IIIA
+tbl.back=KSWEP_ARMOR_IIIA
+tbl.side=KSWEP_ARMOR_IIIA
+tbl.blast=20
+tbl.slash=10
+tbl.club=8
+tbl.suitcoverage=3
+KswepAddArmor(tbl)
+local tbl=table.Copy(def)
 tbl.name="6Б3"
 tbl.front=KSWEP_ARMOR_III
 tbl.back=KSWEP_ARMOR_III
