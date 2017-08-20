@@ -1337,9 +1337,9 @@ function SWEP:DrawHUD()
 	if (scopedata.style=="aimlua") then
 		if (self:GetNWBool("Sight")) then
 			local x=0.5*ScrW()
-			if (self.IronZoom>70) then
-				x=0.64*ScrW()
-			end
+			--if (self.IronZoom>70) then
+			--	x=0.64*ScrW()
+			--end
 			local y=0.5*ScrH()
 			local radius=ScrH()*scopedata.scope_border
 			local scale=scopedata.aimmag/self.Owner:GetFOV()
