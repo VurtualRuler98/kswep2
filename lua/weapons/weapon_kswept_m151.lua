@@ -60,6 +60,7 @@ function SWEP:InitScopeData(def)
 	def.style="aimlua"
 	def.altmode = table.Copy(def)
 	def.altmode.nv=3
+	def.altmode.zerosync=true
 	if (CLIENT) then self:SetOptic2D("Default") end
 end
 
