@@ -33,68 +33,52 @@ SWEP.WorldModel = "models/maxofs2d/camera.mdl"
 SWEP.NoViewModel=true
 
 
-SWEP.Anims = SWEP.Anims or {}
-SWEP.DefaultScopeData = {}
-local def=SWEP.DefaultScopeData
-def.fov=1
-def.fovmin=1
-def.fovmax=3.2
-def.fovsteps=10
-def.sensitivity=40
-def.name="Default"
-def.minsensitivity=12
-def.scopeheight=0
-def.zero = {
-	mils=false,
-	min=0,
-	max=0,
-	step=0,
-	default=100,
-	battlesight=false
-}
-def.zeroalt = {
-	default=-1
-}
-def.windage={mils=false,max=0,step=0}
-def.windagealt=def.windage
-def.scope_border=1.05
-def.scope_ewheel=false
-def.retcolor=color_black
-def.luareticle="leupold_m151"
-def.aimmag=40
-SWEP.AdminSpawnable = true
+function SWEP:InitScopeData(def)
+	def.fovmin=1
+	def.fovmax=3.2
+	def.fovsteps=10
+	def.sensitivity=40
+	def.name="Default"
+	def.minsensitivity=12
+	def.scopeheight=0
+	def.zero = {
+		mils=false,
+		bc=-1,
+		min=0,
+		max=0,
+		step=0,
+		default=100,
+		battlesight=false
+	}
+	def.windage={mils=false,max=0,step=0}
+	def.windagealt=def.windage
+	def.scope_border=1.1
+	def.scope_ewheel=false
+	def.retcolor=color_black
+	def.luareticle="leupold_m151"
+	def.aimmag=40
+	def.style="aimlua"
+	def.altmode = table.Copy(def)
+	def.altmode.nv=3
+	if (CLIENT) then self:SetOptic2D("Default") end
+end
+
 SWEP.MagClass="none"
-SWEP.ViewModel = "models/weapons/cstrike/c_rif_m4a1.mdl"
-SWEP.LoweredOffset = 2
 SWEP.UseHands = false
 SWEP.MagSize = 0
-SWEP.Primary.ClipSize = SWEP.MagSize
-SWEP.Caliber = "vammo_556x45_m855"
+SWEP.Caliber = "vammo_rifle"
 SWEP.ViewModelFlip = false
 SWEP.ScopeMat="kswep/kswep_scope"
-SWEP.InsAnims=false
-SWEP.Auto=false
 SWEP.HoldType="camera"
 SWEP.Length=10 --idk
 SWEP.IdleType="normal"
-SWEP.SelectFire=true
 SWEP.MagType="NONE"
 SWEP.IronSightsPos = Vector()
 SWEP.IronSightsAng = Vector()
-SWEP.InsNoIronAnim=false
---SWEP.AimLuaReticle="steiner_scr"
-SWEP.AimLuaReticleMode=true
-SWEP.RTScope=true
-SWEP.MergeAttachments = {
-	--foregrip = "models/weapons/upgrades/a_standard_akm.mdl"
- }
 SWEP.InsAttachments=false
-SWEP.CanFlashlight=false
+SWEP.CanFlashlight=true
 SWEP.NoLowerAnim=true
 function SWEP:ReloadAct(force)
-end
-function SWEP:Initialize2()
-	if (CLIENT) then self:SetOptic2D("Default") end
 end
 function SWEP:PrimaryFire()
 end
