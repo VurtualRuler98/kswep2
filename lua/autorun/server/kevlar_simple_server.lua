@@ -87,7 +87,7 @@ local function KSBleedingHandler(ent,hitgroup,dmginfo,crit,minicrit)
 			tgt.kswep_bleeding=tgt.kswep_bleeding+0.2
 		elseif (hit>4) then --airway injury
 			tgt.kswep_bleeding=tgt.kswep_bleeding+1
-			if (ent:IsPlayer()) then
+			if (ent:IsPlayer() and  GetConVar("kswep_med_advanced"):GetBool()) then
 				ent.kmedic_admg=ent.kmedic_admg+dmginfo:GetDamage()/2
 			end
 		else --critical neck hit
@@ -96,23 +96,23 @@ local function KSBleedingHandler(ent,hitgroup,dmginfo,crit,minicrit)
 	elseif (hitgroup==HITGROUP_CHEST) then
 		if (crit) then
 			tgt.kswep_bleeding=tgt.kswep_bleeding+50
-			if (ent:IsPlayer()) then
+			if (ent:IsPlayer() and  GetConVar("kswep_med_advanced"):GetBool()) then
 				ent.kmedic_cdmg=ent.kmedic_cdmg+dmginfo:GetDamage()
 			end
 		elseif (hit>80) then --critical lung-area
 			tgt.kswep_bleeding=tgt.kswep_bleeding+10
-			if (ent:IsPlayer()) then
+			if (ent:IsPlayer() and  GetConVar("kswep_med_advanced"):GetBool()) then
 				ent.kmedic_admg=ent.kmedic_admg+dmginfo:GetDamage()*2
 			end
 		elseif (hit>70) then --less-critical lung-area
 			tgt.kswep_bleeding=tgt.kswep_bleeding+4
-			if (ent:IsPlayer()) then
+			if (ent:IsPlayer() and  GetConVar("kswep_med_advanced"):GetBool()) then
 				ent.kmedic_admg=ent.kmedic_admg+dmginfo:GetDamage()/10
 			end
 		else --other chest
 			tgt.kswep_bleeding=tgt.kswep_bleeding+1
 		end
-		if (minicrit) then
+		if (minicrit and GetConVar("kswep_med_advanced"):GetBool()) then
 			ent.kmedic_cdmg=ent.kmedic_cdmg+dmginfo:GetDamage()
 		end
 	elseif (hitgroup==HITGROUP_STOMACH) then
@@ -155,7 +155,7 @@ local function KSDamageHandler(ent,hitgroup,dmginfo)
 	end
 	if (armor~=-1) then
 		local scale=KSScaleDamage(armor,dmginfo,ent)
-		if (ent:IsNPC()) then
+		if (ent:IsNPC() or not GetConVar("kswep_med_advanced"):GetBool()) then
 			dmginfo:ScaleDamage(scale)
 		end
 		if (scale>1) then
@@ -166,7 +166,7 @@ local function KSDamageHandler(ent,hitgroup,dmginfo)
 			local minicrit=false
 			bonevec:Rotate(ent:GetAngles())
 			if (bone and hitgroup==HITGROUP_CHEST and (ent:GetBonePosition(bone)+bonevec):Distance(dmginfo:GetDamagePosition())<8) then
-				if (ent:IsNPC()) then
+				if (ent:IsNPC() or not GetConVar("kswep_med_advanced"):GetBool()) then
 					dmginfo:ScaleDamage(3)
 				else
 					dmginfo:ScaleDamage(scale)
@@ -350,6 +350,7 @@ local function KswepCompileHealthStatus(ply,med)
 	return dmg
 end
 local function KswepMedicalHandler()
+	if (not GetConVar("kswep_med_advanced"):GetBool()) then return end
 	for k,v in pairs(player.GetAll()) do
 		if (v.kmedic.checkup<CurTime()) then
 			local med=v.kmedic
