@@ -113,6 +113,7 @@ SWEP.ViewModel = "models/weapons/cstrike/c_rif_m4a1.mdl"
 SWEP.ViewModelFlip = false
 function SWEP:InitAnims(tbl)
 	tbl.IdleAnim=ACT_VM_IDLE_SILENCED
+	tbl.IronAnim=ACT_VM_IDLE_SILENCED
 	tbl.IdleAnimEmpty=ACT_VM_IDLE_SILENCED
 	tbl.NextIdleAnim=ACT_VM_IDLE_SILENCED
 	tbl.InitialDrawAnim=ACT_VM_DRAW_SILENCED

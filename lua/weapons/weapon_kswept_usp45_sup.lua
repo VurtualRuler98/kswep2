@@ -1,5 +1,5 @@
 --[[
-Copyright 2015 vurtual 
+Copyright 2017 vurtual 
 VurtualRuler98@gmail.com
 vurtual.org
 
@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ]]--
 
-
+--Receiver--
 if (SERVER) then
 	AddCSLuaFile()
 end
@@ -27,75 +27,31 @@ if (CLIENT) then
 	SWEP.Slot = 1
 	SWEP.SlotPos = 0
 end
-
-SWEP.Anims = SWEP.Anims or {}
-SWEP.Anims.IdleAnim=ACT_VM_IDLE_SILENCED
-SWEP.Anims.IdleAnimEmpty=ACT_VM_IDLE_SILENCED
-SWEP.Anims.NextIdleAnim=ACT_VM_IDLE_SILENCED
-SWEP.Anims.InitialDrawAnim=ACT_VM_DRAW_SILENCED
-SWEP.Anims.UnstowAnim=ACT_VM_DRAW_SILENCED
-SWEP.Anims.UnstowAnimEmpty=ACT_VM_DRAW_SILENCED
-SWEP.Anims.StowAnim=ACT_VM_HOLSTER_SILENCED
-SWEP.Anims.StowAnimEmpty=ACT_VM_HOLSTER_SILENCED
-SWEP.Anims.ReloadAnim=ACT_VM_RELOAD_SILENCED
-SWEP.Anims.DryfireAnim=ACT_VM_DRYFIRE_SILENCED
-SWEP.Anims.ShootAnim=ACT_VM_PRIMARYATTACK_SILENCED
-SWEP.Anims.ShootLastAnim=ACT_VM_PRIMARYATTACK_SILENCED
-SWEP.Category = "KSwep Secondary"
-SWEP.Base = "weapon_kswep"
-SWEP.Primary.Delay = 0.2
-SWEP.IronSightHeight=0.5
-SWEP.Primary.Spread = 0.084
-SWEP.Spawnable = true
-SWEP.DrawOnce=false
-SWEP.DefaultZerodata = {
-	mils=false,
-	bc=0.196,
-	min=50,
-	max=50,
-	step=0,
-	default=50,
-	battlesight=false
-}
 SWEP.AdminSpawnable = true
-SWEP.MagClass="Pistol2"
-SWEP.ViewModel = "models/weapons/cstrike/c_pist_usp.mdl"
---SWEP.WorldModel = "models/weapons/w_m9.mdl"
-SWEP.WorldModel = "models/weapons/w_pist_usp.mdl"
-SWEP.LoweredOffset = 2
-SWEP.UseHands = true
-SWEP.MagazineCount = 4
-SWEP.MuzzleVelMod=1.01
-SWEP.RecoilControl=7
-SWEP.MagSize = 12
-SWEP.MaxMagsBonus=2
-SWEP.MuzzleVelModSup = 1.01
-SWEP.SpreadModSup = -0.0005
-SWEP.RecoilModSup = 0.8
+SWEP.Base = "weapon_kswept_usp45"
+SWEP.Category = "KSwep Secondary"
+SWEP.Spawnable = true
+list.Add("NPCUsableWeapons", { class = "weapon_kswept_usp45", title = "TEST USP 45" } )
+
+--Barrel--
 SWEP.Length=18.5
-SWEP.LengthSup=10
-SWEP.Primary.ClipSize = SWEP.MagSize
-SWEP.Caliber = "vammo_45acp_FMJ"
+SWEP.MuzzleVelMod=1.01
+
+
+--Stock--
 SWEP.Primary.Sound = Sound("Weapon_kswept_usp45.Single_sup")
-SWEP.ViewModelFlip = false
-SWEP.Secondary.Ammo = ""
-SWEP.CurrentlyReloading=0
-SWEP.ReloadAnimTime=0
-SWEP.RecoilMassModifier=1.5
-SWEP.HandlingModifier=600
-SWEP.Auto=false
-SWEP.Firemode=true
-SWEP.HoldType="pistol"
-SWEP.HoldOpen=true
-SWEP.CanFlashlight=true
-SWEP.IdleType="normal"
-SWEP.LAMAttachment="1"
-SWEP.SelectFire=false
-SWEP.IronSightsPos = Vector(-5.8, 2, 2.6)
-SWEP.IronSightsAng = Vector(0.8,-0.1,0)
-SWEP.ManualHands="models/weapons/v_hands_sec_m.mdl"
-SWEP.EmptyAnims=false
-SWEP.MagType="USP45"
-function SWEP:ReloadAct(force)
-	self:ReloadMag(force)	
+function SWEP:InitAnims(tbl)
+	tbl.IdleAnim=ACT_VM_IDLE_SILENCED
+	tbl.IronAnim=ACT_VM_IDLE_SILENCED
+	tbl.IdleAnimEmpty=ACT_VM_IDLE_SILENCED
+	tbl.NextIdleAnim=ACT_VM_IDLE_SILENCED
+	tbl.InitialDrawAnim=ACT_VM_DRAW_SILENCED
+	tbl.UnstowAnim=ACT_VM_DRAW_SILENCED
+	tbl.UnstowAnimEmpty=ACT_VM_DRAW_SILENCED
+	tbl.StowAnim=ACT_VM_HOLSTER_SILENCED
+	tbl.StowAnimEmpty=ACT_VM_HOLSTER_SILENCED
+	tbl.ReloadAnim=ACT_VM_RELOAD_SILENCED
+	tbl.DryfireAnim=ACT_VM_DRYFIRE_SILENCED
+	tbl.ShootAnim=ACT_VM_PRIMARYATTACK_SILENCED
+	tbl.ShootLastAnim=ACT_VM_PRIMARYATTACK_SILENCED
 end

@@ -1,5 +1,5 @@
 --[[
-Copyright 2015 vurtual 
+Copyright 2017 vurtual 
 VurtualRuler98@gmail.com
 vurtual.org
 
@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ]]--
 
-
+--Receiver--
 if (SERVER) then
 	AddCSLuaFile()
 end
@@ -28,63 +28,80 @@ if (CLIENT) then
 	SWEP.SlotPos = 0
 end
 
-SWEP.Anims = SWEP.Anims or {}
-SWEP.Category = "KSwep Secondary"
-SWEP.Base = "weapon_kswep"
-SWEP.Primary.Delay = 0.2
-SWEP.IronSightHeight=0.5
-SWEP.Primary.Spread = 0.084
-SWEP.Spawnable = true
-SWEP.DrawOnce=false
-SWEP.DefaultZerodata = {
-	mils=false,
-	bc=0.149,
-	min=50,
-	max=50,
-	step=0,
-	default=50,
-	battlesight=false
-}
 SWEP.AdminSpawnable = true
-SWEP.MagClass="Pistol2"
-SWEP.ViewModel = "models/weapons/cstrike/c_pist_glock18.mdl"
---SWEP.WorldModel = "models/weapons/w_m9.mdl"
-SWEP.WorldModel = "models/weapons/w_pist_glock18.mdl"
-SWEP.LoweredOffset = 2
-SWEP.UseHands = true
-SWEP.MagazineCount = 4
-SWEP.MuzzleVelMod=1
-SWEP.RecoilControl=5
-SWEP.MagSize = 15
-SWEP.MaxMagsBonus=2
-SWEP.MuzzleVelModSup = 1.01
-SWEP.SpreadModSup = -0.0005
-SWEP.RecoilModSup = 0.8
+SWEP.Base = "weapon_kswep"
+SWEP.Category = "KSwep Secondary"
+SWEP.Spawnable = true
+list.Add("NPCUsableWeapons", { class = "weapon_kswept_glock19", title = "TEST Glock 19" } )
+
+
+--Barrel--
+SWEP.HandlingModifier=5
 SWEP.Length=8.5
-SWEP.LengthSup=10
-SWEP.Primary.ClipSize = SWEP.MagSize
-SWEP.Caliber = "vammo_9x19_FMJ"
-SWEP.Primary.Sound = Sound("Weapon_kswept_glock19.Single")
-SWEP.Primary.SoundSup = Sound("Weapon_m9.SingleSilenced")
-SWEP.ViewModelFlip = false
-SWEP.Secondary.Ammo = ""
-SWEP.CurrentlyReloading=0
-SWEP.ReloadAnimTime=0
+SWEP.Primary.Spread = 0.084
 SWEP.RecoilMassModifier=1.5
-SWEP.HandlingModifier=600
-SWEP.Auto=false
-SWEP.Firemode=true
-SWEP.HoldType="pistol"
-SWEP.HoldOpen=true
-SWEP.CanFlashlight=true
-SWEP.IdleType="normal"
-SWEP.SelectFire=false
-SWEP.IronSightsPos = Vector(-5.8, 2, 2.6)
-SWEP.IronSightsAng = Vector(0.8,-0.1,0)
-SWEP.ManualHands="models/weapons/v_hands_sec_m.mdl"
-SWEP.EmptyAnims=true
+SWEP.MuzzleVelMod=1
+
+--Magazine--
+SWEP.Caliber = "vammo_9x19_FMJ"
+SWEP.MagClass="Pistol2"
+SWEP.MagSize = 15
 SWEP.MagType="Glock9"
-SWEP.LAMAttachment="1"
 function SWEP:ReloadAct(force)
-	self:ReloadMag(force)	
+	self:ReloadMag(force)
 end
+
+
+--Rail--
+SWEP.CanFlashlight=true
+SWEP.LAMAttachment="1"
+
+--Sight--
+SWEP.IronSightHeight=0.5
+SWEP.IronSightsPos = Vector(-5.8, 2, 2.6)
+SWEP.IronSightsAng = Vector(-0.8,-0.1,0)
+function SWEP:InitScopeData(def)
+	def.sensitivity=1
+	def.name="Default"
+	def.scopeheight=0
+	def.zero = {
+		mils=false,
+		bc=0.149,
+		min=50,
+		max=50,
+		step=0,
+		default=50,
+		battlesight=false
+	}
+	def.style="crosshair"
+	if (CLIENT) then self:SetOptic2D("Default") end
+end
+
+
+--Stock--
+SWEP.DrawOnce=false
+SWEP.HoldType="pistol"
+SWEP.IdleType="normal"
+SWEP.NoLowerAnim=true
+SWEP.LoweredOffset = 2
+SWEP.Primary.Sound = Sound("Weapon_kswept_glock19.Single")
+SWEP.UseHands = true
+SWEP.WorldModel = "models/weapons/w_pist_glock18.mdl"
+SWEP.ViewModel = "models/weapons/cstrike/c_pist_glock18.mdl"
+SWEP.ViewModelFlip = false
+function SWEP:InitAnims(tbl)
+	tbl.InitialDrawAnim=ACT_VM_READY
+end
+
+--Trigger--
+SWEP.NPCBustDist=512
+SWEP.NPCBurstMax=3
+SWEP.NPCBurstMin=1
+SWEP.NPCBurstTimeMin= 0.2
+SWEP.NPCBurstTimeMax = 0.3
+SWEP.HoldOpen=true
+SWEP.Primary.Delay = 0.2
+function SWEP:PrimaryFire()
+	self:NormalFire()
+end
+

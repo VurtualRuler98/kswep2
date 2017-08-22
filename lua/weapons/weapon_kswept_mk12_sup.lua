@@ -48,6 +48,7 @@ SWEP.MuzzleVelMod=1
 SWEP.Primary.Sound = Sound("weapon_kswept_m4.single_sup")
 function SWEP:InitAnims(tbl)
 	tbl.IdleAnim=ACT_VM_IDLE_SILENCED
+	tbl.IronAnim=ACT_VM_IDLE_SILENCED
 	tbl.IdleAnimEmpty=ACT_VM_IDLE_SILENCED
 	tbl.NextIdleAnim=ACT_VM_IDLE_SILENCED
 	tbl.InitialDrawAnim=ACT_VM_DRAW_SILENCED
