@@ -227,13 +227,13 @@ hook.Add("HUDPaint","KswepMedicalHUD",function()
 	if (kswep_med_b>0) then
 		local t=kswep_med_b
 		local col=Color(128,128,128,255)
-		if (t>50) then
+		if (t>10) then
 			col=Color(255,0,0,255)
-		elseif(t>25) then
+		elseif(t>5) then
 			col=Color(255,128,0,255)
-		elseif(t>10) then
+		elseif(t>1) then
 			col=Color(255,255,0,255)
 		end
-		draw.RoundedBox(size/2,hudx-hudstep*0.5-size,hudy-size,size*2,size*2,Color(255,255,0,255))
+		draw.RoundedBox(size/2,hudx-hudstep*0.5-size,hudy-size,size*2,size*2,col)
 	end
 end)

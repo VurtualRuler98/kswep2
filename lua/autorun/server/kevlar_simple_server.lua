@@ -11,6 +11,9 @@ local kmedic_base={
 function KSSetSpawnArmor(ply)
 	ply.ksarmor=kswep_armors["none"]
 	ply.kmedic=table.Copy(kmedic_base)
+	ply.kmedic_admg=0
+	ply.kmedic_cdmg=0
+	ply.kmedic_pdmg=0
 end
 hook.Add("PlayerSpawn","SetSpawnArmor",KSSetSpawnArmor)
 net.Receive("showvestmenu",function(len,pl)
@@ -59,7 +62,7 @@ local function KSDamageHandlerEnt(ent,dmginfo)
 		dmginfo:ScaleDamage(KSSuitHandler(ent,dmginfo))
 	end
 end
-local function KSBleedingHandler(ent,hitgroup,dmginfo,crit)
+local function KSBleedingHandler(ent,hitgroup,dmginfo,crit,minicrit)
 	local tgt
 	if (not KswepBleedingEntities[ent:EntIndex()]) then
 		tgt={}
@@ -84,18 +87,33 @@ local function KSBleedingHandler(ent,hitgroup,dmginfo,crit)
 			tgt.kswep_bleeding=tgt.kswep_bleeding+0.2
 		elseif (hit>4) then --airway injury
 			tgt.kswep_bleeding=tgt.kswep_bleeding+1
+			if (ent:IsPlayer()) then
+				ent.kmedic_admg=ent.kmedic_admg+dmginfo:GetDamage()/2
+			end
 		else --critical neck hit
 			tgt.kswep_bleeding=tgt.kswep_bleeding+30
 		end
 	elseif (hitgroup==HITGROUP_CHEST) then
 		if (crit) then
 			tgt.kswep_bleeding=tgt.kswep_bleeding+50
+			if (ent:IsPlayer()) then
+				ent.kmedic_cdmg=ent.kmedic_cdmg+dmginfo:GetDamage()
+			end
 		elseif (hit>80) then --critical lung-area
 			tgt.kswep_bleeding=tgt.kswep_bleeding+10
+			if (ent:IsPlayer()) then
+				ent.kmedic_admg=ent.kmedic_admg+dmginfo:GetDamage()*2
+			end
 		elseif (hit>70) then --less-critical lung-area
 			tgt.kswep_bleeding=tgt.kswep_bleeding+4
+			if (ent:IsPlayer()) then
+				ent.kmedic_admg=ent.kmedic_admg+dmginfo:GetDamage()/10
+			end
 		else --other chest
 			tgt.kswep_bleeding=tgt.kswep_bleeding+1
+		end
+		if (minicrit) then
+			ent.kmedic_cdmg=ent.kmedic_cdmg+dmginfo:GetDamage()
 		end
 	elseif (hitgroup==HITGROUP_STOMACH) then
 		if (hit>90) then --bad guts hit
@@ -137,16 +155,30 @@ local function KSDamageHandler(ent,hitgroup,dmginfo)
 	end
 	if (armor~=-1) then
 		local scale=KSScaleDamage(armor,dmginfo,ent)
-		dmginfo:ScaleDamage(scale)
+		if (ent:IsNPC()) then
+			dmginfo:ScaleDamage(scale)
+		end
 		if (scale>1) then
+			
 			local bone=ent:LookupBone("ValveBiped.Bip01_Spine4")
 			local bonevec=Vector(2,0,2)
 			local crit=false
+			local minicrit=false
 			bonevec:Rotate(ent:GetAngles())
 			if (bone and hitgroup==HITGROUP_CHEST and (ent:GetBonePosition(bone)+bonevec):Distance(dmginfo:GetDamagePosition())<8) then
-				dmginfo:ScaleDamage(3)
+				if (ent:IsNPC()) then
+					dmginfo:ScaleDamage(3)
+				else
+					dmginfo:ScaleDamage(scale)
+				end
 				crit=true
-			end
+			elseif (bone and hitgroup==HITGROUP_CHEST) then
+					local dist=1/ent:GetBonePosition(bone)+bonevec:Distance(dmginfo:GetDamagePosition())/8
+					if (dist>0.1) then
+						minicrit=true
+						dmginfo:ScaleDamage(scale/dist)
+					end
+				end
 			if (GetConVar("kswep_bleeding")) then
 				KSBleedingHandler(ent,hitgroup,dmginfo,crit)
 			end
@@ -323,11 +355,22 @@ local function KswepMedicalHandler()
 			local med=v.kmedic
 			local bleed=0
 			if (KswepBleedingEntities[v:EntIndex()]) then
-				bleed=KswepBleedingEntities[v:EntIndex()].kswep_bloodloss*10
+				bleed=KswepBleedingEntities[v:EntIndex()].kswep_bleeding
 				KswepApplyStimulus(med,"c","bloodloss",math.floor(KswepBleedingEntities[k].kswep_bloodloss/20),1)
+			end
+			KswepApplyStimulus(med,"c","cdmg",v.kmedic_cdmg,1)
+			local med_a=KswepCompileHealthStatus(v,med.a)
+			if (med_a>99) then
+				v:TakeDamage(v:Health())
+				return
 			end
 			local med_c=KswepCompileHealthStatus(v,med.c)
 			if (med_c>99) then
+				v:TakeDamage(v:Health())
+				return
+			end
+			local med_p=KswepCompileHealthStatus(v,med.p)
+			if (med_p>99) then
 				v:TakeDamage(v:Health())
 				return
 			end
