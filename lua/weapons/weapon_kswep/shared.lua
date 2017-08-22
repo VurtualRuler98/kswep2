@@ -2233,7 +2233,7 @@ function SWEP:Think()
 		if ( self.Weapon:Clip1() <= 0 and not self:GetNWBool("Chambered") ) or (self.Weapon:Clip1() <= 0 and self.OpenBolt==true) then
 			self:Reload()
 		end
-		if ( self.Owner:GetEnemy() and self.NPCBurstCount>0 and self.NPCBurstCount>-1 and self.NPCBurstTime<CurTime()) then
+		if ( self.Owner:GetEnemy() and self.Owner:GetEnemy():Health()>0 and self.NPCBurstCount>0 and self.NPCBurstCount>-1 and self.NPCBurstTime<CurTime()) then
 			self.NPCBurstCount=self.NPCBurstCount-1
 			self:PrimaryAttack()
 		end
