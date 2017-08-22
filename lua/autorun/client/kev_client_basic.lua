@@ -157,3 +157,83 @@ net.Receive("kswep_gunrack",function()
 	box.GunList=net.ReadTable()
 	box:ClUseBox(nil,nil,nil,nil)
 end)
+net.Receive("kswep_medical",function()
+	kswep_med_a=net.ReadInt(8)
+	kswep_med_b=net.ReadInt(8)
+	kswep_med_c=net.ReadInt(8)
+	kswep_med_p=net.ReadInt(8)
+end)
+kswep_med_a=0
+kswep_med_b=0
+kswep_med_c=0
+kswep_med_p=0
+hook.Add("HUDPaint","KswepMedicalHUD",function()
+	local size=ScrW()/50
+	local hudx=ScrW()/2
+	local hudstep=ScrW()/20
+	local hudy=ScrH()/1.1
+	local triangle= {
+		{x = hudx-hudstep*1.5, y=hudy-size},
+		{x = hudx-hudstep*1.5+size, y=hudy+size},
+		{x = hudx-hudstep*1.5-size, y=hudy+size}
+	}
+	local circle={}
+	local x=hudx+0.5*hudstep
+	table.insert(circle,{x=x,y=hudy})
+	for i=0,32 do
+		local a=math.rad((i/32) * -360)
+		table.insert(circle,{x = x + math.sin(a) * size, y = hudy + math.cos(a) * size})
+	end
+	draw.NoTexture()
+	if (kswep_med_a>0) then
+		local t=kswep_med_a
+		if (t>50) then
+			surface.SetDrawColor(255,0,0,255)
+		elseif(t>25) then
+			surface.SetDrawColor(255,128,0,255)
+		elseif(t>10) then
+			surface.SetDrawColor(255,255,0,255)
+		else
+			surface.SetDrawColor(128,128,128,255)
+		end
+		surface.DrawPoly(triangle)
+	end
+	if (kswep_med_c>0) then
+		local t=kswep_med_c
+		if (t>50) then
+			surface.SetDrawColor(255,0,0,255)
+		elseif(t>25) then
+			surface.SetDrawColor(255,128,0,255)
+		elseif(t>10) then
+			surface.SetDrawColor(255,255,0,255)
+		else
+			surface.SetDrawColor(128,128,128,255)
+		end
+		surface.DrawPoly(circle)
+	end
+	if (kswep_med_p>0) then
+		local t=kswep_med_p
+		if (t>50) then
+			surface.SetDrawColor(255,0,0,255)
+		elseif(t>25) then
+			surface.SetDrawColor(255,128,0,255)
+		elseif(t>10) then
+			surface.SetDrawColor(255,255,0,255)
+		else
+			surface.SetDrawColor(128,128,128,255)
+		end
+		surface.DrawRect(hudx+hudstep*1.5-size,hudy-size,size*2,size*2)
+	end
+	if (kswep_med_b>0) then
+		local t=kswep_med_b
+		local col=Color(128,128,128,255)
+		if (t>50) then
+			col=Color(255,0,0,255)
+		elseif(t>25) then
+			col=Color(255,128,0,255)
+		elseif(t>10) then
+			col=Color(255,255,0,255)
+		end
+		draw.RoundedBox(size/2,hudx-hudstep*0.5-size,hudy-size,size*2,size*2,Color(255,255,0,255))
+	end
+end)

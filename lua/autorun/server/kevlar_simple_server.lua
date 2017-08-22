@@ -2,40 +2,21 @@ util.AddNetworkString("showvestmenu")
 function kevlardebugprint(str)
 	if (GetConVar("kevlar_debug"):GetBool()==true) then print(str) end
 end
+local kmedic_base={
+	a={}, --airway
+	c={}, --circulation
+	p={}, --pain
+	checkup=0
+}
 function KSSetSpawnArmor(ply)
 	ply.ksarmor=kswep_armors["none"]
-	ply.ksarmor.front=0
-	ply.ksarmor.back=0
-	ply.ksarmor.side=0
-	ply.ksarmor.helmet=0
-	ply.ksarmordmgtime=0	
+	ply.kmedic=table.Copy(kmedic_base)
 end
 hook.Add("PlayerSpawn","SetSpawnArmor",KSSetSpawnArmor)
 net.Receive("showvestmenu",function(len,pl)
 local choice=net.ReadString()
 	if (choice and kswep_armors[choice]) then
 		pl.ksarmor=kswep_armors[choice]
-	end
-	if (choice==-1) then
-		pl.ksarmor.helmet=0
-		pl.ksarmor.front=0
-		pl.ksarmor.back=0
-		pl.ksarmor.side=0
-	elseif (choice==0) then
-		pl.ksarmor.helmet=0
-		pl.ksarmor.front=KSWEP_ARMOR_IIIA
-		pl.ksarmor.back=KSWEP_ARMOR_IIIA
-		pl.ksarmor.side=KSWEP_ARMOR_IIIA
-	elseif (choice==1) then
-		pl.ksarmor.helmet=0
-		pl.ksarmor.front=KSWEP_ARMOR_III
-		pl.ksarmor.back=KSWEP_ARMOR_III
-		pl.ksarmor.side=KSWEP_ARMOR_IIIA
-	elseif (choice==2) then
-		pl.ksarmor.helmet=KSWEP_ARMOR_IIIA
-		pl.ksarmor.front=KSWEP_ARMOR_IV
-		pl.ksarmor.back=KSWEP_ARMOR_IV
-		pl.ksarmor.side=KSWEP_ARMOR_IV
 	end
 end)
 local function KSSuitHandler(ent,dmginfo)
@@ -280,7 +261,7 @@ hook.Add("EntityTakeDamage","KSDamageHandler",KSDamageHandlerEnt)
 hook.Add("ScaleNPCDamage","KSDamageHandler",KSDamageHandler)
 kevlardebugprint("Kevlar simple loaded.")
 
-KswepBleedingEntities={}
+KswepBleedingEntities=KswepBleedingEntities or {}
 local function KSBleedEntities()
 	for k,v in pairs(KswepBleedingEntities) do
 		if (not Entity(k):IsValid()) then KswepBleedingEntities[k]=nil
@@ -290,14 +271,14 @@ local function KSBleedEntities()
 			else
 				v.nextbleed=CurTime()+1
 				v.kswep_bloodloss=v.kswep_bloodloss+v.kswep_bleeding
-				if (v.kswep_bloodloss>2000) then
-				Entity(k):TakeDamage(10)
-				end
+				--if (v.kswep_bloodloss>2000) then
+				--Entity(k):TakeDamage(10)
+				--end
 				if (v.kswep_bleeding>0) then
 					v.kswep_lastbleed=v.kswep_lastbleed+v.kswep_bleeding
 					v.kswep_bleeding=v.kswep_bleeding-0.001
 				end
-				if (v.kswep_bleeding>1 and Entity(k):IsPlayer() and v.kswep_lastbleedmsg<v.kswep_bleeding) then
+				--[[if (v.kswep_bleeding>1 and Entity(k):IsPlayer() and v.kswep_lastbleedmsg<v.kswep_bleeding) then
 					if (v.kswep_bleeding>10) then
 						v.kswep_lastbleedmsg=2000
 						Entity(k):ChatPrint("You are severely bleeding.")
@@ -305,7 +286,7 @@ local function KSBleedEntities()
 						v.kswep_lastbleedmsg=10
 						Entity(k):ChatPrint("You are bleeding.")
 					end
-				end
+				end]]
 				if (v.kswep_bleeding<0) then
 					v.kswep_bleeding=0
 					v.kswep_lastbleedmsg=0
@@ -322,3 +303,44 @@ local function KSBleedEntities()
 	end
 end
 hook.Add("Think","KSBleedEntities",KSBleedEntities)
+local function KswepApplyStimulus(med,class,key,value,time)
+	med[class][key]={dmg=value,time=CurTime()+time}
+end
+local function KswepCompileHealthStatus(ply,med)
+	local dmg=0
+	for k,v in pairs(med) do
+		if (v.time>CurTime()) then
+			dmg=dmg+v.dmg
+		else
+			med[k]=nil
+		end
+	end
+	return dmg
+end
+local function KswepMedicalHandler()
+	for k,v in pairs(player.GetAll()) do
+		if (v.kmedic.checkup<CurTime()) then
+			local med=v.kmedic
+			local bleed=0
+			if (KswepBleedingEntities[v:EntIndex()]) then
+				bleed=KswepBleedingEntities[v:EntIndex()].kswep_bloodloss*10
+				KswepApplyStimulus(med,"c","bloodloss",math.floor(KswepBleedingEntities[k].kswep_bloodloss/20),1)
+			end
+			local med_c=KswepCompileHealthStatus(v,med.c)
+			if (med_c>99) then
+				v:TakeDamage(v:Health())
+				return
+			end
+			v.kmedic.checkup=CurTime()+1
+			bleed=math.floor(bleed)
+			if (bleed>100) then bleed=100 end
+			net.Start("kswep_medical")
+			net.WriteInt(0,8)
+			net.WriteInt(bleed,8)
+			net.WriteInt(med_c,8)
+			net.WriteInt(0,8)
+			net.Send(v)
+		end
+	end
+end
+hook.Add("Think","KswepMedicalHandler",KswepMedicalHandler)
