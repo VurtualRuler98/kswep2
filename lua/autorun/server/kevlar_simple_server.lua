@@ -173,7 +173,7 @@ local function KSDamageHandler(ent,hitgroup,dmginfo)
 				end
 				crit=true
 			elseif (bone and hitgroup==HITGROUP_CHEST) then
-					local dist=1/ent:GetBonePosition(bone)+bonevec:Distance(dmginfo:GetDamagePosition())/8
+					local dist=1/(ent:GetBonePosition(bone)+bonevec:Distance(dmginfo:GetDamagePosition()))/8
 					if (dist>0.1) then
 						minicrit=true
 						dmginfo:ScaleDamage(scale/dist)
