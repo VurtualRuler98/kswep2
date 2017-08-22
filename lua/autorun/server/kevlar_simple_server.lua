@@ -179,7 +179,7 @@ local function KSDamageHandler(ent,hitgroup,dmginfo)
 						dmginfo:ScaleDamage(scale/dist)
 					end
 				end
-			if (GetConVar("kswep_bleeding")) then
+			if (GetConVar("kswep_bleeding"):GetBool()) then
 				KSBleedingHandler(ent,hitgroup,dmginfo,crit)
 			end
 		end
