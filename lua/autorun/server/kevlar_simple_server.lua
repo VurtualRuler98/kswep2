@@ -139,7 +139,7 @@ local function KSBleedingHandler(ent,hitgroup,dmginfo,crit,minicrit)
 		end
 	end	
 end
-local function KSDamageHandler(ent,hitgroup,dmginfo)
+function KSDamageHandler(ent,hitgroup,dmginfo)
 	if (GetConVar("kevlar_enabled"):GetBool()==false) then return end
 	local armor=-1
 	if (ent:IsPlayer() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then

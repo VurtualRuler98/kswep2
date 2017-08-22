@@ -3026,10 +3026,13 @@ end
 
 function SWEP:GenerateBulletDir(recoil,aimPenalty,aimcone)
 	local scopedata=self:GetScopeStuff()
-	local dir
-	local spray=Vector(util.SharedRandom("randbulletone",-aimcone,aimcone,CurTime()),util.SharedRandom("randbullettwo",-aimcone,aimcone,CurTime()),0)
+	local dir=self.Owner:GetAimVector()
+	local spray=Angle(util.SharedRandom("randbulletone",-aimcone,aimcone,CurTime()),util.SharedRandom("randbullettwo",-aimcone,aimcone,CurTime()),0)
+	local ang=dir:Angle()
+	ang=ang+spray
+	dir=ang:Forward()
 	local handling=(self.Owner:GetVelocity():Length()/(self.HandlingModifier*1000*scopedata.handling))
-	dir=self.Owner:GetAimVector()+spray+(0.005*recoil*aimPenalty*self:SharedVectorRand())+VectorRand()*handling
+	dir=dir+(0.005*recoil*aimPenalty*self:SharedVectorRand())+VectorRand()*handling
 	return dir
 end
 function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
@@ -3084,6 +3087,12 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         bullet.Damage   = damage
         bullet.AmmoType = ammo
 	if (bullet.Num==1 and GetConVar("kswep_phys"):GetBool()) then
+		bullet.Spread = Vector()
+		if (self.Owner:IsPlayer()) then
+			bullet.Dir=self:GenerateBulletDir(recoil,aimPenalty,aimcone)
+		else
+			bullet.Dir=self.Owner:GetAimVector()+(0.005*returnrecoil*VectorRand()*aimPenalty)+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
+		end
 		self:FlyBulletStart(bullet)
 	elseif (GetConVar("kswep_phys"):GetBool()) then
 		bullet.Num=1
@@ -3091,7 +3100,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 			local tbl=table.Copy(bullet)
 			tbl.Spread = Vector()
 			if (self.Owner:IsPlayer()) then
-				bullet.Dir=self:GenerateBulletDir(recoil,aimPenalty,aimcone)
+				tbl.Dir=self:GenerateBulletDir(recoil,aimPenalty,aimcone)
 			else
 				tbl.Dir=self.Owner:GetAimVector()+(0.005*returnrecoil*VectorRand()*aimPenalty)+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
 			end
@@ -3464,6 +3473,55 @@ net.Receive("kswepfirebulletclient",function()
 	LocalPlayer():FireBullets(net.ReadTable())
 end)
 function SWEP:FireShot(bullet)
+	if (false and GetConVar("kswep_phys"):GetBool()) then
+		local trdata={
+			start=bullet.Src,
+			endpos=bullet.Src+(bullet.Dir*56756),
+			filter=self.Owner,
+			mask=MASK_SHOT
+		}	
+		local tr= util.TraceLine(trdata)
+		if (SERVER) then
+			if (tr.Hit and tr.Entity) then
+				local dmginfo = DamageInfo()
+				dmginfo:SetAmmoType(game.GetAmmoID(bullet.AmmoType))
+				dmginfo:SetAttacker(self.Owner)
+				dmginfo:SetDamage(bullet.Damage)
+				dmginfo:SetDamageForce(Vector())
+				dmginfo:SetDamagePosition(tr.HitPos)
+				dmginfo:SetDamageType(DMG_BULLET)
+				dmginfo:SetInflictor(self)
+				dmginfo:SetReportedPosition(bullet.Src)
+				if (tr.Entity:IsPlayer() or tr.Entity:IsNPC()) then
+					KSDamageHandler(tr.Entity,tr.HitGroup,dmginfo)
+				end
+				tr.Entity:TakeDamageInfo(dmginfo)
+			end 
+			--[[if (tr.Hit) then
+				local decal="Impact.Metal"
+				net.Start("kswep_bulletimpact")
+				net.WriteInt(tr.MatType,8)
+				net.WriteVector(bullet.Src)
+				net.WriteVector(tr.HitPos+(bullet.Dir*10))
+				net.WriteEntity(self.Owner)
+				net.Send(player.GetAll())
+				if (tr.MatType==MAT_METAL) then
+					tr.Entity:EmitSound("MetalGrate.BulletImpact",100,100)
+				end
+				if (tr.MatType==MAT_GLASS) then
+					decal="Impact.Glass"
+				end
+				if (tr.MatType==MAT_FLESH) then
+					decal="Impact.Flesh"
+				end
+				if (tr.MatType==MAT_ALIENFLESH) then
+					decal="Impact.AlienFlesh"
+				end
+				util.Decal(decal,bullet.Src,tr.HitPos+(bullet.Dir*10),self.Owner)
+			end]]
+		end
+		return
+	end
 	if (SERVER or game.SinglePlayer()) then
 		if (not game.SinglePlayer() and self.Owner:IsPlayer()) then
 		net.Start("kswepfirebulletclient")
