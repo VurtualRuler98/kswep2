@@ -43,5 +43,11 @@ SWEP.Caliber = "vammo_10mm_FMJ"
 SWEP.MagType="MP510"
 
 
+--Trigger--
+SWEP.Firemodes={{auto=false,name="SEMI"},{auto=true,name="BURST",burst=2},{auto=true,name="AUTO"}}
+SWEP.NPCBurstMax=5
+SWEP.NPCBurstMin=2
+
+
 --Stock--
 SWEP.Primary.Sound = Sound("Weapon_kswept_mp510.Single")

@@ -120,7 +120,7 @@ SWEP.Firemodes={{auto=false,name="SEMI"},{auto=true,name="BURST",burst=3},{auto=
 SWEP.HKBurst=true
 SWEP.HoldOpen=false
 SWEP.NPCBustDist=1024
-SWEP.NPCBurstMax=5
+SWEP.NPCBurstMax=8
 SWEP.NPCBurstMin=3
 SWEP.NPCBurstTimeMin= 0.075
 SWEP.NPCBurstTimeMax = 0.075
