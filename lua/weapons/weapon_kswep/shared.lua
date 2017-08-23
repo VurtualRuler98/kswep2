@@ -302,6 +302,7 @@ function SWEP:Initialize()
 	self:SetNWFloat("DropAfter",0)
 	self:SetNWBool("AltIrons",false)
 	self:SetNWBool("HoldAim",false)
+	self:SetNWFloat("ReflexTime",0)
 	if (self.Anims.RunAnim==nil) then
 		self.Anims.RunAnim=self.Anims.LowerAnim
 		self.Anims.RunAnimEmpty=self.Anims.LowerAnimEmpty
@@ -1807,6 +1808,7 @@ function SWEP:DoDrawCrosshair()
 		end
 	
 		local recoil = self:GetNWFloat("CurRecoil")
+		if (self:GetNWFloat("ReflexTime")>CurTime()) then recoil=recoil+(self:GetNWFloat("ReflexTime")-CurTime()) end
 		if (self.Owner:IsPlayer() and ConVarExists("prone_bindkey_enabled") and not self.Owner:IsProne()) then
 			if (self.Owner:Crouching()) then
 				recoil=recoil*1.25
@@ -2051,6 +2053,8 @@ function SWEP.DetectScroll(ply,bind,pressed)
 							zero=zero-zdata.step
 							if (zero<zdata.max*-1) then
 								zero=zdata.max*-1
+							else
+								wep:EmitSound("weapon_smg1.special1")
 							end
 							scopeconf.windage=zero
 							net.Start("kswep_zerowindage")
@@ -2070,6 +2074,8 @@ function SWEP.DetectScroll(ply,bind,pressed)
 								else
 									zero=zdata.min
 								end
+							else
+								wep:EmitSound("weapon_smg1.special1")
 							end
 							scopeconf.zero=zero
 							net.Start("kswep_zero")
@@ -2102,6 +2108,8 @@ function SWEP.DetectScroll(ply,bind,pressed)
 							zero=zero+zdata.step
 							if (zero>zdata.max) then
 								zero=zdata.max
+							else
+								wep:EmitSound("weapon_smg1.special1")
 							end
 							scopeconf.windage=zero
 							net.Start("kswep_zerowindage")
@@ -2117,9 +2125,10 @@ function SWEP.DetectScroll(ply,bind,pressed)
 							zero=zero+zdata.step
 							if (zero>zdata.max) then
 								zero=zdata.max
-							end
-							if (zero<zdata.min) then
+							elseif (zero<zdata.min) then
 								zero=zdata.min
+							else
+								wep:EmitSound("weapon_smg1.special1")
 							end
 							scopeconf.zero=zero
 							net.Start("kswep_zero")
@@ -2601,11 +2610,14 @@ function SWEP:DrawRTScope()
 	end
 	render.OverrideAlphaWriteEnable(true,true)
 	render.RenderView(scopeview)
-	if (self:GetNWFloat("CurRecoil")>0.04) then
+	if (self:GetNWFloat("CurRecoil")>0.04 or self:GetNWFloat("ReflexTime")>CurTime()) then
 		local recblur=self:GetNWFloat("CurRecoil")*5
 		local blur=4
 		if (scopedata.aimmag) then
 			blur=scopedata.aimmag/scopeconf.fov
+		end
+		if (self:GetNWFloat("ReflexTime")>CurTime()) then
+			recblur=recblur+(self:GetNWFloat("ReflexTime")-CurTime())
 		end
 		render.BlurRenderTarget(self.RenderTarget,recblur,recblur,blur)
 	end
@@ -3068,6 +3080,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 	end
 	
 	local recoil = self:GetNWFloat("CurRecoil")
+	if (self:GetNWFloat("ReflexTime")>CurTime()) then recoil=recoil+(self:GetNWFloat("ReflexTime")-CurTime()) end
 	if (self.Owner:IsPlayer() and ConVarExists("prone_bindkey_enabled") and not self.Owner:IsProne()) then
 		if (self.Owner:Crouching()) then
 			recoil=recoil*1.25
@@ -3632,12 +3645,8 @@ function SWEP:ToggleAim(unhold)
 		if (not self:GetNWBool("Raised")) then self:SetNWBool("HoldAim",true) end
                 self:ServeNWBool("Sight",true)
 		scopedata,scopeconf=self:GetScopeStuff()
-		local reflex=0
-		if (scopedata.style=="aimlua") then
-			reflex=(scopedata.aimmag/scopedata.fovmin)*(scopedata.fovmin/scopeconf.fov)
-		end
-		if (self:GetNWFloat("CurRecoil")<reflex) then
-			self:SetNWFloat("CurRecoil",reflex)
+		if (self:GetNWFloat("ReflexTime")<CurTime()+1) then
+			self:SetNWFloat("ReflexTime",CurTime()+1)
 		end
 		if (self.InsAnims) then
 			local anim=self.Anims.IronInAnim

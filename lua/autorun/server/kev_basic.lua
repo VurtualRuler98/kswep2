@@ -120,6 +120,9 @@ net.Receive("kswep_zero",function(len,pl)
 		end
 	end
 	scopeconf.zero=zero
+	if (wep:GetNWFloat("ReflexTime")<CurTime()+1) then
+		wep:SetNWFloat("ReflexTime",CurTime()+1)
+	end
 end)
 net.Receive("kswep_zerowindage",function(len,pl)
 	local wep=net.ReadEntity()
@@ -134,6 +137,9 @@ net.Receive("kswep_zerowindage",function(len,pl)
 		zero=zdata.max*-1
 	end
 	scopeconf.windage=zero
+	if (wep:GetNWFloat("ReflexTime")<CurTime()+1) then
+		wep:SetNWFloat("ReflexTime",CurTime()+1)
+	end
 end)
 net.Receive("kswep_zerofov",function(len,pl)
 	local wep=net.ReadEntity()
@@ -147,6 +153,9 @@ net.Receive("kswep_zerofov",function(len,pl)
 		fov=scopedata.fovmin
 	end
 	scopeconf.fov=fov
+	if (wep:GetNWFloat("ReflexTime")<CurTime()+1) then
+		wep:SetNWFloat("ReflexTime",CurTime()+1)
+	end
 end)
 net.Receive("kswep_weaponrange",function(len,pl)
 	local wep=net.ReadEntity()
