@@ -53,7 +53,7 @@ net.Receive("kswep_supersonic",function(len)
 	local pos=net.ReadVector()
 	if (isvector(pos) and KSWEP_LAST_SUPERSONIC<CurTime()) then
 		KSWEP_LAST_SUPERSONIC=CurTime()+0.1
-		sound.Play("kswep.supersonic",pos)
+		sound.Play("bullets.nearmiss",pos)
 	end
 end)
 function KSwepRenderClientLights()
