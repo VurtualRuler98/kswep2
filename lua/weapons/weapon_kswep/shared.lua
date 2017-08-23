@@ -17,8 +17,9 @@ limitations under the License.
 ]]--
 if (SERVER) then
 	AddCSLuaFile("shared.lua")
+	AddCSLuaFile("ai_translations.lua")
 end
-
+include("ai_translations.lua")
 if (CLIENT) then
 	SWEP.PrintName = "Glock 17"
 	SWEP.Author = "vurtual"
