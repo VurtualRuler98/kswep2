@@ -2084,6 +2084,11 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (scopeconf.fov>scopedata.fovmax) then --QEPIS FIX
 						scopeconf.fov=scopedata.fovmax
 					 end
+					net.Start("kswep_zerofov")
+					net.WriteEntity(wep)
+					net.WriteBool(wep:GetNWBool("AltIrons"))
+					net.WriteFloat(scopeconf.fov)
+					net.SendToServer()
 				else
 					wep.IronZoom=wep.IronZoom+5
 					if (wep.IronZoom>wep:IronZoomMin()) then wep.IronZoom=wep:IronZoomMin() end
@@ -2129,6 +2134,11 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					if (scopeconf.fov<scopedata.fovmin) then
 						scopeconf.fov=scopedata.fovmin
 					end
+					net.Start("kswep_zerofov")
+					net.WriteEntity(wep)
+					net.WriteBool(wep:GetNWBool("AltIrons"))
+					net.WriteFloat(scopeconf.fov)
+					net.SendToServer()
 				else
 					wep.IronZoom=wep.IronZoom-5 --flabbis
 					if (wep.IronZoom<wep:IronZoomMax()) then wep.IronZoom=wep:IronZoomMax() end
@@ -3621,8 +3631,13 @@ function SWEP:ToggleAim(unhold)
                 --Start using sight
 		if (not self:GetNWBool("Raised")) then self:SetNWBool("HoldAim",true) end
                 self:ServeNWBool("Sight",true)
-		if (self:GetNWFloat("CurRecoil")<self.MaxRecoil/3) then
-			self:SetNWFloat("CurRecoil",self.MaxRecoil/3)
+		scopedata,scopeconf=self:GetScopeStuff()
+		local reflex=0
+		if (scopedata.style=="aimlua") then
+			reflex=(scopedata.aimmag/scopedata.fovmin)*(scopedata.fovmin/scopeconf.fov)
+		end
+		if (self:GetNWFloat("CurRecoil")<reflex) then
+			self:SetNWFloat("CurRecoil",reflex)
 		end
 		if (self.InsAnims) then
 			local anim=self.Anims.IronInAnim
@@ -3645,3 +3660,5 @@ function SWEP:ToggleAim(unhold)
 		end
         end
 end
+
+
