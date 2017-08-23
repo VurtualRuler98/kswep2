@@ -31,7 +31,7 @@ SWEP.AdminSpawnable = true
 SWEP.Base = "weapon_kswept_usp45"
 SWEP.Category = "KSwep Secondary"
 SWEP.Spawnable = true
-list.Add("NPCUsableWeapons", { class = "weapon_kswept_usp45", title = "TEST USP 45 Suppressed" } )
+list.Add("NPCUsableWeapons", { class = "weapon_kswept_usp45_sup", title = "TEST USP 45 Suppressed" } )
 
 --Barrel--
 SWEP.Length=18.5
