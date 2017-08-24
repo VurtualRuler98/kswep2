@@ -174,6 +174,7 @@ SWEP.MagType=nil
 SWEP.ChamberAmmo={}
 SWEP.IsSecondaryWeapon=false
 SWEP.ReloadDelay=0
+SWEP.ReloadSingleDelay=0
 SWEP.IronZoom=90
 SWEP.InsAttachments=false
 SWEP.IronOffsetPos=Vector()
@@ -732,8 +733,12 @@ end
 net.Receive("kswep_magtable",function(len)
 	local self=net.ReadEntity()
 	self.MagTable=net.ReadTable()
+	local snd=net.ReadBool()
 	if (self.SingleReload and #self.MagTable>0) then 
 		self.Ammo=vurtual_ammodata[self.MagTable[#self.MagTable].caliber]
+	end
+	if (self.ReloadSingleSound and snd) then
+		self:EmitSound(self.ReloadSingleSound)
 	end
 end)
 function SWEP:TakePrimaryAmmo(num)
@@ -750,6 +755,7 @@ function SWEP:TakePrimaryAmmo(num)
 						net.Start("kswep_magtable")
 						net.WriteEntity(self)
 						net.WriteTable(self.MagTable)
+						net.WriteBool(false)
 						net.Send(self.Owner)
 					end
 					if (self.SingleReload and #self.MagTable>0) then 
@@ -973,8 +979,8 @@ function SWEP:Reload()
 			anim=self.Anims.MidReloadAnimEmpty
 			self.DidEmptyReload=false
 		end
-		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(anim))+self.ReloadDelay)
-		self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(anim))+self.ReloadDelay
+		self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(anim))+self.ReloadDelay+self.ReloadSingleDelay)
+		self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration(self.Weapon:SelectWeightedSequence(anim))+self.ReloadDelay+self.ReloadSingleDelay
 		self:SetNWFloat("NextIdle",0)
 		self:SetNWBool("CurrentlyReloading",true)
 		return
@@ -1240,15 +1246,17 @@ function SWEP:ReloadTube()
 	self:SetNWBool("Lowered",false)
 	local reloadspeed=self.ReloadModLight
 	self:SetNWBool("Sight",false)
+	local anim=self.Anims.ReloadAnim
 	if (self.Anims.StartReloadAnim) then
 		reloadspeed=1
-		self.Weapon:SendWeaponAnim(self.Anims.StartReloadAnim)
+		anim=self.Anims.StartReloadAnim
 	else
-		self.Weapon:SendWeaponAnim(self.ReloadAnim)
 	end
+	local seq = self.Owner:GetViewModel():SelectWeightedSequence(anim)
+	self.Weapon:SendWeaponAnim(anim)
 	self.Owner:GetViewModel():SetPlaybackRate(1/reloadspeed)
-	self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed+self.ReloadDelay)
-	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration()*reloadspeed+self.ReloadDelay
+	self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration(seq)*reloadspeed+self.ReloadDelay+self.ReloadSingleDelay)
+	self.ReloadAnimTime=CurTime()+self.Owner:GetViewModel():SequenceDuration(seq)*reloadspeed+self.ReloadDelay+self.ReloadSingleDelay
 	self:ServeNWBool("CurrentlyReloading",true)
 	if (self.SingleReloadDump) then
 		table.Add(self.Magazines,self.MagTable)
@@ -1670,6 +1678,7 @@ function SWEP:FinishReloadClip()
 		net.Start("kswep_magtable")
 		net.WriteEntity(self)
 		net.WriteTable(self.MagTable)
+		net.WriteBool(false)
 		net.Send(self.Owner)
 		if (self.OpenBolt and #self.MagTable>0) then 
 			self.Ammo=vurtual_ammodata[self.MagTable[#self.MagTable].caliber]
@@ -1938,6 +1947,11 @@ function SWEP:FinishReloadSingle()
 		net.Start("kswep_magtable")
 		net.WriteEntity(self)
 		net.WriteTable(self.MagTable)
+		if (self.ReloadSingleSound) then
+			net.WriteBool(true)
+		else
+			net.WriteBool(false)
+		end
 		net.Send(self.Owner)
 		if (self.OpenBolt and #self.MagTable>0) then 
 			self.Ammo=vurtual_ammodata[self.MagTable[#self.MagTable].caliber]
@@ -2347,7 +2361,11 @@ function SWEP:Think()
 	end
 	if (self.ReloadAnimTime~=0 and CurTime()>self.ReloadAnimTime and self:GetNWBool("CurrentlyReloading")==true) then
 		if (self.ClipReload) then
-			self:FinishReloadClip()
+			if (not self.ClipAllowSight or self.ClipAllowSight==self.Scopedata.name) then
+				self:FinishReloadClip()
+			else
+				self:FinishReloadSingle()
+			end
 		elseif (self.SingleReload) then
 			self:FinishReloadSingle()
 		else

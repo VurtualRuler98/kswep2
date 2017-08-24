@@ -79,6 +79,24 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	AddAmmodata(tbl)
 	local tbl = {}
 	tbl.vestpenetration=KSWEP_ARMOR_III
+	tbl.dmgbase=16
+	tbl.dmgvitalmin=5
+	tbl.dmgvitalmax=8
+	tbl.coefficient=0.338
+	tbl.name = "vammo_762x54_lps"
+	tbl.printname = "7.62x54mm LPS"
+	tbl.caliber = "vammo_762x54"
+	tbl.diameter=0.312
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.damagescale = 1
+	tbl.recoil = 12
+	tbl.wallbang = 4
+	tbl.velocity = 2838
+	tbl.mass=147
+	AddAmmodata(tbl)
+	local tbl = {}
+	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=17
 	tbl.dmgvitalmin=6
 	tbl.dmgvitalmax=8
