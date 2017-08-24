@@ -1625,11 +1625,13 @@ function SWEP:FinishReloadClip()
 		self:ServeNWBool("CurrentlyReloading",false)
 		self:ServeNWBool("FiringPin",true)
 	if (SERVER) then
+		table.SortByMember(self.Magazines,"num",false)
 		if (self.ReloadingClips>0) then
 			for i=1,self.ReloadingClips do
-				local clip=table.GetLastValue(self.Magazines)
+				print("jopis")
+				local clip=self.Magazines[1]
 				for k,v in pairs(self.Magazines) do
-					if (v.num+#self.MagTable<self.Primary.ClipSize and clip.num<v.num) then
+					if (v.num+#self.MagTable>=self.Primary.ClipSize and clip.num>v.num) then
 						clip=v
 					end
 				end
@@ -1843,18 +1845,27 @@ function SWEP:UpdateMagazines()
 		for k,v in pairs(self.Owner.KswepLBE) do
 			for g,w in pairs(v) do
 				if (w.magtype==self.MagType) then
-					table.insert(self.Magazines,w)
+					if (w.num<1) then
+						w=nil
+					else
+						table.insert(self.Magazines,w)
+					end
 				end
 			end
 		end
 		for k,v in pairs(self.Owner.KswepLBEAddon) do
 			for g,w in pairs(v) do
 				if (w.magtype==self.MagType) then
-					table.insert(self.Magazines,w)
+					if (w.num<1) then
+						w=nil
+					else
+						table.insert(self.Magazines,w)
+					end
 				end
 			end
 		end
 		self:UpdateMagCount()
+		table.SortByMember(self.Magazines,"num",true)
 	end
 end
 function SWEP:UpdateMagCount()
