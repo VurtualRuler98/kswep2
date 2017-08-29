@@ -78,6 +78,7 @@ SWEP.Scopeconfig={}
 SWEP.ScopeconfigAlt={}
 SWEP.Anims={}
 SWEP.AnimsDiscovered={}
+SWEP.EZReticle={}
 SWEP.DefaultZeroTable=nil
 SWEP.ZeroTable=nil
 SWEP.DefaultZeroTableAlt=nil
@@ -1339,7 +1340,8 @@ function SWEP:DrawHUD()
 			fov=fov/(self.IronZoom/self:IronZoomMax())
 		end
 		local scale=oldW/(fov*18)
-		self:DrawLuaReticle(scopedata.luareticle,scopeconf.retcolor,oldW,oldH,scale,oldH/oldW)
+		local scale2=ScrW()/(scopeconf.fov*18)
+		self:DrawLuaReticle(scopedata.luareticle,scopeconf.retcolor,oldW,oldH,scale,oldH/oldW,scale2)
 	end
 		render.SetViewPort(0,0,oldW,oldH)
 		render.PopRenderTarget()
@@ -1497,7 +1499,7 @@ function SWEP:DrawViewScope(x,y,radius)
 	end
 	surface.DrawPoly(circle)
 end
-function SWEP:DrawLuaReticle(reticle,retcol,width,height,scale,scalemod)
+function SWEP:DrawLuaReticle(reticle,retcol,width,height,scale,scalemod,scale2)
 		local aspectratio=(width/height)/(4/3)
 		--scale=scale/aspectratio
 		draw.NoTexture()
@@ -1573,6 +1575,73 @@ function SWEP:DrawLuaReticle(reticle,retcol,width,height,scale,scalemod)
 			end
 				
 		end
+		if (GetConVar("kswep_ezreticle"):GetBool() and #self.EZReticle>0) then
+			surface.SetDrawColor(100,128,255)
+			local zadj=0
+			if (scopedata.zero.mils) then
+				zadj=scopeconf.zero/scopedata.zero.mils
+			end
+			if (scopedata.zero.moa) then
+				zadj=scopeconf.zero/scopedata.zero.moa/3.43775
+			end
+			local cosine=math.Round(math.abs(math.cos(math.rad(self.Owner:EyeAngles().p))*100))/100
+			for k,v in pairs(self.EZReticle) do
+				local x1=(-1*v.size*scale2)+0.5*width
+				local y=((v.dist-zadj)*cosine*scale2*scalemod)+0.5*height
+				local x2=(v.size*scale2)+0.5*width
+				surface.DrawLine(x1,y,x2,y)
+			end
+				
+		end
+end
+function SWEP:SetEZReticle() --TODO has some precision errors(0.2 mil or so?)
+	if (!GetConVar("kswep_ezreticle"):GetBool()) then return end
+	if (#self.EZReticle>0) then self.EZReticle={} return end
+	local scopedata,scopeconf=self:GetScopeStuff()
+	local zdata=scopedata.zero
+	local zero=scopeconf.zero
+	if (zdata.mils) then
+		zero=zdata.default
+	end
+	if (zdata.moa) then
+		zero=zdata.default
+	end
+	local zerovel=self.Ammo.velocity*self.MuzzleVelMod
+	local drag_vector=Vector(zerovel,0,0)
+	local drag_dist=0
+	local drag_time=0
+	local scoperange=100
+	local drag_bc=self.Ammo.coefficient or 0.25
+	local drag_ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
+	local drop=0
+	local canadjust=true
+	local lastrange=0
+	local basedropadj=-1
+	local maxdist=GetConVar("kswep_ezreticle"):GetInt()
+	if (maxdist<1) then maxdist=1 end
+	maxdist=maxdist
+	maxdist=maxdist*3970.1
+	self.EZReticle={}
+	while (drag_ticks>0 and canadjust) do
+		drag_ticks=drag_ticks-1
+		drag_time=drag_time+1
+		drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
+		drag_vector=(drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
+		drop=drop-drag_vector.z*12*engine.TickInterval()
+		if (basedropadj==-1 and drag_dist>zero*39.3701) then
+			basedropadj=math.atan((drop+self:GetSightHeight())/drag_dist)
+		end
+		if (basedropadj>0 and drag_dist/39.701>lastrange+scoperange) then
+			lastrange=lastrange+scoperange
+			local newdropadj=math.atan((drop+self:GetSightHeight())/drag_dist)-basedropadj
+			if (drag_dist<maxdist) then
+				newdropadj=newdropadj*1000
+				table.insert(self.EZReticle,{dist=newdropadj,size=450/(drag_dist/39.701)})
+			else
+				canadjust=false
+			end
+		end
+	end
 end
 function SWEP:MagWeight(reloadweight,magsize)
 	local weightratio=reloadweight/magsize
@@ -2208,6 +2277,8 @@ function SWEP.DetectScroll(ply,bind,pressed)
 					end
 				elseif (bind=="slot2") then
 					wep:OpenRangeCard()
+				elseif (bind=="slot3") then
+					wep:SetEZReticle()
 				end
 			end
 		end
