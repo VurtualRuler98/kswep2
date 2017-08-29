@@ -1587,9 +1587,11 @@ function SWEP:DrawLuaReticle(reticle,retcol,width,height,scale,scalemod,scale2)
 			local cosine=math.Round(math.abs(math.cos(math.rad(self.Owner:EyeAngles().p))*100))/100
 			for k,v in pairs(self.EZReticle) do
 				local x1=(-1*v.size*scale2)+0.5*width
-				local y=((v.dist-zadj)*cosine*scale2*scalemod)+0.5*height
+				local y1=((v.dist-zadj)*cosine*scale2*scalemod)+0.5*height
 				local x2=(v.size*scale2)+0.5*width
-				surface.DrawLine(x1,y,x2,y)
+				local y2=y1+v.size*8*scale2*scalemod
+				surface.DrawLine(x1,y1,x2,y1)
+				surface.DrawLine(x2,y1,x2,y2)
 			end
 				
 		end
@@ -1636,7 +1638,7 @@ function SWEP:SetEZReticle() --TODO has some precision errors(0.2 mil or so?)
 			local newdropadj=math.atan((drop+self:GetSightHeight())/drag_dist)-basedropadj
 			if (drag_dist<maxdist) then
 				newdropadj=newdropadj*1000
-				table.insert(self.EZReticle,{dist=newdropadj,size=450/(drag_dist/39.701)})
+				table.insert(self.EZReticle,{dist=newdropadj,size=450/(lastrange)})
 			else
 				canadjust=false
 			end
