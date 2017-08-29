@@ -351,7 +351,7 @@ function SWEP:Initialize()
 		if (self.ScopeReticle) then 
 			self.ScopeReticleMaterial=Material(self.ScopeReticle)
 		end
-		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
+		self.RenderTarget=GetRenderTargetEx("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,RT_SIZE_NO_CHANGE,MATERIAL_RT_DEPTH_NONE,768,0,IMAGE_FORMAT_BGR888)
 		
 		self.ScopeRTMaterial=Material(self.ScopeMat)
 		self.ScopeRTMaterial:SetTexture("$basetexture",self.RenderTarget)
@@ -1408,8 +1408,6 @@ function SWEP:DrawHUD()
 			if (scopedata.fovmin) then fov=scopedata.fovmin end
 			local scale=scopedata.aimmag/self.Owner:GetFOV()
 			radius=radius*scale
-			surface.SetTexture(surface.GetTextureID(self.ScopeMat))
-			surface.SetDrawColor(color_white)
 			self:DrawViewScope(x,y,radius)
 		end
 	end
@@ -1464,6 +1462,9 @@ function SWEP:GetWindageString(dosuffix)
 	return zerostring
 end
 function SWEP:DrawViewScope(x,y,radius)
+	surface.SetDrawColor(color_white)
+	surface.SetMaterial(self.ScopeRTMaterial)
+	render.ClearDepth()
 	local circle={}
 	table.insert(circle,{x=x,y=y,u=0.5,v=0.5})
 	local ypos=y+radius
@@ -2685,9 +2686,8 @@ function SWEP:DrawRTScope()
 	local oldW, oldH = ScrW(),ScrH()
 	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
 	render.PushRenderTarget(self.RenderTarget)
-	if (not self:GetNWBool("Sight")) then
-		render.Clear(0,0,0,255)
-	else
+	if (self:GetNWBool("Sight")) then
+	render.Clear(0,0,0,0)
 	local texperture=0
 	self.AimShake=self.AimShake or Angle()
 	local scopeview = {}
@@ -2700,7 +2700,7 @@ function SWEP:DrawRTScope()
 	scopeview.drawhud = false
 	scopeview.dopostprocess=true
 	scopeview.fov = scopeconf.fov
-	if (self.SuperScope) then
+	--[[if (self.SuperScope) then
 		render.SetLightingMode(1)
 		render.RenderView(scopeview)
 		render.CapturePixels()
@@ -2710,8 +2710,9 @@ function SWEP:DrawRTScope()
 			end
 		end
 		render.SetLightingMode(0)
-	end
-	render.OverrideAlphaWriteEnable(true,true)
+	end]]
+	--render.OverrideAlphaWriteEnable(false,true)
+	--render.SetWriteDepthToDestAlpha(false)
 	render.RenderView(scopeview)
 	if (self:GetNWFloat("CurRecoil")>0.04 or self:GetNWFloat("ReflexTime")>CurTime()) then
 		local recblur=self:GetNWFloat("CurRecoil")*5
@@ -2724,7 +2725,7 @@ function SWEP:DrawRTScope()
 		end
 		render.BlurRenderTarget(self.RenderTarget,recblur,recblur,blur)
 	end
-	render.OverrideAlphaWriteEnable(false)
+	--render.OverrideAlphaWriteEnable(false)
 	if (scopedata.nv) then
 		local aperture=math.max(render.ComputeLighting(EyePos(),EyeAngles():Forward()).x,render.ComputeDynamicLighting(EyePos(),EyeAngles():Forward()).x)
 		aperture=aperture^2
@@ -2773,7 +2774,7 @@ function SWEP:DrawRTScope()
 		end
 		--render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
 	end
-	if (self.SuperScope) then
+	--[[if (self.SuperScope) then
 		--DON'T LET ME COLOMOD PROPERLY WILL YOU
 		local aperture=0
 		render.CapturePixels()
@@ -2804,9 +2805,9 @@ function SWEP:DrawRTScope()
 		render.DrawScreenQuad()
 		mat:SetTexture("$fbtexture",render.GetScreenEffectTexture())
 		--TOO BAD SCOPEMAT TIME
-	end
-	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
-	if (self.ScopeOverlayMat) then
+	end]]
+	--render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
+	--[[if (self.ScopeOverlayMat) then
 		render.SetMaterial(Material(self.ScopeOverlayMat))
 		render.DrawScreenQuadEx(0,0,self.ScopeRes,self.ScopeRes)
 	end
@@ -2824,15 +2825,15 @@ function SWEP:DrawRTScope()
 			self.superlight:SetFarZ(31500)
 			self.superlight:SetColor(Color(0,255,0,255))
 			self.superlight:Update()
-		end
+		end]]
 
 	end
 	render.PopRenderTarget()
 	render.SetViewPort(0,0,oldW,oldH)
-	if (self.superlight) then
-		self.superlight:SetBrightness(0)
-		self.superlight:Update()
-	end
+	--if (self.superlight) then
+	--	self.superlight:SetBrightness(0)
+	--	self.superlight:Update()
+	--end
 	end
 end
 function SWEP:AttachModel(model)
