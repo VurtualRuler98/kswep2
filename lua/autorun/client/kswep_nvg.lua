@@ -40,17 +40,17 @@ function KSwepNVGEffects()
 	local aperture=math.max(render.ComputeLighting(EyePos(),EyeAngles():Forward()).x,render.ComputeDynamicLighting(EyePos(),EyeAngles():Forward()).x)
 	aperture=aperture^2
 	if (aperture>2) then aperture=2 end
-	kswep_nvg_brightness=Lerp(0.02,kswep_nvg_brightness,aperture)
+	kswep_nvg_brightness=Lerp(0.2,kswep_nvg_brightness,aperture)
 	aperture=math.max(kswep_nvg_brightness,aperture)
 	local tab = {
 		[ "$pp_colour_addr" ] = 0,
 		[ "$pp_colour_addg" ] = 0,
 		[ "$pp_colour_addb" ] = 0,
 		[ "$pp_colour_brightness" ] = 0,
-		[ "$pp_colour_contrast" ] =0.5+(1-aperture)*0.2,
+		[ "$pp_colour_contrast" ] =0.5+(10*aperture)*0.2,
 		[ "$pp_colour_colour" ] = 0,
 		[ "$pp_colour_mulr" ] = 0,
-		[ "$pp_colour_mulg" ] = 0,
+		[ "$pp_colour_mulg" ] = 1,
 		[ "$pp_colour_mulb" ] = 0,
 	}
 	local mat=Material("pp/colour")
