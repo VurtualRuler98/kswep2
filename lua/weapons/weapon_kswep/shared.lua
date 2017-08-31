@@ -351,7 +351,7 @@ function SWEP:Initialize()
 		if (self.ScopeReticle) then 
 			self.ScopeReticleMaterial=Material(self.ScopeReticle)
 		end
-		self.RenderTarget=GetRenderTargetEx("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,RT_SIZE_NO_CHANGE,MATERIAL_RT_DEPTH_NONE,768,0,IMAGE_FORMAT_BGR888)
+		self.RenderTarget=GetRenderTarget("kswep_rt_ScopeZoom",self.ScopeRes,self.ScopeRes,false)
 		
 		self.ScopeRTMaterial=Material(self.ScopeMat)
 		self.ScopeRTMaterial:SetTexture("$basetexture",self.RenderTarget)
