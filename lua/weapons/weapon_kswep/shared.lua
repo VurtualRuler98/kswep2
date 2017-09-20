@@ -3133,7 +3133,7 @@ function SWEP:IsResting()
 		length = length+self.LengthSup
 	end
 	local tr = util.TraceHull( {
-		filter = self.Owner,
+		filter = {self.Owner},
 		start = self.Owner:GetShootPos(),
 		endpos = self.Owner:GetShootPos()+(self.Owner:GetAimVector()*length),
 		mins=Vector(-15,-15,-15-self.BipodHeight),
