@@ -80,18 +80,18 @@ end
 if (vurtual_ammotypes==nil) then
 	KSwepSetupAmmoTypes()
 end
-function KswepCheckScopeCompat(wep,data)
+function KswepCheckScopeCompat(wep,data,test)
 	for k,v in pairs(wep.OpticRails) do
 		if (data.mounttype~=v.railtype and data.mounttype~="ANY" and v.railtype~="ANY") then break end
 		if (data.mounttype~="ANY" and v.railtype~="ANY") then
-			if (data.mountlength>v.length) then break end
+			if (data.mountlength>v.length) then if (test) then print("Mount too long") end break end
 			local bell=data.mountbell
 			local maxscopedist=v.length-data.mountlength+v.relief-data.mountbell
-			if (maxscopedist<data.eyereliefmin) then break end
+			if (maxscopedist<data.eyereliefmin) then if (test) then print("Not enough eye relief") end break end
 			if (data.mountbell>v.overhang) then bell=v.overhang-data.mountbell end
-			if ((bell*-1)>v.length-data.mountlength) then break end
-			local minscopedist=v.start-bell
-			if (minscopedist>data.eyereliefmax) then break end
+			if ((bell*-1)>v.length-data.mountlength) then if (test) then print("Scope bell too big") end break end
+			local minscopedist=v.start
+			if (minscopedist>data.eyereliefmax) then if (test) then print("Too much eye relief") end break end
 		end
 		return true
 	end
