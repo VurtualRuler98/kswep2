@@ -56,6 +56,7 @@ end
 SWEP.CanFlashlight=true
 SWEP.Has2DOptics=true
 SWEP.LAMAttachment="1"
+SWEP.OpticRails={KSWEP_RAILDEFS.FLATTOP}
 
 
 --Sight--

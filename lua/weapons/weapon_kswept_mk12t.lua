@@ -58,10 +58,7 @@ SWEP.BipodHeight=9
 SWEP.CanFlashlight=true
 SWEP.Has2DOptics=true
 SWEP.LAMAttachment="1"
-SWEP.OpticRailRelief=15
-SWEP.OpticRailoverhang=10
-SWEP.OpticRailStart=5
-SWEP.OpticRailLength=12
+SWEP.OpticRails={KSWEP_RAILDEFS.FLATTOP}
 SWEP.Suppressable=false
 
 --Sight--

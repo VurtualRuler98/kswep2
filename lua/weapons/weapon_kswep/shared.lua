@@ -279,11 +279,13 @@ SWEP.GrenadeLauncher=false
 SWEP.Bayonet=false
 SWEP.RunTimer=0
 --Values are for flat top AR with no railed handguard.
-SWEP.OpticRailType = "STANAG" --style of rail
+--[[SWEP.OpticRailType = "ANY" --style of rail
 SWEP.OpticRailRelief=15 --How many cm behind a rail the optic's minimum eye relief can go.
 SWEP.OpticRailOverhang=10 --How many cm the optic go behind rail position 0.
 SWEP.OpticRailStart=5 --How many cm minimum the shooter's eye can be from the first position on the rail.
 SWEP.OpticRailLength=12 --Length of mounting rail in cm.
+]]
+SWEP.OpticRails={KSWEP_RAILDEFS.ANY}
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end

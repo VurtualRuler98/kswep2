@@ -57,10 +57,7 @@ SWEP.CanFlashlight=true
 SWEP.Has2DOptics=true
 SWEP.LAMAttachment="1"
 SWEP.Suppressable=false
-SWEP.OpticRailRelief=16
-SWEP.OpticRailoverhang=2
-SWEP.OpticRailStart=6
-SWEP.OpticRailLength=28
+SWEP.OpticRails={KSWEP_RAILDEFS.MK12MOD0}
 
 --Sight--
 SWEP.IronSightHeight=2.8
