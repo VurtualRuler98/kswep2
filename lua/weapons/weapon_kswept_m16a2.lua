@@ -22,7 +22,7 @@ if (SERVER) then
 end
 
 if (CLIENT) then
-	SWEP.PrintName = "TEST M4 Carbine"
+	SWEP.PrintName = "TEST M16A2"
 	SWEP.Author = "vurtual"
 	SWEP.Slot = 2
 	SWEP.SlotPos = 0
@@ -36,10 +36,10 @@ list.Add("NPCUsableWeapons", { class = "weapon_kswept_m4", title = "TEST M4 Carb
 
 --Barrel--
 SWEP.HandlingModifier=5
-SWEP.Length=30
+SWEP.Length=40
 SWEP.Primary.Spread = 0.034
-SWEP.RecoilMassModifier=0.2
-SWEP.MuzzleVelMod=0.95
+SWEP.RecoilMassModifier=0.18
+SWEP.MuzzleVelMod=1
 
 
 --Magazine--
@@ -53,10 +53,8 @@ end
 
 
 --Rail--
-SWEP.CanFlashlight=true
 SWEP.Has2DOptics=true
-SWEP.LAMAttachment="1"
-SWEP.OpticRails={KSWEP_RAILDEFS.FLATTOP,KSWEP_RAILDEFS.CARRYHANDLE}
+SWEP.OpticRails={KSWEP_RAILDEFS.CARRYHANDLE}
 
 
 --Sight--
@@ -98,7 +96,7 @@ function SWEP:InitScopeData(def)
 	def.scope_ewheel=false
 	def.retcolor=color_black
 	def.luareticle="irons"
-	def.luaretsfp=11*0.825
+	def.luaretsfp=11
 	def.aimmag=6.5
 	def.altmode = table.Copy(def)
 	def.altmode.style="aimlua"

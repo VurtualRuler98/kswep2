@@ -5,6 +5,7 @@ KSWEP_RAILDEFS={}
 KSWEP_RAILDEFS.ANY = {railtype="ANY",relief=0,overhang=0,start=0,length=0}
 KSWEP_RAILDEFS.FLATTOP={railtype="STANAG",relief=15,overhang=10,start=5,length=12}
 KSWEP_RAILDEFS.MK12MOD0={railtype="STANAG",relief=16,overhang=2,start=6,length=28}
+KSWEP_RAILDEFS.CARRYHANDLE={railtype="CARRYHANDLE",relief=0,overhang=0,start=0,length=0}
 
 kswep_2dscopes = {}
 local function AddKswep2DScope(tbl)
@@ -348,4 +349,31 @@ tbl.sensitivity=7
 tbl.minsensitivity=2
 tbl.scope_border=1.02
 tbl.aimmag=3.32*6.7
+AddKswep2DScope(tbl)
+local tbl=table.Copy(def)
+tbl.name="AN/PVS-4"
+tbl.fovmax=14.5
+tbl.fovmin=14.5
+tbl.fovsteps=0
+tbl.zero={
+	mils=false,
+	bc=-1,
+	min=200,
+	max=200,
+	step=0,
+	default=200,
+	battlesight=false
+}
+tbl.luareticle="duplex"
+tbl.retcolor=Color(128,255,128,255)
+tbl.sensitivity=3.6
+tbl.minsensitivity=3.6
+tbl.scope_border=1.2
+tbl.aimmag=14.5*3.6
+tbl.mountlength=0 --ARMS #22 throw lever rings, medium
+tbl.mountbell=0
+tbl.eyereliefmin=0
+tbl.eyereliefmax=99
+tbl.mounttype = "CARRYHANDLE"
+tbl.nv=10
 AddKswep2DScope(tbl)

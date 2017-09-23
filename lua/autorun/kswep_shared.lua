@@ -93,6 +93,6 @@ function KswepCheckScopeCompat(wep,data)
 			local minscopedist=v.start-bell
 			if (minscopedist>data.eyereliefmax) then break end
 		end
+		return true
 	end
-	return true
 end

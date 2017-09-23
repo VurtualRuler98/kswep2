@@ -2683,7 +2683,7 @@ end
 function SWEP:DrawRTScope()
 	local scopedata,scopeconf=self:GetScopeStuff()
 	if (self:IsRTScopeStyle(scopedata.style)) then
-	if (scopedata.nv) then
+	if (self:GetNWBool("Sight") and scopedata.nv) then
 		if (not IsValid(self.superlight)) then
 			self.superlight=ProjectedTexture()
 		end
