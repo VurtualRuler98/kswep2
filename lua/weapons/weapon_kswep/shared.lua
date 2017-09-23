@@ -234,6 +234,11 @@ def.windage = {
 def.altmode=nil
 def.handling=1
 def.accuracy=1
+def.mounttype = "ANY"
+def.eyereliefmax=99
+def.eyereliefmin=0
+def.mountlength=1
+def.mountbell=0
 SWEP.UseDelayForBolt=false
 SWEP.WaitShot=false
 SWEP.WaitShotIron=false
@@ -273,6 +278,12 @@ SWEP.Firemodes={}
 SWEP.GrenadeLauncher=false
 SWEP.Bayonet=false
 SWEP.RunTimer=0
+--Values are for flat top AR with no railed handguard.
+SWEP.OpticRailType = "STANAG" --style of rail
+SWEP.OpticRailRelief=15 --How many cm behind a rail the optic's minimum eye relief can go.
+SWEP.OpticRailOverhang=10 --How many cm the optic go behind rail position 0.
+SWEP.OpticRailStart=5 --How many cm minimum the shooter's eye can be from the first position on the rail.
+SWEP.OpticRailLength=12 --Length of mounting rail in cm.
 if (CLIENT) then
 	SWEP.NextPrimaryAttack=0
 end
@@ -866,6 +877,7 @@ function SWEP:SetOptic2D(name)
 	else
 		scopedata=kswep_2dscopes[name]
 	end
+	if (not KswepCheckScopeCompat(self,scopedata)) then scopedata=self.DefaultScopedata end
 	if (CLIENT and self.Owner==LocalPlayer()) then
 		net.Start("kswep_2dscopesetup")
 		net.WriteEntity(self)	

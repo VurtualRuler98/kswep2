@@ -354,7 +354,9 @@ function ENT:ClUse2DOpticBox(wep)
 		scrollmenu:SetSize(menuwidth-32,menuheight-32)
 		scrollmenu:AddColumn("Scopes")
 		for k,v in pairs(kswep_2dscopes) do
-			scrollmenu:AddLine(v.name)
+			if (KswepCheckScopeCompat(wep,v)) then 
+				scrollmenu:AddLine(v.name)
+			end
 		end
 		function scrollmenu:OnClickLine(line,selected)
 			wep:SetOptic2D(line:GetValue(1))

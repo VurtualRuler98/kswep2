@@ -80,3 +80,17 @@ end
 if (vurtual_ammotypes==nil) then
 	KSwepSetupAmmoTypes()
 end
+function KswepCheckScopeCompat(wep,data)
+	if (data.mounttype~=wep.OpticRailType and data.mounttype~="ANY") then return false end
+	if (data.mounttype~="ANY") then
+		if (data.mountlength>wep.OpticRailLength) then return false end
+		local bell=data.mountbell
+		local maxscopedist=wep.OpticRailLength-data.mountlength+wep.OpticRailRelief-data.mountbell
+		if (maxscopedist<data.eyereliefmin) then return false end
+		if (data.mountbell>wep.OpticRailOverhang) then bell=wep.OpticRailOverhang-data.mountbell end
+		if ((bell*-1)>wep.OpticRailLength-data.mountlength) then return false end
+		local minscopedist=wep.OpticRailStart-bell
+		if (minscopedist>data.eyereliefmax) then return false end
+	end
+	return true
+end
