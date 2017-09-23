@@ -1,5 +1,5 @@
 --[[
-Copyright 2015 vurtual 
+Copyright 2017 vurtual 
 VurtualRuler98@gmail.com
 vurtual.org
 
@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ]]--
 
-
+--Receiver--
 if (SERVER) then
 	AddCSLuaFile()
 end
@@ -28,75 +28,113 @@ if (CLIENT) then
 	SWEP.SlotPos = 0
 end
 
-SWEP.Anims = SWEP.Anims or {}
-SWEP.Category = "KSwep Special"
-SWEP.Base = "weapon_kswep"
-SWEP.Primary.Delay = 0.1
-SWEP.Primary.Damage = 8
-SWEP.Primary.Spread = 0.01
-SWEP.Spawnable = true
-SWEP.DrawOnce=false
-SWEP.DefaultZero=50
-SWEP.DefaultBattlesightZero=50
-SWEP.DefaultMinZero=50
-SWEP.DefaultMaxZero=50
-SWEP.DefaultZeroStep=0
+
 SWEP.AdminSpawnable = true
-SWEP.ViewModel = "models/weapons/v_rpg.mdl"
-SWEP.GivesGrenade=true
---SWEP.WorldModel = "models/weapons/w_m9.mdl"
-SWEP.WorldModel = "models/weapons/w_rocket_launcher.mdl"
-SWEP.LoweredOffset = 2
-SWEP.UseHands = false
-SWEP.MagazineCount = 4
+SWEP.Base = "weapon_kswep"
+SWEP.Category = "KSwep Special"
+SWEP.Spawnable = true
+
+--Barrel--
+SWEP.HandlingModifier=2
 SWEP.MuzzleVelMod=1
-SWEP.RecoilControl=5
-SWEP.MagSize = 8
-SWEP.MaxMags=4
-SWEP.Suppressable=false
 SWEP.Length=36
-SWEP.Primary.ClipSize = SWEP.MagSize
-SWEP.Caliber = "vammo_rifle"
-SWEP.Primary.Rocketsound = Sound("Weapon_kswept_law.single")
-SWEP.ViewModelFlip = false
-SWEP.Secondary.Ammo = ""
-SWEP.CurrentlyReloading=0
-SWEP.ReloadAnimTime=0
-SWEP.RecoilMassModifier=1.2
-SWEP.HandlingModifier=600
-SWEP.InsAnims=true
-SWEP.Auto=false
-SWEP.Firemode=true
-SWEP.HoldType="rpg"
-SWEP.HoldOpen=true
-SWEP.CanFlashlight=true
-SWEP.IdleType="passive"
-SWEP.SelectFire=false
-SWEP.Anims.InitialDrawAnim=ACT_VM_DRAW
-SWEP.Anims.SafetyAnim=ACT_VM_FIREMODE
-SWEP.Anims.TossAnim = ACT_VM_IDLE_TO_LOWERED
-SWEP.IronSightsPos = Vector(-1.43, 2, 0.4)
-SWEP.IronSightsAng = Vector(2,-2.4,8)
-SWEP.InsNoIronAnim=true
-SWEP.InsAttachments=false
-SWEP.MergeAttachments = {
-}
-SWEP.EmptyAnims=true
-SWEP.MagType=nil
-SWEP.RocketSingleShot=true
-function SWEP:ReloadAct(force)
-end
-SWEP.RocketClass="sent_kgrent_law"
+SWEP.Primary.Spread = 0.01 --AUTHENTIC
+SWEP.RecoilMassModifier=0.2
 SWEP.RocketForce=80000
-function SWEP:PrimaryFire()
-	self:FireRocket()
-	self:CreateBackblast()
-end
-function SWEP:DiscoverModelAnims()
-end
+
+--Magazine--
+SWEP.Caliber = "vammo_rifle"
+SWEP.GivesGrenade=true
+SWEP.MagSize = 0
+SWEP.MagType="NONE"
+SWEP.RocketClass="sent_kgrent_law"
 function SWEP:CustomAmmoDisplay()
 	self.AmmoDisplay = self.AmmoDisplay or {}
 	self.AmmoDisplay.Draw = true
 	self.AmmoDisplay.PrimaryClip=self:GetNWInt("numgrenades")
 	return self.AmmoDisplay
 end
+function SWEP:ReloadAct(force)
+end
+
+
+--Rail--
+SWEP.BipodHeight=9
+SWEP.CanFlashlight=true
+SWEP.Has2DOptics=false
+SWEP.LAMAttachment="1"
+SWEP.Suppressable=false
+
+--Sight--
+SWEP.IronSightHeight=2.8
+SWEP.IronSightsPos = Vector(-7.88,-2,0.2)
+SWEP.IronSightsAng = Vector(2,-1.5,-3)
+SWEP.InsAttachments=false
+function SWEP:InitScopeData(def)
+	def.fovmin=11
+	def.fovmax=11
+	def.sensitivity=1
+	def.name="Default"
+	def.minsensitivity=1
+	def.scopeheight=0
+	def.zero = {
+		mils=false,
+		bc=-1,
+		min=0,
+		max=0,
+		step=0,
+		default=50,
+		battlesight=false
+	}
+	def.windage={mils=false,max=0,step=0}
+	def.windagealt=def.windage
+	def.scope_border=1.1
+	def.scope_ewheel=false
+	def.retcolor=color_black
+	def.luareticle="irons"
+	def.luaretsfp=2.5
+	def.aimmag=6.5
+	def.style="crosshair"
+	def.altmode = nil
+	if (CLIENT) then self:SetOptic2D("Default") end
+end
+
+
+--Stock--
+SWEP.DrawOnce=false
+SWEP.HoldType="rpg"
+SWEP.IdleType="passive"
+SWEP.InsAnims=false
+SWEP.NoLowerAnim=true
+SWEP.LoweredOffset = 2
+SWEP.Primary.Rocketsound = Sound("Weapon_kswept_law.single")
+SWEP.UseHands = true
+SWEP.WorldModel = "models/weapons/w_rocket_launcher.mdl"
+SWEP.ViewModel = "models/weapons/v_rpg.mdl"
+SWEP.ViewModelFlip = false
+function SWEP:InitAnims(tbl)
+	tbl.InitialDrawAnim=ACT_VM_DRAW
+	tbl.SafetyAnim=ACT_VM_FIREMODE
+	tbl.TossAnim = ACT_VM_IDLE_TO_LOWERED
+end
+
+--Trigger--
+SWEP.Auto=false
+SWEP.Firemode=false
+SWEP.HKBurst=false
+SWEP.NPCBustDist=2048
+SWEP.NPCBurstMax=4
+SWEP.NPCBurstMin=1
+SWEP.NPCBurstTimeMin= 0.08
+SWEP.NPCBurstTimeMax = 0.08
+SWEP.HoldOpen=true
+SWEP.Primary.Delay = 0.08
+SWEP.RocketSingleShot=true
+SWEP.SelectFire=false
+function SWEP:PrimaryFire()
+	self:FireRocket()
+	self:CreateBackblast()
+end
+
+
+
