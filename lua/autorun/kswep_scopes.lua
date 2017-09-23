@@ -254,6 +254,54 @@ tbl.altmode=table.Copy(tbl)
 tbl.altmode.zerosync=true
 tbl.altmode.nv=false
 AddKswep2DScope(tbl)
+local tbl=table.Copy(tbl)
+tbl.name="Nightforce 2.5-10x24 NXS Compact (PVS-30)"
+tbl.nv=3
+tbl.altmode=table.Copy(tbl)
+tbl.altmode.zerosync=true
+tbl.altmode.nv=false
+AddKswep2DScope(tbl)
+local tbl=table.Copy(def)
+tbl.name="TEST 4x24mm Optic"
+tbl.zero={
+	mils=10,
+	bc=-1,
+	min=0,
+	max=100,
+	step=1,
+	default=100,
+	battlesight=false
+}
+tbl.windage={mils=false,max=0,step=0}
+tbl.fovmax=6
+tbl.fovmin=6
+tbl.fovsteps=1
+tbl.luareticle="test_rifmil"
+tbl.retcolor=Color(255,0,0,255)
+tbl.sensitivity=4
+tbl.scope_border=1.05
+tbl.scope_ewheel=true
+tbl.scope_range=100
+tbl.minsensitivity=4
+tbl.aimmag=6*4
+tbl.mountlength=8 --LT-104
+tbl.mountbell=5
+tbl.eyereliefmin=7
+tbl.eyereliefmax=8
+tbl.mounttype = "STANAG"
+AddKswep2DScope(tbl)
+local tbl=table.Copy(tbl)
+tbl.name="Leupold TS30-A2 (ACI)"
+tbl.scope_cwheel=true
+AddKswep2DScope(tbl)
+local tbl=table.Copy(tbl)
+tbl.name="Leupold TS30-A2 (PVS-22)"
+tbl.scope_cwheel=false
+tbl.nv=4
+tbl.altmode=table.Copy(tbl)
+tbl.altmode.zerosync=true
+tbl.altmode.nv=false
+AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
 tbl.name="Leupold TS30-A2"
 tbl.zero={

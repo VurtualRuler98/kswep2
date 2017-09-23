@@ -403,3 +403,37 @@ local tbl = {
 {shape="line",start={3.4,1.1},endpos={3.5,1.1},color=color_black}
 }
 AddKswepReticle(tbl,"nightforce_milr")
+local tbl = {
+{shape="line",start={-20,0},endpos={20,0},color=color_black},
+{shape="line",start={0,-30},endpos={0,10},color=color_black},
+{shape="ring",pos={0,0},radius=1}
+}
+
+for i=1,2 do
+	local j=i-0.5
+	table.insert(tbl,{shape="line",start={-2,-i*10},endpos={2,-i*10},color=color_black})
+	table.insert(tbl,{shape="line",start={-i*10,-2},endpos={-i*10,2},color=color_black})
+	table.insert(tbl,{shape="line",start={i*10,-2},endpos={i*10,2},color=color_black})
+	table.insert(tbl,{shape="line",start={-1,-j*10},endpos={1,-j*10},color=color_black})
+	table.insert(tbl,{shape="line",start={-j*10,-1},endpos={-j*10,1},color=color_black})
+	table.insert(tbl,{shape="line",start={j*10,-1},endpos={j*10,1},color=color_black})
+end
+table.insert(tbl,{shape="line",start={-1,-25},endpos={1,-25},color=color_black})
+table.insert(tbl,{shape="line",start={-1,5},endpos={1,5},color=color_black})
+table.insert(tbl,{shape="line",start={-2.5,10},endpos={2.5,10},color=color_black})
+table.insert(tbl,{shape="line",start={-2.5,-30},endpos={2.5,-30},color=color_black})
+for i=2,4 do
+	table.insert(tbl,{shape="line",start={-i,-0.5},endpos={-i,0.5},color=color_black})
+	table.insert(tbl,{shape="line",start={i,-0.5},endpos={i,0.5},color=color_black})
+	table.insert(tbl,{shape="line",start={-0.5,-i},endpos={0.5,-i},color=color_black})
+	table.insert(tbl,{shape="line",start={-0.5,i},endpos={0.5,i},color=color_black})
+end
+for i=16,19 do
+	table.insert(tbl,{shape="line",start={-i,-0.5},endpos={-i,0.5},color=color_black})
+	table.insert(tbl,{shape="line",start={i,-0.5},endpos={i,0.5},color=color_black})
+end
+for i=6,9 do
+	table.insert(tbl,{shape="line",start={-0.5,i},endpos={0.5,i},color=color_black})
+end
+table.insert(tbl,{shape="circle",pos={0,0},radius=0.1})
+AddKswepReticle(tbl,"test_rifmil")
