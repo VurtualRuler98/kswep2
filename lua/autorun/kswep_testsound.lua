@@ -28,6 +28,22 @@ sound.Add({
 	channel=CHAN_STATIC
 })
 sound.Add({
+	name="weapon_kswept_akm.single",
+	volume=1.0,
+	pitch={175,185},
+	sound="weapons/ak47/ak47-1.wav",
+	level=145,
+	channel=CHAN_STATIC
+})
+sound.Add({
+	name="weapon_kswept_ak74.single",
+	volume=1.0,
+	pitch={200,205},
+	sound="weapons/ak47/ak47-1.wav",
+	level=145,
+	channel=CHAN_STATIC
+})
+sound.Add({
 	name="weapon_kswept_glock19.single",
 	volume=1.0,
 	pitch={185,195},
