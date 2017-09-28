@@ -441,7 +441,7 @@ function SWEP:Melee()
 	local tr=self.Owner:GetEyeTrace()
 	if (self.Bayonet) then
 		local anim=self.Anims.IdleAnim
-		if (self:IsRunning()) then
+		if (self:IsRunning() and self.Anims.RunBayonet) then
 			anim=self.Anims.RunBayonet
 		end
 		if (self.Anims.BayonetEmpty and self:IsWeaponEmpty()) then
@@ -449,7 +449,7 @@ function SWEP:Melee()
 			if (self:IsRunning()) then
 				anim=self.Anims.RunBayonetEmpty
 			end
-		else
+		elseif (self.Anims.Bayonet) then
 			self:SendWeaponAnim(self.Anims.Bayonet)
 		end
 		local runbonus=0.1*self.Owner:GetVelocity():Dot(self.Owner:GetAimVector())
@@ -480,8 +480,10 @@ function SWEP:Melee()
 				self:EmitSound("weapon_knife.hitwall")
 			end
 		end
-		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
-		nextattack=0.1+self.Owner:GetViewModel():SequenceDuration()
+		local animtime=self.Owner:GetViewModel():SequenceDuration()
+		if (self.MeleeAnimTime) then animtime=self.MeleeAnimTime end
+		self:NextIdle(CurTime()+animtime,anim)
+		nextattack=0.1+animtime
 	else
 		if (tr.HitPos:Distance(self.Owner:GetShootPos())<self.Length+10) then
 			hit=true
@@ -501,7 +503,9 @@ function SWEP:Melee()
 				end
 			end
 			self:SendWeaponAnim(anim)
-			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim2)
+			local animtime=self.Owner:GetViewModel():SequenceDuration()
+			if (self.MeleeAnimTime) then animtime=self.MeleeAnimTime end
+			self:NextIdle(CurTime()+animtime,anim2)
 			nextattack=0.1+self.Owner:GetViewModel():SequenceDuration()
 		else
 			self.ShowViewModel=CurTime()+0.8

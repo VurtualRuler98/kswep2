@@ -39,7 +39,8 @@ SWEP.Length=48
 SWEP.Primary.Spread = 0.02
 SWEP.RecoilMassModifier=0.2
 SWEP.MuzzleVelMod=1
-
+SWEP.Bayonet=true
+SWEP.BayonetLength=17
 
 --Magazine--
 SWEP.Caliber = "vammo_762x54_lps"
@@ -131,6 +132,7 @@ SWEP.HoldOpen=false
 SWEP.OpenBolt=true
 SWEP.Primary.Delay = 1.4
 SWEP.SelectFire=false
+SWEP.MeleeAnimTime=0.5
 function SWEP:PrimaryFire()
 	self:NormalFire()
 end
