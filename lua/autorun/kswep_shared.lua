@@ -64,6 +64,7 @@ CreateConVar("kswep_npc_cheaplehunt",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_phys",1,FCVAR_REPLICATED )
 CreateConVar("kswep_earpro",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_max_flighttime",10,FCVAR_REPLICATED+FCVAR_ARCHIVE )
+CreateConVar("kswep_bullet_3dsky",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_ezreticle",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
 local files,directories= file.Find("lua/calibers/*.lua","GAME")
 for k,v in pairs(files) do

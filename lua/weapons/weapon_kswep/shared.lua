@@ -3390,6 +3390,8 @@ function SWEP:FlyBulletStart(bullet)
 	shot.dist = nil
 	shot.crack=-1
 	shot.crackpos=shot.pos
+	shot.scale=1
+	shot.sky=not GetConVar("kswep_bullet_3dsky"):GetBool()
 	table.insert(self.Bullets,shot)
 end
 function SWEP:FlyBullet(shot)
@@ -3398,7 +3400,7 @@ function SWEP:FlyBullet(shot)
 	if (shot.dist~=nil) then
 		travel=shot.dist
 	else
-		travel = shot.pos + (shot.dragvector*12*engine.TickInterval())
+		travel = shot.pos + (shot.dragvector*12*engine.TickInterval())*shot.scale
 		--self.Owner:SetPos(travel)
 	end
 	local tr=util.TraceLine( {
@@ -3451,8 +3453,15 @@ function SWEP:FlyBullet(shot)
 		self:FireShot(shot.bullet)
 	
 	end
-	if ((not tr.Hit or (not tr.HitSky)) and travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
-		if (tr.Hit) then
+	if ((not tr.Hit or (not tr.HitSky or not shot.sky)) and travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
+		if (SERVER and tr.HitSky) then
+			local skycamera=ents.FindByClass("sky_camera")[1]
+			local kv=skycamera:GetKeyValues()
+			travel=(travel/kv.scale)+skycamera:GetPos()
+			shot.scale=shot.scale/kv.scale
+			shot.sky=true
+			shot.pos=travel
+		elseif (tr.Hit) then
 			local armor=0
 			shot.dragvector, shot.pos, shot.dist=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
 		else
