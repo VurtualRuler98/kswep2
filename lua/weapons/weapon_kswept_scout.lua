@@ -1,5 +1,5 @@
 --[[
-Copyright 2015 vurtual 
+Copyright 2017 vurtual 
 VurtualRuler98@gmail.com
 vurtual.org
 
@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ]]--
 
-
+--Receiver--
 if (SERVER) then
 	AddCSLuaFile()
 end
@@ -27,100 +27,100 @@ if (CLIENT) then
 	SWEP.Slot = 2
 	SWEP.SlotPos = 0
 end
-SWEP.Anims = SWEP.Anims or {}
-SWEP.Category = "KSwep Primary"
-SWEP.IronSightHeight=2 --wild guess again
-SWEP.Base = "weapon_kswep"
-SWEP.Primary.Delay = 1.4
-SWEP.Primary.Spread = 0.01
-SWEP.Spawnable = true
-SWEP.DrawOnce=false
-SWEP.DefaultScopeData = {}
-local def=SWEP.DefaultScopeData
-def.fov=4.2
-def.name = "Default"
-def.sensitivity=2.3
-def.minsensitivity=1
-def.scopeheight=0
-def.scope_border=1.08
-def.retcolor=color_black
-def.luareticle="leupold_heavy_duplex"
-def.aimmag=2.3*4.2
-def.zero= {
-	mils=false,
-	bc=-1,
-	min=100,
-	max=100,
-	step=0,
-	default=100,
-	battlesight=false
-}
-def.windage={mils=false,max=0,step=0}
-def.windagealt=def.windage
-def.zeroalt={default=-1}
+
 SWEP.AdminSpawnable = true
-SWEP.MagClass="BoltMag"
-SWEP.ViewModel = "models/weapons/cstrike/c_snip_scout.mdl"
---SWEP.WorldModel = "models/weapons/w_mk18.mdl"
-SWEP.WorldModel = "models/weapons/w_snip_scout.mdl"
-SWEP.LoweredOffset = 2
-SWEP.UseHands = true
-SWEP.MuzzleVelMod=1
-SWEP.MagSize = 10
-SWEP.Primary.ClipSize = SWEP.MagSize
-SWEP.Caliber = "vammo_762x51_m118"
-SWEP.Primary.Sound = Sound("weapon_kswept_scout.single")
-SWEP.Primary.SoundSup = Sound("Weapon_kswep.singlesilenced")
-SWEP.ViewModelFlip = false
-SWEP.Secondary.Ammo = ""
-SWEP.CurrentlyReloading=0
-SWEP.ReloadAnimTime=0
-SWEP.ScopeMat="kswep/kswep_scope"
-SWEP.RecoilMassModifier=0.3
-SWEP.HandlingModifier=200
-SWEP.InsAnims=false
-SWEP.Auto=false
-SWEP.Firemode=true
-SWEP.HoldType="ar2"
-SWEP.HoldOpen=false
+SWEP.Spawnable = true
+SWEP.Base = "weapon_kswep"
+SWEP.Category = "KSwep Primary"
+list.Add("NPCUsableWeapons", { class = "weapon_kswept_scout", title = "TEST Steyr Scout 7.62x51mm" } )
+
+
+--Barrel--
+SWEP.HandlingModifier=2
 SWEP.Length=40
-SWEP.LengthSup=10
-SWEP.Suppressable=false
-SWEP.MuzzleVelModSup= 1.01
-SWEP.RecoilModSup=0.9
-SWEP.SpreadModSup=-0.0005
-SWEP.IdleType="passive"
-SWEP.SelectFire=false
+SWEP.Primary.Spread = 0.01
+SWEP.RecoilMassModifier=0.3
+SWEP.MuzzleVelMod=1
+
+
+--Magazine--
+SWEP.Caliber = "vammo_762x51_m118"
+SWEP.MagClass="BoltMag"
+SWEP.MagSize = 10
 SWEP.MagType="SCOUT308"
-SWEP.HKBurst=true
-SWEP.IronSightsPos = Vector()
-SWEP.IronSightsAng = Vector()
-SWEP.InsNoIronAnim=false
-SWEP.AimNoModel=true
---SWEP.AimLuaReticle="steiner_scr"
-SWEP.AimLuaReticleMode=true
-SWEP.RTScope=true
-SWEP.ScopeFOV=1.394
-SWEP.ScopeFOVMin=1.394
-SWEP.ScopeFOVMax=6.875
-SWEP.ScopeFOVSteps=12
-SWEP.MinSensitivity=3
-SWEP.MaxSensitivity=15
-SWEP.Scope2DBorderRatio=1.05
-SWEP.Scope2DWheelElevation=true
-SWEP.MergeAttachments = {
-	--foregrip = "models/weapons/upgrades/a_standard_akm.mdl"
- }
-SWEP.InsAttachments=false
-SWEP.Anims.InitialDrawAnim=ACT_VM_READY
-SWEP.CanFlashlight=false
-SWEP.NoLowerAnim=true
 function SWEP:ReloadAct(force)
 	self:ReloadMag(force)
 end
-function SWEP:Initialize2()
-	if (CLIENT) then self:SetOptic2D("Default") end
+
+
+--Rail--
+SWEP.BipodHeight=9
+SWEP.CanFlashlight=false
+SWEP.Has2DOptics=true
+SWEP.Suppressable=false
+SWEP.OpticRails={KSWEP_RAILDEFS.ANY}
+
+
+--Sight--
+SWEP.IronSightHeight=2 --wild guess again
+SWEP.IronSightsPos = Vector(-7.88,-2,0.2)
+SWEP.IronSightsAng = Vector(2,-1.5,-3)
+SWEP.ScopeMat="kswep/kswep_scope"
+function SWEP:InitScopeData(def)
+	def.fovmin=11
+	def.fovmax=11
+	def.sensitivity=1
+	def.name="Default"
+	def.minsensitivity=1
+	def.scopeheight=0
+	def.zero = {
+		mils=false,
+		bc=-1,
+		min=0,
+		max=0,
+		step=0,
+		default=100,
+		battlesight=false
+	}
+	def.windage={mils=false,max=0,step=0}
+	def.windagealt=def.windage
+	def.scope_border=1.1
+	def.scope_ewheel=false
+	def.retcolor=color_black
+	def.luareticle="irons"
+	def.luaretsfp=2.5
+	def.aimmag=6.5
+	def.style="crosshair"
+	def.altmode = table.Copy(def)
+	def.altmode.style="aimlua"
+	def.altmode.zerosync=true
+	if (CLIENT) then self:SetOptic2D("Leupold M8 2.5x28mm IER Scout") end
 end
+
+
+--Stock--
+SWEP.DrawOnce=false
+SWEP.HoldType="ar2"
+SWEP.IdleType="passive"
+SWEP.InsAnims=false
+SWEP.NoLowerAnim=true
+SWEP.LoweredOffset = 2
+SWEP.Primary.Sound = Sound("weapon_kswept_scout.single")
+SWEP.UseHands = true
+SWEP.WorldModel = "models/weapons/w_snip_scout.mdl"
+SWEP.ViewModel = "models/weapons/cstrike/c_snip_scout.mdl"
+SWEP.ViewModelFlip = false
+function SWEP:InitAnims(tbl)
+	tbl.InitialDrawAnim=ACT_VM_READY
+end
+
+
+--Trigger--
+SWEP.Auto=false
+SWEP.Firemode=false
+SWEP.HoldOpen=false
+SWEP.Primary.Delay = 1.4
+SWEP.SelectFire=false
 function SWEP:PrimaryFire()
 	self:NormalFire()
 end

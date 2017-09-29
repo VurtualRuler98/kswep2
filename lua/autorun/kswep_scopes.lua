@@ -400,6 +400,26 @@ tbl.scope_border=1.02
 tbl.aimmag=3.32*6.7
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
+tbl.name="Leupold M8 2.5x28mm IER Scout"
+tbl.sensitivity=2.3
+tbl.retcolor=color_black
+tbl.luareticle="leupold_heavy_duplex"
+tbl.aimmag=2.3*4.2
+tbl.zero={
+	mils=false,
+	bc=-1,
+	min=100,
+	max=100,
+	step=0,
+	default=100,
+	battlesight=false
+}
+tbl.fovmax=4.2
+tbl.fovmin=4.2
+tbl.fovsteps=1
+def.scope_border=1.08
+AddKswep2DScope(tbl)
+local tbl=table.Copy(def)
 tbl.name="AN/PVS-4"
 tbl.fovmax=14.5
 tbl.fovmin=14.5

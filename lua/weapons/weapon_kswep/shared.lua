@@ -1317,18 +1317,18 @@ function SWEP:DrawHUD()
 		render.PushRenderTarget(self.RenderTarget)
 		render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)
 		if (scopedata.rtranger) then
-		local tr=self.RangerTrace
-		local dist=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
-		local rangetext=""
-		if (tr.Hit and not tr.HitSky) then
-			rangetext=dist .. "m"
-		else
-			rangetext="---m"
-		end
-		surface.SetFont("KSwepRanger")
-		surface.SetTextColor(255,0,0,255)
-		surface.SetTextPos((oldW*0.5)+(self.ScopeRes*0.01*scopedata.rtrangerx),(oldH*0.5)+(self.ScopeRes*0.01*scopedata.rtrangery))
-		surface.DrawText(rangetext)
+			local tr=self.RangerTrace
+			local dist=math.floor((tr.HitPos:Distance(tr.StartPos))/39.3701)
+			local rangetext=""
+			if (tr.Hit and not tr.HitSky) then
+				rangetext=dist .. "m"
+			else
+				rangetext="---m"
+			end
+			surface.SetFont("KSwepRanger")
+			surface.SetTextColor(255,0,0,255)
+			surface.SetTextPos((oldW*0.5)+(self.ScopeRes*0.01*scopedata.rtrangerx),(oldH*0.5)+(self.ScopeRes*0.01*scopedata.rtrangery))
+			surface.DrawText(rangetext)
 		end
 		if (self.ScopeReticle~=false) then --QEPIS FIX
 			local pixmil=self.ScopeReticlePixMil*(self.ScopeRes/1024)
@@ -1346,21 +1346,21 @@ function SWEP:DrawHUD()
 			local scalemod=oldH/oldW
 			surface.DrawTexturedRectUV((oldW-scale)/2,(oldH-scale*scalemod)/2,scale,scale*scalemod,0,0,1,1)
 		end
-	if (scopedata.luareticle~=false) then
-		local fov=scopeconf.fov
-		if (scopedata.luaretsfp) then
-			fov=scopedata.luaretsfp
+		if (scopedata.luareticle~=false) then
+			local fov=scopeconf.fov
+			if (scopedata.luaretsfp) then
+				fov=scopedata.luaretsfp
+			end
+			if (scopedata.luaretscale) then
+				fov=fov/scopedata.luaretscale
+			end
+			if (scopedata.luaretholo) then
+				fov=fov/(self.IronZoom/self:IronZoomMax())
+			end
+			local scale=oldW/(fov*18)
+			local scale2=ScrW()/(scopeconf.fov*18)
+			self:DrawLuaReticle(scopedata.luareticle,scopeconf.retcolor,oldW,oldH,scale,oldH/oldW,scale2)
 		end
-		if (scopedata.luaretscale) then
-			fov=fov/scopedata.luaretscale
-		end
-		if (scopedata.luaretholo) then
-			fov=fov/(self.IronZoom/self:IronZoomMax())
-		end
-		local scale=oldW/(fov*18)
-		local scale2=ScrW()/(scopeconf.fov*18)
-		self:DrawLuaReticle(scopedata.luareticle,scopeconf.retcolor,oldW,oldH,scale,oldH/oldW,scale2)
-	end
 		render.SetViewPort(0,0,oldW,oldH)
 		render.PopRenderTarget()
 	end
@@ -2994,9 +2994,9 @@ end
 
 
 function SWEP:TranslateFOV(fov)
-        if (self:GetNWBool("sight") and ((not self.RTScope and not self:GetNWBool("AltIrons")) or (not self.RTScopeAlt and self:GetNWBool("AltIrons"))) and not self.CurrentSight) then
+        if (self:GetNWBool("Sight") and ((not self.RTScope and not self:GetNWBool("AltIrons")) or (not self.RTScopeAlt and self:GetNWBool("AltIrons"))) and not self.CurrentSight) then
                 return (self.IronZoom/self.ScopeZoom)
-        elseif (self:GetNWBool("sight")) then
+        elseif (self:GetNWBool("Sight")) then
                 return self.IronZoom
         else
 		return fov
@@ -3005,18 +3005,19 @@ end
 
 function SWEP:AdjustMouseSensitivity()
 	scopedata,scopeconf=self:GetScopeStuff()
-        if (self:GetNWBool("sight")==true) then
+        if (self:GetNWBool("Sight")==true) then
 		local scopesens=1
-		if (scopedata.fovsteps~=nil) then
-			scopesens=((scopedata.sensitivity-1)*(-1*(scopeconf.fov-scopedata.fovmax)/(scopedata.fovmax-scopedata.fovmin)))
+		if (scopedata.fovsteps~=nil and scopedata.fovsteps>1) then
+			scopesens=1
+			print((scopedata.sensitivity-1)*(-1*(scopeconf.fov-scopedata.fovmax)/(scopedata.fovmax-scopedata.fovmin)))
 		elseif (scopeconf.fov~=nil) then
 			scopesens=scopedata.sensitivity
 		end
-		scopesens=1+(scopesens+scopedata.minsensitivity-1)*((self:IronZoomMin()-self.IronZoom)/(self:IronZoomMin()-self:IronZoomMax()))
+		--scopesens=1+(scopesens+scopedata.minsensitivity-1)*((self:IronZoomMin()-self.IronZoom)/(self:IronZoomMin()-self:IronZoomMax()))
 		if (self.Owner:KeyDown(IN_SPEED)) then
 			scopesens=scopesens*4
 		end
-		return 1/scopesens/self.ScopeZoom
+		return 1/scopesens
 	else
                 return 1
         end
