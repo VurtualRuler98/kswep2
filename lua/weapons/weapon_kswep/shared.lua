@@ -2700,6 +2700,8 @@ function SWEP:DrawRTScope()
 			self.superlight:SetFarZ(31500)
 			self.superlight:Update()
 		end
+	elseif (self:GetNWBool("Sight") and not scopedata.nv and IsValid(self.superlight)) then
+		self.superlight:Remove()
 	end
 	local oldW, oldH = ScrW(),ScrH()
 	render.SetViewPort(0,0,self.ScopeRes,self.ScopeRes)	
@@ -3008,8 +3010,7 @@ function SWEP:AdjustMouseSensitivity()
         if (self:GetNWBool("Sight")==true) then
 		local scopesens=1
 		if (scopedata.fovsteps~=nil and scopedata.fovsteps>1) then
-			scopesens=1
-			print((scopedata.sensitivity-1)*(-1*(scopeconf.fov-scopedata.fovmax)/(scopedata.fovmax-scopedata.fovmin)))
+			scopesens=(scopedata.sensitivity-1)*(-1*(scopeconf.fov-scopedata.fovmax)/(scopedata.fovmax-scopedata.fovmin))
 		elseif (scopeconf.fov~=nil) then
 			scopesens=scopedata.sensitivity
 		end
@@ -3017,6 +3018,7 @@ function SWEP:AdjustMouseSensitivity()
 		if (self.Owner:KeyDown(IN_SPEED)) then
 			scopesens=scopesens*4
 		end
+		if (scopesens<1 or scopesens~=scopesens) then scopesens=1 end
 		return 1/scopesens
 	else
                 return 1
