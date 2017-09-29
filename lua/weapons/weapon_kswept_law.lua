@@ -132,8 +132,8 @@ SWEP.Primary.Delay = 0.08
 SWEP.RocketSingleShot=true
 SWEP.SelectFire=false
 function SWEP:PrimaryFire()
-	self:FireRocket()
 	self:CreateBackblast()
+	self:FireRocket()
 end
 
 
