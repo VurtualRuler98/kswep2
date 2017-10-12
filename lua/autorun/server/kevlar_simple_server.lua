@@ -56,6 +56,8 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 			covers=true
 		elseif (hitgroup==HITGROUP_STOMACH and bit.band(v.coverage,2)==2) then
 			covers=true
+		elseif (hitgroup==HITGROUP_HEAD and bit.band(v.coverage,8)==8) then
+			covers=true
 		end
 		if (covers and rating.protection>=KSGetBullet(dmginfo)) then
 			local pass=true
