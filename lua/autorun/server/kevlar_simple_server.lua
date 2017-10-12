@@ -21,6 +21,7 @@ net.Receive("showvestmenu",function(len,pl)
 local choice=net.ReadString()
 	if (choice and kswep_armors[choice]) then
 		pl.ksarmor=kswep_armors[choice]
+		table.Empty(ply.kdmg)
 	end
 end)
 local function KSGetArmorDir(ent,dmginfo)

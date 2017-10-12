@@ -2499,7 +2499,7 @@ function SWEP:Think()
 		
 	if (self.HolsterAfter<CurTime() and self.Holstering~=nil) then
 		self.HolsterAfter=0
-		if (SERVER) then
+		if (SERVER and self.Owner:IsPlayer()) then
 			self.Owner:SelectWeapon(self.Holstering:GetClass())
 		end
 		self.Holstering=nil
