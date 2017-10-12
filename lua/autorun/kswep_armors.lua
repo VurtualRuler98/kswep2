@@ -30,16 +30,30 @@ tbl.slash=10
 tbl.club=5
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
-tbl.name="Interceptor (SAPI)"
-tbl.hitpoints={vest={rating="NIJ IIIA",chestgroup=7,coverage=3},sapi={rating="SAPI",chestgroup=3,coverage=1}}
-tbl.blast=15
+tbl.name="Interceptor"
+tbl.hitpoints={vest={rating="NIJ IIIA",chestgroup=7,coverage=3}}
+tbl.blast=28
 tbl.slash=10
 tbl.club=5
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
+tbl.name="Interceptor (SAPI)"
+tbl.hitpoints={vest={rating="NIJ IIIA",chestgroup=7,coverage=3},sapi={rating="SAPI",chestgroup=3,coverage=1}}
+tbl.blast=30
+tbl.slash=20
+tbl.club=20
+KswepAddArmor(tbl)
+local tbl=table.Copy(def)
 tbl.name="Interceptor (SAPI)/Helmet"
 tbl.hitpoints={vest={rating="NIJ IIIA",chestgroup=7,coverage=11},sapi={rating="SAPI",chestgroup=3,coverage=1}}
-tbl.blast=15
-tbl.slash=10
+tbl.blast=33
+tbl.slash=20
 tbl.club=5
+KswepAddArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="Plate Carrier Level IV"
+tbl.hitpoints={plate={rating="NIJ IV",chestgroup=7,coverage=1}}
+tbl.blast=5
+tbl.slash=20
+tbl.club=20
 KswepAddArmor(tbl)

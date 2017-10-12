@@ -62,7 +62,7 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 		if (covers and rating.protection>=KSGetBullet(dmginfo)) then
 			local pass=true
 			for j,u in pairs(ent.kdmg) do
-				if (u.hitpoint==k) then
+				if (u.hitpoint==k and u.dir==dir) then
 					local dist=u.pos:Distance(dmginfo:GetDamagePosition()-ent:GetPos())
 					if (dist<rating.spacing) then
 						local pen_a=dist-rating.space_min
@@ -74,7 +74,7 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 				end
 			end
 			if (pass) then
-				table.insert(ent.kdmg,{hitpoint=k,pos=dmginfo:GetDamagePosition()-ent:GetPos()})
+				table.insert(ent.kdmg,{hitpoint=k,pos=dmginfo:GetDamagePosition()-ent:GetPos(),dir=dir})
 				return v.rating
 			end
 		end
