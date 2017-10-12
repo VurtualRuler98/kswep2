@@ -29,3 +29,10 @@ tbl.blast=5
 tbl.slash=10
 tbl.club=5
 KswepAddArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="Interceptor (SAPI)"
+tbl.hitpoints={vest={rating="NIJ IIIA",chestgroup=7,coverage=3},sapi={rating="SAPI",chestgroup=3,coverage=1}}
+tbl.blast=15
+tbl.slash=10
+tbl.club=5
+KswepAddArmor(tbl)

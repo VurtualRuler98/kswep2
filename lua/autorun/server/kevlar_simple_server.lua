@@ -57,7 +57,7 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 		elseif (hitgroup==HITGROUP_STOMACH and bit.band(v.coverage,2)==2) then
 			covers=true
 		end
-		if (covers and rating.protection>KSGetBullet(dmginfo)) then
+		if (covers and rating.protection>=KSGetBullet(dmginfo)) then
 			local pass=true
 			for j,u in pairs(ent.kdmg) do
 				if (u.hitpoint==k) then
@@ -65,7 +65,7 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 					if (dist<rating.spacing) then
 						local pen_a=dist-rating.space_min
 						local pen_b=rating.spacing-rating.space_min
-						if (math.Rand(0,pen_b)<pen_a) then
+						if (math.Rand(rating.space_min,rating.spacing)>dist) then
 							pass=false
 						end
 					end
