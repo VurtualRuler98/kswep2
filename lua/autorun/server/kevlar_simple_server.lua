@@ -10,6 +10,7 @@ local kmedic_base={
 }
 function KSSetSpawnArmor(ply)
 	ply.ksarmor=kswep_armors["none"]
+	ply.kdmg={}
 	ply.kmedic=table.Copy(kmedic_base)
 	ply.kmedic_admg=0
 	ply.kmedic_cdmg=0
@@ -22,6 +23,63 @@ local choice=net.ReadString()
 		pl.ksarmor=kswep_armors[choice]
 	end
 end)
+local function KSGetArmorDir(ent,dmginfo)
+	local dmgangle=(dmginfo:GetDamagePosition()-ent:GetPos()):GetNormalized():Angle()[2]
+	local dir=1
+        if ((dmgangle>105 and dmgangle<165) or (dmgangle>285 and dmgangle<345)) then
+                dir=4
+        else
+                if (dmgangle>180) then
+                        dir=2
+                end
+        end
+	return dir
+end
+local function KSGetBullet(dmginfo)
+	local bullet=vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())]
+	if (not bullet) then
+		bullet=vurtual_ammodata["Pistol"]
+	end
+	local penetration=bullet.vestpenetration
+	local custpen=dmginfo:GetDamageCustom()
+	if (custpen>55644 and custpen<55645+50) then --PROBABLY kswep data
+		penetration=custpen-55645
+	end
+	return penetration
+end
+local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
+	local dir=KSGetArmorDir(ent,dmginfo)
+	for k,v in pairs(ksarmor.hitpoints) do
+		local rating=kswep_armor_ratings[v.rating]
+		local covers=false
+		if (hitgroup==HITGROUP_CHEST and bit.band(v.coverage,1)==1 and bit.band(v.chestgroup,dir)==dir) then
+			covers=true
+		elseif (hitgroup==HITGROUP_STOMACH and bit.band(v.coverage,2)==2) then
+			covers=true
+		end
+		if (covers and rating.protection>KSGetBullet(dmginfo)) then
+			local pass=true
+			for j,u in pairs(ent.kdmg) do
+				if (u.hitpoint==k) then
+					local dist=u.pos:Distance(dmginfo:GetDamagePosition()-ent:GetPos())
+					if (dist<rating.spacing) then
+						local pen_a=dist-rating.space_min
+						local pen_b=rating.spacing-rating.space_min
+						if (math.Rand(0,pen_b)<pen_a) then
+							pass=false
+						end
+					end
+				end
+			end
+			if (pass) then
+				table.insert(ent.kdmg,{hitpoint=k,pos=dmginfo:GetDamagePosition()-ent:GetPos()})
+				return v.rating
+			end
+		end
+	end
+	return "NONE"
+end
+		
 local function KSSuitHandler(ent,dmginfo)
 	local scale=0
 	local dmgtype=dmginfo:GetDamageType()
@@ -143,12 +201,7 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 	if (GetConVar("kevlar_enabled"):GetBool()==false) then return end
 	local armor=-1
 	if (ent:IsPlayer() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
-		local dmgangle=(dmginfo:GetDamagePosition()-ent:GetPos()):GetNormalized():Angle()[2]
-		if (hitgroup == HITGROUP_CHEST) then
-			armor=KSGetArmorVest(ent,dmgangle)
-		else
-			armor=ent.ksarmor.helmet
-		end
+		armor=kswep_armor_ratings[KSGetArmorNew(ent,ent.ksarmor,hitgroup,dmginfo)].protection
 	end
 	if (ent:IsNPC() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
 		armor=KSGetArmorNPC(ent,hitgroup)
@@ -270,24 +323,6 @@ function KSGetArmorNPC(npc,hitgroup)
 	return -1
 end
 		
-function KSGetArmorVest(ply,dmgangle)
-	local dir=0
-        if ((dmgangle>105 and dmgangle<165) or (dmgangle>285 and dmgangle<345)) then
-                dir=2
-        else
-             dir=0
-                if (dmgangle>180) then
-                        dir=1
-                end
-        end
-	if (dir==0) then 
-		return ply.ksarmor.front
-	elseif (dir==1) then
-		return ply.ksarmor.back
-	else
-		return ply.ksarmor.side
-	end
-end
 hook.Add("ScalePlayerDamage","KSDamageHandler",KSDamageHandler)
 hook.Add("EntityTakeDamage","KSDamageHandler",KSDamageHandlerEnt)
 hook.Add("ScaleNPCDamage","KSDamageHandler",KSDamageHandler)
