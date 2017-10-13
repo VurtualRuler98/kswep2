@@ -57,3 +57,10 @@ tbl.blast=5
 tbl.slash=20
 tbl.club=20
 KswepAddArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="Plate Carrier ESAPI"
+tbl.hitpoints={plate={rating="ESAPI",chestgroup=3,coverage=1}}
+tbl.blast=5
+tbl.slash=20
+tbl.club=20
+KswepAddArmor(tbl)

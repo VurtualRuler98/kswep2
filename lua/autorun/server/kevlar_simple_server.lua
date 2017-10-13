@@ -24,6 +24,12 @@ local choice=net.ReadString()
 		table.Empty(pl.kdmg)
 	end
 end)
+function KSSetArmor(pl,choice)
+	if (choice and kswep_armors[choice]) then
+		pl.ksarmor=kswep_armors[choice]
+		table.Empty(pl.kdmg)
+	end
+end
 local function KSGetArmorDir(ent,dmginfo)
 	local dmgangle=(dmginfo:GetDamagePosition()-ent:GetPos()):GetNormalized():Angle()[2]
 	local dir=1
@@ -62,8 +68,12 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 		end
 		if (covers and rating.protection>=KSGetBullet(dmginfo)) then
 			local pass=true
+			local hits=0
+			local hitdmg=1
+			if (KSGetBullet(dmginfo)<rating.dmg_half) then hitdmg=0.5 end
 			for j,u in pairs(ent.kdmg) do
 				if (u.hitpoint==k and u.dir==dir) then
+					hits=hits+u.hit
 					local dist=u.pos:Distance(dmginfo:GetDamagePosition()-ent:GetPos())
 					if (dist<rating.spacing) then
 						local pen_a=dist-rating.space_min
@@ -74,8 +84,15 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 					end
 				end
 			end
+			if (hits+hitdmg>rating.hits) then
+				local chance=0
+				if ((1+rating.hits)-(hits+hitdmg)>0) then chance=(1+rating.hits)-(hits+hitdmg) end
+				if (chance<math.random()) then
+					pass=false
+				end
+			end
+			table.insert(ent.kdmg,{hitpoint=k,pos=dmginfo:GetDamagePosition()-ent:GetPos(),dir=dir,hit=hitdmg})
 			if (pass) then
-				table.insert(ent.kdmg,{hitpoint=k,pos=dmginfo:GetDamagePosition()-ent:GetPos(),dir=dir})
 				return v.rating
 			end
 		end
