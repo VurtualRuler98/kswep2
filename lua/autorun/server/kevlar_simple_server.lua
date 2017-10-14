@@ -104,6 +104,22 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 	end
 	return "NONE"
 end
+function KSSuitSealCheck(ent) --checks for integrity of suit
+	local barriers={}
+	for k,v in pairs(ent.ksarmor.hitpoints) do
+		if (v.barrier) then
+			table.insert(barriers,k)
+		end
+	end
+	if (#barriers==0) then return true end
+	for k,v in pairs(ent.kdmg) do
+		if (table.HasValue(barriers,v.hitpoint)) then
+			table.RemoveByValue(barriers,v.hitpoint)
+		end
+	end
+	if (#barriers==0) then return false end
+	return true
+end
 		
 local function KSSuitHandler(ent,dmginfo)
 	local scale=0
@@ -138,7 +154,7 @@ local function KSSuitHandler(ent,dmginfo)
 	if (bit.band(dmgtype,DMG_CRUSH)>0) then
 		if (ent.ksarmor.crush>scale) then scale=ent.ksarmor.crush end
 	end
-	if (dmginfo:GetDamage()<scale/10) then scale=100 end
+	if (KSSuitSealCheck(ent) and dmginfo:GetDamage()<scale/10) then scale=100 end
 	return 1-(scale/100)
 end
 local function KSDamageHandlerEnt(ent,dmginfo)

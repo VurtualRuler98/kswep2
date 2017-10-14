@@ -68,7 +68,7 @@ local tbl=table.Copy(def)
 tbl.name="Sunrise Suit w/ Gas Mask"
 tbl.hitpoints={
 	poly={rating="NIJ II",chestgroup=7,coverage=3},
-	skin={rating="NIJ I",chestgroup=7,coverage=7}
+	skin={rating="NIJ I",chestgroup=7,coverage=7,barrier=true}
 }
 tbl.burn=30 --CoP, rubber flame retardant suit
 tbl.acid=30
@@ -87,7 +87,8 @@ tbl.hitpoints={
 	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8},
 	ceramic={rating="CRISAT Scale",chestgroup=7,coverage=3},
 	poly={rating="NIJ II",chestgroup=7,coverage=3},
-	skin={rating="NIJ I",chestgroup=7,coverage=7}
+	skin2={rating="NIJ I",chestgroup=7,coverage=7,barrier=true},
+	skin={rating="NIJ I",chestgroup=7,coverage=7,barrier=true}
 }
 tbl.burn=30 --CoP, rubber flame retardant suit
 tbl.acid=30
