@@ -1083,26 +1083,32 @@ function SWEP:OpenRangeCard()
 	drop=0
 	drag_time=0
 	drag_dist=0
+	local drag_wind=0
 	drag_ticks=(GetConVar("kswep_max_flighttime"):GetInt()/engine.TickInterval())
 	drag_vector=Vector(zerovel,0,0)
+	local wind=Vector(math.sin(90),math.cos(90),0)*5*3.28
 	while (drag_ticks>0 and canadjust) do
 		drag_ticks=drag_ticks-1
 		drag_time=drag_time+1
 		drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
-		drag_vector=(drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
+		drag_wind=drag_wind+drag_vector.y*12*engine.TickInterval()
+		drag_vector=(drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*(drag_vector-wind)*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
 		drop=drop-drag_vector.z*12*engine.TickInterval()
 		if (drag_dist/39.701>lastrange+scoperange) then
 			local droprange=math.floor((drag_dist/39.701)/scoperange)*scoperange
 			lastrange=droprange
 			local newdropadj=math.atan((drop+self:GetSightHeight())/drag_dist)-basedropadj
+			local newwindadj=math.atan(drag_wind/drag_dist)
 			if (newdropadj*1000<maxdropadj) then
 				if (moamode) then
 					newdropadj=newdropadj*3.43775
+					newwindadj=newwindadj*3.43775
 				end
 				newdropadj=math.floor(newdropadj*10000)/10
+				newwindadj=math.floor(newwindadj*10000)/10
 				local label="mils"
 				if (moamode) then label="moa" end
-				dropdata=dropdata..droprange.."m: "..newdropadj.." "..label..", "..math.floor(drag_vector:Length()).." FPS, "..(math.floor(drag_time*engine.TickInterval()*10)/10).."seconds \n"
+				dropdata=dropdata..droprange.."m: "..newdropadj.." "..label..", "..math.floor(drag_vector:Length()).." FPS, "..(math.floor(drag_time*engine.TickInterval()*10)/10).."seconds, "..newwindadj.." "..label.." per 5m/s wind\n"
 			else
 				canadjust=false
 			end
