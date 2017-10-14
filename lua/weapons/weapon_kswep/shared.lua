@@ -3437,8 +3437,14 @@ function SWEP:FlyBullet(shot)
 			self:FireShot(fakebullet)
 		end
 	end
+	local wind=Vector()
+	if (StormFox~=nil) then
+		windvel=StormFox.GetNetworkData("Wind")
+		windang=StormFox.GetNetworkData("WindAngle")
+		wind=Vector(math.sin(windang),math.cos(windang),0)*windvel*3.28
+	end
 	local oldspeed=shot.dragvector:Length()
-	shot.dragvector=shot.dragvector+(-1*drag)*shot.dragvector*engine.TickInterval()-Vector(0,0,(386/12)*(engine.TickInterval()))
+	shot.dragvector=shot.dragvector+(-1*drag)*(shot.dragvector-wind)*engine.TickInterval()-Vector(0,0,(386/12)*(engine.TickInterval()))
 	if (oldspeed-shot.dragvector:Length()>1125) then shot.dragvector=Vector(0,0,0) end
 	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.dragvector:Length()>100) then
 		shot.bullet.Src=shot.pos
