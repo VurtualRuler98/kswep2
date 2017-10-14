@@ -85,7 +85,7 @@ local tbl=table.Copy(def)
 tbl.name="Sunrise Suit Upgraded w/ Gas Mask/Helmet"
 tbl.hitpoints={
 	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8},
-	ceramic={rating="CRISAT Scale",chestgroup=7,coverage=1},
+	ceramic={rating="CRISAT Scale",chestgroup=7,coverage=3},
 	poly={rating="NIJ II",chestgroup=7,coverage=3},
 	skin={rating="NIJ I",chestgroup=7,coverage=7}
 }
