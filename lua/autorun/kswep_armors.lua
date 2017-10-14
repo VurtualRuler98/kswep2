@@ -30,6 +30,13 @@ tbl.slash=10
 tbl.club=5
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
+tbl.name="HEV Suit"
+tbl.hitpoints={vest={rating="HEV",chestgroup=7,coverage=15}}
+tbl.blast=0
+tbl.slash=0
+tbl.club=0
+KswepAddArmor(tbl)
+local tbl=table.Copy(def)
 tbl.name="Interceptor"
 tbl.hitpoints={vest={rating="NIJ IIIA",chestgroup=7,coverage=3}}
 tbl.blast=28
