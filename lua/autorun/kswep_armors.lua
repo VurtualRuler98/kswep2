@@ -64,3 +64,39 @@ tbl.blast=5
 tbl.slash=20
 tbl.club=20
 KswepAddArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="Sunrise Suit w/ Gas Mask"
+tbl.hitpoints={
+	poly={rating="NIJ II",chestgroup=7,coverage=3},
+	skin={rating="NIJ I",chestgroup=7,coverage=7}
+}
+tbl.burn=30 --CoP, rubber flame retardant suit
+tbl.acid=30
+tbl.slash=30
+tbl.shock=25
+tbl.blast=2 --it's lined with ballistic fabric ok
+tbl.poison=30
+tbl.radiation=30
+tbl.nervegas=100
+tbl.club=30
+tbl.crush=10
+KswepAddArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="Sunrise Suit Upgraded w/ Gas Mask/Helmet"
+tbl.hitpoints={
+	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8},
+	ceramic={rating="CRISAT Scale",chestgroup=7,coverage=1},
+	poly={rating="NIJ II",chestgroup=7,coverage=3},
+	skin={rating="NIJ I",chestgroup=7,coverage=7}
+}
+tbl.burn=30 --CoP, rubber flame retardant suit
+tbl.acid=30
+tbl.slash=30
+tbl.shock=25
+tbl.blast=2 --it's lined with ballistic fabric ok
+tbl.poison=30
+tbl.radiation=30
+tbl.nervegas=100
+tbl.club=30
+tbl.crush=10
+KswepAddArmor(tbl)

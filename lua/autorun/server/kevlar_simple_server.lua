@@ -56,12 +56,15 @@ local function KSGetBullet(dmginfo)
 end
 local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 	local dir=KSGetArmorDir(ent,dmginfo)
+	local limbs={HITGROUP_LEFTARM,HITGROUP_RIGHTARM,HITGROUP_LEFTLEG,HITGROUP_RIGHTLEG}
 	for k,v in pairs(ksarmor.hitpoints) do
 		local rating=kswep_armor_ratings[v.rating]
 		local covers=false
 		if (hitgroup==HITGROUP_CHEST and bit.band(v.coverage,1)==1 and bit.band(v.chestgroup,dir)==dir) then
 			covers=true
 		elseif (hitgroup==HITGROUP_STOMACH and bit.band(v.coverage,2)==2) then
+			covers=true
+		elseif (table.HasValue(limbs,hitgroup) and bit.band(v.coverage,4)==4) then
 			covers=true
 		elseif (hitgroup==HITGROUP_HEAD and bit.band(v.coverage,8)==8) then
 			covers=true
@@ -84,7 +87,7 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 					end
 				end
 			end
-			if (hits+hitdmg>rating.hits) then
+			if (rating.hits > 0 and hits+hitdmg>rating.hits) then
 				local chance=0
 				if ((1+rating.hits)-(hits+hitdmg)>0) then chance=(1+rating.hits)-(hits+hitdmg) end
 				if (chance<math.random()) then
@@ -95,6 +98,8 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 			if (pass) then
 				return v.rating
 			end
+		elseif (covers) then
+			table.insert(ent.kdmg,{hitpoint=k,pos=dmginfo:GetDamagePosition()-ent:GetPos(),dir=dir,hit=1})
 		end
 	end
 	return "NONE"
