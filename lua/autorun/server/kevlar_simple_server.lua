@@ -138,6 +138,7 @@ local function KSSuitHandler(ent,dmginfo)
 	if (bit.band(dmgtype,DMG_CRUSH)>0) then
 		if (ent.ksarmor.crush>scale) then scale=ent.ksarmor.crush end
 	end
+	if (dmginfo:GetDamage()<scale/10) then scale=100 end
 	return 1-(scale/100)
 end
 local function KSDamageHandlerEnt(ent,dmginfo)
