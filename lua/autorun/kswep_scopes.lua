@@ -170,6 +170,23 @@ tbl.sensitivity=1.5
 tbl.aimmag=1.5*7.4
 AddKswep2DScope(tbl)
 local tbl=table.Copy(def)
+tbl.name="Trijicon ACOG 4x RCO"
+tbl.fovmin=7
+tbl.luareticle="acog_rco"
+tbl.zero={
+	mils=false,
+	bc=-1,
+	min=100,
+	max=100,
+	step=0,
+	default=100,
+	battlesight=false
+}
+tbl.retcolor=Color(255,0,0,255)
+tbl.sensitivity=4
+tbl.aimmag=4*7
+AddKswep2DScope(tbl)
+local tbl=table.Copy(def)
 tbl.name="Schmidt & Bender 3-12x50 PM II"
 tbl.zero={
 	mils=10,

@@ -143,6 +143,28 @@ local tbl = {
 }
 AddKswepReticle(tbl,"m82")
 local tbl = {
+	{shape="poly",poly={{x=0,y=0},{x=0.83,y=1.2},{x=0.4,y=1.2},{x=0,y=0.5},{x=-0.4,y=1.2},{x=-0.83,y=1.2}}},
+	{shape="line",start={0,1.2},endpos={0,6}},
+	{shape="line",start={-0.625,2.3},endpos={0.625,2.3}},
+	{shape="line",start={-0.5,3.6},endpos={0.5,3.6}},
+	{shape="line",start={-0.5,3.6},endpos={0.5,3.6},color=Color(0,0,0,175)},
+	{shape="line",start={0,3.6},endpos={0,6},color=Color(0,0,0,175)},
+	{shape="line",start={-0.416,5.4},endpos={0.416,5.4}},
+	{shape="line",start={-0.416,5.4},endpos={0.416,5.4},color=Color(0,0,0,175)},
+	{shape="line",start={0,6},endpos={0,10.2},color=color_black},
+	{shape="line",start={-0.357,7.5},endpos={0.357,7.5},color=color_black},
+	{shape="line",start={-0.312,10.2},endpos={0.312,10.2},color=color_black},
+	{shape="line",start={10,1.2},endpos={55,1.2},color=color_black},
+	{shape="line",start={-55,1.2},endpos={-10,1.2},color=color_black}
+}
+for i=1,5 do
+	table.insert(tbl,{shape="line",start={i*10,-0.8},endpos={i*10,3.2},color=color_black})
+	table.insert(tbl,{shape="line",start={i*10+5,0.2},endpos={i*10+5,2.2},color=color_black})
+	table.insert(tbl,{shape="line",start={-i*10,-0.8},endpos={-i*10,3.2},color=color_black})
+	table.insert(tbl,{shape="line",start={-i*10-5,0.2},endpos={-i*10-5,2.2},color=color_black})
+end
+AddKswepReticle(tbl,"acog_rco")
+local tbl = {
 {shape="line",start={-200,0.9},endpos={200,0.9}},
 {shape="poly",poly={{x=-0.3,y=0},{x=0.3,y=0},{x=0.75,y=60},{x=-0.75,y=60}}}
 }
