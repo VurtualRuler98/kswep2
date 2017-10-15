@@ -12,6 +12,8 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.printname = "5.56x45mm M193"
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.coefficient=0.25
 	tbl.diameter=0.224
@@ -30,6 +32,8 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.printname = "5.56x45mm M200 Blank"
 	tbl.projectiles = 0
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.coefficient=0
 	tbl.diameter=0.224
@@ -50,6 +54,8 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.projectiles = 1
 	tbl.diameter=0.224
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 4
 	tbl.mass=62
@@ -68,6 +74,8 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.projectiles = 1
 	tbl.diameter=0.224
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 4
 	tbl.mass=52

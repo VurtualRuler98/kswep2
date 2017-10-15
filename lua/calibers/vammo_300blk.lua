@@ -12,6 +12,8 @@ hook.Add("VurtualAmmotypes","vammo_300blk", function()
 	tbl.printname = ".300blk 208gr Hornady A-MAX Subsonic"
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.coefficient=0.648
 	tbl.diameter=0.308
@@ -30,6 +32,8 @@ hook.Add("VurtualAmmotypes","vammo_300blk", function()
 	tbl.printname = ".300blk Tranquilizer"
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.coefficient=1
 	tbl.diameter=0.308

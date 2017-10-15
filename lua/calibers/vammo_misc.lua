@@ -14,6 +14,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.projectiles = 1
 	tbl.coefficient = 0.408
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 15
 	tbl.velocity = 3260
@@ -33,6 +35,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.projectiles = 1
 	tbl.coefficient = 0.393
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 12
 	tbl.wallbang = 6
@@ -51,6 +55,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.coefficient=0.648
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.wallbang = 3
 	tbl.damagescale = 1
 	tbl.recoil = 5
@@ -71,6 +77,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.312
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 12
 	tbl.wallbang = 4
@@ -89,6 +97,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.312
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 12
 	tbl.wallbang = 4
@@ -107,6 +117,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 12
 	tbl.mass=152
@@ -125,6 +137,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.312
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 12
 	tbl.wallbang = 4
@@ -143,6 +157,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.324
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 12
 	tbl.wallbang = 4
@@ -161,6 +177,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.324
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.mass=125
 	tbl.recoil = 6
@@ -179,6 +197,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.mass=165
 	tbl.recoil = 12
@@ -197,6 +217,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.312
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 0.5
 	tbl.wallbang = 0
@@ -215,6 +237,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.wallbang = 12
 	tbl.mass=126.6
@@ -271,6 +295,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.355
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.wallbang = 0
 	tbl.recoil = 0.8
 	tbl.mass=20
@@ -288,6 +314,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.451
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.recoil = 1.2
 	tbl.wallbang = 4
 	tbl.velocity = 825 --1911
@@ -305,6 +333,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.309
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.recoil = 1.4
 	tbl.wallbang = 4
 	tbl.mass=86
@@ -322,6 +352,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.223
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.wallbang = 2
 	tbl.recoil = 0.2
 	tbl.mass=40
@@ -338,6 +370,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.223
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.wallbang = 2
 	tbl.recoil = 0.25
 	tbl.mass=32
@@ -355,6 +389,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.4
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.wallbang = 5
 	tbl.recoil = 1.5
 	tbl.mass=110
@@ -372,6 +408,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.4
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.wallbang = 3
 	tbl.recoil = 1.5
 	tbl.mass=110
@@ -390,6 +428,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.wallbang = 5
 	tbl.mass=147
@@ -403,12 +443,14 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.caliber = "vammo_12gauge"
 	tbl.coefficient=0.05
 	tbl.diameter=0.33
-	tbl.vestpenetration=0
+	tbl.vestpenetration=KSWEP_ARMOR_I
 	tbl.dmgbase=3
 	tbl.dmgvitalmin=5
 	tbl.dmgvitalmax=8
 	tbl.projectiles = 9
-	tbl.spreadscale = 3
+	tbl.spreadscale = 1
+	tbl.chokescale = 1
+	tbl.hitscale=0.1
 	tbl.recoil = 15
 	tbl.wallbang = 3
 	tbl.mass=60
@@ -427,6 +469,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.dmgvitalmax=8
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.recoil = 18
 	tbl.mass=300
@@ -448,6 +492,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.wallbang = 4
 	tbl.velocity = 891

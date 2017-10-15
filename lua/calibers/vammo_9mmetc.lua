@@ -11,7 +11,9 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.dmgvitalmin = 5 --Damage multiplier done with an unarmored headshot/chest shot, halved for NPCs
 	tbl.dmgvitalmax = 8
 	tbl.coefficient = 0.149
-	tbl.spreadscale = 1 --ratio of bullet spread, primarily used for shotgun shells.
+	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1 --ratio of bullet spread, primarily used for shotgun shells.
 	tbl.wallbang = 4 --units of generic wall it can penetrate
 	tbl.recoil = 1 --recoil value
 	tbl.velocity =	1300 --115gr fmj fps
@@ -29,6 +31,8 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.diameter=0.308
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.wallbang = 5
 	tbl.recoil = 1.5
 	tbl.velocity =	1990 --110gr FMJ
@@ -47,6 +51,8 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.diameter=0.365
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.wallbang = 4
 	tbl.recoil = 1
 	tbl.velocity = 1030 --makarov
@@ -64,6 +70,8 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.diameter=0.365
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.wallbang = 6
 	tbl.recoil = 1
 	tbl.mass=55
@@ -80,6 +88,8 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.caliber = "vammo_9x17"
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.wallbang = 4
 	tbl.diameter=0.355
 	tbl.recoil = 1
@@ -99,6 +109,8 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.diameter=0.357
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.wallbang = 4
 	tbl.recoil = 1.5
 	tbl.mass=125 --verify
@@ -117,6 +129,8 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.projectiles = 1
 	tbl.wallbang = 2
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.velocity = 1240 --116gr JHP
 	tbl.mass=116
 	tbl.recoil = 1
@@ -137,6 +151,8 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.mass=115
 	tbl.wallbang = 4
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.recoil = 1.1
 	AddAmmodata(tbl)
 end)

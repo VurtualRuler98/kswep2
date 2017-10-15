@@ -13,6 +13,8 @@ hook.Add("VurtualAmmotypes","vammo_545x39", function()
 	tbl.caliber = "vammo_545x39"
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.coefficient=0.338 --JBM calculated
 	tbl.recoil = 4
@@ -31,6 +33,8 @@ hook.Add("VurtualAmmotypes","vammo_545x39", function()
 	tbl.caliber = "vammo_545x39"
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.coefficient=0.338 --JBM calculated
 	tbl.recoil = 4

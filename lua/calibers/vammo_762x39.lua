@@ -34,6 +34,8 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	tbl.projectiles = 1
 	tbl.coefficient=0.3 --WILD GUESS
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.damagescale = 1
 	tbl.wallbang = 5
 	tbl.mass=123
@@ -52,6 +54,8 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	tbl.coefficient = 0.3 --TODO figure this out!
 	tbl.projectiles = 1
 	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
 	tbl.mass=193
 	tbl.damagescale = 1
 	tbl.wallbang = 6.5

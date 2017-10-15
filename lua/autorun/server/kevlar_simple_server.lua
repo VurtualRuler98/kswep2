@@ -74,6 +74,8 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 			local hits=0
 			local hitdmg=1
 			if (KSGetBullet(dmginfo)<rating.dmg_half) then hitdmg=0.5 end
+			hitdmg=hitdmg*vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())].hitscale
+
 			for j,u in pairs(ent.kdmg) do
 				if (u.hitpoint==k and u.dir==dir) then
 					hits=hits+u.hit
@@ -81,7 +83,7 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 					if (dist<rating.spacing) then
 						local pen_a=dist-rating.space_min
 						local pen_b=rating.spacing-rating.space_min
-						if (math.Rand(rating.space_min,rating.spacing)>dist) then
+						if (math.Rand(rating.space_min,rating.spacing)*u.hit>dist) then
 							pass=false
 						end
 					end

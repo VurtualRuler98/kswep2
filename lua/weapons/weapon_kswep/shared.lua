@@ -52,6 +52,7 @@ SWEP.Secondary.ClipSize = 1
 SWEP.ReloadAnimTime=0
 SWEP.Firemode=0
 SWEP.SingleReload=false
+SWEP.ChokeScale=1
 SWEP.HoldType="pistol"
 SWEP.IdleType="normal"
 SWEP.SelectFire=false
@@ -176,6 +177,7 @@ SWEP.ChamberAmmo={}
 SWEP.IsSecondaryWeapon=false
 SWEP.ReloadDelay=0
 SWEP.ReloadSingleDelay=0
+SWEP.ReloadPostDelay=0
 SWEP.IronZoom=90
 SWEP.InsAttachments=false
 SWEP.IronOffsetPos=Vector()
@@ -683,7 +685,7 @@ function SWEP:NormalFire()
 	else
 		self:SetNWBool("Chambered",false)
 	end
-	self:ShootBullet(ammo.dmgbase, ammo.projectiles, ammo.spreadscale*(self.Primary.Spread+spreadsup)*scopedata.accuracy,ammo.name)
+	self:ShootBullet(ammo.dmgbase, ammo.projectiles, (ammo.spreadscale+(ammo.chokescale*self.ChokeScale))*(self.Primary.Spread+spreadsup)*scopedata.accuracy,ammo.name)
 	local anim=self.Anims.IdleAnim
 	local animbolt = self.Anims.BoltAnim
 	if (self:GetNWBool("Sight")) then
@@ -1732,7 +1734,6 @@ function SWEP:FinishReloadClip()
 		table.SortByMember(self.Magazines,"num",false)
 		if (self.ReloadingClips>0) then
 			for i=1,self.ReloadingClips do
-				print("jopis")
 				local clip=self.Magazines[1]
 				for k,v in pairs(self.Magazines) do
 					if (v.num+#self.MagTable>=self.Primary.ClipSize and clip.num>v.num) then
@@ -1929,7 +1930,7 @@ function SWEP:DoDrawCrosshair()
 			end
 		end
 		local recdiff=90-(Vector((0.005*recoil*aimPenalty)+((self.Owner:GetVelocity():Length()/(self.HandlingModifier*1000*scopedata.handling))),1,0):Angle().y)
-		local spread=self.Ammo.spreadscale*(self.Primary.Spread)*spreadsup+recdiff*16*scopedata.accuracy
+		local spread=(self.Ammo.spreadscale+(self.Ammo.chokescale*self.ChokeScale))*(self.Primary.Spread)*spreadsup+recdiff*16*scopedata.accuracy
 		local scale=ScrW()/(self.Owner:GetFOV()*18)
 		local linesize=ScrW()/256
 		surface.DrawLine((ScrW()/2)-spread*scale-linesize*1.5,ScrH()/2,ScrW()/2-spread*scale-linesize*0.25,ScrH()/2)
@@ -2052,6 +2053,9 @@ function SWEP:FinishReloadSingle()
 		if (self.OpenBolt and #self.MagTable>0) then 
 			self.Ammo=vurtual_ammodata[self.MagTable[#self.MagTable].caliber]
 		end
+	end
+	if (self.ReloadPostDelay) then
+		self:SetNextAttack(CurTime()+self.ReloadPostDelay)
 	end
 end
 
@@ -3177,15 +3181,15 @@ function SWEP:SharedVectorRand()
 	return Vector(util.SharedRandom("aimpenaltyx",-1,1,CurTime()),util.SharedRandom("aimpenaltyy",-1,1,CurTime()),util.SharedRandom("aimpenaltyz",-1,1,CurTime())):GetNormalized()
 end
 
-function SWEP:GenerateBulletDir(recoil,aimPenalty,aimcone)
+function SWEP:GenerateBulletDir(recoil,aimPenalty,aimcone,mod)
 	local scopedata=self:GetScopeStuff()
 	local dir=self.Owner:GetAimVector()
-	local spray=Angle(util.SharedRandom("randbulletone",-aimcone*0.5,aimcone*0.5,CurTime()),util.SharedRandom("randbullettwo",-aimcone*0.5,aimcone*0.5,CurTime()),0)
+	local spray=Angle(util.SharedRandom("randbulletone",-aimcone*0.5,aimcone*0.5,CurTime()+mod),util.SharedRandom("randbullettwo",-aimcone*0.5,aimcone*0.5,CurTime()+mod),0)
 	local ang=dir:Angle()
 	ang=ang+spray
 	dir=ang:Forward()
 	local handling=(self.Owner:GetVelocity():Length()/(self.HandlingModifier*1000*scopedata.handling))
-	dir=dir+(0.005*recoil*aimPenalty*self:SharedVectorRand())+VectorRand()*handling
+	dir=dir+(0.005*recoil*aimPenalty*self:SharedVectorRand())+self:SharedVectorRand()*handling
 	return dir
 end
 function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
@@ -3231,7 +3235,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
         bullet.Num              = num_bullets
         bullet.Src              = self.Owner:GetShootPos()+Vector(0,0,self:GetSightHeight()*-1)                      -- Source
 	if (self.Owner:IsPlayer()) then
-		bullet.Dir=self:GenerateBulletDir(recoil,aimPenalty,0)
+		bullet.Dir=self:GenerateBulletDir(recoil,aimPenalty,0,0)
 	else
 		bullet.Dir		= self.Owner:GetAimVector()+(0.005*recoil*VectorRand())
 	end
@@ -3243,7 +3247,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 	if (bullet.Num==1 and GetConVar("kswep_phys"):GetBool()) then
 		bullet.Spread = Vector()
 		if (self.Owner:IsPlayer()) then
-			bullet.Dir=self:GenerateBulletDir(recoil,aimPenalty,aimcone)
+			bullet.Dir=self:GenerateBulletDir(recoil,aimPenalty,aimcone,0)
 		else
 			bullet.Dir=self.Owner:GetAimVector()+(0.005*returnrecoil*VectorRand()*aimPenalty)+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
 		end
@@ -3254,7 +3258,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 			local tbl=table.Copy(bullet)
 			tbl.Spread = Vector()
 			if (self.Owner:IsPlayer()) then
-				tbl.Dir=self:GenerateBulletDir(recoil,aimPenalty,aimcone)
+				tbl.Dir=self:GenerateBulletDir(recoil,aimPenalty,aimcone,i)
 			else
 				tbl.Dir=self.Owner:GetAimVector()+(0.005*returnrecoil*VectorRand()*aimPenalty)+Vector(0,math.Rand(-aimcone,aimcone),math.Rand(-aimcone,aimcone))
 			end
