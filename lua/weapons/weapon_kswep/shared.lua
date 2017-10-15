@@ -3180,7 +3180,7 @@ end
 function SWEP:GenerateBulletDir(recoil,aimPenalty,aimcone)
 	local scopedata=self:GetScopeStuff()
 	local dir=self.Owner:GetAimVector()
-	local spray=Angle(util.SharedRandom("randbulletone",-aimcone,aimcone,CurTime()),util.SharedRandom("randbullettwo",-aimcone,aimcone,CurTime()),0)
+	local spray=Angle(util.SharedRandom("randbulletone",-aimcone*0.5,aimcone*0.5,CurTime()),util.SharedRandom("randbullettwo",-aimcone*0.5,aimcone*0.5,CurTime()),0)
 	local ang=dir:Angle()
 	ang=ang+spray
 	dir=ang:Forward()
