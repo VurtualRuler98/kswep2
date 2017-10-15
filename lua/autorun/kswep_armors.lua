@@ -45,14 +45,14 @@ tbl.club=5
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="Interceptor (SAPI)"
-tbl.hitpoints={vest={rating="NIJ IIIA",chestgroup=7,coverage=3},sapi={rating="SAPI",chestgroup=3,coverage=1}}
+tbl.hitpoints={sapi={rating="SAPI",chestgroup=3,coverage=1},vest={rating="NIJ IIIA",chestgroup=7,coverage=3}}
 tbl.blast=30
 tbl.slash=20
 tbl.club=20
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="Interceptor (SAPI)/Helmet"
-tbl.hitpoints={vest={rating="NIJ IIIA",chestgroup=7,coverage=11},sapi={rating="SAPI",chestgroup=3,coverage=1}}
+tbl.hitpoints={sapi={rating="SAPI",chestgroup=3,coverage=1},vest={rating="NIJ IIIA",chestgroup=7,coverage=11}}
 tbl.blast=33
 tbl.slash=20
 tbl.club=5
@@ -66,7 +66,7 @@ tbl.club=20
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="Plate Carrier ESAPI"
-tbl.hitpoints={plate={rating="ESAPI",chestgroup=3,coverage=1}}
+tbl.hitpoints={plate={rating="ESAPI",chestgroup=3,coverage=1},backer={rating="NIJ IIIA",chestgroup=3,coverage=1}}
 tbl.blast=5
 tbl.slash=20
 tbl.club=20
