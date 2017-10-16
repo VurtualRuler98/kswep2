@@ -40,8 +40,6 @@ SWEP.Primary.Spread = 0.05
 SWEP.ChokeScale=25
 SWEP.RecoilMassModifier=0.4
 SWEP.MuzzleVelMod=1
-SWEP.Bayonet=true
-SWEP.BayonetLength=17
 
 --Magazine--
 SWEP.Caliber = "vammo_12gauge_00buck"
