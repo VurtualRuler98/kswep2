@@ -34,11 +34,11 @@ SWEP.Spawnable = true
 list.Add("NPCUsableWeapons", { class = "weapon_kswept_toz34", title = "TEST TOZ-34" } )
 
 --Barrel--
-SWEP.HandlingModifier=1
+SWEP.HandlingModifier=3
 SWEP.Length=42
 SWEP.Primary.Spread = 0.05
 SWEP.ChokeScale=25
-SWEP.RecoilMassModifier=0.2
+SWEP.RecoilMassModifier=0.4
 SWEP.MuzzleVelMod=1
 SWEP.Bayonet=true
 SWEP.BayonetLength=17
@@ -54,15 +54,14 @@ function SWEP:ReloadAct(force)
 end
 
 --Rail--
-SWEP.BipodHeight=12
 SWEP.CanFlashlight=false
 SWEP.Has2DOptics=true
 
 
 --Sight--
 SWEP.IronSightHeight=2 --wild guess again
-SWEP.IronSightsPos = Vector(-7.375,4,0)
-SWEP.IronSightsAng = Vector()
+SWEP.IronSightsPos = Vector(-8.95,-8,4.4)
+SWEP.IronSightsAng = Vector(-8,0,0)
 SWEP.InsAttachments=false
 SWEP.ScopeMat="kswep/kswep_scope"
 function SWEP:InitScopeData(def)
