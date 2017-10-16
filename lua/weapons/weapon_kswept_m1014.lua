@@ -22,7 +22,7 @@ if (SERVER) then
 end
 
 if (CLIENT) then
-	SWEP.PrintName = "TEST TOZ-34"
+	SWEP.PrintName = "TEST M1014"
 	SWEP.Author = "vurtual"
 	SWEP.Slot = 2
 	SWEP.SlotPos = 0
@@ -31,22 +31,24 @@ SWEP.AdminSpawnable = true
 SWEP.Base = "weapon_kswep"
 SWEP.Category = "KSwep Primary"
 SWEP.Spawnable = true
-list.Add("NPCUsableWeapons", { class = "weapon_kswept_toz34", title = "TEST TOZ-34" } )
+list.Add("NPCUsableWeapons", { class = "weapon_kswept_toz34", title = "TEST M1014" } )
 
 --Barrel--
 SWEP.HandlingModifier=3
-SWEP.Length=42
-SWEP.Primary.Spread = 0.045
+SWEP.Length=35
+SWEP.Primary.Spread = 0.05
 SWEP.ChokeScale=15
-SWEP.RecoilMassModifier=0.4
+SWEP.RecoilMassModifier=0.2
 SWEP.MuzzleVelMod=1
 
 --Magazine--
 SWEP.Caliber = "vammo_12gauge_00buck"
 SWEP.ClipAllowSight="Default"
 SWEP.MagClass="Shotshell"
-SWEP.MagSize = 2
+SWEP.MagSize = 7
 SWEP.SingleReload=true
+SWEP.ReloadDelay=0.5
+SWEP.ReloadPostDelay=0.2
 function SWEP:ReloadAct(force)
 	self:ReloadTube()
 end
@@ -58,8 +60,8 @@ SWEP.Has2DOptics=true
 
 --Sight--
 SWEP.IronSightHeight=2 --wild guess again
-SWEP.IronSightsPos = Vector(-8.95,-8,4.4)
-SWEP.IronSightsAng = Vector(-8,0,0)
+SWEP.IronSightsPos = Vector(-6.9,-8,2.7)
+SWEP.IronSightsAng = Vector(-3,-0.75,0)
 SWEP.InsAttachments=false
 SWEP.ScopeMat="kswep/kswep_scope"
 function SWEP:InitScopeData(def)
@@ -72,10 +74,10 @@ function SWEP:InitScopeData(def)
 	def.zero = {
 		mils=false,
 		bc=0.338,
-		min=100,
-		max=100,
-		step=100,
-		default=100,
+		min=50,
+		max=50,
+		step=0,
+		default=50,
 		battlesight=false
 	}
 	def.windage={mils=false,max=0,step=0}
@@ -99,10 +101,9 @@ SWEP.InsAnims=false
 SWEP.NoLowerAnim=true
 SWEP.LoweredOffset = 2
 SWEP.Primary.Sound = Sound("weapon_kswept_shotgun.single")
-SWEP.ReloadSingleSound = Sound("weapon_smg1.special1")
 SWEP.UseHands = true
-SWEP.WorldModel = "models/weapons/w_annabelle.mdl"
-SWEP.ViewModel = "models/weapons/c_shotgun.mdl"
+SWEP.WorldModel = "models/weapons/w_shot_xm1014.mdl"
+SWEP.ViewModel = "models/weapons/cstrike/c_shot_xm1014.mdl"
 SWEP.ViewModelFlip = false
 function SWEP:InitAnims(tbl)
 	tbl.InitialDrawAnim=ACT_VM_READY
@@ -112,16 +113,14 @@ end
 --Trigger--
 SWEP.Auto=false
 SWEP.Firemode=false
-SWEP.NPCBurstDist=1
+SWEP.NPCBurstDist=256
 SWEP.NPCBurstMin=1
-SWEP.NPCBurstMax=1
-SWEP.HoldOpen=true
-SWEP.OpenBolt=true
+SWEP.NPCBurstMax=2
+SWEP.HoldOpen=false
+SWEP.OpenBolt=false
 SWEP.Primary.Delay = 0.4
 SWEP.SelectFire=false
 SWEP.MeleeAnimTime=0.5
-SWEP.ReloadDelay=1.5
-SWEP.ReloadPostDelay=1.5
 function SWEP:PrimaryFire()
 	self:NormalFire()
 end
