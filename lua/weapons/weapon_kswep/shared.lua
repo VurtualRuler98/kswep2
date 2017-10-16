@@ -3472,11 +3472,15 @@ function SWEP:FlyBullet(shot)
 	if ((not tr.Hit or (not tr.HitSky or not shot.sky)) and travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
 		if (SERVER and tr.HitSky) then
 			local skycamera=ents.FindByClass("sky_camera")[1]
-			local kv=skycamera:GetKeyValues()
-			travel=(travel/kv.scale)+skycamera:GetPos()
-			shot.scale=shot.scale/kv.scale
-			shot.sky=true
-			shot.pos=travel
+			if (skycamera~=nil) then
+				local kv=skycamera:GetKeyValues()
+				travel=(travel/kv.scale)+skycamera:GetPos()
+				shot.scale=shot.scale/kv.scale
+				shot.sky=true
+				shot.pos=travel
+			else
+				return nil
+			end
 		elseif (tr.Hit) then
 			local armor=0
 			shot.dragvector, shot.pos, shot.dist=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
