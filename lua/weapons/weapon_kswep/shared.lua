@@ -2154,7 +2154,7 @@ function SWEP:SwitchFiremode()
 end
 function SWEP:IronZoomMax()
 	local width=(ScrW()/(ScrW()/ScrH()))*(4/3)
-	local fovlimit=width/60
+	local fovlimit=width/180
 	if (fovlimit>90) then fovlimit=90 end --your monitor is higher resolution than the actual human eye!
 	return fovlimit
 end
