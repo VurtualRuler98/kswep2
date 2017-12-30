@@ -68,6 +68,8 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 			covers=true
 		elseif (hitgroup==HITGROUP_HEAD and bit.band(v.coverage,8)==8) then
 			covers=true
+		elseif (hitgroup==HITGROUP_GENERIC and bit.band(v.coverage,16)==16 and bit.band(v.chestgroup,dir)==dir) then
+			covers=true
 		end
 		if (covers and rating.protection>=KSGetBullet(dmginfo)) then
 			local pass=true
@@ -247,8 +249,16 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 	if (ent:IsPlayer() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
 		armor=kswep_armor_ratings[KSGetArmorNew(ent,ent.ksarmor,hitgroup,dmginfo)].protection
 	end
-	if (ent:IsNPC() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
-		armor=KSGetArmorNPC(ent,hitgroup)
+		
+	if(ent:IsNPC() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
+		if (kswep_npcarmors[ent:GetClass()]) then
+			if (ent.kdmg==nil) then
+				ent.kdmg={}
+			end
+			armor=kswep_armor_ratings[KSGetArmorNew(ent,kswep_npcarmors[ent:GetClass()],hitgroup,dmginfo)].protection
+		else
+			armor=KSGetArmorNPC(ent,hitgroup)
+		end
 	end
 	if (armor~=-1) then
 		local scale=KSScaleDamage(armor,dmginfo,ent)
