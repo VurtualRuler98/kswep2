@@ -16,6 +16,7 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	tbl.chokescale = 0
 	tbl.coefficient=0.252
 	tbl.damagescale = 1
+	tbl.hitscale = 1
 	tbl.mass=123
 	tbl.wallbang = 6
 	tbl.velocity = 2346 --AKM muzzle velocity
