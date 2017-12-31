@@ -51,3 +51,42 @@ tbl.poison=10
 tbl.radiation=10
 tbl.nervegas=100
 KswepAddNPCArmor(tbl)
+
+
+
+
+
+
+local tbl=table.Copy(def)
+tbl.name="kswep_otv_sapi"
+tbl.hitpoints={
+	sapi={rating="SAPI",chestgroup=3,coverage=1},
+	vest={rating="NIJ IIIA",chestgroup=7,coverage=3}
+	}
+tbl.blast=30
+tbl.slash=20
+tbl.club=20
+KswepAddNPCArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="kswep_otv_sapi_helmet"
+tbl.hitpoints={
+	sapi={rating="SAPI",chestgroup=3,coverage=1},
+	vest={rating="NIJ IIIA",chestgroup=7,coverage=11},
+	}
+tbl.blast=33
+tbl.slash=20
+tbl.club=20
+KswepAddNPCArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="kswep_otv_sapi_helmet_mask"
+tbl.hitpoints={
+	sapi={rating="SAPI",chestgroup=3,coverage=1},
+	vest={rating="NIJ IIIA",chestgroup=7,coverage=11},
+	}
+tbl.blast=33
+tbl.slash=20
+tbl.club=20
+tbl.poison=10
+tbl.radiation=10
+tbl.nervegas=100
+KswepAddNPCArmor(tbl)

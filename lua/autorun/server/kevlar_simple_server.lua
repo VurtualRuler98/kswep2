@@ -108,9 +108,9 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 	end
 	return "NONE"
 end
-function KSSuitSealCheck(ent) --checks for integrity of suit
+function KSSuitSealCheck(ent,ksarmor) --checks for integrity of suit
 	local barriers={}
-	for k,v in pairs(ent.ksarmor.hitpoints) do
+	for k,v in pairs(ksarmor.hitpoints) do
 		if (v.barrier) then
 			table.insert(barriers,k)
 		end
@@ -125,45 +125,54 @@ function KSSuitSealCheck(ent) --checks for integrity of suit
 	return true
 end
 		
-local function KSSuitHandler(ent,dmginfo)
+local function KSSuitHandler(ent,dmginfo,ksarmor)
 	local scale=0
 	local dmgtype=dmginfo:GetDamageType()
 	if (bit.band(dmgtype,DMG_SLASH)>0) then
-		if (ent.ksarmor.slash>scale) then scale=ent.ksarmor.slash end
+		if (ksarmor.slash>scale) then scale=ksarmor.slash end
 	end
 	if (bit.band(dmgtype,DMG_BURN)>0) then
-		if (ent.ksarmor.burn>scale) then scale=ent.ksarmor.burn end
+		if (ksarmor.burn>scale) then scale=ksarmor.burn end
 	end
 	if (bit.band(dmgtype,DMG_BLAST)>0) then
-		if (ent.ksarmor.blast>scale) then scale=ent.ksarmor.blast end
+		if (ksarmor.blast>scale) then scale=ksarmor.blast end
 	end
 	if (bit.band(dmgtype,DMG_SHOCK)>0) then
-		if (ent.ksarmor.shock>scale) then scale=ent.ksarmor.shock end
+		if (ksarmor.shock>scale) then scale=ksarmor.shock end
 	end
 	if (bit.band(dmgtype,DMG_POISON)>0) then
-		if (ent.ksarmor.poison>scale) then scale=ent.ksarmor.poison end
+		if (ksarmor.poison>scale) then scale=ksarmor.poison end
 	end
 	if (bit.band(dmgtype,DMG_ACID)>0) then
-		if (ent.ksarmor.acid>scale) then scale=ent.ksarmor.acid end
+		if (ksarmor.acid>scale) then scale=ksarmor.acid end
 	end
 	if (bit.band(dmgtype,DMG_NERVEGAS)>0) then
-		if (ent.ksarmor.nervegas>scale) then scale=ent.ksarmor.nervegas end
+		if (ksarmor.nervegas>scale) then scale=ksarmor.nervegas end
 	end
 	if (bit.band(dmgtype,DMG_RADIATION)>0) then
-		if (ent.ksarmor.radiation>scale) then scale=ent.ksarmor.radiation end
+		if (ksarmor.radiation>scale) then scale=ksarmor.radiation end
 	end
 	if (bit.band(dmgtype,DMG_CLUB)>0) then
-		if (ent.ksarmor.club>scale) then scale=ent.ksarmor.club end
+		if (ksarmor.club>scale) then scale=ksarmor.club end
 	end
 	if (bit.band(dmgtype,DMG_CRUSH)>0) then
-		if (ent.ksarmor.crush>scale) then scale=ent.ksarmor.crush end
+		if (ksarmor.crush>scale) then scale=ksarmor.crush end
 	end
-	if (KSSuitSealCheck(ent) and dmginfo:GetDamage()<scale/10) then scale=100 end
+	if (KSSuitSealCheck(ent,ksarmor) and dmginfo:GetDamage()<scale/10) then scale=100 end
 	return 1-(scale/100)
 end
 local function KSDamageHandlerEnt(ent,dmginfo)
 	if (ent:IsPlayer()) then
-		dmginfo:ScaleDamage(KSSuitHandler(ent,dmginfo))
+		dmginfo:ScaleDamage(KSSuitHandler(ent,dmginfo,ent.ksarmor))
+	end
+	if (ent:IsNPC()) then
+		local class=ent:GetClass()
+		if (class=="npc_combine_s") then 
+			class=KSGetNPCArmorCombine(ent)
+		end
+		if (kswep_npcarmors[class]) then
+			dmginfo:ScaleDamage(KSSuitHandler(ent,dmginfo,kswep_npcarmors[class]))
+		end
 	end
 end
 local function KSBleedingHandler(ent,hitgroup,dmginfo,crit,minicrit)
@@ -243,6 +252,13 @@ local function KSBleedingHandler(ent,hitgroup,dmginfo,crit,minicrit)
 		end
 	end	
 end
+function KSGetNPCArmorCombine(ent)
+	local model=ent:GetModel()
+	if (kswep_armorclass_combine[model]) then
+		return kswep_armorclass_combine[model]
+	end
+	return "npc_combine_s"
+end
 function KSDamageHandler(ent,hitgroup,dmginfo)
 	if (GetConVar("kevlar_enabled"):GetBool()==false) then return end
 	local armor=-1
@@ -251,11 +267,15 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 	end
 		
 	if(ent:IsNPC() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
-		if (kswep_npcarmors[ent:GetClass()]) then
+		local class=ent:GetClass()
+		if (class=="npc_combine_s") then 
+			class=KSGetNPCArmorCombine(ent)
+		end
+		if (kswep_npcarmors[class]) then
 			if (ent.kdmg==nil) then
 				ent.kdmg={}
 			end
-			armor=kswep_armor_ratings[KSGetArmorNew(ent,kswep_npcarmors[ent:GetClass()],hitgroup,dmginfo)].protection
+			armor=kswep_armor_ratings[KSGetArmorNew(ent,kswep_npcarmors[class],hitgroup,dmginfo)].protection
 		else
 			armor=KSGetArmorNPC(ent,hitgroup)
 		end

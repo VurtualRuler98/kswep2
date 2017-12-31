@@ -157,10 +157,7 @@ function ENT:ThinkSmokeCS()
 						self.LastCough=math.random(1,4)+CurTime()
 					end
 				elseif (v:IsNPC()) then
-					local c=v:GetClass()
-					if (c=="npc_citizen" or c=="npc_kleiner" or c=="npc_eli" or c=="npc_mossman" or c=="npc_magnusson") then
-						v:TakeDamageInfo(dmginfo)
-					end
+					v:TakeDamageInfo(dmginfo)
 				end
 			end
 			self.CSGasTimer=CurTime()+self.CSGasEffectDelay
