@@ -17,3 +17,8 @@ kswep_armorclass_combine["models/wgrunt/wgrunt2.mdl"]="kswep_otv_sapi_helmet_mas
 kswep_armorclass_combine["models/npc/ins_security_standard_e.mdl"]="kswep_esapi_helmet"
 kswep_armorclass_combine["models/npc/ins_security_light_e.mdl"]="kswep_esapi"
 kswep_armorclass_combine["models/npc/ins_security_heavy_e.mdl"]="kswep_iotv_esapi_helmet"
+
+
+kswep_armorclass_combine["models/npc/ins_insurgent_standard_e.mdl"]="kswep_otv_sapi"
+kswep_armorclass_combine["models/npc/ins_insurgent_light_e.mdl"]="none"
+kswep_armorclass_combine["models/npc/ins_insurgent_heavy_e.mdl"]="kswep_otv_sapi_helmet"
