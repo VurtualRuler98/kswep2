@@ -55,7 +55,7 @@ tbl.name="Interceptor (SAPI)/Helmet"
 tbl.hitpoints={sapi={rating="SAPI",chestgroup=3,coverage=1},vest={rating="NIJ IIIA",chestgroup=7,coverage=11}}
 tbl.blast=33
 tbl.slash=20
-tbl.club=5
+tbl.club=25
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="Plate Carrier Level IV"
