@@ -329,7 +329,7 @@ function KSScaleDamage(armor,dmginfo,ent)
 		if (ent:IsPlayer()) then
 			return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)
 		else
-			return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)/2
+			return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)*GetConVar("kswep_ai_damagescale"):GetFloat()
 		end
 	else
 		if (ent:IsPlayer()) then

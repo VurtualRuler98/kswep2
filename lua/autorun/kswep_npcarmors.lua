@@ -58,6 +58,36 @@ KswepAddNPCArmor(tbl)
 
 
 local tbl=table.Copy(def)
+tbl.name="kswep_iotv_esapi_helmet"
+tbl.hitpoints={
+	sapi={rating="ESAPI",chestgroup=7,coverage=1},
+	vest={rating="NIJ IIIA",chestgroup=7,coverage=11}
+	}
+tbl.blast=30
+tbl.slash=20
+tbl.club=20
+KswepAddNPCArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="kswep_esapi_helmet"
+tbl.hitpoints={
+	sapi={rating="ESAPI",chestgroup=7,coverage=1},
+	helmet={rating="NIJ IIIA",chestgroup=7,coverage=9}
+	}
+tbl.blast=30
+tbl.slash=20
+tbl.club=20
+KswepAddNPCArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="kswep_esapi"
+tbl.hitpoints={
+	sapi={rating="ESAPI",chestgroup=7,coverage=1},
+	backer={rating="NIJ IIIA",chestgroup=7,coverage=1}
+	}
+tbl.blast=5
+tbl.slash=20
+tbl.club=20
+KswepAddNPCArmor(tbl)
+local tbl=table.Copy(def)
 tbl.name="kswep_otv_sapi"
 tbl.hitpoints={
 	sapi={rating="SAPI",chestgroup=3,coverage=1},

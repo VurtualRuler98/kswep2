@@ -2,6 +2,7 @@ if (SERVER) then
 	AddCSLuaFile()
 end
 CreateConVar("kevlar_debug","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
+CreateConVar("kswep_ai_damagescale","0.5",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kevlar_enabled","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_test_shrapnel","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_bleeding","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
