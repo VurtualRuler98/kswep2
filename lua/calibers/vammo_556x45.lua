@@ -94,6 +94,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.caliber = "vammo_556x45"
 	tbl.projectiles = 1
 	tbl.spreadscale = 0.9
+	tbl.hitscale = 1
 	tbl.chokescale = 0
 	tbl.damagescale = 1
 	tbl.wallbang = 4
