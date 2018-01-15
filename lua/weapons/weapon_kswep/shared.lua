@@ -651,11 +651,6 @@ function SWEP:NextBolt(idle,anim,bolt)
 	self.NextBoltAnim=bolt
 	self.Anims.NextIdleAnim=anim
 end
-function SWEP:NextBolt(idle,anim,bolt)
-	self:SetNWFloat("NextIdle",idle)
-	self.NextBoltAnim=bolt
-	self.Anims.NextIdleAnim=anim
-end
 function SWEP:NextIdle(idle,anim)
 	self:ServeNWFloat("NextIdle",idle)
 	self.Anims.NextIdleAnim=anim
@@ -736,14 +731,18 @@ function SWEP:ShotgunFire()
 	if (not self:TryPrimaryAttack()) then return end
 	if (not self:GetNWBool("Chambered")) then
 		local anim=self.Anims.IdleAnim
+		local animbolt=self.Anims.BoltAnim
 		if (self:GetNWBool("Sight")) then
 			anim=self.Anims.IronAnim
+			animbolt=self.Anims.BoltAnimIron
 		end
 		self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),anim)
 		self:SetNextAttack(CurTime()+self.Primary.Delay)
 		self:ServeNWBool("Chambered",true)
+		self:ServeNWBool("FiringPin",true)
 		self:TakePrimaryAmmo(1)
-		self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
+		self.Weapon:SendWeaponAnim(animbolt)
+		self:EmitSound(self.BoltSound)
 	else
 		
 		
@@ -2521,6 +2520,9 @@ function SWEP:Think()
 			self.NextBoltAnim=nil
 			self:NextIdle(CurTime()+self.Owner:GetViewModel():SequenceDuration(),self.Anims.NextIdleAnim)
 			self:SetNextAttack(CurTime()+self.Owner:GetViewModel():SequenceDuration())
+			if (self.BoltSound) then
+				self:EmitSound(self.BoltSound)
+			end
 			end
 		else
 			self.Weapon:SendWeaponAnim(self.Anims.NextIdleAnim)
