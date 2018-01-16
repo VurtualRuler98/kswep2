@@ -42,7 +42,6 @@ KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="npc_combine_s"
 tbl.hitpoints={
-	suit={rating="CombineArmor",chestgroup=7,coverage=31}, --main ballistic suit
 	esapi={rating="ESAPI",chestgroup=7,coverage=1}, --torso underlayer
 	helmetliner={rating="NIJ IIIA",chestgroup=0,coverage=8} --helmet liner
 }
