@@ -29,10 +29,12 @@ function ENT:Initialize()
 		phys:SetMass(0.5)
 		phys:Wake()
 	end
+	self:CreateFear()
 end
 end
 function ENT:Detonate()
 	self:DetFlash()
+	self:AdvanceFear()
 	if (IsFirstTimePredicted()) then
 		self:EmitSound(self.DetonateSound)
 	end

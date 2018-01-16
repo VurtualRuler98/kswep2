@@ -20,6 +20,7 @@ ENT.BurnTime=40
 ENT.DetonateSound="flashbang.explode"
 ENT.BurnSound="physicscannister.thrusterloop"
 ENT.BurnEndSound="weapon_ar2.special2"
+ENT.DetFearVolume=256
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -40,11 +41,13 @@ function ENT:Initialize()
 		phys:SetMass(2)
 		phys:Wake()
 	end
+	self:CreateFear()
 end
 end
 function ENT:Detonate()
 	self:EmitSound(self.DetonateSound)
 	self:DetBurn()
+	self:AdvanceFear()
 end
 function ENT:Think2()
 	self:ThinkBurn()

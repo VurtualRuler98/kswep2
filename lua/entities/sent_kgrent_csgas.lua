@@ -13,6 +13,7 @@ ENT.DetonateSound="weapon_flaregun.single"
 ENT.BurnSound="weapon_flaregun.burn"
 ENT.BurnEndSound="weapon_ar2.special2"
 ENT.BurnEffectDelay=0.08
+ENT.DetFearVolume=256
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -34,11 +35,13 @@ function ENT:Initialize()
 		phys:SetMass(1)
 		phys:Wake()
 	end
+	self:CreateFear()
 end
 end
 function ENT:Detonate()
 	self:EmitSound(self.DetonateSound)
 	self:DetSmoke()
+	self:AdvanceFear()
 end
 function ENT:Think2()
 	self:ThinkSmokeCS()

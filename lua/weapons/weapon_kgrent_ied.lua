@@ -20,4 +20,5 @@ SWEP.GrenadeEntity="sent_kgrent_ied"
 SWEP.ThrowForce=700
 function SWEP:RunGrenadeCode(grenade)
 	grenade:SetAngles(Angle(0,0,-90))
+	grenade:SetNWFloat("Fuze",0)
 end

@@ -32,11 +32,13 @@ function ENT:Initialize()
 		phys:SetMass(1)
 		phys:Wake()
 	end
+	self:CreateFear()
 end
 end
 function ENT:Detonate()
 	if (not IsFirstTimePredicted()) then return end
 	self:EmitSound(self.DetonateSound)
+	self:AdvanceFear()
 	self:DetBoom()
 	self:DetSmokeFOG()
 	self:Remove()

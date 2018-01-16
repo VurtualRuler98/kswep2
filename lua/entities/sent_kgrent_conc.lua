@@ -16,6 +16,7 @@ ENT.FragClusters=5
 ENT.SuperFragClusters=0
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
+ENT.ThrowFearVolume=512
 
 if (CLIENT) then
 function ENT:Draw()
@@ -48,5 +49,6 @@ function ENT:Initialize()
 		phys:SetMass(0.39)
 		phys:Wake()
 	end
+	self:CreateFear()
 end
 end

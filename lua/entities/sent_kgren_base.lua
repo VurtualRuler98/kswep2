@@ -34,6 +34,9 @@ ENT.CSGasTimer=0
 ENT.CSGasEffectDelay=0.3
 ENT.LastCough=0
 ENT.ShrapnelAmmoType="buckshot" --bad approximation
+ENT.DetFearVolume=0
+ENT.ThrowFearVolume=256
+ENT.StartThrowFearVolume=512
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -65,12 +68,21 @@ function ENT:Initialize()
 		phys:SetMass(0.6)
 		phys:Wake()
 	end
+	self:CreateFear()
 end
 end
 function ENT:Think()
 	if (not self.Detonated and self:GetNWFloat("Fuze")>0 and self:GetNWFloat("Fuze")<CurTime()) then
 		self.Detonated=true
 		self:Detonate()
+	end
+	if (IsValid(self.DetFearEnt) and self.DetFearTime<CurTime()) then
+		self.DetFearEnt:Fire("EmitAISound")
+		self.DetFearTime=CurTime()+1
+		if (self.DetFearThrown) then
+			self.DetFearThrown=false
+			self.DetFearEnt:SetKeyValue("volume",self.ThrowFearVolume)
+		end
 	end
 	self:Think2()
 end
@@ -82,6 +94,7 @@ function ENT:Detonate()
 	self:EffectGrenadeFrag()
 	self:DetBoom()
 	self:DetFrag()
+	self:AdvanceFear()
 end
 function ENT:LookingAtMe(ent)
 	if (ent:IsLineOfSightClear(self)) then
@@ -94,6 +107,42 @@ function ENT:LookingAtMe(ent)
 		end
 	end
 	return false
+end
+function ENT:CreateFear()
+	if (SERVER) then
+		self.DetFearEnt = ents.Create("ai_sound")
+		local ent=self.DetFearEnt
+		ent:SetPos(self:GetPos())
+		ent:Spawn()
+		ent:SetParent(self)
+		ent:SetKeyValue("soundtype",8)
+		ent:SetKeyValue("volume",self.StartThrowFearVolume)
+		ent:SetKeyValue("duration",1)
+		ent:Activate()
+		self.DetFearEnt:Fire("EmitAISound")
+		self.DetFearTime=CurTime()+1
+		self.DetFearThrown=true
+		print("yopis")
+	end
+end
+function ENT:AdvanceFear()
+	if (SERVER and self.DetFearEnt) then
+		self.DetFearThrown=false
+		if (self.DetFearVolume<1) then
+			self.DetFearEnt:Remove()
+			self.DetFearEnt=nil
+		else
+			self.DetFearEnt:SetKeyValue("volume",self.DetFearVolume)
+		end
+	end
+end
+function ENT:OnRemove()
+	if (SERVER and IsValid(self.DetFearEnt)) then
+		self.DetFearEnt:Remove()
+	end
+	if (SERVER and IsValid(self.boom)) then
+		self.boom:Remove()
+	end
 end
 function ENT:DetFlash()
 	if (SERVER) then
@@ -287,7 +336,8 @@ function ENT:EffectRocketBoom()
 end
 function ENT:DetBoom()
 	if (CLIENT) then return end
-	local boom=ents.Create("env_explosion")
+	self.boom=ents.Create("env_explosion")
+	local boom=self.boom
 	boom:SetOwner(self)
 	boom:SetPos(self:GetPos())
 	boom:SetKeyValue("Spawnflags","894")

@@ -14,6 +14,7 @@ ENT.BurnSound=""
 ENT.BurnEndSound=""
 ENT.BurnEffectDelay=0.01
 ENT.SmokeScale=40
+ENT.ThrowFearVolume=768
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -35,9 +36,11 @@ function ENT:Initialize()
 		phys:SetMass(1)
 		phys:Wake()
 	end
+	self:CreateFear()
 end
 end
 function ENT:Detonate()
+	self:AdvanceFear()
 	if (IsFirstTimePredicted()) then
 		self:EmitSound(self.DetonateSound)
 	end

@@ -44,6 +44,7 @@ function ENT:Initialize()
 		phys:EnableGravity(false)
 		phys:Wake()
 	end
+	self:CreateFear()
 end
 function ENT:PhysicsCollide(data,phys)
 	self:SetNWFloat("Fuze",1)
@@ -57,6 +58,7 @@ function ENT:Think()
 end
 function ENT:Detonate()
 	if (not IsFirstTimePredicted()) then return end
+	self:AdvanceFear()
 	self:EmitSound(self.DetonateSound)
 	self:EffectRocketBoom()
 	self:DetConstraints()

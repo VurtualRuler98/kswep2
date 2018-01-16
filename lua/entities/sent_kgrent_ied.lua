@@ -17,6 +17,7 @@ ENT.SuperFragClusters=5
 ENT.Spawnable = false
 ENT.CanDetonator=true
 ENT.AdminSpawnable = false
+ENT.ThrowFearVolume=512
 
 if (CLIENT) then
 function ENT:Draw()
@@ -49,8 +50,9 @@ function ENT:Initialize()
 		phys:SetMass(2)
 		phys:Wake()
 	end
+	self:CreateFear()
 end
-function ENT:Think()
+function ENT:Think2()
 	--[[
 	for k,v in pairs(ents.FindInSphere(self:GetPos(),128)) do
 		if (v:IsVehicle()) then
