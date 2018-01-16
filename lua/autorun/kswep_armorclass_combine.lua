@@ -3,6 +3,9 @@ if (SERVER) then
 end
 
 kswep_armorclass_combine={}
+
+kswep_armorclass_combine["models/combine_super_soldier.mdl"]="kswep_combine_elite"
+
 --Woodland HECU
 for k,v in pairs({"3","3b","3c","3d","3e"}) do
 	kswep_armorclass_combine["models/wgrunt/wgrunt"..v..".mdl"]="kswep_otv_sapi"

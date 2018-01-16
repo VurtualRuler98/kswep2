@@ -42,12 +42,12 @@ KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="npc_combine_s"
 tbl.hitpoints={
-	esapi={rating="ESAPI",chestgroup=7,coverage=1}, --torso underlayer
-	helmetliner={rating="NIJ IIIA",chestgroup=0,coverage=8} --helmet liner
+	sapi={rating="SAPI",chestgroup=7,coverage=17}, --plates
+	vest={rating="NIJ IIIA",chestgroup=7,coverage=19}, --soft armor
+	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8} --helmet
 }
-tbl.blast=50
-tbl.poison=10
-tbl.radiation=10
+tbl.poison=100
+tbl.radiation=100
 tbl.nervegas=100
 KswepAddNPCArmor(tbl)
 
@@ -56,6 +56,17 @@ KswepAddNPCArmor(tbl)
 
 
 
+local tbl=table.Copy(def)
+tbl.name="kswep_combine_elite"
+tbl.hitpoints={
+	sapi={rating="ESAPI",chestgroup=7,coverage=17}, --plates
+	vest={rating="NIJ IIIA",chestgroup=7,coverage=19}, --soft armor
+	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8} --helmet
+}
+tbl.poison=100
+tbl.radiation=100
+tbl.nervegas=100
+KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="kswep_iotv_esapi_helmet"
 tbl.hitpoints={
