@@ -457,6 +457,25 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.mass=60
 	tbl.velocity = 1200 --00buck
 	AddAmmodata(tbl)
+	local tbl = {}
+	tbl.name="vammo_12gauge_flechette"
+	tbl.printname = "12 Gauge Flechette"
+	tbl.caliber = "vammo_12gauge"
+	tbl.coefficient=0.5 --randomly picked because I didn't understand the paper
+	tbl.diameter=0.33
+	tbl.vestpenetration=KSWEP_ARMOR_CRISAT
+	tbl.dmgbase=2
+	tbl.dmgvitalmin=2
+	tbl.dmgvitalmax=5
+	tbl.projectiles = 20
+	tbl.spreadscale = 1
+	tbl.chokescale = 1
+	tbl.hitscale=0.1
+	tbl.recoil = 15
+	tbl.wallbang = 7 --good penetrator?
+	tbl.mass=10 --SPIW XM144
+	tbl.velocity = 1200 --00buck
+	AddAmmodata(tbl)
 
 	local tbl = {}
 	tbl.name="vammo_12gauge_slug"
