@@ -1,5 +1,5 @@
 --[[
-Copyright 2016 vurtual 
+Copyright 2018 vurtual 
 VurtualRuler98@gmail.com
 vurtual.org
 
