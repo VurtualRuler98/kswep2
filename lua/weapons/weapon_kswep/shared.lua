@@ -663,7 +663,12 @@ function SWEP:NormalFire()
 	if (self.Suppressed) then
 		snd=self.Primary.SoundSup
 	end
-	self.Weapon:EmitSound(snd)
+	if (SERVER) then
+		net.Start("kswep_gunshot")
+		net.WriteEntity(self.Weapon)
+		net.WriteString(snd)
+		net.Send(player.GetAll())
+	end
 	if (self:Clip1()==1 and self.OpenBolt and self.Primary.SoundPing) then
 		self.Weapon:EmitSound(self.Primary.SoundPing)
 	end

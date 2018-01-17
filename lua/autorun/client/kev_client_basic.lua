@@ -31,6 +31,12 @@ net.Receive("kswep_swapslot_cl",function(len)
 	if (not IsValid(wep)) then return end
 	wep.IsSecondaryWeapon=slot
 end)
+net.Receive("kswep_gunshot",function(len)
+	local wep=net.ReadEntity()
+	local snd=net.ReadString()
+	if (not IsValid(wep)) then return end
+	wep:EmitSound(snd)
+end)
 local function KSwepSetEquipment_cl(len)
 	local lbe=net.ReadString()
 	local lbeaddon=net.ReadString()
