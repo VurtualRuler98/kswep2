@@ -155,4 +155,11 @@ sound.Add({
 	level=110,
 	channel=CHAN_WEAPON
 })
-	
+sound.Add({
+	name="weapon_kgrent_flashbang.detonate",
+	volume=1,
+	pitch={195,205},
+	sound="^weapons/aug/aug-1.wav",
+	level=145,
+	channel=CHAN_WEAPON
+})	

@@ -8,7 +8,7 @@ ENT.Instructions		= "Spawn. Use. Reload."
 ENT.Category	= "Vurtual's base"
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
-ENT.DetonateSound="flashbang.explode"
+ENT.DetonateSound="weapon_kgrent_flashbang.detonate"
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -36,7 +36,7 @@ function ENT:Detonate()
 	self:DetFlash()
 	self:AdvanceFear()
 	if (IsFirstTimePredicted()) then
-		self:EmitSound(self.DetonateSound)
+		self:EmitGunSound(self.DetonateSound)
 	end
 	if (SERVER) then
 		self:Remove()

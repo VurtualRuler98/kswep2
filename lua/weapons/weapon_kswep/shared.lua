@@ -699,7 +699,7 @@ function SWEP:NormalFire()
 		anim=self.Anims.IdleAnimEmpty
 	end
 	local bolttime = 0
-	if (animbolt) then
+	if (animbolt and self.Owner:IsPlayer()) then
 		if (self.UseDelayForBolt) then
 			self:NextBolt(CurTime()+self.Primary.Delay,anim,animbolt)
 		else

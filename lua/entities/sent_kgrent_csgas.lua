@@ -39,7 +39,7 @@ function ENT:Initialize()
 end
 end
 function ENT:Detonate()
-	self:EmitSound(self.DetonateSound)
+	self:EmitGunSound(self.DetonateSound)
 	self:DetSmoke()
 	self:AdvanceFear()
 end

@@ -59,7 +59,7 @@ end
 function ENT:Detonate()
 	if (not IsFirstTimePredicted()) then return end
 	self:AdvanceFear()
-	self:EmitSound(self.DetonateSound)
+	self:EmitGunSound(self.DetonateSound)
 	self:EffectRocketBoom()
 	self:DetConstraints()
 	self:DetBoom()

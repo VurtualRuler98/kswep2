@@ -42,7 +42,7 @@ end
 function ENT:Detonate()
 	self:AdvanceFear()
 	if (IsFirstTimePredicted()) then
-		self:EmitSound(self.DetonateSound)
+		self:EmitGunSound(self.DetonateSound)
 	end
 	self:DetSmoke()
 end

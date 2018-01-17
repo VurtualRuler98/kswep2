@@ -88,9 +88,17 @@ function ENT:Think()
 end
 function ENT:Think2()
 end
+function ENT:EmitGunSound(snd)
+	if (SERVER) then
+		net.Start("kswep_gunshot")
+		net.WriteEntity(self)
+		net.WriteString(snd)
+		net.Send(player.GetAll())
+	end
+end
 function ENT:Detonate()
 	if (not IsFirstTimePredicted()) then return end
-	self:EmitSound(self.DetonateSound)
+	self:EmitGunSound(self.DetonateSound)
 	self:EffectGrenadeFrag()
 	self:DetBoom()
 	self:DetFrag()
@@ -122,7 +130,6 @@ function ENT:CreateFear()
 		self.DetFearEnt:Fire("EmitAISound")
 		self.DetFearTime=CurTime()+1
 		self.DetFearThrown=true
-		print("yopis")
 	end
 end
 function ENT:AdvanceFear()
