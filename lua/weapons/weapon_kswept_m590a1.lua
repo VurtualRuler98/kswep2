@@ -31,7 +31,7 @@ SWEP.AdminSpawnable = true
 SWEP.Base = "weapon_kswep"
 SWEP.Category = "KSwep Primary"
 SWEP.Spawnable = true
-list.Add("NPCUsableWeapons", { class = "weapon_kswept_m590a1", title = "TEST M1014" } )
+list.Add("NPCUsableWeapons", { class = "weapon_kswept_m590a1", title = "TEST M590A1" } )
 
 --Barrel--
 SWEP.HandlingModifier=3

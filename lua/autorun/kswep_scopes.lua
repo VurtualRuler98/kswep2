@@ -7,6 +7,7 @@ KSWEP_RAILDEFS.FLATTOP={railtype="STANAG",relief=15,overhang=10,start=5,length=1
 KSWEP_RAILDEFS.MK12MOD0={railtype="STANAG",relief=16,overhang=2,start=6,length=28}
 KSWEP_RAILDEFS.CARRYHANDLE={railtype="CARRYHANDLE",relief=0,overhang=0,start=0,length=0}
 KSWEP_RAILDEFS.SIDE_AK={railtype="SIDE_AK",relief=0,overhang=0,start=0,length=0}
+KSWEP_RAILDEFS.SCARH={railtype="STANAG",relief=16,overhang=10,start=5,length=20} --estimate
 
 kswep_2dscopes = {}
 local function AddKswep2DScope(tbl)

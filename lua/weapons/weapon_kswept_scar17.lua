@@ -22,32 +22,31 @@ if (SERVER) then
 end
 
 if (CLIENT) then
-	SWEP.PrintName = "TEST 300blk Suppressed"
+	SWEP.PrintName = "TEST SCAR 17 Standard"
 	SWEP.Author = "vurtual"
 	SWEP.Slot = 2
 	SWEP.SlotPos = 0
 end
-
-list.Add("NPCUsableWeapons", { class = "weapon_kswept_300blk", title = "TEST 300blk Suppressed" } )
-SWEP.Base = "weapon_kswep"
-SWEP.Category = "KSwep Primary"
-SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
+SWEP.Base = "weapon_kswep"
+SWEP.Category = "KSwep Auto"
+SWEP.Spawnable = true
+list.Add("NPCUsableWeapons", { class = "weapon_kswept_scar17", title = "TEST SCAR 17 Standard" } )
 
 
 --Barrel--
-SWEP.HandlingModifier=200
-SWEP.Length=30 --integrally suppressed design?
-SWEP.Primary.Spread = 0.03
-SWEP.RecoilMassModifier=0.1
-SWEP.MuzzleVelMod=1
+SWEP.HandlingModifier=5
+SWEP.Length=38
+SWEP.Primary.Spread = 0.020
+SWEP.RecoilMassModifier=0.2
+SWEP.MuzzleVelMod=0.95
 
 
 --Magazine--
-SWEP.Caliber = "vammo_300blk_208gr_amax_sub"
-SWEP.MagClass="STANAG"
-SWEP.MagSize = 30
-SWEP.MagType="AR300BLK"
+SWEP.Caliber = "vammo_762x51_m80"
+SWEP.MagClass="BattleRifle"
+SWEP.MagSize = 20
+SWEP.MagType="SCAR17"
 function SWEP:ReloadAct(force)
 	self:ReloadMag(force)
 end
@@ -57,15 +56,13 @@ end
 SWEP.CanFlashlight=true
 SWEP.Has2DOptics=true
 SWEP.LAMAttachment="1"
+SWEP.OpticRails={KSWEP_RAILDEFS.SCARH}
 
 
 --Sight--
 SWEP.IronSightHeight=2.8
-SWEP.IronSightsPos = Vector(-7.88,-2,0.2)
-SWEP.IronSightsAng = Vector(2,-1.5,-3)
-SWEP.InsAttachments=false
-SWEP.ScopeMat="kswep/kswep_scope"
-
+SWEP.IronSightsPos = Vector(-6.5,-2,0.2)
+SWEP.IronSightsAng = Vector(2,-0.5,0)
 function SWEP:InitScopeData(def)
 	def.fovmin=11
 	def.fovmax=11
@@ -75,28 +72,30 @@ function SWEP:InitScopeData(def)
 	def.scopeheight=0
 	def.zero = {
 		mils=false,
-		bc=-1,
-		min=0,
-		max=0,
+		bc=0.393,
+		min=300,
+		max=300,
 		step=0,
 		default=300,
 		battlesight=false
 	}
+	def.zeroalt = {
+		default=-1
+	}
+	def.style="crosshair"
 	def.windage={mils=false,max=0,step=0}
 	def.windagealt=def.windage
 	def.scope_border=1.1
 	def.scope_ewheel=false
 	def.retcolor=color_black
 	def.luareticle="irons"
-	def.luaretsfp=2.5
+	def.luaretsfp=11*0.825
 	def.aimmag=6.5
-	def.style="crosshair"
 	def.altmode = table.Copy(def)
 	def.altmode.style="aimlua"
 	def.altmode.zerosync=true
 	if (CLIENT) then self:SetOptic2D("Default") end
 end
-
 
 
 --Stock--
@@ -106,38 +105,27 @@ SWEP.IdleType="passive"
 SWEP.InsAnims=false
 SWEP.NoLowerAnim=true
 SWEP.LoweredOffset = 2
-SWEP.Primary.Sound = Sound("weapon_kswept_300blk.single_sup")
+SWEP.Primary.Sound = Sound("weapon_kswept_scar17.single")
 SWEP.UseHands = true
-SWEP.WorldModel = "models/weapons/w_rif_m4a1.mdl"
-SWEP.ViewModel = "models/weapons/cstrike/c_rif_m4a1.mdl"
+SWEP.WorldModel = "models/weapons/w_snip_g3sg1.mdl"
+SWEP.ViewModel = "models/weapons/cstrike/c_snip_g3sg1.mdl"
 SWEP.ViewModelFlip = false
 function SWEP:InitAnims(tbl)
-	tbl.IdleAnim=ACT_VM_IDLE_SILENCED
-	tbl.IronAnim=ACT_VM_IDLE_SILENCED
-	tbl.IdleAnimEmpty=ACT_VM_IDLE_SILENCED
-	tbl.NextIdleAnim=ACT_VM_IDLE_SILENCED
-	tbl.InitialDrawAnim=ACT_VM_DRAW_SILENCED
-	tbl.UnstowAnim=ACT_VM_DRAW_SILENCED
-	tbl.UnstowAnimEmpty=ACT_VM_DRAW_SILENCED
-	tbl.StowAnim=ACT_VM_HOLSTER_SILENCED
-	tbl.StowAnimEmpty=ACT_VM_HOLSTER_SILENCED
-	tbl.ReloadAnim=ACT_VM_RELOAD_SILENCED
-	tbl.DryfireAnim=ACT_VM_DRYFIRE_SILENCED
-	tbl.ShootAnim=ACT_VM_PRIMARYATTACK_SILENCED
+	tbl.InitialDrawAnim=ACT_VM_READY
 end
 
 --Trigger--
 SWEP.Auto=false
 SWEP.Firemode=true
-SWEP.HoldOpen=false
-SWEP.NPCBustDist=2048
+SWEP.Firemodes={{auto=false,name="SEMI"},{auto=true,name="AUTO"}}
+SWEP.NPCBustDist=1024
 SWEP.NPCBurstMax=3
-SWEP.NPCBurstMin=2
+SWEP.NPCBurstMin=1
 SWEP.NPCBurstTimeMin= 0.1
-SWEP.NPCBurstTimeMax = 0.15
+SWEP.NPCBurstTimeMax = 0.1
+SWEP.HoldOpen=true
 SWEP.Primary.Delay = 0.1
-SWEP.SelectFire=false
+SWEP.SelectFire=true
 function SWEP:PrimaryFire()
-	self:NormalFire()
+	self:FiremodeFire()
 end
-

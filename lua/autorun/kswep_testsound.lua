@@ -124,6 +124,14 @@ sound.Add({
 	channel=CHAN_WEAPON
 })
 sound.Add({
+	name="weapon_kswept_scar17.single",
+	volume=1.0,
+	pitch={125,135},
+	sound="^weapons/g3sg1/g3sg1-1.wav",
+	level=160,
+	channel=CHAN_WEAPON
+})
+sound.Add({
 	name="weapon_kswept_usp45.single",
 	volume=1.0,
 	pitch={165,170},
