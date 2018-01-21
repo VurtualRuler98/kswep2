@@ -52,6 +52,22 @@ sound.Add({
 	channel=CHAN_WEAPON
 })
 sound.Add({
+	name="weapon_kswept_p228.single",
+	volume=1.0,
+	pitch={185,195},
+	sound="^weapons/elite/elite-1.wav",
+	level=145,
+	channel=CHAN_WEAPON
+})
+sound.Add({
+	name="weapon_kswept_p238.single",
+	volume=1.0,
+	pitch={185,195},
+	sound="^weapons/g3sg1/g3sg1-1.wav",
+	level=145,
+	channel=CHAN_WEAPON
+})
+sound.Add({
 	name="weapon_kswept_mp5.single",
 	volume=1.0,
 	pitch={185,195},
@@ -97,6 +113,14 @@ sound.Add({
 	pitch={70,75},
 	sound="^weapons/awp/awp1.wav",
 	level=160,
+	channel=CHAN_WEAPON
+})
+sound.Add({
+	name="weapon_kswept_j22.single",
+	volume=1,
+	pitch={245,255},
+	sound="^weapons/sg552/sg552-1.wav",
+	level=135,
 	channel=CHAN_WEAPON
 })
 sound.Add({
