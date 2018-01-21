@@ -1839,7 +1839,7 @@ function SWEP:FinishReload()
 		self:SetClip1(mag.num)
 		self.CurrentMagSize=mag.max
 		self.Ammo=vurtual_ammodata[mag.caliber]
-		if (self:Clip1()>0) then
+		if (self:Clip1()>0 and not self.MagLoseAmmo) then
 			self.Magazines[#self.Magazines].num=oldmag.num
 			self.Magazines[#self.Magazines].caliber=oldmag.caliber
 			self.Magazines[#self.Magazines].max=oldmag.max
