@@ -52,6 +52,14 @@ sound.Add({
 	channel=CHAN_WEAPON
 })
 sound.Add({
+	name="weapon_kswept_nagant.single",
+	volume=1.0,
+	pitch={145,155},
+	sound="^weapons/pistol/pistol_fire3.wav",
+	level=145,
+	channel=CHAN_WEAPON
+})
+sound.Add({
 	name="weapon_kswept_p228.single",
 	volume=1.0,
 	pitch={185,195},
