@@ -76,6 +76,14 @@ sound.Add({
 	channel=CHAN_WEAPON
 })
 sound.Add({
+	name="weapon_kswept_mac11.single",
+	volume=1,
+	pitch={225,235},
+	sound="^weapons/usp/usp_unsil-1.wav",
+	level=145,
+	channel=CHAN_WEAPON
+})
+sound.Add({
 	name="weapon_kswept_p238.single",
 	volume=1.0,
 	pitch={185,195},
