@@ -521,7 +521,27 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.mass=98
 	tbl.recoil = 1
 	AddAmmodata(tbl)
+	
 
+	local tbl = {}
+	tbl.name="vammo_410_000buck"
+	tbl.printname = ".410 000 Buck"
+	tbl.caliber = "vammo_410"
+	tbl.coefficient=0.05
+	tbl.diameter=0.33
+	tbl.vestpenetration=KSWEP_ARMOR_I
+	tbl.dmgbase=4
+	tbl.dmgvitalmin=5
+	tbl.dmgvitalmax=8
+	tbl.projectiles = 3
+	tbl.spreadscale = 1
+	tbl.chokescale = 1
+	tbl.hitscale=0.2
+	tbl.recoil = 10
+	tbl.wallbang = 3
+	tbl.mass=70
+	tbl.velocity = 1300
+	AddAmmodata(tbl)
 
 
 end)

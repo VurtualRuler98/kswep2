@@ -68,6 +68,14 @@ sound.Add({
 	channel=CHAN_WEAPON
 })
 sound.Add({
+	name="weapon_kswept_judge.single",
+	volume=0.7,
+	pitch={225,245},
+	sound="^weapons/deagle/deagle-1.wav",
+	level=145,
+	channel=CHAN_WEAPON
+})
+sound.Add({
 	name="weapon_kswept_p238.single",
 	volume=1.0,
 	pitch={185,195},
