@@ -505,8 +505,8 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.vestpenetration=KSWEP_ARMOR_II --VERIFY
 	tbl.dmgbase=4
 	tbl.coefficient=0.157
-	tbl.powermin=5
-	tbl.powermax=8
+	tbl.dmgvitalmin=5
+	tbl.dmgvitalmax=8
 	tbl.name = "vammo_762x38"
 	tbl.printname = "7.62x38mm FMJ Commercial"
 	tbl.caliber = "vammo_762x38"
@@ -541,6 +541,27 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.wallbang = 3
 	tbl.mass=70
 	tbl.velocity = 1300
+	AddAmmodata(tbl)
+	
+	local tbl = {}
+	tbl.vestpenetration=KSWEP_ARMOR_III
+	tbl.dmgbase=2
+	tbl.coefficient=0.2 --random guess
+	tbl.dmgvitalmin=5
+	tbl.dmgvitalmax=8
+	tbl.name = "vammo_57x28_ss190"
+	tbl.printname = "5.7x28mm SS190"
+	tbl.caliber = "vammo_57x28"
+	tbl.diameter=0.22
+	tbl.projectiles = 1
+	tbl.spreadscale = 1
+	tbl.chokescale = 0
+	tbl.hitscale = 1
+	tbl.damagescale = 1
+	tbl.wallbang = 8
+	tbl.velocity = 2350 --P90
+	tbl.mass=31
+	tbl.recoil = 1.2
 	AddAmmodata(tbl)
 
 

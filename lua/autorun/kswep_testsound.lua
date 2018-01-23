@@ -52,6 +52,14 @@ sound.Add({
 	channel=CHAN_WEAPON
 })
 sound.Add({
+	name="weapon_kswept_fiveseven.single",
+	volume=1.0,
+	pitch={125,135},
+	sound="^weapons/fiveseven/fiveseven-1.wav",
+	level=145,
+	channel=CHAN_WEAPON
+})
+sound.Add({
 	name="weapon_kswept_nagant.single",
 	volume=1.0,
 	pitch={145,155},
@@ -80,6 +88,14 @@ sound.Add({
 	volume=1,
 	pitch={225,235},
 	sound="^weapons/usp/usp_unsil-1.wav",
+	level=145,
+	channel=CHAN_WEAPON
+})
+sound.Add({
+	name="weapon_kswept_p90.single",
+	volume=1,
+	pitch={245,255},
+	sound="^weapons/p90/p90-1.wav",
 	level=145,
 	channel=CHAN_WEAPON
 })
