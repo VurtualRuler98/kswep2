@@ -309,6 +309,7 @@ function SWEP:Initialize()
         self:SetNWString("HoldType",self.HoldType)
         self:SetNWString("IdleType",self.IdleType)
 	self:SetNWInt("Burst",self.Burst)
+	self:SetNWBool("Binary",false)
 	self:SetNWBool("FiremodeSelected",false)
 	self:SetNWBool("Firemode",false)
 	self:SetNWInt("FiremodeInt",1)
@@ -1727,6 +1728,11 @@ function SWEP:FiremodeFire()
 			end
 			self.LastBurst=self.LastBurst-1
 		end
+	elseif (self:GetFiremode().binary) then
+		if (not self:GetNWBool("Binary")) then
+			self:SetNWBool("Binary",true)
+			self:NormalFire()
+		end
 	else
 		self:NormalFire()
 	end
@@ -2403,6 +2409,12 @@ function SWEP:Think()
 			drawmodel=false
 		end
 		self.Owner:DrawViewModel(drawmodel)
+	end
+	if (SERVER and self.Owner:IsPlayer() and self:GetNWFloat("NextPrimaryAttack")<CurTime() and self:GetNWBool("Binary") and not self.Owner:KeyDown(IN_ATTACK)) then
+		if (self:GetFiremode().binary and not self:ModKeyDown()) then
+			self:NormalFire()
+		end
+		self:SetNWBool("Binary",false)
 	end
 	if (self.NoViewModel and SERVER and self.Owner:IsPlayer()) then
 		self.Owner:DrawViewModel(false)
@@ -3476,7 +3488,7 @@ function SWEP:FlyBullet(shot)
 		self:FireShot(shot.bullet)
 	
 	end
-	if ((not tr.Hit or (not tr.HitSky or not shot.sky)) and travel:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
+	if ((not tr.Hit or (not tr.HitSky or not shot.sky)) and shot.pos:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
 		if (SERVER and tr.HitSky) then
 			local skycamera=ents.FindByClass("sky_camera")[1]
 			if (skycamera~=nil) then
