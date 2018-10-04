@@ -310,10 +310,6 @@ tbl.eyereliefmax=8
 tbl.mounttype = "STANAG"
 AddKswep2DScope(tbl)
 local tbl=table.Copy(tbl)
-tbl.name="Leupold TS30-A2 (ACI)"
-tbl.scope_cwheel=true
-AddKswep2DScope(tbl)
-local tbl=table.Copy(tbl)
 tbl.name="Leupold TS30-A2 (PVS-22)"
 tbl.scope_cwheel=false
 tbl.nv=4
