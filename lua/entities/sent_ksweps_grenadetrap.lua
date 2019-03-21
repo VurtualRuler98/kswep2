@@ -12,8 +12,8 @@ ENT.AdminSpawnable = true
 ENT.Igniting=false
 ENT.HasGrenade=false
 ENT.nade=nil
-ENT.Live=-1
 ENT.TimeStopped=false
+ENT.ClientDetonated=false
 if (CLIENT) then
 function ENT:Draw()
 	self.Entity:DrawModel()
@@ -35,6 +35,7 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 	self.Entity:SetUseType(SIMPLE_USE)
+	self:SetNWFloat("Live",-1)
 end
 function ENT:SpawnFunction(ply,tr)
 	if (not tr.Hit) then return end
@@ -51,9 +52,13 @@ function ENT:Think()
 			self:Remove()
 		end
 	end
-	if (self.Live>0 and self.Live<CurTime() and not self.TimeStopped) then
+	if (self:GetNWFloat("Live")>0 and self:GetNWFloat("Live")<CurTime() and not self.TimeStopped) then
 		for k,v in pairs(ents.FindInSphere(self:GetPos(),64)) do
 			if (v:IsNPC() or v:IsPlayer() or v:IsVehicle()) then
+				if (not self.ClientDetonated) then
+					self:EmitSound("weapon_smg1.special1")
+					self.ClientDetonated=true
+				end
 				if (kswep_timestop_check()) then
 					self.TimeStopped=true
 				else
@@ -95,8 +100,8 @@ function ENT:Use(activator,caller)
 				wep:SetNWInt("numgrenades",wep:GetNWInt("numgrenades")+1)
 				self:Remove()
 			end
-		elseif (self.Live<0) then
-			self.Live=CurTime()+2
+		elseif (self:GetNWFloat("Live")<0) then
+			self:SetNWFloat("Live",CurTime()+2)
 			self.nade:EmitSound("weapon_slam.tripminemode")
 		end
 	end
