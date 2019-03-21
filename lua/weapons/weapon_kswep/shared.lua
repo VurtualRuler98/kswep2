@@ -3372,6 +3372,7 @@ function SWEP:FlyBulletStart(bullet)
 	table.insert(self.Bullets,shot)
 end
 function SWEP:FlyBullet(shot)
+	if (kswep_timestop_check()) then return shot end
 	shot.ticks=shot.ticks-1
 	local travel
 	if (shot.dist~=nil) then

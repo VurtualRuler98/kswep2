@@ -13,6 +13,7 @@ ENT.Igniting=false
 ENT.HasGrenade=false
 ENT.nade=nil
 ENT.Live=-1
+ENT.TimeStopped=false
 if (CLIENT) then
 function ENT:Draw()
 	self.Entity:DrawModel()
@@ -50,12 +51,19 @@ function ENT:Think()
 			self:Remove()
 		end
 	end
-	if (self.Live>0 and self.Live<CurTime()) then
+	if (self.Live>0 and self.Live<CurTime() and not self.TimeStopped) then
 		for k,v in pairs(ents.FindInSphere(self:GetPos(),64)) do
 			if (v:IsNPC() or v:IsPlayer() or v:IsVehicle()) then
-				self:Detonate()
+				if (kswep_timestop_check()) then
+					self.TimeStopped=true
+				else
+					self:Detonate()
+				end
 			end
 		end
+	end
+	if (not kswep_timestop_check() and self.TimeStopped) then
+		self:Detonate()
 	end
 end
 function ENT:RunGrenadeCode(grenade)
@@ -77,8 +85,8 @@ function ENT:Use(activator,caller)
 				self.nade:SetOwner(caller)
 				self:SetPos(self:GetPos()-Vector(0,0,2))
 				self.nade:SetPos(self:GetPos()+Vector(0,0,8))
-				self.nade:Spawn()
 				self.nade:SetParent(self)
+				self.nade:Spawn()
 				self.nade:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 				self:RunGrenadeCode(self.nade)
 				self.nade:SetNWFloat("Fuze",0)

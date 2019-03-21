@@ -49,7 +49,9 @@ kswep_validitems= {
 	"secondaryammo",
 	"nothing"
 }
-	
+function kswep_timestop_check()
+	return (#ents.FindByClass("ent_stop_time")>0)
+end
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 	game.AddAmmoType({name=tbl.name,dmgtype=DMG_BULLET,force=10})

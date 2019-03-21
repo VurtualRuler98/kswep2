@@ -37,6 +37,7 @@ ENT.ShrapnelAmmoType="buckshot" --bad approximation
 ENT.DetFearVolume=0
 ENT.ThrowFearVolume=256
 ENT.StartThrowFearVolume=512
+ENT.TimeStopped=0
 if (CLIENT) then
 function ENT:Draw()
 	--AddWorldTip( self.Entity:EntIndex(), "ammo", 0.5, self.Entity:GetPos(),self.Entity)
@@ -72,7 +73,18 @@ function ENT:Initialize()
 end
 end
 function ENT:Think()
-	if (not self.Detonated and self:GetNWFloat("Fuze")>0 and self:GetNWFloat("Fuze")<CurTime()) then
+	if (not kswep_timestop_check() and self.TimeStopped > 0) then
+		if (not IsValid(self:GetParent()) or self:GetParent():GetClass()~="sent_ksweps_grenadetrap") then
+			self:SetNWFloat("Fuze",CurTime()+self.TimeStopped)
+		end
+		self.TimeStopped=0
+	end
+	if (kswep_timestop_check() and self.TimeStopped==0 and self:GetNWFloat("Fuze")>0) then
+		self.TimeStopped = (self:GetNWFloat("Fuze")-CurTime())
+		print(self.TimeStopped)
+		self:SetNWFloat("Fuze",0)
+	end
+	if (self.TimeStopped == 0 and not self.Detonated and self:GetNWFloat("Fuze")>0 and self:GetNWFloat("Fuze")<CurTime()) then
 		self.Detonated=true
 		self:Detonate()
 	end
@@ -118,18 +130,20 @@ function ENT:LookingAtMe(ent)
 end
 function ENT:CreateFear()
 	if (SERVER) then
-		self.DetFearEnt = ents.Create("ai_sound")
-		local ent=self.DetFearEnt
-		ent:SetPos(self:GetPos())
-		ent:Spawn()
-		ent:SetParent(self)
-		ent:SetKeyValue("soundtype",8)
-		ent:SetKeyValue("volume",self.StartThrowFearVolume)
-		ent:SetKeyValue("duration",1)
-		ent:Activate()
-		self.DetFearEnt:Fire("EmitAISound")
-		self.DetFearTime=CurTime()+1
-		self.DetFearThrown=true
+		if (not IsValid(self:GetParent())) then
+			self.DetFearEnt = ents.Create("ai_sound")
+			local ent=self.DetFearEnt
+			ent:SetPos(self:GetPos())
+			ent:Spawn()
+			ent:SetParent(self)
+			ent:SetKeyValue("soundtype",8)
+			ent:SetKeyValue("volume",self.StartThrowFearVolume)
+			ent:SetKeyValue("duration",1)
+			ent:Activate()
+			self.DetFearEnt:Fire("EmitAISound")
+			self.DetFearTime=CurTime()+1
+			self.DetFearThrown=true
+		end
 	end
 end
 function ENT:AdvanceFear()
