@@ -108,3 +108,26 @@ tbl.nervegas=100
 tbl.club=30
 tbl.crush=10
 KswepAddArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="Sunrise Suit Upgraded w/ Oxygen System/Helmet"
+tbl.hitpoints={
+	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8},
+	mask={rating="NONE",chestgroup=0,coverage=8,airmask=true},
+	airtank2={rating="NIJ I",chestgroup=2,coverage=1,airtank=true}, --made out of steel
+	airtank={rating="NIJ I",chestgroup=2,coverage=1,airtank=true},
+	ceramic={rating="CRISAT Scale",chestgroup=7,coverage=3},
+	poly={rating="NIJ II",chestgroup=7,coverage=3},
+	skin2={rating="NIJ I",chestgroup=7,coverage=7,barrier=true},
+	skin={rating="NIJ I",chestgroup=7,coverage=7,barrier=true}
+}
+tbl.burn=30 --CoP, rubber flame retardant suit
+tbl.acid=30
+tbl.slash=30
+tbl.shock=25
+tbl.blast=2 --it's lined with ballistic fabric ok
+tbl.poison=30
+tbl.radiation=30
+tbl.nervegas=100
+tbl.club=30
+tbl.crush=10
+KswepAddArmor(tbl)

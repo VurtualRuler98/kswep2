@@ -124,6 +124,32 @@ function KSSuitSealCheck(ent,ksarmor) --checks for integrity of suit
 	if (#barriers==0) then return false end
 	return true
 end
+function KSuitAirCheck(ent,ksarmor)
+	local tanks={}
+	local masks={}
+	for k,v in pairs(ksarmor.hitpoints) do
+		if (v.airtank) then
+			table.insert(tanks,k)
+		end
+		if (v.airmask) then
+			table.insert(masks,k)
+		end
+	end
+	local hastank=(#tanks~=0)
+	local hasmask=(#masks~=0)
+	if (not hasmask and not hastank) then return false end
+	for k,v in pairs(ent.kdmg) do
+		if (table.HasValue(tanks,v.hitpoint)) then
+			table.RemoveByValue(tanks,v.hitpoint)
+		end
+		if (table.HasValue(masks,v.hitpoint)) then
+			table.RemoveByValue(tanks,v.hitpoint)
+		end
+	end
+	if ((hastank and #tanks==0) or (hasmask and #masks==0)) then return false end
+	return true
+end
+	
 		
 local function KSSuitHandler(ent,dmginfo,ksarmor)
 	local scale=0
@@ -159,6 +185,11 @@ local function KSSuitHandler(ent,dmginfo,ksarmor)
 		if (ksarmor.crush>scale) then scale=ksarmor.crush end
 	end
 	if (KSSuitSealCheck(ent,ksarmor) and dmginfo:GetDamage()<scale/10) then scale=100 end
+	if (KSuitAirCheck(ent,ksarmor)) then
+		if (bit.band(dmgtype,DMG_NERVEGAS+DMG_DROWN+DMG_DROWNRECOVER)>0) then
+			scale=100
+		end
+	end
 	return 1-(scale/100)
 end
 local function KSDamageHandlerEnt(ent,dmginfo)
