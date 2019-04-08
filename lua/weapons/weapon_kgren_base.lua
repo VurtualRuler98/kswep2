@@ -201,7 +201,14 @@ function SWEP:ThrowGrenade(force)
 		end
 		grenade:Spawn()
 		grenade:SetOwner(self.Owner)
-		grenade:SetNWFloat("Fuze",self:GetNWFloat("Fuze"))
+		if (kswep_timestop_check()) then
+			grenade.TimeStopped = self:GetNWFloat("Fuze")-CurTime()
+			self:SetNWFloat("Fuze",0)
+			if (grenade.TimeStopped<=0) then 
+				grenade.TimeStopped=0.01
+			end
+		end
+			grenade:SetNWFloat("Fuze",self:GetNWFloat("Fuze"))
 		grenade:SetNWFloat("ImpactFuze",self:GetNWFloat("ImpactFuze"))
 		self:RunGrenadeCode(grenade)
 		local phys=grenade:GetPhysicsObject()

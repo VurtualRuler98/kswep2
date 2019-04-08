@@ -50,7 +50,9 @@ kswep_validitems= {
 	"nothing"
 }
 function kswep_timestop_check()
-	return (#ents.FindByClass("ent_stop_time")>0)
+	if (#ents.FindByClass("ent_stop_time")>0) then return true end
+	if (TW_TIMESTOPWORLD_ENABLED) then return true end
+	return false 
 end
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
