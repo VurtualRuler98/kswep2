@@ -18,10 +18,8 @@ limitations under the License.
 if (SERVER) then
 	AddCSLuaFile("shared.lua")
 	AddCSLuaFile("ai_translations.lua")
-	AddCSLuaFile("ballistics.lua")
 end
 include("ai_translations.lua")
-include("ballistics.lua")
 if (CLIENT) then
 	SWEP.PrintName = "Glock 17"
 	SWEP.Author = "vurtual"
@@ -2476,9 +2474,6 @@ function SWEP:Think()
 	if (not self.Owner:OnGround()) then
 		self:SetNWFloat("CurRecoil",self.MaxRecoil)
 	end
-	for k,v in pairs(self.Bullets) do
-		self.Bullets[k]=self:FlyBullet(v)
-	end
 	if (self.ReloadAnimTime~=0 and CurTime()>self.ReloadAnimTime and self:GetNWBool("CurrentlyReloading")==true) then
 		if (self.ClipReload) then
 			if (not self.ClipAllowSight or self.ClipAllowSight==self.Scopedata.name) then
@@ -3258,7 +3253,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 		if (self.Suppressed) then supmod=self.MuzzleVelModSup end
 		if (sndrange<140 and self.Ammo.velocity*self.MuzzleVelMod*supmod>1125) then sndrange=140 end
 		for k,v in pairs(ents.FindByClass("player")) do
-			self:CalcHearingLoss(sndrange,self.Owner:GetShootPos(),v)
+			KswepCalcHearingLoss(sndrange,self.Owner:GetShootPos(),v)
 		end
 	end
 end
@@ -3331,7 +3326,7 @@ function SWEP:FlyBulletStart(bullet)
 		drag_ticks=drag_ticks-1
 		drag_time=drag_time+1
 		drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
-		drag_vector=(drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
+		drag_vector=(drag_vector+(-1*KswepGetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
 		drop=drop-drag_vector.z*12*engine.TickInterval()
 	end	
 	local zerotime=drag_time --amount of frames it will take to fly the distance
@@ -3369,251 +3364,9 @@ function SWEP:FlyBulletStart(bullet)
 	shot.crackpos=shot.pos
 	shot.scale=1
 	shot.sky=not GetConVar("kswep_bullet_3dsky"):GetBool()
-	table.insert(self.Bullets,shot)
+	shot.weapon=self
+	table.insert(kswep_bullets,shot)
 end
-function SWEP:FlyBullet(shot)
-	if (kswep_timestop_check()) then return shot end
-	shot.ticks=shot.ticks-1
-	local travel
-	if (shot.dist~=nil) then
-		travel=shot.dist
-	else
-		travel = shot.pos + (shot.dragvector*12*engine.TickInterval())*shot.scale
-		--self.Owner:SetPos(travel)
-	end
-	local tr=util.TraceLine( {
-		filter = self.Owner,
-		start = shot.pos,
-		endpos = travel,
-		mask = bit.bor(MASK_SHOT,MASK_WATER)
-	})
-	local water
-	local waterlength=0
-	if (tr.Hit) then
-		water=tr
-		tr = util.TraceLine( {
-			filter = self.Owner,
-			start = shot.pos,
-			endpos = travel,
-			mask = MASK_SHOT
-			})
-		if (water.StartSolid) then water.Fraction=0 end
-		local backwater=util.TraceLine( {filter=self.Owner,start=tr.HitPos,endpos=shot.pos,mask=MASK_WATER})
-		if (backwater.StartSolid) then backwater.Fraction=0 end
-		waterlength=tr.Fraction-water.Fraction-(backwater.Fraction*tr.Fraction)
-	end
-	local drag=self:GetBetterDrag("G1",shot.dragvector:Length())/shot.bc
-	if (waterlength>0) then
-		drag=drag+(drag*100*waterlength)
-		if (not water.StartSolid) then
-			local fakebullet=table.Copy(shot.bullet)
-			fakebullet.Damage = 0
-			fakebullet.Src = shot.pos
-			fakebullet.AmmoType="pistol"
-			fakebullet.Force = 0
-			fakebullet.Distance=(shot.dragvector:Length()*12*engine.TickInterval())
-			self:FireShot(fakebullet)
-		end
-	end
-	local wind=Vector()
-	if (StormFox~=nil) then
-		windvel=StormFox.GetNetworkData("Wind")
-		windang=StormFox.GetNetworkData("WindAngle")
-		wind=Vector(math.sin(windang),math.cos(windang),0)*windvel*3.28
-	end
-	local oldspeed=shot.dragvector:Length()
-	shot.dragvector=shot.dragvector+(-1*drag)*(shot.dragvector-wind)*engine.TickInterval()-Vector(0,0,(386/12)*(engine.TickInterval()))
-	if (oldspeed-shot.dragvector:Length()>1125) then shot.dragvector=Vector(0,0,0) end
-	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.dragvector:Length()>100) then
-		shot.bullet.Src=shot.pos
-		--self.Owner:SetPos(tr.HitPos)
-		--local energybase=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].velocity^2
-		--local energynew=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*shot.dragvector:Length()^2
-		local energybase=(vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].diameter*vurtual_ammodata[shot.bullet.AmmoType].velocity)/7000
-		local energynew=(vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].diameter*shot.dragvector:Length())/7000
-		shot.bullet.Damage=shot.dmg*(energynew/energybase)
-		shot.bullet.Dir=shot.dragvector
-		shot.bullet.DamageCustom=self:CalcReducedArmorPen(vurtual_ammodata[shot.bullet.AmmoType].vestpenetration,energynew/energybase)
-		self:FireShot(shot.bullet)
-	
-	end
-	if ((not tr.Hit or (not tr.HitSky or not shot.sky)) and shot.pos:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
-		if (SERVER and tr.HitSky) then
-			local skycamera=ents.FindByClass("sky_camera")[1]
-			if (skycamera~=nil) then
-				local kv=skycamera:GetKeyValues()
-				travel=(travel/kv.scale)+skycamera:GetPos()
-				shot.scale=shot.scale/kv.scale
-				shot.sky=true
-				shot.pos=travel
-			else
-				return nil
-			end
-		elseif (tr.Hit) then
-			local armor=0
-			shot.dragvector, shot.pos, shot.dist=self:CalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
-		else
-			--386 inches per second also thanks justarandomgeek
-			shot.pos=travel
-			shot.dist=nil
-		end
-		if (shot.dragvector:Length()>100 and shot.ticks>0) then --TODO: better minimum lethal velocity
-			if (shot.dist~=nil) then
-			return self:FlyBullet(shot)
-			else
-			if (SERVER and shot.dragvector:Length()>1125) then
-				for k,v in pairs(player.GetAll()) do
-				shot["crack"..v:EntIndex()]=shot["crack"..v:EntIndex()] or -1
-				shot["crackpos"..v:EntIndex()]=shot["crackpos"..v:EntIndex()] or shot.pos
-				local cr=v:EyePos():Distance(shot.pos)
-				if ((cr<shot["crack"..v:EntIndex()] or shot["crack"..v:EntIndex()]==-1) and self.Owner:GetPos():Distance(shot.pos)<self.Owner:GetPos():Distance(v:EyePos()))then
-					shot["crack"..v:EntIndex()]=cr
-					shot["crackpos"..v:EntIndex()]=shot.pos
-				elseif (shot["crack"..v:EntIndex()]>0) then
-					shot["crack"..v:EntIndex()]=0
-					net.Start("kswep_supersonic")
-					net.WriteVector(shot["crackpos"..v:EntIndex()])
-					net.Send(v)
-					local sndrange=sound.GetProperties("kswep.supersonic").level
-					self:CalcHearingLoss(sndrange,shot.pos,v)
-				end
-				end
-			end
-			return shot
-			end
-		else
-			return nil
-		end
-	else
-		return nil
-	end
-end
-function SWEP:CalcHearingLoss(sndrange,start,ply)
-		local endpos=ply:EyePos()
-		local dist=endpos:Distance(start)
-		local db=sndrange*(512/dist)
-		if (db>sndrange) then db=sndrange end
-		if (db>130+ply.KEarPro and not util.TraceLine({start=start,endpos=endpos,mask=MASK_BLOCKLOS}).Hit) then
-			ply.KHearingRing=ply.KHearingRing+db-130-ply.KEarPro
-		end
-end
-function SWEP:CalcReducedArmorPen(rating,ratio) --mostly made up for now
-	local testvel=9999
-	if (rating==KSWEP_ARMOR_I) then
-		testvel=850
-	elseif (rating==KSWEP_ARMOR_IIA) then
-		testvel=1090
-	elseif (rating==KSWEP_ARMOR_II) then
-		testvel=1175
-	elseif (rating==KSWEP_ARMOR_IIIA) then
-		testvel=1400
-	elseif (rating==KSWEP_ARMOR_CRISAT) then --random
-		testvel=1650
-	elseif (rating==KSWEP_ARMOR_III) then --energy comparison, 308 and  SUPER FAST 9mm
-		testvel=3000
-	elseif (rating==KSWEP_ARMOR_IV) then --more fast
-		testvel=4000
-	end
-	testvel=testvel*ratio*0.95
-	local newpen=KSWEP_ARMOR_IV+1
-	if (testvel<850) then
-		newpen=KSWEP_ARMOR_I
-	elseif (testvel<1090) then
-		newpen=KSWEP_ARMOR_IIA
-	elseif (testvel<1175) then
-		newpen=KSWEP_ARMOR_II
-	elseif (testvel<1400) then
-		newpen=KSWEP_ARMOR_IIIA
-	elseif (testvel<1650) then
-		newpen=KSWEP_ARMOR_CRISAT
-	elseif (testvel<3000) then
-		newpen=KSWEP_ARMOR_III
-	elseif (testvel<4000) then
-		newpen=KSWEP_ARMOR_IV
-	end
-	return 55645+newpen
-end
-
-function SWEP:CalcPenetration(mat,shot,hitpos,travel,tex,ent)
-	local tr = util.TraceLine( {
-		filter = self.Owner,
-		start = hitpos,
-		endpos = travel,
-		mask = MASK_SHOT
-		})
-	local pen2=0
-	if (tr.HitWorld) then
-	local btr = util.TraceLine( {
-		filter = self.Owner,
-		start = hitpos+(travel*tr.FractionLeftSolid)+(tr.Normal*10),
-		endpos = hitpos,
-		mask = MASK_SHOT
-	})
-	pen2=self:MaterialPenetration(btr.MatType)
-	end	
-	local penetration=self:MaterialPenetration(mat)
-	if (pen2>penetration and penetration~=0) then
-		penetration=pen2
-	end
-	--kevlar simple fix
-	if (IsValid(ent) and ent:IsPlayer() and ent.ksarmor~=nil) then
-		if (GetConVar("kevlar_enabled"):GetBool()) then
-			penetration=0
-		end
-	end
-	local dist = nil
-	if (penetration>0) then
-		local propexit
-		local basespeed=vurtual_ammodata[shot.bullet.AmmoType].velocity --standard velocity of bullet
-		local wallcost=basespeed/vurtual_ammodata[shot.bullet.AmmoType].wallbang --how much speed is required to penetrate one unit of dirt
-		local barrier=tr.FractionLeftSolid*(hitpos:Distance(travel)) --Amount of wall we're going through
-		if (tr.FractionLeftSolid>0.9) then barrier=hitpos:Distance(travel) end
-		local hitprop=false
-		
-		if (((tr.HitNonWorld and IsValid(tr.Entity)) or (tr.SurfaceProps~=0 and tr.HitTexture=="**studio**" and util.GetSurfacePropName(tr.SurfaceProps)~="default")) and not tr.Entity:IsPlayer() and not tr.Entity:IsNPC()) then 
-		hitprop=true
-		local ent=tr.Entity
-		propexitobb=util.IntersectRayWithOBB(travel,hitpos-travel,ent:LocalToWorld(ent:OBBCenter()),ent:GetAngles(),ent:OBBMins(),ent:OBBMaxs())
-		propexit=util.TraceLine({
-			start=propexitobb,
-			endpos=hitpos,
-			mask=MASK_SHOT
-			}).HitPos
-		barrier=hitpos:Distance(propexit)
-		--local physpenetration=self:PhysMaterialPenetration(tr.Entity:GetPhysicsObject():GetMaterial())
-		--if (physpenetration~=0) then penetration=physpenetration end
-		end
-		local oldspeed=shot.dragvector:Length()
-		local speed=shot.dragvector:Length()-(wallcost*barrier*penetration)
-		local newvector=Vector()
-		if (tex=="**empty**" or tex=="**displacement**") then speed=0 end
-		if (tr.Entity:IsNPC()) then speed = 0 end
-		if (speed>0 and not tr.AllSolid) then
-			local fakebullet=table.Copy(shot.bullet)
-			fakebullet.Damage = 0
-			fakebullet.Dir=Vector()
-			fakebullet.Dir:Set(shot.dragvector:GetNormalized())
-			fakebullet.Src = hitpos+((travel-hitpos)*tr.FractionLeftSolid)+(tr.Normal*10)
-			fakebullet.Dir:Rotate(Angle(0,180,0))
-			fakebullet.Force =0
-			self:FireShot(fakebullet)
-			dist=travel
-			newvector=shot.dragvector*(speed/oldspeed)
-		end
-		local traveladj=hitpos+((travel-hitpos)*tr.FractionLeftSolid)+(tr.Normal*10)
-		if (hitprop) then 
-			traveladj=propexit+(tr.Normal*10)
-		end
-		return newvector,traveladj,dist--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
-	else return Vector(0,0,0),travel,dist  end
-end
-	--impact tseter
-		--[[if (SERVER) then
-		local ono=ents.Create("item_healthvial")
-		ono:SetPos(hitpos+(travel*tr.FractionLeftSolid))
-		ono:Spawn()
-		ono:GetPhysicsObject():EnableMotion(false)
-		end]] 
 net.Receive("kswepfirebulletclient",function()
 	LocalPlayer():FireBullets(net.ReadTable())
 end)
@@ -3681,27 +3434,6 @@ function SWEP:FireShot(bullet)
 		self.Owner:FireBullets(bullet)
 		bullet.Callback=nil
 	end
-end
-function SWEP:MaterialPenetration(mat)
-	local penetration = 0
-	if (mat==MAT_WOOD or MAT_DIRT or mat==MAT_PLASTIC or mat==MAT_GRATE or mat==MAT_GLASS or mat==MAT_FOLIAGE or mat==MAT_TILE) then
-		penetration = 0.1 --added MAT_DIRT for plaset walls. Dirt barriers should be thick anyway.
-	elseif (mat==MAT_GRASS or mat==MAT_FLESH or mat==MAT_SNOW or mat==MAT_SAND or mat==MAT_SLOSH or mat==MAT_BLOODYFLESH or mat==MAT_ALIENFLESH or mat==MAT_ANTLION or mat==MAT_CONCRETE or mat==MAT_VENT) then
-		penetration = 1
-	elseif (mat==MAT_METAL ) then
-		penetration = 2
-	end
-	return penetration
-end
-function SWEP:PhysMaterialPenetration(mat)
-	local penetration=0
-	if (mat=="dirt") then
-		penetration=0.1 --hopefully it's a couchnot 
-	end
-	if (mat=="metal_barrel" or mat=="metalvehicle") then
-		penetration=0.5
-	end
-	return penetration
 end
 function SWEP:GetShootAnim()
 	local anim=self.Anims.ShootAnim
