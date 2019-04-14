@@ -3362,79 +3362,17 @@ function SWEP:FlyBulletStart(bullet)
 	shot.dist = nil
 	shot.crack=-1
 	shot.crackpos=shot.pos
+	shot.flytime=0
 	shot.scale=1
 	shot.sky=not GetConVar("kswep_bullet_3dsky"):GetBool()
 	shot.weapon=self
+	shot.Owner=self.Owner
+	shot.filter=self.Owner
 	table.insert(kswep_bullets,shot)
 end
 net.Receive("kswepfirebulletclient",function()
 	LocalPlayer():FireBullets(net.ReadTable())
 end)
-function SWEP:FireShot(bullet)
-	if (false and GetConVar("kswep_phys"):GetBool()) then
-		local trdata={
-			start=bullet.Src,
-			endpos=bullet.Src+(bullet.Dir*56756),
-			filter=self.Owner,
-			mask=MASK_SHOT
-		}	
-		local tr= util.TraceLine(trdata)
-		if (SERVER) then
-			if (tr.Hit and tr.Entity) then
-				local dmginfo = DamageInfo()
-				dmginfo:SetAmmoType(game.GetAmmoID(bullet.AmmoType))
-				dmginfo:SetAttacker(self.Owner)
-				dmginfo:SetDamage(bullet.Damage)
-				dmginfo:SetDamageForce(Vector())
-				dmginfo:SetDamagePosition(tr.HitPos)
-				dmginfo:SetDamageType(DMG_BULLET)
-				dmginfo:SetInflictor(self)
-				dmginfo:SetReportedPosition(bullet.Src)
-				if (tr.Entity:IsPlayer() or tr.Entity:IsNPC()) then
-					KSDamageHandler(tr.Entity,tr.HitGroup,dmginfo)
-				end
-				tr.Entity:TakeDamageInfo(dmginfo)
-			end 
-			--[[if (tr.Hit) then
-				local decal="Impact.Metal"
-				net.Start("kswep_bulletimpact")
-				net.WriteInt(tr.MatType,8)
-				net.WriteVector(bullet.Src)
-				net.WriteVector(tr.HitPos+(bullet.Dir*10))
-				net.WriteEntity(self.Owner)
-				net.Send(player.GetAll())
-				if (tr.MatType==MAT_METAL) then
-					tr.Entity:EmitSound("MetalGrate.BulletImpact",100,100)
-				end
-				if (tr.MatType==MAT_GLASS) then
-					decal="Impact.Glass"
-				end
-				if (tr.MatType==MAT_FLESH) then
-					decal="Impact.Flesh"
-				end
-				if (tr.MatType==MAT_ALIENFLESH) then
-					decal="Impact.AlienFlesh"
-				end
-				util.Decal(decal,bullet.Src,tr.HitPos+(bullet.Dir*10),self.Owner)
-			end]]
-		end
-		return
-	end
-	if (SERVER or game.SinglePlayer()) then
-		if (not game.SinglePlayer() and self.Owner:IsPlayer()) then
-		net.Start("kswepfirebulletclient")
-		net.WriteTable(bullet)
-		net.Send(self.Owner)
-		end
-		if (bullet.DamageCustom) then
-			bullet.Callback=function(attacker,tr,dmginfo)
-				dmginfo:SetDamageCustom(bullet.DamageCustom)
-			end
-		end
-		self.Owner:FireBullets(bullet)
-		bullet.Callback=nil
-	end
-end
 function SWEP:GetShootAnim()
 	local anim=self.Anims.ShootAnim
 	if (self.InsAnims and self:GetNWBool("Sight")) then

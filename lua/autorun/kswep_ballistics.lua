@@ -1,5 +1,6 @@
 kswep_bullets={}
-CreateConVar("kswep_clearbullets",0,FCVAR_REPLICATED+FCVAR_ARCHIVE,"Should midair bullets disappear when a weapon is deeleted?")
+--CreateConVar("kswep_clearbullets",0,FCVAR_REPLICATED+FCVAR_ARCHIVE,"Should midair bullets disappear when a weapon is deeleted?")
+CreateConVar("kswep_shot_self_ticks",0,FCVAR_REPLICATED+FCVAR_ARCHIVE,"Can you be hit by your own bullets?")
 function KswepGetBetterDrag(func,speed)
 	local high=KswepGetDrag(func,speed+50)
 	local low=KswepGetDrag(func,speed-50)
@@ -73,7 +74,7 @@ function KswepCalcHearingLoss(sndrange,start,ply)
 end
 function KswepBulletThink()
 	for k,v in pairs(kswep_bullets) do
-		if (IsValid(v.weapon) or GetConVar("kswep_clearBullets"):GetBool()==false) then
+		if (IsValid(v.Owner)) then
 			kswep_bullets[k]=KswepFlyBullet(v)
 		else
 			kswep_bullets[k]=nil
@@ -84,14 +85,18 @@ hook.Add("Think","KswepBulletThink",KswepBulletThink)
 function KswepFlyBullet(shot)
 	if (kswep_timestop_check()) then return shot end
 	shot.ticks=shot.ticks-1
+	shot.flytime=shot.flytime+1
 	local travel
 	if (shot.dist~=nil) then
 		travel=shot.dist
 	else
 		travel = shot.pos + (shot.dragvector*12*engine.TickInterval())*shot.scale
 	end
+	if (GetConVar("kswep_shot_filter_self"):GetBool()==false) then
+		shot.filter=nil
+	end
 	local tr=util.TraceLine( {
-		filter = shot.weapon.Owner,
+		filter = shot.filter,
 		start = shot.pos,
 		endpos = travel,
 		mask = bit.bor(MASK_SHOT,MASK_WATER)
@@ -101,13 +106,13 @@ function KswepFlyBullet(shot)
 	if (tr.Hit) then
 		water=tr
 		tr = util.TraceLine( {
-			filter = shot.weapon.Owner,
+			filter = shot.filter,
 			start = shot.pos,
 			endpos = travel,
 			mask = MASK_SHOT
 			})
 		if (water.StartSolid) then water.Fraction=0 end
-		local backwater=util.TraceLine( {filter=shot.weapon.Owner,start=tr.HitPos,endpos=shot.pos,mask=MASK_WATER})
+		local backwater=util.TraceLine( {filter=shot.filter,start=tr.HitPos,endpos=shot.pos,mask=MASK_WATER})
 		if (backwater.StartSolid) then backwater.Fraction=0 end
 		waterlength=tr.Fraction-water.Fraction-(backwater.Fraction*tr.Fraction)
 	end
@@ -121,7 +126,7 @@ function KswepFlyBullet(shot)
 			fakebullet.AmmoType="pistol"
 			fakebullet.Force = 0
 			fakebullet.Distance=(shot.dragvector:Length()*12*engine.TickInterval())
-			shot.weapon:FireShot(fakebullet)
+			KswepFireShot(shot,fakebullet)
 		end
 	end
 	local wind=Vector()
@@ -142,7 +147,7 @@ function KswepFlyBullet(shot)
 		shot.bullet.Damage=shot.dmg*(energynew/energybase)
 		shot.bullet.Dir=shot.dragvector
 		shot.bullet.DamageCustom=KswepCalcReducedArmorPen(vurtual_ammodata[shot.bullet.AmmoType].vestpenetration,energynew/energybase)
-		shot.weapon:FireShot(shot.bullet)
+		KswepFireShot(shot,shot.bullet)
 	
 	end
 	if ((not tr.Hit or (not tr.HitSky or not shot.sky)) and shot.pos:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
@@ -174,7 +179,7 @@ function KswepFlyBullet(shot)
 				shot["crack"..v:EntIndex()]=shot["crack"..v:EntIndex()] or -1
 				shot["crackpos"..v:EntIndex()]=shot["crackpos"..v:EntIndex()] or shot.pos
 				local cr=v:EyePos():Distance(shot.pos)
-				if ((cr<shot["crack"..v:EntIndex()] or shot["crack"..v:EntIndex()]==-1) and shot.weapon.Owner:GetPos():Distance(shot.pos)<shot.weapon.Owner:GetPos():Distance(v:EyePos()))then
+				if ((cr<shot["crack"..v:EntIndex()] or shot["crack"..v:EntIndex()]==-1) and shot.Owner:GetPos():Distance(shot.pos)<shot.Owner:GetPos():Distance(v:EyePos()))then
 					shot["crack"..v:EntIndex()]=cr
 					shot["crackpos"..v:EntIndex()]=shot.pos
 				elseif (shot["crack"..v:EntIndex()]>0) then
@@ -235,7 +240,7 @@ end
 
 function KswepCalcPenetration(mat,shot,hitpos,travel,tex,ent)
 	local tr = util.TraceLine( {
-		filter = shot.weapon.Owner,
+		filter = shot.filter,
 		start = hitpos,
 		endpos = travel,
 		mask = MASK_SHOT
@@ -243,7 +248,7 @@ function KswepCalcPenetration(mat,shot,hitpos,travel,tex,ent)
 	local pen2=0
 	if (tr.HitWorld) then
 	local btr = util.TraceLine( {
-		filter = shot.weapon.Owner,
+		filter = shot.filter,
 		start = hitpos+(travel*tr.FractionLeftSolid)+(tr.Normal*10),
 		endpos = hitpos,
 		mask = MASK_SHOT
@@ -295,7 +300,7 @@ function KswepCalcPenetration(mat,shot,hitpos,travel,tex,ent)
 			fakebullet.Src = hitpos+((travel-hitpos)*tr.FractionLeftSolid)+(tr.Normal*10)
 			fakebullet.Dir:Rotate(Angle(0,180,0))
 			fakebullet.Force =0
-			shot.weapon:FireShot(fakebullet)
+			KswepFireShot(shot,fakebullet)
 			dist=travel
 			newvector=shot.dragvector*(speed/oldspeed)
 		end
@@ -326,4 +331,35 @@ function KswepPhysMaterialPenetration(mat)
 		penetration=0.5
 	end
 	return penetration
+end
+function KswepFireShot(shot,bullet)
+	if (SERVER or game.SinglePlayer()) then
+		if (not game.SinglePlayer() and shot.Owner:IsPlayer()) then
+		net.Start("kswepfirebulletclient")
+		net.WriteTable(bullet)
+		net.Send(shot.Owner)
+		end
+		if (bullet.DamageCustom) then
+			bullet.Callback=function(attacker,tr,dmginfo)
+				dmginfo:SetDamageCustom(bullet.DamageCustom)
+				dmginfo:SetAttacker(shot.Owner)
+				dmginfo:SetInflictor(shot.Owner)
+			end
+		end
+		local shooter=shot.Owner
+		local self_ticks = GetConVar("kswep_shot_self_ticks"):GetInt()
+		if (self_ticks>0 and self_ticks<shot.flytime) then
+			local trdata={
+				start=bullet.Src,
+				endpos=bullet.Src+(bullet.Dir*56756),
+				mask=MASK_SHOT
+			}
+			local tr=util.TraceLine(trdata)
+			if (tr.Hit and tr.Entity==shot.Owner) then
+				shooter=ents.GetByIndex(0)
+			end
+		end
+		shooter:FireBullets(bullet)
+		bullet.Callback=nil
+	end
 end
