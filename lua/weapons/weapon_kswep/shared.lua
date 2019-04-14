@@ -3368,6 +3368,7 @@ function SWEP:FlyBulletStart(bullet)
 	shot.weapon=self
 	shot.Owner=self.Owner
 	shot.filter=self.Owner
+	shot.stopped=false
 	table.insert(kswep_bullets,shot)
 end
 net.Receive("kswepfirebulletclient",function()

@@ -83,7 +83,17 @@ function KswepBulletThink()
 end
 hook.Add("Think","KswepBulletThink",KswepBulletThink)
 function KswepFlyBullet(shot)
-	if (kswep_timestop_check()) then return shot end
+	if (kswep_timestop_check()) then
+		if (SERVER and not shot.stopped) then
+			local shotmodel = ents.Create("sent_kweps_bullet")
+			shotmodel:SetPos(shot.pos)
+			shotmodel:SetAngles(shot.dragvector:Angle())
+			shotmodel:Spawn()
+			shot.stopped=true
+		end
+		return shot
+	end
+	shot.stopped=false
 	shot.ticks=shot.ticks-1
 	shot.flytime=shot.flytime+1
 	local travel
@@ -91,9 +101,6 @@ function KswepFlyBullet(shot)
 		travel=shot.dist
 	else
 		travel = shot.pos + (shot.dragvector*12*engine.TickInterval())*shot.scale
-	end
-	if (GetConVar("kswep_shot_filter_self"):GetBool()==false) then
-		shot.filter=nil
 	end
 	local tr=util.TraceLine( {
 		filter = shot.filter,
