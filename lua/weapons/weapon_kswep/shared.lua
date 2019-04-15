@@ -3385,6 +3385,10 @@ function SWEP:FlyBulletStart(bullet)
 		shot.tracestart=self.Ammo.tracestart
 		shot.shown=false --set to true when the shot appears
 	end
+	shot.basemodel = self.Ammo.basemodel
+	shot.basemodelscale = self.Ammo.basemodelscale
+	shot.basematerial = self.Ammo.basematerial
+	shot.basecolor = self.Ammo.basecolor
 	table.insert(kswep_bullets,shot)
 end
 net.Receive("kswepfirebulletclient",function()

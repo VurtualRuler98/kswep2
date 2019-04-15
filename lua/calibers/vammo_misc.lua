@@ -460,6 +460,9 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.wallbang = 3
 	tbl.mass=60
 	tbl.velocity = 1200 --00buck
+	tbl.basemodel = "models/props_phx/gibs/flakgib1.mdl"
+	tbl.basemodelscale = 0.05
+	tbl.basematerial = "phoenix_storms/pack2/darkgrey"
 	AddAmmodata(tbl)
 	local tbl = table.Copy(kswep_default_ammo)
 	tbl.name="vammo_12gauge_flechette"
@@ -479,6 +482,9 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.wallbang = 7 --good penetrator?
 	tbl.mass=10 --SPIW XM144
 	tbl.velocity = 1200 --00buck
+	tbl.basemodel = "models/weapons/w_stunbaton.mdl"
+	tbl.basemodelscale = 0.05
+	tbl.basematerial = "phoenix_storms/pack2/darkgrey"
 	AddAmmodata(tbl)
 
 	local tbl = table.Copy(kswep_default_ammo)
@@ -500,6 +506,9 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.mass=300
 	tbl.velocity = 1800
 	tbl.wallbang = 7
+	tbl.basemodel = "models/weapons/shotgun_shell.mdl"
+	tbl.basemodelscale = 0.5
+	tbl.basematerial = "phoenix_storms/pack2/darkgrey"
 	AddAmmodata(tbl)
 
 

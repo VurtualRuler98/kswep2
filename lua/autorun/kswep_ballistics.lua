@@ -100,6 +100,10 @@ function KswepFlyBullet(shot)
 			shotmodel:SetAngles(shot.dragvector:Angle())
 			shotmodel.stopped=true
 			shotmodel:Spawn()
+			shotmodel:SetModel(shot.basemodel)
+			shotmodel:SetModelScale(shot.basemodelscale)
+			shotmodel:SetColor(shot.basecolor)
+			shotmodel:SetMaterial(shot.basematerial)
 			shot.stopped=true
 		end
 		if (SERVER and not shot.stopped and shot.visible and not shot.shown) then
