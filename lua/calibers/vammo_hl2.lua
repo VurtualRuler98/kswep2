@@ -5,7 +5,7 @@ end
 hook.Add("VurtualAmmotypes","vammo_hl2", function()
 
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.name="SMG1"
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=4
@@ -20,7 +20,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.mass=31
 	AddAmmodata(tbl)
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.name="Pistol"
 	tbl.vestpenetration=KSWEP_ARMOR_II
 	tbl.dmgbase=5
@@ -36,7 +36,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.mass=115
 	AddAmmodata(tbl)
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.name="Buckshot"
 	tbl.vestpenetration=0
 	tbl.dmgbase=8
@@ -52,7 +52,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.mass=60
 	AddAmmodata(tbl)
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.name="AR2"
 	tbl.vestpenetration=KSWEP_ARMOR_CRISAT
 	tbl.dmgbase=8
@@ -68,7 +68,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.mass=100 --idk
 	AddAmmodata(tbl)
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.name="357"
 	tbl.vestpenetration=KSWEP_ARMOR_II
 	tbl.dmgbase=8

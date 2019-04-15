@@ -1,6 +1,6 @@
 if (SERVER) then AddCSLuaFile() end
 hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_II --weakest armor that can stop it
 	tbl.name = "vammo_9x19_FMJ" --unique name of ammo
 	tbl.printname = "9x19mm FMJ" --printname we show
@@ -19,7 +19,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.velocity =	1300 --115gr fmj fps
 	tbl.mass=115
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_CRISAT
 	tbl.dmgbase = 8
 	tbl.dmgvitalmin = 5
@@ -39,7 +39,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.mass=110
 	AddAmmodata(tbl)
 	
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_IIA
 	tbl.dmgbase = 4
 	tbl.dmgvitalmin = 5
@@ -58,7 +58,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.velocity = 1030 --makarov
 	tbl.mass=93
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase = 4
 	tbl.dmgvitalmin = 4
@@ -77,7 +77,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.mass=55
 	tbl.velocity = 820 --makarov
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_IIA
 	tbl.dmgbase = 4
 	tbl.dmgvitalmax = 7
@@ -97,7 +97,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.velocity = 840 --PPK
 	AddAmmodata(tbl)
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_IIA
 	tbl.dmgbase = 4
 	tbl.dmgvitalmin = 4
@@ -116,7 +116,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.mass=125 --verify
 	tbl.velocity = 1000 --Model 10
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_IIA
 	tbl.dmgbase=5
 	tbl.dmgvitalmin=8
@@ -136,7 +136,7 @@ hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	tbl.recoil = 1
 	AddAmmodata(tbl)
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_IIIA
 	tbl.dmgbase=6
 	tbl.dmgvitalmin=5

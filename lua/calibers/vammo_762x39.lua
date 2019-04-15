@@ -2,7 +2,7 @@ if (SERVER) then
 	AddCSLuaFile()
 end
 hook.Add("VurtualAmmotypes","vammo_762x39", function()
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=12
 	tbl.dmgvitalmin=4
@@ -22,7 +22,7 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	tbl.velocity = 2346 --AKM muzzle velocity
 	tbl.recoil = 6
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=12
 	tbl.dmgvitalmin=6
@@ -44,7 +44,7 @@ hook.Add("VurtualAmmotypes","vammo_762x39", function()
 	tbl.velocity = 2363 --16in barrel, roughly yugo spec
 	tbl.recoil = 6
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=6
 	tbl.dmgvitalmin=6

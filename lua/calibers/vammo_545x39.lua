@@ -2,7 +2,7 @@ if (SERVER) then
 	AddCSLuaFile()
 end
 hook.Add("VurtualAmmotypes","vammo_545x39", function()
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III --TODO make this different
 	tbl.dmgbase=10
 	tbl.dmgvitalmin=5
@@ -22,7 +22,7 @@ hook.Add("VurtualAmmotypes","vammo_545x39", function()
 	tbl.velocity = 2900 --16.3in barrel
 	tbl.wallbang = 6
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=10
 	tbl.dmgvitalmin=5

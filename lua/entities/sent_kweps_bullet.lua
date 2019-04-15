@@ -6,6 +6,7 @@ ENT.Category    = "Vurtual's base"
 
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
+ENT.stopped=true
 if (CLIENT) then
 function ENT:Draw()
         self.Entity:DrawModel()
@@ -23,10 +24,11 @@ function ENT:Initialize()
         self.Entity:SetMoveType( MOVETYPE_NONE )
         self.Entity:SetCollisionGroup(COLLISION_GROUP_NONE)
         self.Entity:SetUseType(SIMPLE_USE)
+	self.Entity:SetRenderMode( RENDERMODE_TRANSALPHA )
 end
 end
 function ENT:Think()
-	if (SERVER and not kswep_timestop_check()) then
+	if (SERVER and self.stopped and not kswep_timestop_check()) then
 		self:Remove()
 	end
 end

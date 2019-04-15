@@ -2,7 +2,7 @@ if (SERVER) then
 	AddCSLuaFile()
 end
 hook.Add("VurtualAmmotypes","vammo_misc", function()
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=20
 	tbl.dmgvitalmin=6
@@ -21,9 +21,10 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity = 3260
 	tbl.mass=195 --random hornady ammo
 	tbl.wallbang = 6
+	tbl.visible=false
 	AddAmmodata(tbl)
 	
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=15
 	tbl.dmgvitalmin=5
@@ -42,8 +43,9 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.wallbang = 6
 	tbl.velocity = 2733 --24 in barrel
 	tbl.mass=147
+	tbl.visible=false
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=10
 	tbl.dmgvitalmin=6
@@ -62,10 +64,11 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.recoil = 5
 	tbl.velocity = 990 --24 in barrel
 	tbl.mass=175 --random google result
+	tbl.visible=false
 	AddAmmodata(tbl)
 	
 	
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=16
 	tbl.dmgvitalmin=5
@@ -85,7 +88,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity = 2700
 	tbl.mass=152
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=16
 	tbl.dmgvitalmin=5
@@ -105,7 +108,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity = 2838
 	tbl.mass=147
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=17
 	tbl.dmgvitalmin=6
@@ -125,7 +128,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.wallbang = 4
 	tbl.velocity = 2800
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=17
 	tbl.coefficient=0.478
@@ -145,7 +148,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.mass=174
 	tbl.velocity = 2441
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=17
 	tbl.dmgvitalmin=6
@@ -165,7 +168,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.mass=198
 	tbl.velocity = 2493
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=12
 	tbl.dmgvitalmin=6
@@ -185,7 +188,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.wallbang = 4
 	tbl.velocity = 2250
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_IV
 	tbl.dmgbase=17
 	tbl.dmgvitalmin=4
@@ -205,7 +208,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.wallbang = 10
 	tbl.velocity = 2715
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=0
 	tbl.dmgbase=0
 	tbl.dmgvitalmin=0
@@ -225,7 +228,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.mass=20 --idk
 	tbl.velocity = 1000
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_IV+1
 	tbl.dmgbase=15
 	tbl.dmgvitalmin=4
@@ -246,7 +249,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.recoil = 12
 	AddAmmodata(tbl)
 	
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=15
 	tbl.dmgvitalmin=6.5
@@ -265,7 +268,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.wallbang = 5
 	tbl.velocity = 2580 --M118LR is the same projectile
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=15
 	tbl.dmgvitalmin=6.5
@@ -285,7 +288,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity = 2452 --real life ~m40a1 velocity divided by the muzzle mod of the m40a1 itself
 	AddAmmodata(tbl)
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=0
 	tbl.coefficient=1
 	tbl.dmgbase=0
@@ -304,7 +307,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.mass=20
 	tbl.velocity =	1000 --tranq
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_II
 	tbl.dmgbase=5
 	tbl.coefficient=0.196
@@ -323,7 +326,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity = 825 --1911
 	tbl.mass=230
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_II
 	tbl.dmgbase=6
 	tbl.dmgvitalmin=5
@@ -342,7 +345,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.mass=86
 	tbl.velocity = 1400 --C96
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_I
 	tbl.dmgbase = 5
 	tbl.dmgvitalmin = 1
@@ -379,7 +382,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.mass=32
 	tbl.velocity =	1640
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_IIIA
 	tbl.dmgbase = 7
 	tbl.coefficient=0.284
@@ -398,7 +401,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.mass=110
 	tbl.velocity =	1100 --110gr FMJ
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_IIIA
 	tbl.dmgbase = 7
 	tbl.dmgvitalmin = 8
@@ -418,7 +421,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity =	1100 --estimated
 	AddAmmodata(tbl)
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=15
 	tbl.dmgvitalmin=6
@@ -439,7 +442,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.recoil = 12
 	AddAmmodata(tbl)
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.name="vammo_12gauge_00buck"
 	tbl.printname = "12 Gauge 00 Buck"
 	tbl.caliber = "vammo_12gauge"
@@ -458,7 +461,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.mass=60
 	tbl.velocity = 1200 --00buck
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.name="vammo_12gauge_flechette"
 	tbl.printname = "12 Gauge Flechette"
 	tbl.caliber = "vammo_12gauge"
@@ -478,7 +481,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity = 1200 --00buck
 	AddAmmodata(tbl)
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.name="vammo_12gauge_slug"
 	tbl.printname = "12 Gauge Slug"
 	tbl.caliber = "vammo_12gauge"
@@ -501,7 +504,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 
 
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_II --VERIFY
 	tbl.dmgbase=4
 	tbl.coefficient=0.157
@@ -523,7 +526,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	AddAmmodata(tbl)
 	
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.name="vammo_410_000buck"
 	tbl.printname = ".410 000 Buck"
 	tbl.caliber = "vammo_410"
@@ -543,7 +546,7 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.velocity = 1300
 	AddAmmodata(tbl)
 	
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase=2
 	tbl.coefficient=0.2 --random guess

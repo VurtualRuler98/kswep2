@@ -3369,6 +3369,17 @@ function SWEP:FlyBulletStart(bullet)
 	shot.Owner=self.Owner
 	shot.filter=self.Owner
 	shot.stopped=false
+	shot.visible = self.Ammo.visible
+	if (SERVER and shot.visible) then
+		shot.model = ents.Create("sent_kweps_bullet")
+		shot.model:SetPos(shot.pos)
+		shot.model:SetAngles(shot.dragvector:Angle())
+		shot.model.stopped = false
+		shot.model:Spawn()
+		shot.model:SetModel(self.Ammo.model)
+		shot.model:SetColor(Color(0,0,0,0))
+		shot.color=self.Ammo.color
+	end
 	table.insert(kswep_bullets,shot)
 end
 net.Receive("kswepfirebulletclient",function()

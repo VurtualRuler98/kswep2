@@ -84,10 +84,11 @@ end
 hook.Add("Think","KswepBulletThink",KswepBulletThink)
 function KswepFlyBullet(shot)
 	if (kswep_timestop_check()) then
-		if (SERVER and not shot.stopped) then
+		if (SERVER and not shot.stopped and not shot.visible) then
 			local shotmodel = ents.Create("sent_kweps_bullet")
 			shotmodel:SetPos(shot.pos)
 			shotmodel:SetAngles(shot.dragvector:Angle())
+			shotmodel.stopped=true
 			shotmodel:Spawn()
 			shot.stopped=true
 		end
@@ -95,6 +96,13 @@ function KswepFlyBullet(shot)
 	end
 	shot.stopped=false
 	shot.ticks=shot.ticks-1
+	if (SERVER and shot.visible) then
+		shot.model:SetPos(shot.pos)
+		shot.model:SetAngles(shot.dragvector:Angle())
+		if (shot.flytime == 3) then
+			shot.model:SetColor(shot.color)
+		end
+	end
 	shot.flytime=shot.flytime+1
 	local travel
 	if (shot.dist~=nil) then
@@ -167,6 +175,9 @@ function KswepFlyBullet(shot)
 				shot.sky=true
 				shot.pos=travel
 			else
+				if (SERVER and shot.visible) then
+					shot.model:Remove()
+				end
 				return nil
 			end
 		elseif (tr.Hit) then
@@ -202,9 +213,15 @@ function KswepFlyBullet(shot)
 			return shot
 			end
 		else
+			if (SERVER and shot.visible) then
+				shot.model:Remove()
+			end
 			return nil
 		end
 	else
+		if (SERVER and shot.visible) then
+			shot.model:Remove()
+		end
 		return nil
 	end
 end

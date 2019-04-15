@@ -76,6 +76,24 @@ for k,v in pairs(files) do
 end
 function KSwepSetupAmmoTypes()
 	vurtual_ammodata = {}
+        kswep_default_ammo = {}
+	local tbl = kswep_default_ammo
+        tbl.name="DEFAULT"
+        tbl.vestpenetration=KSWEP_ARMOR_II
+        tbl.dmgbase=1
+        tbl.dmgvitalmin=1
+        tbl.dmgvitalmax=1
+        tbl.projectiles = 1
+        tbl.spreadscale = 1
+        tbl.chokescale = 0
+        tbl.hitscale = 1
+        tbl.damagescale = 1
+        tbl.diameter=0.355
+        tbl.velocity = 1300 --115gr fmj
+        tbl.mass=115
+	tbl.visible = false
+	tbl.model = ""
+	tbl.color = Color(255,255,255,128)
 	hook.Run("VurtualAmmotypes")
 	vurtual_ammotypes = {"ar2",null,"pistol","smg1","357",null,"shotgun"}
 	local customammotypes=game.BuildAmmoTypes()

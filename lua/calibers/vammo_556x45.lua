@@ -2,7 +2,7 @@ if (SERVER) then
 	AddCSLuaFile()
 end
 hook.Add("VurtualAmmotypes","vammo_556x45", function()
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase = 10
 	tbl.dmgvitalmin = 6
@@ -22,7 +22,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.velocity = 3165 --20" barrel
 	tbl.wallbang = 4
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=0
 	tbl.dmgbase = 0
 	tbl.dmgvitalmin = 0
@@ -42,7 +42,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.velocity = 3165 --20" barrel
 	tbl.wallbang = 0
 	AddAmmodata(tbl)
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase = 10
 	tbl.dmgvitalmin = 5
@@ -63,7 +63,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.wallbang = 6
 	AddAmmodata(tbl)
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_IV+1
 	tbl.dmgbase = 10
 	tbl.dmgvitalmin = 4
@@ -84,7 +84,7 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.velocity = 3324 --20" barrel I think?
 	AddAmmodata(tbl)
 
-	local tbl = {}
+	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III
 	tbl.dmgbase = 10
 	tbl.dmgvitalmin = 6.5
