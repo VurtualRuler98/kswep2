@@ -100,6 +100,7 @@ function KSwepSetupAmmoTypes()
 	tbl.material = ""
 	tbl.color = Color(255,255,255,128)
 	tbl.tracetime=0
+	tbl.tracestart=0
 	hook.Run("VurtualAmmotypes")
 	if (vurtual_ammotypes == nil) then --legacy code, probably not needed
 		vurtual_ammotypes = {"ar2",null,"pistol","smg1","357",null,"shotgun"}

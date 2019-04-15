@@ -3373,7 +3373,7 @@ function SWEP:FlyBulletStart(bullet)
 	shot.tranq = self.Ammo.tranq
 	if (SERVER and shot.visible) then
 		shot.model = ents.Create("sent_kweps_bullet")
-		shot.model:SetPos(shot.pos)
+		shot.model:SetPos(shot.pos+shot.dragvector*engine.TickInterval())
 		shot.model:SetAngles(shot.dragvector:Angle())
 		shot.model.stopped = false
 		shot.model:Spawn()
@@ -3382,6 +3382,7 @@ function SWEP:FlyBulletStart(bullet)
 		shot.color=self.Ammo.color
 		shot.material=self.Ammo.material
 		shot.tracetime=self.Ammo.tracetime
+		shot.tracestart=self.Ammo.tracestart
 		shot.shown=false --set to true when the shot appears
 	end
 	table.insert(kswep_bullets,shot)
