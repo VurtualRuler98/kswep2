@@ -3380,6 +3380,9 @@ function SWEP:FlyBulletStart(bullet)
 		shot.model:SetModel(self.Ammo.model)
 		shot.model:SetColor(Color(0,0,0,0))
 		shot.color=self.Ammo.color
+		shot.material=self.Ammo.material
+		shot.tracetime=self.Ammo.tracetime
+		shot.shown=false --set to true when the shot appears
 	end
 	table.insert(kswep_bullets,shot)
 end

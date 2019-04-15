@@ -22,6 +22,15 @@ hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	tbl.velocity = 3165 --20" barrel
 	tbl.wallbang = 4
 	AddAmmodata(tbl)
+	local tbl=table.Copy(tbl)
+	tbl.name = "vammo_556x45_m196"
+	tbl.visible=true
+	tbl.model="models/gibs/furniture_gibs/furnituretable001a_chunk06.mdl"
+	tbl.material="models/vortigaunt/pupil"
+	tbl.color=Color(255,0,0,128)
+	tbl.printname="5.56x45mm M196 Tracer"
+	tbl.tracetime = 0.7
+	AddAmmodata(tbl)
 	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=0
 	tbl.dmgbase = 0

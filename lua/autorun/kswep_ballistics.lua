@@ -102,6 +102,11 @@ function KswepFlyBullet(shot)
 			shotmodel:Spawn()
 			shot.stopped=true
 		end
+		if (SERVER and not shot.stopped and shot.visible and not shot.shown) then
+			shot.shown=true
+			shot.model:SetColor(shot.color)
+			shot.model:SetMaterial(shot.material)
+		end
 		return shot
 	end
 	shot.stopped=false
@@ -109,9 +114,17 @@ function KswepFlyBullet(shot)
 	if (SERVER and shot.visible) then
 		shot.model:SetPos(shot.pos)
 		shot.model:SetAngles(shot.dragvector:Angle())
-		if (shot.flytime == 3) then
+		if (not shot.shown and shot.flytime > 1) then
 			shot.model:SetColor(shot.color)
+			shot.model:SetMaterial(shot.material)
+			shot.shown=true
 		end
+		if (shot.flytime*engine.TickInterval()>shot.tracetime) then
+			shot.visible=false
+			shot.shown=false
+			shot.model:Remove()
+			shot.model=nil
+		end	
 	end
 	shot.flytime=shot.flytime+1
 	local travel
