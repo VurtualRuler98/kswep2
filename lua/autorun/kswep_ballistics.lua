@@ -1,4 +1,5 @@
 kswep_bullets={}
+kswep_tranqtargets = {}
 --CreateConVar("kswep_clearbullets",0,FCVAR_REPLICATED+FCVAR_ARCHIVE,"Should midair bullets disappear when a weapon is deeleted?")
 CreateConVar("kswep_shot_self_ticks",0,FCVAR_REPLICATED+FCVAR_ARCHIVE,"Can you be hit by your own bullets?")
 function KswepGetBetterDrag(func,speed)
@@ -78,6 +79,15 @@ function KswepBulletThink()
 			kswep_bullets[k]=KswepFlyBullet(v)
 		else
 			kswep_bullets[k]=nil
+		end
+	end
+	for k,v in pairs(kswep_tranqtargets) do
+		if (IsValid(v.Owner)) then
+			if (v.time<CurTime()) then
+				kswep_tranqtargets[k]=KswepTranqSecond(v)
+			end
+		else
+			kswep_tranqtargets[k]=nil
 		end
 	end
 end
@@ -357,33 +367,74 @@ function KswepPhysMaterialPenetration(mat)
 	return penetration
 end
 function KswepFireShot(shot,bullet)
-	if (SERVER or game.SinglePlayer()) then
-		if (not game.SinglePlayer() and shot.Owner:IsPlayer()) then
-		net.Start("kswepfirebulletclient")
-		net.WriteTable(bullet)
-		net.Send(shot.Owner)
-		end
-		if (bullet.DamageCustom) then
-			bullet.Callback=function(attacker,tr,dmginfo)
-				dmginfo:SetDamageCustom(bullet.DamageCustom)
-				dmginfo:SetAttacker(shot.Owner)
-				dmginfo:SetInflictor(shot.Owner)
+	if (shot.tranq>0) then 
+		local tr=util.TraceLine({
+			start=bullet.Src,
+			endpos=bullet.Src+bullet.Dir*10000,
+			filter=shot.Owner,
+			mask=MASK_SHOT
+		})
+	       if (IsValid(tr.Entity) and (tr.Entity:IsPlayer() or tr.Entity:IsNPC())) then
+			if (SERVER) then
+				local dmg
+				if (tr.HitGroup==HITGROUP_CHEST) then
+					dmg=20*shot.tranq
+				elseif (tr.HitGroup==HITGROUP_HEAD) then
+					dmg=100*shot.tranq
+				else
+					dmg=5*shot.tranq
+				end
+				local tranq = {dmg=dmg,ent=tr.Entity,Owner=shot.Owner,time=0}
+				table.insert(kswep_tranqtargets,tranq)
 			end
+
+			sound.Play("weapon_tmosin.HitBody",tr.HitPos)
+		else
+			sound.Play("weapon_tmosin.HitWorld",tr.HitPos)
 		end
-		local shooter=shot.Owner
-		local self_ticks = GetConVar("kswep_shot_self_ticks"):GetInt()
-		if (self_ticks>0 and self_ticks<shot.flytime) then
-			local trdata={
-				start=bullet.Src,
-				endpos=bullet.Src+(bullet.Dir*56756),
-				mask=MASK_SHOT
-			}
-			local tr=util.TraceLine(trdata)
-			if (tr.Hit and tr.Entity==shot.Owner) then
-				shooter=ents.GetByIndex(0)
+	else
+		if (SERVER or game.SinglePlayer()) then
+			if (not game.SinglePlayer() and shot.Owner:IsPlayer()) then
+			net.Start("kswepfirebulletclient")
+			net.WriteTable(bullet)
+			net.Send(shot.Owner)
 			end
+			if (bullet.DamageCustom) then
+				bullet.Callback=function(attacker,tr,dmginfo)
+					dmginfo:SetDamageCustom(bullet.DamageCustom)
+					dmginfo:SetAttacker(shot.Owner)
+					dmginfo:SetInflictor(shot.Owner)
+				end
+			end
+			local shooter=shot.Owner
+			local self_ticks = GetConVar("kswep_shot_self_ticks"):GetInt()
+			if (self_ticks>0 and self_ticks<shot.flytime) then
+				local trdata={
+					start=bullet.Src,
+					endpos=bullet.Src+(bullet.Dir*56756),
+					mask=MASK_SHOT
+				}
+				local tr=util.TraceLine(trdata)
+				if (tr.Hit and tr.Entity==shot.Owner) then
+					shooter=ents.GetByIndex(0)
+				end
+			end
+			shooter:FireBullets(bullet)
+			bullet.Callback=nil
 		end
-		shooter:FireBullets(bullet)
-		bullet.Callback=nil
 	end
 end
+function KswepTranqSecond(tranq)
+	if (not IsValid(tranq.ent)) then return nil end
+	tranq.time=CurTime()+1
+	local d=DamageInfo()
+	d:SetDamageType(DMG_PREVENT_PHYSICS_FORCE)
+	d:SetAttacker(tranq.ent)
+	d:SetInflictor(tranq.ent)
+	d:SetDamage(tranq.dmg)
+	tranq.ent:TakeDamageInfo(d)
+	if (IsValid(tranq.ent) and tranq.ent:IsNPC()) then
+		return tranq
+	end
+	return nil
+end	

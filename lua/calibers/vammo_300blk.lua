@@ -42,7 +42,8 @@ hook.Add("VurtualAmmotypes","vammo_300blk", function()
 	tbl.velocity = 1000 --16" barrel
 	tbl.wallbang = 0
 	tbl.visible=true
-	tbl.model = "models/Items/Flare.mdl"
+	tbl.tranq=1
+	tbl.model = "models/weapons/flare.mdl"
 	tbl.color = Color(128,128,128,128)
 	AddAmmodata(tbl)
 

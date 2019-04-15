@@ -95,6 +95,7 @@ function KSwepSetupAmmoTypes()
         tbl.velocity = 1300 --115gr fmj
         tbl.mass=115
 	tbl.visible = false
+	tbl.tranq = 0
 	tbl.model = ""
 	tbl.color = Color(255,255,255,128)
 	hook.Run("VurtualAmmotypes")

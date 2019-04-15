@@ -3370,6 +3370,7 @@ function SWEP:FlyBulletStart(bullet)
 	shot.filter=self.Owner
 	shot.stopped=false
 	shot.visible = self.Ammo.visible
+	shot.tranq = self.Ammo.tranq
 	if (SERVER and shot.visible) then
 		shot.model = ents.Create("sent_kweps_bullet")
 		shot.model:SetPos(shot.pos)
