@@ -121,7 +121,7 @@ function KswepFlyBullet(shot)
 				shot.shown=true
 			--end
 		end
-		if (shot.flytime*engine.TickInterval()>shot.tracetime) then
+		if (shot.tracetime>0 and shot.flytime*engine.TickInterval()>shot.tracetime) then
 			shot.visible=false
 			shot.shown=false
 			shot.model:Remove()
