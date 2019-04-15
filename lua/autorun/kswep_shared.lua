@@ -56,7 +56,9 @@ function kswep_timestop_check()
 end
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
-	game.AddAmmoType({name=tbl.name,dmgtype=DMG_BULLET,force=10})
+	if (vurtual_ammotypes==nil) then
+		game.AddAmmoType({name=tbl.name,dmgtype=DMG_BULLET,force=10})
+	end
 end
 function AddKswepHands(tbl)
 	kswep_hands[tbl.name]=table.Copy(tbl)
@@ -73,6 +75,7 @@ CreateConVar("kswep_ezreticle",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
 local files,directories= file.Find("lua/calibers/*.lua","GAME")
 for k,v in pairs(files) do
 	include ("calibers/"..v)
+	AddCSLuaFile("calibers/"..v)
 end
 function KSwepSetupAmmoTypes()
 	vurtual_ammodata = {}
@@ -95,14 +98,14 @@ function KSwepSetupAmmoTypes()
 	tbl.model = ""
 	tbl.color = Color(255,255,255,128)
 	hook.Run("VurtualAmmotypes")
-	vurtual_ammotypes = {"ar2",null,"pistol","smg1","357",null,"shotgun"}
-	local customammotypes=game.BuildAmmoTypes()
-	for k,v in pairs(customammotypes) do table.insert(vurtual_ammotypes,k+25,v.name) end
+	if (vurtual_ammotypes == nil) then --legacy code, probably not needed
+		vurtual_ammotypes = {"ar2",null,"pistol","smg1","357",null,"shotgun"}
+		local customammotypes=game.BuildAmmoTypes()
+		for k,v in pairs(customammotypes) do table.insert(vurtual_ammotypes,k+25,v.name) end
+	end
 end
 
-if (vurtual_ammotypes==nil) then
-	KSwepSetupAmmoTypes()
-end
+KSwepSetupAmmoTypes()
 function KswepCheckScopeCompat(wep,data,test)
 	for k,v in pairs(wep.OpticRails) do
 		if (data.mounttype~=v.railtype and data.mounttype~="ANY" and v.railtype~="ANY") then break end
