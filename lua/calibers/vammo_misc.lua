@@ -464,6 +464,29 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.basemodelscale = 0.05
 	tbl.basematerial = "phoenix_storms/pack2/darkgrey"
 	AddAmmodata(tbl)
+	--[[
+	local tbl = table.Copy(kswep_default_ammo)
+	tbl.name="vammo_12gauge_no7_lead"
+	tbl.printname = "12 Gauge No. 7 Leadk"
+	tbl.caliber = "vammo_12gauge"
+	tbl.coefficient=0.03
+	tbl.diameter=0.1
+	tbl.vestpenetration=KSWEP_ARMOR_I
+	tbl.dmgbase=0.01
+	tbl.dmgvitalmin=2
+	tbl.dmgvitalmax=3
+	tbl.projectiles = 291
+	tbl.spreadscale = 1
+	tbl.chokescale = 1
+	tbl.hitscale=0.05
+	tbl.recoil = 12
+	tbl.wallbang = 2
+	tbl.mass=1.46
+	tbl.velocity = 1200 
+	tbl.basemodel = "models/props_phx/gibs/flakgib1.mdl"
+	tbl.basemodelscale = 0.16
+	tbl.basematerial = "phoenix_storms/pack2/darkgrey"
+	AddAmmodata(tbl)]]--
 	local tbl = table.Copy(kswep_default_ammo)
 	tbl.name="vammo_12gauge_flechette"
 	tbl.printname = "12 Gauge Flechette"

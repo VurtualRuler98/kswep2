@@ -94,24 +94,28 @@ end
 hook.Add("Think","KswepBulletThink",KswepBulletThink)
 function KswepFlyBullet(shot)
 	if (kswep_timestop_check()) then
-		if (SERVER and not shot.stopped and not shot.visible) then
-			local shotmodel = ents.Create("sent_kweps_bullet")
-			shotmodel:SetPos(shot.pos)
-			shotmodel:SetAngles(shot.dragvector:Angle())
-			shotmodel.stopped=true
-			shotmodel:Spawn()
-			shotmodel:SetModel(shot.basemodel)
-			shotmodel:SetModelScale(shot.basemodelscale)
-			shotmodel:SetColor(shot.basecolor)
-			shotmodel:SetMaterial(shot.basematerial)
-			shot.stopped=true
-		end
-		if (SERVER and not shot.stopped and shot.visible and not shot.shown) then
+		if (SERVER and shot.visible and not shot.shown) then
 			shot.shown=true
 			shot.model:SetColor(shot.color)
 			shot.model:SetMaterial(shot.material)
 		end
-		return shot
+		if (shot.timedelay>0) then
+			shot.timedelay=shot.timedelay-1
+		else
+			if (SERVER and not shot.stopped and not shot.visible) then
+				local shotmodel = ents.Create("sent_kweps_bullet")
+				shotmodel:SetPos(shot.pos)
+				shotmodel:SetAngles(shot.dragvector:Angle())
+				shotmodel.stopped=true
+				shotmodel:Spawn()
+				shotmodel:SetModel(shot.basemodel)
+				shotmodel:SetModelScale(shot.basemodelscale)
+				shotmodel:SetColor(shot.basecolor)
+				shotmodel:SetMaterial(shot.basematerial)
+				shot.stopped=true
+			end
+			return shot
+		end
 	end
 	shot.stopped=false
 	shot.ticks=shot.ticks-1

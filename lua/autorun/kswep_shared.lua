@@ -65,6 +65,7 @@ function AddKswepHands(tbl)
 end
 CreateConVar("kswep_slow",0,FCVAR_REPLICATED )
 CreateConVar("kswep_npc_wander",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
+CreateConVar("kswep_timestop_delay",0,FCVAR_REPLICATED+FCVAR_ARCHIVE,"How many ticks can a bullet move when fired in stopped time")
 CreateConVar("kswep_npc_randompos",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_npc_cheaplehunt",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_phys",1,FCVAR_REPLICATED )

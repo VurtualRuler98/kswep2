@@ -3369,6 +3369,11 @@ function SWEP:FlyBulletStart(bullet)
 	shot.Owner=self.Owner
 	shot.filter=self.Owner
 	shot.stopped=false
+	if (kswep_timestop_check()) then
+		shot.timedelay=GetConVar("kswep_timestop_delay"):GetInt()
+	else
+		shot.timedelay=0
+	end
 	shot.visible = self.Ammo.visible
 	shot.tranq = self.Ammo.tranq
 	if (SERVER and shot.visible) then
