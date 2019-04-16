@@ -128,9 +128,9 @@ function KswepDrawLaser(wep,att)
 	end
 end
 hook.Add("Think","kswep_client_lights",KSwepRenderClientLights)
-net.Receive("kevlar_ammo", function()
+--[[net.Receive("kevlar_ammo", function()
 	vurtual_ammodata=net.ReadTable()
-end )
+end )]]
 surface.CreateFont("KSwepRanger",{
 	font = "Roboto",
 	extended=false,
@@ -139,8 +139,8 @@ surface.CreateFont("KSwepRanger",{
 net.Receive("kswep_rearm",function()
 	local box=net.ReadEntity()
 	local wep=net.ReadEntity()
-	local mags=net.ReadTable()
-	box:ClUseMagBox(wep,mags)
+	--local mags=net.ReadTable()
+	box:ClUseMagBox(wep)
 
 end)
 net.Receive("kswep_givegrenades",function()
@@ -151,12 +151,12 @@ end)
 net.Receive("kswep_supplybox",function()
 		local box=net.ReadEntity()
 		local wep=net.ReadEntity()
-		local mags=net.ReadTable()
+		--local mags=net.ReadTable()
 		local canmag=net.ReadBool()
 		local canoptic=net.ReadBool()
 		local can2doptic=net.ReadBool()
 		box.GunList=net.ReadTable()
-		box:ClUseBox(wep,mags,canmag,canoptic,can2doptic)
+		box:ClUseBox(wep,canmag,canoptic,can2doptic)
 end)
 net.Receive("kswep_gunrack",function()
 	local box=net.ReadEntity()

@@ -49,7 +49,7 @@ function ENT:ClGunRack()
 		end
 
 end 
-function ENT:ClUseMagBox(wep,mags)
+function ENT:ClUseMagBox(wep)
 	local menuwidth=200
 	local menuheight=200
 	local ammoframe = vgui.Create("DFrame")
@@ -131,7 +131,7 @@ function ENT:ShowEquipmentAddonMenu()
 		end
 end
 	
-function ENT:ClUseBox(wep,mags,canmag,canoptic,can2doptic)
+function ENT:ClUseBox(wep,canmag,canoptic,can2doptic)
 	local menuwidth=200
 	local menuheight=400
 	local ammoframe = vgui.Create("DFrame")
@@ -147,7 +147,7 @@ function ENT:ClUseBox(wep,mags,canmag,canoptic,can2doptic)
 			dbutton:SetText("Ammo")
 			dbutton.DoClick = function()
 				if (LocalPlayer():GetActiveWeapon()==wep) then
-					self:ClUseMagBox(wep,mags)
+					self:ClUseMagBox(wep)
 				end
 				ammoframe:Close()
 			end
