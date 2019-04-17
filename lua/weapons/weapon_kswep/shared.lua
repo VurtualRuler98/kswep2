@@ -1069,7 +1069,7 @@ function SWEP:OpenRangeCard()
 		drag_ticks=drag_ticks-1
 		drag_time=drag_time+1
 		drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
-		drag_vector=(drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
+		drag_vector=(drag_vector+(-1*KswepGetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
 		drop=drop-drag_vector.z*12*engine.TickInterval()
 	end
 	drop=drop+self:GetSightHeight()
@@ -1099,7 +1099,7 @@ function SWEP:OpenRangeCard()
 		drag_time=drag_time+1
 		drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
 		drag_wind=drag_wind+drag_vector.y*12*engine.TickInterval()
-		drag_vector=(drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*(drag_vector-wind)*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
+		drag_vector=(drag_vector+(-1*KswepGetBetterDrag("G1",drag_vector:Length())/drag_bc)*(drag_vector-wind)*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
 		drop=drop-drag_vector.z*12*engine.TickInterval()
 		if (drag_dist/39.701>lastrange+scoperange) then
 			local droprange=math.floor((drag_dist/39.701)/scoperange)*scoperange
@@ -1660,7 +1660,7 @@ function SWEP:SetEZReticle() --TODO has some precision errors(0.2 mil or so?)
 		drag_ticks=drag_ticks-1
 		drag_time=drag_time+1
 		drag_dist=drag_dist+drag_vector.x*12*engine.TickInterval()
-		drag_vector=(drag_vector+(-1*self:GetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
+		drag_vector=(drag_vector+(-1*KswepGetBetterDrag("G1",drag_vector:Length())/drag_bc)*drag_vector*engine.TickInterval())-Vector(0,0,(386/12)*(engine.TickInterval()))
 		drop=drop-drag_vector.z*12*engine.TickInterval()
 		if (basedropadj==-1 and drag_dist>zero*39.3701) then
 			basedropadj=math.atan((drop+self:GetSightHeight())/drag_dist)
