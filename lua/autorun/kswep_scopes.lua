@@ -460,3 +460,33 @@ tbl.eyereliefmax=99
 tbl.mounttype = "CARRYHANDLE"
 tbl.nv=10
 AddKswep2DScope(tbl)
+local tbl=table.Copy(def)
+tbl.name="Nightforce NX8 1-8x24 F1"
+tbl.zero={
+	mils=10,
+	bc=-1,
+	min=0,
+	max=150,
+	step=2,
+	default=100,
+	battlesight=false
+}
+tbl.windage={mils=10,max=150,step=2}
+tbl.fovmax=19.44
+tbl.fovmin=2.52
+tbl.fovsteps=8
+tbl.luareticle="nightforce_fc_mil"
+tbl.retillum=Color(255,0,0,255)
+tbl.sensitivity=8
+tbl.scope_border=1.06
+tbl.scope_ewheel=true
+tbl.scope_wwheel=true
+tbl.scope_range=100
+tbl.minsensitivity=1
+tbl.aimmag=2.52*8*2/3
+tbl.mountlength=8 --LT-104
+tbl.mountbell=6
+tbl.eyereliefmin=9
+tbl.eyereliefmax=9.5
+tbl.mounttype = "STANAG"
+AddKswep2DScope(tbl)

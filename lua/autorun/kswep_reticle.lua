@@ -459,3 +459,39 @@ for i=6,9 do
 end
 table.insert(tbl,{shape="circle",pos={0,0},radius=0.1})
 AddKswepReticle(tbl,"test_rifmil")
+
+local tbl = {
+{shape="line",start={-0,0.5},endpos={0,10},color=color_black},
+{shape="line",start={0.5,0},endpos={5,0},color=color_black},
+{shape="line",start={-0.5,0},endpos={-5,0},color=color_black},
+{shape="line",start={-0.1,1},endpos={0.1,1},color=color_black},
+{shape="line",start={1,-0.1},endpos={1,0.1},color=color_black},
+{shape="line",start={-1,-0.1},endpos={-1,0.1},color=color_black},
+{shape="line",start={-10,-1.5},endpos={-10,1.5},color=color_black},
+{shape="line",start={-15,-1.5},endpos={-15,1.5},color=color_black},
+{shape="line",start={10,-1.5},endpos={10,1.5},color=color_black},
+{shape="line",start={15,-1.5},endpos={15,1.5},color=color_black},
+{shape="line",start={-1.5,15},endpos={1.5,15},color=color_black},
+{shape="line",start={-1.5,20},endpos={1.5,20},color=color_black},
+{shape="poly",poly={{x=-5,y=0},{x=-15,y=1},{x=-50,y=1},{x=-50,y=-1},{x=-15,y=-1}},color=color_black},
+{shape="poly",poly={{x=5,y=0},{x=15,y=-1},{x=50,y=-1},{x=50,y=1},{x=15,y=1}},color=color_black},
+{shape="poly",poly={{x=0,y=11},{x=1,y=20},{x=1,y=50},{x=-1,y=50},{x=-1,y=20}},color=color_black},
+{shape="circle",pos={0,0},radius=0.35/2},
+{shape="poly",poly={{x=0.6,y=-0.35/2},{x=0.35/2,y=-0.6},{x=0.35/2,y=-1},{x=1,y=-0.35/2}}},
+{shape="poly",poly={{x=0.6,y=0.35/2},{x=1,y=0.35/2},{x=0.35/2,y=1},{x=0.35/2,y=0.6}}},
+{shape="poly",poly={{x=-0.6,y=0.35/2},{x=-0.35/2,y=0.6},{x=-0.35/2,y=1},{x=-1,y=0.35/2}}},
+{shape="poly",poly={{x=-0.6,y=-0.35/2},{x=-1,y=-0.35/2},{x=-0.35/2,y=-1},{x=-0.35/2,y=-0.6}}}
+}
+for i=2,5 do
+	local j=i-0.5
+	table.insert(tbl,{shape="line",start={-i,0.5},endpos={-i,-0.5},color=color_black})
+	table.insert(tbl,{shape="line",start={i,-0.5},endpos={i,0.5},color=color_black})
+	table.insert(tbl,{shape="line",start={-j,-0.1},endpos={-j,0.1},color=color_black})
+	table.insert(tbl,{shape="line",start={j,-0.1},endpos={j,0.1},color=color_black})
+end
+for i=2,10 do
+	local j=i-0.5
+	table.insert(tbl,{shape="line",start={-0.5,i},endpos={0.5,i},color=color_black})
+	table.insert(tbl,{shape="line",start={-0.1,j},endpos={0.1,j},color=color_black})
+end
+AddKswepReticle(tbl,"nightforce_fc_mil")
