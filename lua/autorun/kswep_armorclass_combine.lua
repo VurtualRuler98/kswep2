@@ -25,3 +25,5 @@ kswep_armorclass_combine["models/npc/ins_security_heavy_e.mdl"]="kswep_iotv_esap
 kswep_armorclass_combine["models/npc/ins_insurgent_standard_e.mdl"]="kswep_otv_sapi"
 kswep_armorclass_combine["models/npc/ins_insurgent_light_e.mdl"]="none"
 kswep_armorclass_combine["models/npc/ins_insurgent_heavy_e.mdl"]="kswep_otv_sapi_helmet"
+kswep_armorclass_combine["models/deepalley/alley_thug.mdl"]="none"
+kswep_armorclass_combine["models/bala/gangboi.mdl"]="none"
