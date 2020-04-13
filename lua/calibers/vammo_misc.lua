@@ -576,6 +576,9 @@ hook.Add("VurtualAmmotypes","vammo_misc", function()
 	tbl.wallbang = 3
 	tbl.mass=70
 	tbl.velocity = 1300
+	tbl.basemodel = "models/props_phx/gibs/flakgib1.mdl"
+	tbl.basemodelscale = 0.05
+	tbl.basematerial = "phoenix_storms/pack2/darkgrey"
 	AddAmmodata(tbl)
 	
 	local tbl = table.Copy(kswep_default_ammo)
