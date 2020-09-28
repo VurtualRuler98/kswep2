@@ -348,16 +348,20 @@ function KswepCalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		local speed=shot.dragvector:Length()-(wallcost*barrier*penetration)
 		local newvector=Vector()
 		if (tex=="**empty**" or tex=="**displacement**") then speed=0 end
-		if (tr.Entity:IsNPC()) then speed = 0 end
+		--if (tr.Entity:IsNPC()) then speed = 0 end
 		if (speed>0 and (not tr.AllSolid or hitprop)) then
-			local fakebullet=table.Copy(shot.bullet)
-			fakebullet.Damage = 0
-			fakebullet.Dir=Vector()
-			fakebullet.Dir:Set(shot.dragvector:GetNormalized())
-			fakebullet.Src = hitpos+((travel-hitpos)*tr.FractionLeftSolid)+(tr.Normal*10)
-			fakebullet.Dir:Rotate(Angle(0,180,0))
-			fakebullet.Force =0
-			KswepFireShot(shot,fakebullet)
+			if (not tr.Entity:IsNPC()) then
+				local fakebullet=table.Copy(shot.bullet)
+				fakebullet.Damage = 0
+				fakebullet.Dir=Vector()
+				fakebullet.Dir:Set(shot.dragvector:GetNormalized())
+				fakebullet.Src = hitpos+((travel-hitpos)*tr.FractionLeftSolid)+(tr.Normal*10)
+				fakebullet.Dir:Rotate(Angle(0,180,0))
+				fakebullet.Force =0
+				fakebullet.Distance = 10
+				fakebullet.AmmoType=""
+				KswepFireShot(shot,fakebullet)
+			end
 			dist=travel
 			newvector=shot.dragvector*(speed/oldspeed)
 		end
