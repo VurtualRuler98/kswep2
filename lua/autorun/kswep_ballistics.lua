@@ -349,7 +349,7 @@ function KswepCalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		local newvector=Vector()
 		if (tex=="**empty**" or tex=="**displacement**") then speed=0 end
 		if (tr.Entity:IsNPC()) then speed = 0 end
-		if (speed>0 and not tr.AllSolid) then
+		if (speed>0 and (not tr.AllSolid or hitprop)) then
 			local fakebullet=table.Copy(shot.bullet)
 			fakebullet.Damage = 0
 			fakebullet.Dir=Vector()
@@ -363,7 +363,7 @@ function KswepCalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		end
 		local traveladj=hitpos+((travel-hitpos)*tr.FractionLeftSolid)+(tr.Normal*10)
 		if (hitprop) then 
-			traveladj=propexit+(tr.Normal*10)
+			traveladj=propexit+(tr.Normal*2)
 		end
 		return newvector,traveladj,dist--reduce speed by speed required to penetrate this amount of wall: the cost of a wall unit, times number of units, times the hardness of the wall
 	else return Vector(0,0,0),travel,dist  end
