@@ -106,6 +106,13 @@ function KSwepSetupAmmoTypes()
 	tbl.basemodelscale = 1 --size-scale for basemodel
 	tbl.basematerial = "" --material override for the basemodel
 	tbl.basecolor = Color(255,255,255,255) --color override for the basemodel
+	tbl.hastrail = false
+	tbl.trailColor = Color(255,255,255,255)
+	tbl.trailStartwidth = 1
+	tbl.trailEndwidth = 1
+	tbl.trailLifetime = 1
+	tbl.trailTexture = "trails/plasma"
+	tbl.modellifetime = 0
 	hook.Run("VurtualAmmotypes")
 	if (vurtual_ammotypes == nil) then --legacy code, probably not needed
 		vurtual_ammotypes = {"ar2",null,"pistol","smg1","357",null,"shotgun"}

@@ -20,11 +20,19 @@ hook.Add("VurtualAmmotypes","vammo_scifi", function()
 	tbl.recoil = 5
 	tbl.mass=300
 	tbl.velocity = 9001
+	--tbl.velocity = 50
 	tbl.wallbang = 9999
-	tbl.visible=false
+	tbl.visible=true
 	tbl.basemodel = "models/weapons/flare.mdl"
 	tbl.basecolor = Color(0,0,0,255)
 	tbl.basemodelscale = 0.5
+	tbl.hastrail = true
+	tbl.trailColor = Color(255,255,255,255)
+	tbl.trailStartwidth = 1
+	tbl.trailEndwidth = 1
+	tbl.trailLifetime = 10
+	tbl.trailTexture = "trails/plasma"
+	tbl.modellifetime = 1
 	AddAmmodata(tbl)
 
 

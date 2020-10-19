@@ -1,4 +1,5 @@
 kswep_bullets={}
+kswep_shotmodels={}
 kswep_tranqtargets = {}
 --CreateConVar("kswep_clearbullets",0,FCVAR_REPLICATED+FCVAR_ARCHIVE,"Should midair bullets disappear when a weapon is deeleted?")
 CreateConVar("kswep_shot_self_ticks",0,FCVAR_REPLICATED+FCVAR_ARCHIVE,"Can you be hit by your own bullets?")
@@ -78,7 +79,16 @@ function KswepBulletThink()
 		if (IsValid(v.Owner)) then
 			kswep_bullets[k]=KswepFlyBullet(v)
 		else
+			if (IsValid(kswep_bullets[k].model)) then
+				table.insert(kswep_shotmodels,{model=kswep_bullets[k].model,lifetime=CurTime()})
+			end
 			kswep_bullets[k]=nil
+		end
+	end
+	for k,v in pairs (kswep_shotmodels) do
+		if (v.lifetime<CurTime()) then
+			v.model:Remove()
+			kswep_shotmodels[k]=nil
 		end
 	end
 	for k,v in pairs(kswep_tranqtargets) do
@@ -132,7 +142,7 @@ function KswepFlyBullet(shot)
 		if (shot.tracetime>0 and shot.flytime*engine.TickInterval()>shot.tracetime) then
 			shot.visible=false
 			shot.shown=false
-			shot.model:Remove()
+			table.insert(kswep_shotmodels,{model=shot.model,lifetime=shot.modellifetime+CurTime()})
 			shot.model=nil
 		end	
 	end
@@ -209,7 +219,7 @@ function KswepFlyBullet(shot)
 				shot.pos=travel
 			else
 				if (SERVER and shot.visible) then
-					shot.model:Remove()
+					table.insert(kswep_shotmodels,{model=shot.model,lifetime=shot.modellifetime+CurTime()})
 				end
 				return nil
 			end
@@ -247,13 +257,13 @@ function KswepFlyBullet(shot)
 			end
 		else
 			if (SERVER and shot.visible) then
-				shot.model:Remove()
+				table.insert(kswep_shotmodels,{model=shot.model,lifetime=shot.modellifetime+CurTime()})
 			end
 			return nil
 		end
 	else
 		if (SERVER and shot.visible) then
-			shot.model:Remove()
+			table.insert(kswep_shotmodels,{model=shot.model,lifetime=shot.modellifetime+CurTime()})
 		end
 		return nil
 	end
