@@ -3377,7 +3377,9 @@ function SWEP:FlyBulletStart(bullet)
 	shot.visible = self.Ammo.visible
 	shot.tranq = self.Ammo.tranq
 	shot.hastrail = self.Ammo.hastrail
+	shot.trailonly = self.Ammo.trailonly
 	shot.modellifetime = self.Ammo.modellifetime
+	shot.modelscale = self.Ammo.modelscale
 	if (SERVER and shot.visible) then
 		shot.model = ents.Create("sent_kweps_bullet")
 		shot.model:SetPos(shot.pos+shot.dragvector*engine.TickInterval())
@@ -3385,6 +3387,7 @@ function SWEP:FlyBulletStart(bullet)
 		shot.model.stopped = false
 		shot.model:Spawn()
 		shot.model:SetModel(self.Ammo.model)
+		shot.model:SetModelScale(shot.modelscale)
 		if (shot.hastrail) then
 			util.SpriteTrail(shot.model, 0, self.Ammo.trailColor, true, self.Ammo.trailStartwidth, self.Ammo.trailEndwidth, self.Ammo.trailLifetime, 1/(self.Ammo.trailStartwidth+self.Ammo.trailEndwidth)*0.5, self.Ammo.trailTexture)
 		end

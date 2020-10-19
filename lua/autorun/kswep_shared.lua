@@ -98,6 +98,7 @@ function KSwepSetupAmmoTypes()
 	tbl.visible = false --can this bullet be seen by the naked eye?
 	tbl.tranq = 0 --set to >0 to act as a tranquilizer bullet instead
 	tbl.model = "" --visible model of the bullet
+	tbl.modelscale = 1
 	tbl.material = "" --material override for the model
 	tbl.color = Color(255,255,255,128) --color override for the model
 	tbl.tracetime=0 --set >0 and the model will disappear after this time(tracer burnout)
@@ -107,6 +108,7 @@ function KSwepSetupAmmoTypes()
 	tbl.basematerial = "" --material override for the basemodel
 	tbl.basecolor = Color(255,255,255,255) --color override for the basemodel
 	tbl.hastrail = false
+	tbl.trailonly = false
 	tbl.trailColor = Color(255,255,255,255)
 	tbl.trailStartwidth = 1
 	tbl.trailEndwidth = 1

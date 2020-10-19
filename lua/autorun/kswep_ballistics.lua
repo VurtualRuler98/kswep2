@@ -112,7 +112,7 @@ function KswepFlyBullet(shot)
 		if (shot.timedelay>0) then
 			shot.timedelay=shot.timedelay-1
 		else
-			if (SERVER and not shot.stopped and not shot.visible) then
+			if (SERVER and not shot.stopped and (not shot.visible or shot.trailonly)) then
 				local shotmodel = ents.Create("sent_kweps_bullet")
 				shotmodel:SetPos(shot.pos)
 				shotmodel:SetAngles(shot.dragvector:Angle())
