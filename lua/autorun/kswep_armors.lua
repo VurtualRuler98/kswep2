@@ -131,3 +131,23 @@ tbl.nervegas=100
 tbl.club=30
 tbl.crush=10
 KswepAddArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="Firefighter Suit"
+tbl.hitpoints={
+	helmet={rating="NIJ I",chestgroup=0,coverage=8},
+	mask={rating="NONE",chestgroup=0,coverage=8,airmask=true},
+	airtank2={rating="NIJ I",chestgroup=2,coverage=1,airtank=true}, --made out of steel
+	airtank={rating="NIJ I",chestgroup=2,coverage=1,airtank=true},
+	skin={rating="NIJ I",chestgroup=7,coverage=7,barrier=true}
+}
+tbl.burn=50 --firefighter suit
+tbl.acid=10
+tbl.slash=10
+tbl.shock=10
+tbl.blast=0
+tbl.poison= 10
+tbl.radiation=0
+tbl.nervegas=0
+tbl.club=10
+tbl.crush=10
+KswepAddArmor(tbl)
