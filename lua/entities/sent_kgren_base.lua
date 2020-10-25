@@ -370,7 +370,7 @@ function ENT:DetBoom()
 end
 function ENT:DetFrag()
 	local thrower=self:GetOwner()
-	self:SetOwner(0)
+	self:SetOwner(NULL)
 	local bullet={
 		Attacker=thrower,
 		Damage=self.FragDamage,
