@@ -73,11 +73,12 @@ CreateConVar("kswep_earpro",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_max_flighttime",10,FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_bullet_3dsky",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_ezreticle",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
-local files,directories= file.Find("lua/calibers/*.lua","GAME")
+local files,directories= file.Find("calibers/*.lua","LUA")
 for k,v in pairs(files) do
 	include ("calibers/"..v)
 	AddCSLuaFile("calibers/"..v)
 end
+
 function KSwepSetupAmmoTypes()
 	vurtual_ammodata = {}
         kswep_default_ammo = {}

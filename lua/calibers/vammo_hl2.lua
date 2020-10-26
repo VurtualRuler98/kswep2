@@ -1,6 +1,3 @@
-if (SERVER) then
-	AddCSLuaFile()
-end
 
 hook.Add("VurtualAmmotypes","vammo_hl2", function()
 

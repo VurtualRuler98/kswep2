@@ -1,6 +1,3 @@
-if (SERVER) then
-	AddCSLuaFile()
-end
 hook.Add("VurtualAmmotypes","vammo_556x45", function()
 	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_III

@@ -1,4 +1,3 @@
-if (SERVER) then AddCSLuaFile() end
 hook.Add("VurtualAmmotypes","vammo_9mmetc", function()
 	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=KSWEP_ARMOR_II --weakest armor that can stop it
