@@ -57,7 +57,7 @@ end
 function AddAmmodata(tbl)
 	vurtual_ammodata[tbl.name]=table.Copy(tbl)
 	if (vurtual_ammotypes==nil) then
-		game.AddAmmoType({name=tbl.name,dmgtype=DMG_BULLET,force=10})
+		game.AddAmmoType({name=tbl.name,dmgtype=tbl.dmgtype,force=10})
 	end
 end
 function AddKswepHands(tbl)
@@ -83,11 +83,12 @@ function KSwepSetupAmmoTypes()
 	vurtual_ammodata = {}
         kswep_default_ammo = {}
 	local tbl = kswep_default_ammo
-        tbl.name="DEFAULT"
-        tbl.vestpenetration=KSWEP_ARMOR_II
-        tbl.dmgbase=1 --how much damage should a weapon do?
-        tbl.dmgvitalmin=1 --minimum multiplier for a center mass shot
-        tbl.dmgvitalmax=1 --maximum multiplier
+        tbl.name = "DEFAULT"
+        tbl.vestpenetration = KSWEP_ARMOR_II
+	tbl.dmgtype = DMG_BULLET
+        tbl.dmgbase= 1 --how much damage should a weapon do?
+        tbl.dmgvitalmin = 1 --minimum multiplier for a center mass shot
+        tbl.dmgvitalmax = 1 --maximum multiplier
         tbl.projectiles = 1 --how many bullets come out
         tbl.spreadscale = 1 --multiply spread by this much
         tbl.chokescale = 0 --special spread multiplier, simulates shotgun cokes
