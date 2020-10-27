@@ -225,7 +225,7 @@ local function KSwepSetEquipmentAddon(len,pl)
 end
 net.Receive("kswep_setequipment",KSwepSetEquipment)
 net.Receive("kswep_setequipmentaddon",KSwepSetEquipmentAddon)
-function RearmMags(len,pl)
+function KswepRearmMagsNet(len,pl)
 	if (IsValid(pl) and pl:IsPlayer()) then
 		local box=net.ReadEntity()
 		local caliber=net.ReadString()
@@ -237,22 +237,42 @@ function RearmMags(len,pl)
 		end	
 		local wep=net.ReadEntity()
 		if (wep~=pl:GetActiveWeapon()) then return end
-		if (wep:IsValid() and string.find(wep:GetClass(),"weapon_kswep")) then
-			if (wep.MagType or wep.SingleReload) then
-				local magsize=wep.MagSize
-				local magtype=wep.MagType
-				local magclass=wep.MagClass
-				--local magbonus=0
-				--local magitem="primaryammo"	
-				--local bonusnum=wep.MaxMagsBonus
-				if (wep.SingleReload and not wep.SingleClips) then
-					magsize=1
-					magtype=wep.Caliber
+		KswepRearmMags(pl,caliber,wep)
+	end
+end
+
+function KswepRearmMags(pl,caliber,wep)
+	if (wep:IsValid() and string.find(wep:GetClass(),"weapon_kswep")) then
+		if (wep.MagType or wep.SingleReload) then
+			local magsize=wep.MagSize
+			local magtype=wep.MagType
+			local magclass=wep.MagClass
+			--local magbonus=0
+			--local magitem="primaryammo"	
+			--local bonusnum=wep.MaxMagsBonus
+			if (wep.SingleReload and not wep.SingleClips) then
+				magsize=1
+				magtype=wep.Caliber
+			end
+			if (wep.SingleClips) then
+				magsize=wep.ReloadClipSize
+			end
+			for k,v in pairs(kswep_lbe[pl.KswepLBEType].slots) do
+				local fits=false
+				for g,w in pairs(v) do
+					if (g==magclass) then
+						fits=w
+					end
 				end
-				if (wep.SingleClips) then
-					magsize=wep.ReloadClipSize
+				if (fits) then
+					pl.KswepLBE[k]={}
+					for i=1,fits do
+						table.insert(pl.KswepLBE[k],{caliber=caliber,num=magsize,max=magsize,magtype=magtype})
+					end
 				end
-				for k,v in pairs(kswep_lbe[pl.KswepLBEType].slots) do
+			end
+			if (kswep_lbe[pl.KswepLBEType].addon~="none" and kswep_lbeaddon[pl.KswepLBEAddonType].addon==(kswep_lbe[pl.KswepLBEType].addon)) then
+				for k,v in pairs(kswep_lbeaddon[pl.KswepLBEAddonType].slots) do
 					local fits=false
 					for g,w in pairs(v) do
 						if (g==magclass) then
@@ -260,35 +280,19 @@ function RearmMags(len,pl)
 						end
 					end
 					if (fits) then
-						pl.KswepLBE[k]={}
+						pl.KswepLBEAddon[k]={}
 						for i=1,fits do
-							table.insert(pl.KswepLBE[k],{caliber=caliber,num=magsize,max=magsize,magtype=magtype})
+							table.insert(pl.KswepLBEAddon[k],{caliber=caliber,num=magsize,max=magsize,magtype=magtype})
 						end
 					end
 				end
-				if (kswep_lbe[pl.KswepLBEType].addon~="none" and kswep_lbeaddon[pl.KswepLBEAddonType].addon==(kswep_lbe[pl.KswepLBEType].addon)) then
-					for k,v in pairs(kswep_lbeaddon[pl.KswepLBEAddonType].slots) do
-						local fits=false
-						for g,w in pairs(v) do
-							if (g==magclass) then
-								fits=w
-							end
-						end
-						if (fits) then
-							pl.KswepLBEAddon[k]={}
-							for i=1,fits do
-								table.insert(pl.KswepLBEAddon[k],{caliber=caliber,num=magsize,max=magsize,magtype=magtype})
-							end
-						end
-					end
-				end
-				wep:ForceReload(caliber,magsize)
-				
 			end
+			wep:ForceReload(caliber,magsize)
+			
 		end
 	end
 end
-net.Receive("kswep_rearm_cl",RearmMags)
+net.Receive("kswep_rearm_cl",KswepRearmMagsNet)
 local function KswepGiveGrenades(len,pl)
 	if (not IsValid(pl) or not pl:IsPlayer()) then return end
 	local box=net.ReadEntity()

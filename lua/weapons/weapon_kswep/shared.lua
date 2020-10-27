@@ -280,6 +280,8 @@ SWEP.Firemodes={}
 SWEP.GrenadeLauncher=false
 SWEP.Bayonet=false
 SWEP.RunTimer=0
+SWEP.DidInitialize=false
+SWEP.DidClientInitialize=false
 --Values are for flat top AR with no railed handguard.
 --[[SWEP.OpticRailType = "ANY" --style of rail
 SWEP.OpticRailRelief=15 --How many cm behind a rail the optic's minimum eye relief can go.
@@ -327,25 +329,10 @@ function SWEP:Initialize()
 		self.Anims.RunAnimEmpty=self.Anims.LowerAnimEmpty
 	end
 	self:SetHoldType(self.HoldType)
-	if (self.Owner:IsNPC()) then
-		local weapon=self
-		hook.Add("Think","KswepThink"..tostring(self),function()
-			if (IsValid(weapon) and weapon.Owner:IsValid() and weapon.Owner:IsNPC()) then
-				weapon:Think()
-			end
-		end)
-		if (self.Owner:GetClass()=="npc_metropolice" and self.HoldType=="ar2") then 
-			self:SetNWString("HoldType","smg")
-			self:SetNWString("IdleType","smg")
-			self:SetHoldType("smg")
-		end
-	end
 	if (self.InsAttachments and self.DefaultSight) then
 		self.CurrentSight=self.DefaultSight
 	end
-	if (CLIENT and self.Owner==LocalPlayer()) then
-		self:InitMergeParts()
-	end
+	self.DefaultAmmo=self.Caliber
 	self.Ammo = vurtual_ammodata[self.Caliber]
 	self.Caliber=self.Ammo.caliber
 	if (self.SingleReload) then
@@ -363,7 +350,21 @@ function SWEP:Initialize()
 	self.Primary.ClipSize = self.MagSize
 
 	self.LastBurst=self.Burst
-	if (CLIENT and self.Owner==LocalPlayer()) then
+
+	if (self:GetNWBool("Chambered")==false and self:Clip1()>0 and self.OpenBolt==false) then
+		self:SetNWBool("Chambered",true)
+		self:TakePrimaryAmmo(1)
+		self:SetDeploySpeed(1)
+	end
+	self.CurrentMagSize=self.MagSize
+	self:Initialize2()
+	self:InitScopeData(self.DefaultScopedata)
+	self:InitAnims(self.Anims)
+	self.DidInitialize=true
+end
+function SWEP:ClientInitialize()
+	if (self.Owner==LocalPlayer()) then
+		self:InitMergeParts()
 		if (self.ScopeReticle) then 
 			self.ScopeReticleMaterial=Material(self.ScopeReticle)
 		end
@@ -372,19 +373,30 @@ function SWEP:Initialize()
 		self.ScopeRTMaterial=Material(self.ScopeMat)
 		self.ScopeRTMaterial:SetTexture("$basetexture",self.RenderTarget)
 	end
-	if (self:GetNWBool("Chambered")==false and self:Clip1()>0 and self.OpenBolt==false) then
-		self:SetNWBool("Chambered",true)
-		self:TakePrimaryAmmo(1)
-		self:SetDeploySpeed(1)
-	end
-	if (CLIENT and self.Owner==LocalPlayer() and self.InsAttachments and self.Owner:IsPlayer()) then
-	end
-	self.CurrentMagSize=self.MagSize
-	self:Initialize2()
-	self:InitScopeData(self.DefaultScopedata)
-	self:InitAnims(self.Anims)
-	if (self.Owner:IsNPC() and SERVER) then self:SetOptic2D("Default") end
+	self.DidClientInitialize=true
+	--[[if (self.Owner==LocalPlayer() and self.InsAttachments and self.Owner:IsPlayer()) then
+	end]]
 end
+function SWEP:Equip()
+	if (self.Owner:IsPlayer() and GetConVar("kswep_giveammo"):GetBool()) then
+		KswepRearmMags(self.Owner,self.DefaultAmmo,self)
+	end
+	if (self.Owner:IsNPC()) then
+		self:SetOptic2D("Default")
+		local weapon=self
+		hook.Add("Think","KswepThink"..tostring(self),function()
+			if (IsValid(weapon) and weapon.Owner:IsValid() and weapon.Owner:IsNPC()) then
+				weapon:Think()
+			end
+		end)
+		if (self.Owner:GetClass()=="npc_metropolice" and self.HoldType=="ar2") then 
+			self:SetNWString("HoldType","smg")
+			self:SetNWString("IdleType","smg")
+			self:SetHoldType("smg")
+		end
+	end
+end
+
 function SWEP:DiscoverModelAnims()
 end
 function SWEP:DiscoverModelAnimsDone()
@@ -837,6 +849,9 @@ function SWEP:Deploy()
 		self.Owner:SetWalkSpeed(200)
 	end
 	self:ServeNWBool("Lowered",false)
+	if (CLIENT and not self.DidClientInitialize) then
+		self:ClientInitialize()
+	end
 end
 function SWEP:IsWeaponEmpty()
 	if ((not self:GetNWBool("Chambered") and (not self.OpenBolt or self.GrenadeLauncher)) or (self.OpenBolt and (not self:GetNWBool("FiringPin") or not self.SingleReloadFiringPin) and self:Clip1()==0)) then
@@ -2383,6 +2398,9 @@ function SWEP:DrawWorldModel()
 	end
 end
 function SWEP:Think()
+	if (CLIENT and not self.DidInitialize) then
+		self:Initialize()
+	end
 	if (SERVER and self.Owner:IsNPC()) then
 		if (not self.Owner:GetEnemy()) then
 			self.NPCAimDistDelay=-1
@@ -2668,6 +2686,7 @@ function SWEP:LowerHolster(lower)
 end
 
 function SWEP:PostDrawViewModel()
+	if (not self.DidClientInitialize) then return end
 	for k,v in pairs(self.MergeParts) do
 		if (IsValid(v)) then
 			self:AttachModel(v)
