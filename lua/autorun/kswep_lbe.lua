@@ -54,7 +54,7 @@ tbl.addon="none"
 KswepAddLBE(tbl)
 local tbl={}
 tbl.name="Range Belt"
-tbl.slots = {{Stick=3,AK=2,STANAG=2,BattleRifle=2,BoltMag=2,Drum=1},{Shotshell=12,RifleClip=4,RifleClip2=2,Box=1,Speedloader=2},{Pistol1=2,Pistol2=2,PistolCarbine=2}}
+tbl.slots = {{Stick=3,AK=2,STANAG=2,BattleRifle=2,BoltMag=2,Drum=1,RifleClip=4,RifleClip2=2,Box=1},{Shotshell=12},{Speedloader=2,Pistol1=2,Pistol2=2,PistolCarbine=2}}
 tbl.addon="none"
 KswepAddLBE(tbl)
 local tbl={}
