@@ -196,21 +196,6 @@ function KswepFlyBullet(shot)
 	local oldspeed=shot.dragvector:Length()
 	shot.dragvector=shot.dragvector+(-1*drag)*(shot.dragvector-wind)*engine.TickInterval()-Vector(0,0,(386/12)*(engine.TickInterval()))
 	if (oldspeed-shot.dragvector:Length()>1125) then shot.dragvector=Vector(0,0,0) end
-	if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.dragvector:Length()>100) then
-		shot.bullet.Src=shot.pos
-		--local energybase=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].velocity^2
-		--local energynew=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*shot.dragvector:Length()^2
-		local energybase=(vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].diameter*vurtual_ammodata[shot.bullet.AmmoType].velocity)/7000
-		local energynew=(vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].diameter*shot.dragvector:Length())/7000
-		shot.bullet.Damage=shot.dmg*(energynew/energybase)
-		shot.bullet.Dir=shot.dragvector
-		shot.bullet.DamageCustom=KswepCalcReducedArmorPen(vurtual_ammodata[shot.bullet.AmmoType].vestpenetration,energynew/energybase)
-		KswepFireShot(shot,shot.bullet)
-		if (tr.Entity and (tr.Entity:IsNPC() or tr.Entity:IsPlayer())) then
-			table.insert(shot.filter,tr.Entity)
-		end
-	
-	end
 	if ((not tr.Hit or (not tr.HitSky or not shot.sky)) and shot.pos:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
 		if (SERVER and tr.HitSky) then
 			local skycamera=ents.FindByClass("sky_camera")[1]
@@ -228,7 +213,26 @@ function KswepFlyBullet(shot)
 			end
 		elseif (tr.Hit) then
 			local armor=0
-			shot.dragvector, shot.pos, shot.dist=KswepCalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
+			local tempshot = {}
+			tempshot.dragvector, tempshot.pos, tempshot.dist=KswepCalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
+			if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.dragvector:Length()>100) then
+				shot.bullet.Src=shot.pos
+				--local energybase=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].velocity^2
+				--local energynew=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*shot.dragvector:Length()^2
+				local energybase=(vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].diameter*vurtual_ammodata[shot.bullet.AmmoType].velocity)/7000
+				local energynew=(vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].diameter*shot.dragvector:Length())/7000
+				shot.bullet.Damage=shot.dmg*(energynew/energybase)
+				shot.bullet.Dir=shot.dragvector
+				shot.bullet.DamageCustom=KswepCalcReducedArmorPen(vurtual_ammodata[shot.bullet.AmmoType].vestpenetration,energynew/energybase)
+				KswepFireShot(shot,shot.bullet)
+				if (tr.Entity and (tr.Entity:IsNPC() or tr.Entity:IsPlayer())) then
+					table.insert(shot.filter,tr.Entity)
+				end
+			
+			end
+			shot.dragvector=tempshot.dragvector
+			shot.pos=tempshot.pos
+			shot.dist=tempshot.dist
 		else
 			--386 inches per second also thanks justarandomgeek
 			shot.pos=travel
@@ -343,9 +347,10 @@ function KswepCalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		local barrier=tr.FractionLeftSolid*(hitpos:Distance(travel)) --Amount of wall we're going through
 		if (tr.FractionLeftSolid>0.9) then barrier=hitpos:Distance(travel) end
 		local hitprop=false
-		
-		if (((tr.HitNonWorld and IsValid(tr.Entity)) or (tr.SurfaceProps~=0 and tr.HitTexture=="**studio**" and util.GetSurfacePropName(tr.SurfaceProps)~="default")) and not tr.Entity:IsPlayer() and not tr.Entity:IsNPC()) then 
-		hitprop=true
+		if (((tr.HitNonWorld and IsValid(tr.Entity)) or (tr.SurfaceProps~=0 and tr.HitTexture=="**studio**" and util.GetSurfacePropName(tr.SurfaceProps)~="default"))) then 
+		if (not tr.Entity:IsPlayer() and not tr.Entity:IsNPC()) then
+			hitprop=true
+		end
 		local ent=tr.Entity
 		propexitobb=util.IntersectRayWithOBB(travel,hitpos-travel,ent:LocalToWorld(ent:OBBCenter()),ent:GetAngles(),ent:OBBMins(),ent:OBBMaxs())
 		propexit=util.TraceLine({
@@ -387,9 +392,11 @@ function KswepCalcPenetration(mat,shot,hitpos,travel,tex,ent)
 end
 function KswepMaterialPenetration(mat)
 	local penetration = 0
-	if (mat==MAT_WOOD or MAT_DIRT or mat==MAT_PLASTIC or mat==MAT_GRATE or mat==MAT_GLASS or mat==MAT_FOLIAGE or mat==MAT_TILE) then
-		penetration = 0.1 --added MAT_DIRT for plaset walls. Dirt barriers should be thick anyway.
-	elseif (mat==MAT_GRASS or mat==MAT_FLESH or mat==MAT_SNOW or mat==MAT_SAND or mat==MAT_SLOSH or mat==MAT_BLOODYFLESH or mat==MAT_ALIENFLESH or mat==MAT_ANTLION or mat==MAT_CONCRETE or mat==MAT_VENT) then
+	if (mat==MAT_WOOD or mat==MAT_DIRT or mat==MAT_PLASTIC or mat==MAT_GRATE or mat==MAT_GLASS or mat==MAT_FOLIAGE or mat==MAT_TILE) then
+		penetration = 0.1 --added MAT_DIRT for plaster walls. Dirt barriers should be thick anyway.
+	elseif (mat==MAT_FLESH) then
+		penetration = 0.35
+	elseif (mat==MAT_GRASS or mat==MAT_SNOW or mat==MAT_SAND or mat==MAT_SLOSH or mat==MAT_BLOODYFLESH or mat==MAT_ALIENFLESH or mat==MAT_ANTLION or mat==MAT_CONCRETE or mat==MAT_VENT) then
 		penetration = 1
 	elseif (mat==MAT_METAL ) then
 		penetration = 2
