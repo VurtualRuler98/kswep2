@@ -849,9 +849,6 @@ function SWEP:Deploy()
 		self.Owner:SetWalkSpeed(200)
 	end
 	self:ServeNWBool("Lowered",false)
-	if (CLIENT and not self.DidClientInitialize) then
-		self:ClientInitialize()
-	end
 end
 function SWEP:IsWeaponEmpty()
 	if ((not self:GetNWBool("Chambered") and (not self.OpenBolt or self.GrenadeLauncher)) or (self.OpenBolt and (not self:GetNWBool("FiringPin") or not self.SingleReloadFiringPin) and self:Clip1()==0)) then
@@ -2400,6 +2397,9 @@ end
 function SWEP:Think()
 	if (CLIENT and not self.DidInitialize) then
 		self:Initialize()
+	end
+	if (CLIENT and not self.DidClientInitialize) then
+		self:ClientInitialize()
 	end
 	if (SERVER and self.Owner:IsNPC()) then
 		if (not self.Owner:GetEnemy()) then
