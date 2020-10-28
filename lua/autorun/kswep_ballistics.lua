@@ -206,6 +206,9 @@ function KswepFlyBullet(shot)
 		shot.bullet.Dir=shot.dragvector
 		shot.bullet.DamageCustom=KswepCalcReducedArmorPen(vurtual_ammodata[shot.bullet.AmmoType].vestpenetration,energynew/energybase)
 		KswepFireShot(shot,shot.bullet)
+		if (tr.Entity and (tr.Entity:IsNPC() or tr.Entity:IsPlayer())) then
+			table.insert(shot.filter,tr.Entity)
+		end
 	
 	end
 	if ((not tr.Hit or (not tr.HitSky or not shot.sky)) and shot.pos:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then

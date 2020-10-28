@@ -3386,7 +3386,7 @@ function SWEP:FlyBulletStart(bullet)
 	shot.sky=not GetConVar("kswep_bullet_3dsky"):GetBool()
 	shot.weapon=self
 	shot.Owner=self.Owner
-	shot.filter=self.Owner
+	shot.filter={self.Owner}
 	shot.stopped=false
 	if (kswep_timestop_check()) then
 		shot.timedelay=GetConVar("kswep_timestop_delay"):GetInt()
