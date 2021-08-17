@@ -193,8 +193,10 @@ local function KSSuitHandler(ent,dmginfo,ksarmor)
 	return 1-(scale/100)
 end
 local function KSDamageHandlerEnt(ent,dmginfo)
+		local scalevalue=1
 	if (ent:IsPlayer()) then
-		dmginfo:ScaleDamage(KSSuitHandler(ent,dmginfo,ent.ksarmor))
+		scalevalue=KSSuitHandler(ent,dmginfo,ent.ksarmor)
+		dmginfo:ScaleDamage(scalevalue)
 	end
 	if (ent:IsNPC()) then
 		local class=ent:GetClass()
@@ -205,6 +207,7 @@ local function KSDamageHandlerEnt(ent,dmginfo)
 			dmginfo:ScaleDamage(KSSuitHandler(ent,dmginfo,kswep_npcarmors[class]))
 		end
 	end
+	if (scalevalue==0) then return true end
 end
 local function KSBleedingHandler(ent,hitgroup,dmginfo,crit,minicrit)
 	local tgt
@@ -291,6 +294,7 @@ function KSGetNPCArmorCombine(ent)
 	return "npc_combine_s"
 end
 function KSDamageHandler(ent,hitgroup,dmginfo)
+	local scale = 1
 	if (GetConVar("kevlar_enabled"):GetBool()==false) then return end
 	local armor=-1
 	if (ent:IsPlayer() and bit.band(dmginfo:GetDamageType(),DMG_BULLET) == DMG_BULLET) then
@@ -312,7 +316,7 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 		end
 	end
 	if (armor~=-1) then
-		local scale=KSScaleDamage(armor,dmginfo,ent)
+		scale=KSScaleDamage(armor,dmginfo,ent)
 		if (ent:IsNPC() or not GetConVar("kswep_med_advanced"):GetBool()) then
 			dmginfo:ScaleDamage(scale)
 		end
@@ -345,6 +349,7 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 	if (game.GetAmmoName(dmginfo:GetAmmoType())=="357") then
 		dmginfo:ScaleDamage(0.2)
 	end
+	if (scale == 0) then return true end
 end	
 function KSScaleDamage(armor,dmginfo,ent)
 	local bullet=vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())]
@@ -370,7 +375,11 @@ function KSScaleDamage(armor,dmginfo,ent)
 			end
 		end
 	end
-	return 1
+	if (GetConVar("kswep_fullarmor"):GetBool()) then
+		return 0
+	else
+		return 1
+	end
 end
 function KSGetArmorNPC(npc,hitgroup)
 	local class=npc:GetClass()
