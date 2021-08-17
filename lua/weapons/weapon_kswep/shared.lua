@@ -3203,7 +3203,7 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo )
 		else
 			recoil=recoil*1.5
 		end
-	elseif (not ConVarExists("prone_bindkey_enabled")) then
+	elseif (self.Owner:IsPlayer() and not ConVarExists("prone_bindkey_enabled")) then
 		if (not self.Owner:Crouching()) then
 			recoil=recoil*1.5
 		end
