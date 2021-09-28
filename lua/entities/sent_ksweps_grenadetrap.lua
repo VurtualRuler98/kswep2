@@ -36,6 +36,7 @@ function ENT:Initialize()
 	end
 	self.Entity:SetUseType(SIMPLE_USE)
 	self:SetNWFloat("Live",-1)
+	self:SetNWBool("Bouncing",false)
 end
 function ENT:SpawnFunction(ply,tr)
 	if (not tr.Hit) then return end
@@ -108,8 +109,15 @@ function ENT:Use(activator,caller)
 end
 function ENT:Detonate()
 	if (SERVER) then
-		self.nade:SetNWFloat("Fuze",1)
 		self.nade:SetParent(nil)
+		if (self:GetNWFloat("Bouncing")) then
+			self.nade:SetPos(self:GetPos()+Vector(0,0,2))
+			self.nade:GetPhysicsObject():SetVelocity(Vector(0,0,300))
+			self.nade:SetNWFloat("Fuze",CurTime()+0.1)
+		else
+			self.nade:SetPos(self:GetPos()+Vector(0,0,2))
+			self.nade:SetNWFloat("Fuze",1)
+		end
 		self:Remove()
 	end
 end

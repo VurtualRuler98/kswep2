@@ -36,6 +36,9 @@ function SWEP:Deploy()
 	--self.Owner:DrawViewModel(false)
 end
 function SWEP:PrimaryAttack()
+	self:PlaceTrap(false)
+end
+function SWEP:PlaceTrap(bounce)
 	if (CLIENT) then return end
 	local tr=self.Owner:GetEyeTrace()
 	if (not tr.Hit) then return end
@@ -45,6 +48,7 @@ function SWEP:PrimaryAttack()
 	if (not IsValid(nade)) then return end	
 	nade:SetPos(tr.HitPos+Vector(0,0,-3))
 	nade:Spawn()
+	nade:SetNWBool("Bouncing",bounce)
 	self.Owner:EmitSound("weapon_smg1.special2")
 	self:SetNWInt("numgrenades",self:GetNWInt("numgrenades")-1)
 	if (self:GetNWInt("numgrenades")<1) then
@@ -52,6 +56,7 @@ function SWEP:PrimaryAttack()
 	end
 end
 function SWEP:SecondaryAttack()
+	self:PlaceTrap(true)
 end
 function SWEP:Reload()
 end
