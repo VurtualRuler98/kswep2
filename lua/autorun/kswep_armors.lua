@@ -72,6 +72,34 @@ tbl.slash=20
 tbl.club=20
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
+tbl.name="Plate Carrier ESAPI+ESBI/Helmet"
+tbl.hitpoints={
+	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8},
+	plate={rating="ESAPI",chestgroup=3,coverage=1},
+	backer={rating="NIJ IIIA",chestgroup=7,coverage=1}
+}
+tbl.blast=5
+tbl.slash=20
+tbl.club=20
+KswepAddArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="Plate Carrier ESAPI+ESBI/Helmet/Gas Mask/CBRN"
+tbl.hitpoints={
+	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8},
+	plate={rating="ESAPI",chestgroup=3,coverage=1},
+	backer={rating="NIJ IIIA",chestgroup=7,coverage=1},
+	skin={rating="NONE",chestgroup=7,coverage=7,barrier=true}
+}
+tbl.acid=20
+tbl.slash=20
+tbl.shock=10
+tbl.blast=5
+tbl.poison=20
+tbl.radiation=20
+tbl.nervegas=100
+tbl.club=20
+KswepAddArmor(tbl)
+local tbl=table.Copy(def)
 tbl.name="Sunrise Suit w/ Gas Mask"
 tbl.hitpoints={
 	poly={rating="NIJ II",chestgroup=7,coverage=3},
@@ -150,4 +178,23 @@ tbl.radiation=0
 tbl.nervegas=0
 tbl.club=10
 tbl.crush=10
+KswepAddArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="Power Armor"
+tbl.hitpoints={
+	helmet={rating="PowerArmorSAPI",chestgroup=0,coverage=8},
+	body={rating="PowerArmorSAPI",chestgroup=7,coverage=7},
+	body2={rating="PowerArmorSAPI",chestgroup=7,coverage=3},
+	liner={rating="NIJ IIIA",chestgroup=7,coverage=7}
+}
+tbl.burn=20
+tbl.acid=50
+tbl.slash=70
+tbl.shock=20
+tbl.blast=20
+tbl.poison=50
+tbl.nervegas=100
+tbl.club=70
+tbl.crush=50
+tbl.radiation=20
 KswepAddArmor(tbl)

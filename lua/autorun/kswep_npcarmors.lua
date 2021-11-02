@@ -130,3 +130,22 @@ tbl.poison=10
 tbl.radiation=10
 tbl.nervegas=100
 KswepAddNPCArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="power_armor"
+tbl.hitpoints={
+	helmet={rating="PowerArmorSAPI",chestgroup=0,coverage=8},
+	body={rating="PowerArmorSAPI",chestgroup=7,coverage=7},
+	body2={rating="PowerArmorSAPI",chestgroup=7,coverage=3},
+	liner={rating="NIJ IIIA",chestgroup=7,coverage=7}
+}
+tbl.burn=20
+tbl.acid=50
+tbl.slash=70
+tbl.shock=20
+tbl.blast=20
+tbl.poison=50
+tbl.nervegas=100
+tbl.club=70
+tbl.crush=50
+tbl.radiation=20
+KswepAddNPCArmor(tbl)

@@ -27,3 +27,8 @@ kswep_armorclass_combine["models/npc/ins_insurgent_light_e.mdl"]="none"
 kswep_armorclass_combine["models/npc/ins_insurgent_heavy_e.mdl"]="kswep_otv_sapi_helmet"
 kswep_armorclass_combine["models/deepalley/alley_thug.mdl"]="none"
 kswep_armorclass_combine["models/bala/gangboi.mdl"]="none"
+
+
+--power armor
+kswep_armorclass_combine["models/kuma96/powerarmor_t51/powerarmor_t51_npc2.mdl"]="power_armor"
+kswep_armorclass_combine["models/kuma96/powerarmor_t51/powerarmor_t51_mini_npc2.mdl"]="power_armor"
