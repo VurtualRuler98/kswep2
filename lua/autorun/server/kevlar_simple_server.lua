@@ -134,7 +134,7 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 					pass=false
 				end
 			end
-			if (rating.hits>0) then
+			if (rating.hits>0 or rating.spacing>0) then
 				table.insert(ent.kdmg,{hitpoint=k,pos=bonedmg,dir=dir,hit=hitdmg,bone=bone,ang=boneang})
 			end
 			if (pass) then

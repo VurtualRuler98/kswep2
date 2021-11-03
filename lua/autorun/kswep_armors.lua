@@ -182,12 +182,13 @@ KswepAddArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="Power Armor"
 tbl.hitpoints={
-	helmet1skin={rating="PowerArmorShell",chestgroup=0,coverage=8},
-	helmet2plate={rating="ESAPI",chestground=0,coverage=8},
-	helmet3={rating="PowerArmorSAPI",chestground=0,coverage=8},
-	body1skin={rating="PowerArmorShell",chestgroup=7,coverage=7},
-	body2plate={rating="ESAPI",chestgroup=7,coverage=3},
-	body3={rating="PowerArmorSAPI",chestgroup=7,coverage=7}
+	a1suit1={rating="PowerArmorShell",chestgroup=0,coverage=15},
+	a2helmet1={rating="ESAPI",chestground=0,coverage=8},
+	a2helmet2={rating="NIJ IIIA",chestground=0,coverage=8},
+	a2body1={rating="ESAPI",chestgroup=7,coverage=3},
+	a2body2={rating="NIJ IIIA",chestgroup=7,coverage=3},
+	a3suit2={rating="PowerArmorSAPI",chestgroup=7,coverage=15},
+	a3suit3={rating="NONE",chestgroup=7,coverage=15,barrier=true}
 }
 tbl.burn=20
 tbl.acid=50
