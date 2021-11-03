@@ -54,23 +54,27 @@ local function KSGetBullet(dmginfo)
 	end
 	return penetration
 end
+local function KSArmorCovers(hitgroup,v,dir)
+	local limbs={HITGROUP_LEFTARM,HITGROUP_RIGHTARM,HITGROUP_LEFTLEG,HITGROUP_RIGHTLEG}
+	if (hitgroup==HITGROUP_CHEST and bit.band(v.coverage,1)==1 and bit.band(v.chestgroup,dir)==dir) then
+		return true
+	elseif (hitgroup==HITGROUP_STOMACH and bit.band(v.coverage,2)==2) then
+		return true
+	elseif (table.HasValue(limbs,hitgroup) and bit.band(v.coverage,4)==4) then
+		return true
+	elseif (hitgroup==HITGROUP_HEAD and bit.band(v.coverage,8)==8) then
+		return true
+	elseif (hitgroup==HITGROUP_GENERIC and bit.band(v.coverage,16)==16 and bit.band(v.chestgroup,dir)==dir) then
+		return true
+	end
+	return false
+end
 local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 	local dir=KSGetArmorDir(ent,dmginfo)
-	local limbs={HITGROUP_LEFTARM,HITGROUP_RIGHTARM,HITGROUP_LEFTLEG,HITGROUP_RIGHTLEG}
-	for k,v in pairs(ksarmor.hitpoints) do
+	for k,v in SortedPairs(ksarmor.hitpoints) do
+		local covers=KSArmorCovers(hitgroup,v,dir)
 		local rating=kswep_armor_ratings[v.rating]
-		local covers=false
-		if (hitgroup==HITGROUP_CHEST and bit.band(v.coverage,1)==1 and bit.band(v.chestgroup,dir)==dir) then
-			covers=true
-		elseif (hitgroup==HITGROUP_STOMACH and bit.band(v.coverage,2)==2) then
-			covers=true
-		elseif (table.HasValue(limbs,hitgroup) and bit.band(v.coverage,4)==4) then
-			covers=true
-		elseif (hitgroup==HITGROUP_HEAD and bit.band(v.coverage,8)==8) then
-			covers=true
-		elseif (hitgroup==HITGROUP_GENERIC and bit.band(v.coverage,16)==16 and bit.band(v.chestgroup,dir)==dir) then
-			covers=true
-		end
+		local spall=rating.spall
 		if (covers and rating.protection>=KSGetBullet(dmginfo)) then
 			local pass=true
 			local hits=0
@@ -98,8 +102,24 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 					pass=false
 				end
 			end
-			table.insert(ent.kdmg,{hitpoint=k,pos=dmginfo:GetDamagePosition()-ent:GetPos(),dir=dir,hit=hitdmg})
+			if (rating.hits>0) then
+				table.insert(ent.kdmg,{hitpoint=k,pos=dmginfo:GetDamagePosition()-ent:GetPos(),dir=dir,hit=hitdmg})
+			end
 			if (pass) then
+				if (spall>0) then
+					local sublayer=false
+					for j,u in SortedPairs(ksarmor.hitpoints) do
+						if (sublayer and spall>0 and KSArmorCovers(hitgroup,u,dir)) then
+							table.insert(ent.kdmg,{hitpoint=j,pos=dmginfo:GetDamagePosition()-ent:GetPos(),dir=dir,hit=hitdmg})
+							if (kswep_armor_ratings[u.rating].protection>=spall) then
+								spall=0
+							end
+						end
+						if (j==k) then
+							sublayer=true
+						end
+					end
+				end
 				return v.rating
 			end
 		elseif (covers) then

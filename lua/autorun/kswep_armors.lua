@@ -45,14 +45,14 @@ tbl.club=5
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="Interceptor (SAPI)"
-tbl.hitpoints={sapi={rating="SAPI",chestgroup=3,coverage=1},vest={rating="NIJ IIIA",chestgroup=7,coverage=3}}
+tbl.hitpoints={vest1sapi={rating="SAPI",chestgroup=3,coverage=1},vest2={rating="NIJ IIIA",chestgroup=7,coverage=3}}
 tbl.blast=30
 tbl.slash=20
 tbl.club=20
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="Interceptor (SAPI)/Helmet"
-tbl.hitpoints={sapi={rating="SAPI",chestgroup=3,coverage=1},vest={rating="NIJ IIIA",chestgroup=7,coverage=11}}
+tbl.hitpoints={vest1sapi={rating="SAPI",chestgroup=3,coverage=1},vest={rating="NIJ IIIA",chestgroup=7,coverage=11}}
 tbl.blast=33
 tbl.slash=20
 tbl.club=25
@@ -66,7 +66,7 @@ tbl.club=20
 KswepAddArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="Plate Carrier ESAPI"
-tbl.hitpoints={plate={rating="ESAPI",chestgroup=3,coverage=1},backer={rating="NIJ IIIA",chestgroup=3,coverage=1}}
+tbl.hitpoints={vest1plate={rating="ESAPI",chestgroup=3,coverage=1},vest2backer={rating="NIJ IIIA",chestgroup=3,coverage=1}}
 tbl.blast=5
 tbl.slash=20
 tbl.club=20
@@ -75,8 +75,8 @@ local tbl=table.Copy(def)
 tbl.name="Plate Carrier ESAPI+ESBI/Helmet"
 tbl.hitpoints={
 	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8},
-	plate={rating="ESAPI",chestgroup=3,coverage=1},
-	backer={rating="NIJ IIIA",chestgroup=7,coverage=1}
+	vest1plate={rating="ESAPI",chestgroup=3,coverage=1},
+	vest2backer={rating="NIJ IIIA",chestgroup=7,coverage=1}
 }
 tbl.blast=5
 tbl.slash=20
@@ -86,9 +86,9 @@ local tbl=table.Copy(def)
 tbl.name="Plate Carrier ESAPI+ESBI/Helmet/Gas Mask/CBRN"
 tbl.hitpoints={
 	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8},
-	plate={rating="ESAPI",chestgroup=3,coverage=1},
-	backer={rating="NIJ IIIA",chestgroup=7,coverage=1},
-	skin={rating="NONE",chestgroup=7,coverage=7,barrier=true}
+	vest1plate={rating="ESAPI",chestgroup=3,coverage=1},
+	vest2backer={rating="NIJ IIIA",chestgroup=7,coverage=1},
+	vest3skin={rating="NONE",chestgroup=7,coverage=7,barrier=true}
 }
 tbl.acid=20
 tbl.slash=20
@@ -102,8 +102,8 @@ KswepAddArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="Sunrise Suit w/ Gas Mask"
 tbl.hitpoints={
-	poly={rating="NIJ II",chestgroup=7,coverage=3},
-	skin={rating="NIJ I",chestgroup=7,coverage=7,barrier=true}
+	suit1poly={rating="NIJ II",chestgroup=7,coverage=3},
+	suit2skin={rating="NIJ I",chestgroup=7,coverage=7,barrier=true}
 }
 tbl.burn=30 --CoP, rubber flame retardant suit
 tbl.acid=30
@@ -120,10 +120,10 @@ local tbl=table.Copy(def)
 tbl.name="Sunrise Suit Upgraded w/ Gas Mask/Helmet"
 tbl.hitpoints={
 	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8},
-	ceramic={rating="CRISAT Scale",chestgroup=7,coverage=3},
-	poly={rating="NIJ II",chestgroup=7,coverage=3},
-	skin2={rating="NIJ I",chestgroup=7,coverage=7,barrier=true},
-	skin={rating="NIJ I",chestgroup=7,coverage=7,barrier=true}
+	suit1ceramic={rating="CRISAT Scale",chestgroup=7,coverage=3},
+	suit2poly={rating="NIJ II",chestgroup=7,coverage=3},
+	suit3skin1={rating="NIJ I",chestgroup=7,coverage=7,barrier=true},
+	suit3skin2={rating="NIJ I",chestgroup=7,coverage=7,barrier=true}
 }
 tbl.burn=30 --CoP, rubber flame retardant suit
 tbl.acid=30
@@ -139,14 +139,14 @@ KswepAddArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="Sunrise Suit Upgraded w/ Oxygen System/Helmet"
 tbl.hitpoints={
-	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8},
-	mask={rating="NONE",chestgroup=0,coverage=8,airmask=true},
-	airtank2={rating="NIJ I",chestgroup=2,coverage=1,airtank=true}, --made out of steel
-	airtank={rating="NIJ I",chestgroup=2,coverage=1,airtank=true},
-	ceramic={rating="CRISAT Scale",chestgroup=7,coverage=3},
-	poly={rating="NIJ II",chestgroup=7,coverage=3},
-	skin2={rating="NIJ I",chestgroup=7,coverage=7,barrier=true},
-	skin={rating="NIJ I",chestgroup=7,coverage=7,barrier=true}
+	head1helmet={rating="NIJ IIIA",chestgroup=0,coverage=8},
+	head2mask={rating="NONE",chestgroup=0,coverage=8,airmask=true},
+	suit0airtank1={rating="NIJ I",chestgroup=2,coverage=1,airtank=true}, --made out of steel
+	suit0airtank2={rating="NIJ I",chestgroup=2,coverage=1,airtank=true},
+	suit1ceramic={rating="CRISAT Scale",chestgroup=7,coverage=3},
+	suit2poly={rating="NIJ II",chestgroup=7,coverage=3},
+	suit3skin1={rating="NIJ I",chestgroup=7,coverage=7,barrier=true},
+	suit3skin2={rating="NIJ I",chestgroup=7,coverage=7,barrier=true}
 }
 tbl.burn=30 --CoP, rubber flame retardant suit
 tbl.acid=30
@@ -162,11 +162,11 @@ KswepAddArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="Firefighter Suit"
 tbl.hitpoints={
-	helmet={rating="NIJ I",chestgroup=0,coverage=8},
-	mask={rating="NONE",chestgroup=0,coverage=8,airmask=true},
-	airtank2={rating="NIJ I",chestgroup=2,coverage=1,airtank=true}, --made out of steel
-	airtank={rating="NIJ I",chestgroup=2,coverage=1,airtank=true},
-	skin={rating="NIJ I",chestgroup=7,coverage=7,barrier=true}
+	head1helmet={rating="NIJ I",chestgroup=0,coverage=8},
+	head2mask={rating="NONE",chestgroup=0,coverage=8,airmask=true},
+	suit1airtank1={rating="NIJ I",chestgroup=2,coverage=1,airtank=true}, --made out of steel
+	suit1airtank2={rating="NIJ I",chestgroup=2,coverage=1,airtank=true},
+	suit2skin={rating="NIJ I",chestgroup=7,coverage=7,barrier=true}
 }
 tbl.burn=50 --firefighter suit
 tbl.acid=10
@@ -182,11 +182,12 @@ KswepAddArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="Power Armor"
 tbl.hitpoints={
-	helmetskin={rating="PowerArmorShell",chestgroup=0,coverage=8},
-	helmetplate={rating="ESAPI",chestground=0,coverage=8},
-	bodyskin={rating="PowerArmorShell",chestgroup=7,coverage=7},
-	bodyplate={rating="ESAPI",chestgroup=7,coverage=3},
-	body={rating="PowerArmorSAPI",chestgroup=7,coverage=7}
+	helmet1skin={rating="PowerArmorShell",chestgroup=0,coverage=8},
+	helmet2plate={rating="ESAPI",chestground=0,coverage=8},
+	helmet3={rating="PowerArmorSAPI",chestground=0,coverage=8},
+	body1skin={rating="PowerArmorShell",chestgroup=7,coverage=7},
+	body2plate={rating="ESAPI",chestgroup=7,coverage=3},
+	body3={rating="PowerArmorSAPI",chestgroup=7,coverage=7}
 }
 tbl.burn=20
 tbl.acid=50

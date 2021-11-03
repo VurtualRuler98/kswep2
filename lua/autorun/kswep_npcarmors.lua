@@ -32,8 +32,8 @@ KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="monster_human_grunt"
 tbl.hitpoints={
-	sapi={rating="SAPI",chestgroup=3,coverage=1},
-	vest={rating="NIJ IIIA",chestgroup=7,coverage=3}
+	vest1sapi={rating="SAPI",chestgroup=3,coverage=1},
+	vest2={rating="NIJ IIIA",chestgroup=7,coverage=3}
 	}
 tbl.blast=30
 tbl.slash=20
@@ -42,8 +42,8 @@ KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="npc_combine_s"
 tbl.hitpoints={
-	sapi={rating="SAPI",chestgroup=7,coverage=17}, --plates
-	vest={rating="NIJ IIIA",chestgroup=7,coverage=19}, --soft armor
+	vest1sapi={rating="SAPI",chestgroup=7,coverage=17}, --plates
+	vest2={rating="NIJ IIIA",chestgroup=7,coverage=19}, --soft armor
 	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8} --helmet
 }
 tbl.poison=100
@@ -59,8 +59,8 @@ KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="kswep_combine_elite"
 tbl.hitpoints={
-	sapi={rating="ESAPI",chestgroup=7,coverage=17}, --plates
-	vest={rating="NIJ IIIA",chestgroup=7,coverage=19}, --soft armor
+	vest1sapi={rating="ESAPI",chestgroup=7,coverage=17}, --plates
+	vest2={rating="NIJ IIIA",chestgroup=7,coverage=19}, --soft armor
 	helmet={rating="NIJ IIIA",chestgroup=0,coverage=8} --helmet
 }
 tbl.poison=100
@@ -70,8 +70,8 @@ KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="kswep_iotv_esapi_helmet"
 tbl.hitpoints={
-	sapi={rating="ESAPI",chestgroup=7,coverage=1},
-	vest={rating="NIJ IIIA",chestgroup=7,coverage=11}
+	vest1sapi={rating="ESAPI",chestgroup=7,coverage=1},
+	vest2={rating="NIJ IIIA",chestgroup=7,coverage=11}
 	}
 tbl.blast=30
 tbl.slash=20
@@ -80,7 +80,8 @@ KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="kswep_esapi_helmet"
 tbl.hitpoints={
-	sapi={rating="ESAPI",chestgroup=7,coverage=1},
+	vest1sapi={rating="ESAPI",chestgroup=7,coverage=1},
+	vest2={rating="NIJ IIIA",chestgroup=7,coverage=1},
 	helmet={rating="NIJ IIIA",chestgroup=7,coverage=9}
 	}
 tbl.blast=30
@@ -90,8 +91,8 @@ KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="kswep_esapi"
 tbl.hitpoints={
-	sapi={rating="ESAPI",chestgroup=7,coverage=1},
-	backer={rating="NIJ IIIA",chestgroup=7,coverage=1}
+	vest1sapi={rating="ESAPI",chestgroup=7,coverage=1},
+	vest2backer={rating="NIJ IIIA",chestgroup=7,coverage=1}
 	}
 tbl.blast=5
 tbl.slash=20
@@ -100,8 +101,8 @@ KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="kswep_otv_sapi"
 tbl.hitpoints={
-	sapi={rating="SAPI",chestgroup=3,coverage=1},
-	vest={rating="NIJ IIIA",chestgroup=7,coverage=3}
+	vest1sapi={rating="SAPI",chestgroup=3,coverage=1},
+	vest2={rating="NIJ IIIA",chestgroup=7,coverage=3}
 	}
 tbl.blast=30
 tbl.slash=20
@@ -110,8 +111,8 @@ KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="kswep_otv_sapi_helmet"
 tbl.hitpoints={
-	sapi={rating="SAPI",chestgroup=3,coverage=1},
-	vest={rating="NIJ IIIA",chestgroup=7,coverage=11},
+	vest1sapi={rating="SAPI",chestgroup=3,coverage=1},
+	vest2={rating="NIJ IIIA",chestgroup=7,coverage=11},
 	}
 tbl.blast=33
 tbl.slash=20
@@ -120,8 +121,8 @@ KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="kswep_otv_sapi_helmet_mask"
 tbl.hitpoints={
-	sapi={rating="SAPI",chestgroup=3,coverage=1},
-	vest={rating="NIJ IIIA",chestgroup=7,coverage=11},
+	vest1sapi={rating="SAPI",chestgroup=3,coverage=1},
+	vest2={rating="NIJ IIIA",chestgroup=7,coverage=11},
 	}
 tbl.blast=33
 tbl.slash=20
@@ -133,11 +134,12 @@ KswepAddNPCArmor(tbl)
 local tbl=table.Copy(def)
 tbl.name="power_armor"
 tbl.hitpoints={
-	helmetskin={rating="PowerArmorShell",chestgroup=0,coverage=8},
-	helmetplate={rating="ESAPI",chestground=0,coverage=8},
-	bodyskin={rating="PowerArmorShell",chestgroup=7,coverage=7},
-	bodyplate={rating="ESAPI",chestgroup=7,coverage=3},
-	body={rating="PowerArmorSAPI",chestgroup=7,coverage=7}
+	helmet1skin={rating="PowerArmorShell",chestgroup=0,coverage=8},
+	helmet2plate={rating="ESAPI",chestground=0,coverage=8},
+	helmet3={rating="PowerArmorSAPI",chestground=0,coverage=8},
+	body1skin={rating="PowerArmorShell",chestgroup=7,coverage=7},
+	body2plate={rating="ESAPI",chestgroup=7,coverage=3},
+	body3={rating="PowerArmorSAPI",chestgroup=7,coverage=7}
 }
 tbl.burn=20
 tbl.acid=50
