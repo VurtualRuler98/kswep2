@@ -138,6 +138,17 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 				table.insert(ent.kdmg,{hitpoint=k,pos=bonedmg,dir=dir,hit=hitdmg,bone=bone,ang=boneang})
 			end
 			if (pass) then
+				if (ent:IsPlayer()) then
+					if (ent.ksarmordmgtime~=CurTime()) then
+						PrintTable(rating)
+						if (rating.hits>0 or rating.spacing>0) then
+							timer.Create("KevlarHitSound",0.1,1,function() ent:EmitSound("player/bhit_helmet-1.wav",100,100) end)
+						else
+							timer.Create("KevlarHitSound",0.1,1,function() ent:EmitSound("FX_RicochetSound.Ricochet",100,100) end)
+						end
+						ent.ksarmordmgtime=CurTime()
+					end
+				end
 				if (spall>0) then
 					local sublayer=false
 					for j,u in SortedPairs(ksarmor.hitpoints) do
@@ -423,13 +434,6 @@ function KSScaleDamage(armor,dmginfo,ent)
 			return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)
 		else
 			return math.Rand(bullet.dmgvitalmin,bullet.dmgvitalmax)*GetConVar("kswep_ai_damagescale"):GetFloat()
-		end
-	else
-		if (ent:IsPlayer()) then
-			if (ent.ksarmordmgtime~=CurTime()) then
-				timer.Create("KevlarHitSound",0.1,1,function() ent:EmitSound("player/bhit_helmet-1.wav",100,100) end)
-				ent.ksarmordmgtime=CurTime()
-			end
 		end
 	end
 	if (GetConVar("kswep_fullarmor"):GetBool()) then
