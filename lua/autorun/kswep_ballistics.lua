@@ -275,23 +275,26 @@ function KswepFlyBullet(shot)
 		return nil
 	end
 end
-function KswepCalcReducedArmorPen(rating,ratio) --mostly made up for now
-	local testvel=9999
+function KswepRatingScaled(rating)
 	if (rating==KSWEP_ARMOR_I) then
-		testvel=850
+		return 850
 	elseif (rating==KSWEP_ARMOR_IIA) then
-		testvel=1090
+		return 1090
 	elseif (rating==KSWEP_ARMOR_II) then
-		testvel=1175
+		return 1175
 	elseif (rating==KSWEP_ARMOR_IIIA) then
-		testvel=1400
+		return 1400
 	elseif (rating==KSWEP_ARMOR_CRISAT) then --random
-		testvel=1650
+		return 1650
 	elseif (rating==KSWEP_ARMOR_III) then --energy comparison, 308 and  SUPER FAST 9mm
-		testvel=3000
+		return 3000
 	elseif (rating==KSWEP_ARMOR_IV) then --more fast
-		testvel=4000
+		return 4000
 	end
+	return 9999
+end
+function KswepCalcReducedArmorPen(rating,ratio) --mostly made up for now
+	local testvel=KswepRatingScaled(rating)
 	testvel=testvel*ratio*0.95
 	local newpen=KSWEP_ARMOR_IV+1
 	if (testvel<850) then

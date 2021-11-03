@@ -119,6 +119,11 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 							sublayer=true
 						end
 					end
+					if (spall>0) then 
+						local ratescale=(KswepRatingScaled(spall)/KswepRatingScaled(rating.protection))*(1+hitdmg)/2
+						dmginfo:ScaleDamage(ratescale)
+						return "NONE"
+					end
 				end
 				return v.rating
 			end

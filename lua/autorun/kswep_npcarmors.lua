@@ -152,3 +152,9 @@ tbl.club=70
 tbl.crush=50
 tbl.radiation=20
 KswepAddNPCArmor(tbl)
+local tbl=table.Copy(def)
+tbl.name="sapi_test"
+tbl.hitpoints={
+	vest={rating="ESAPI",chestgroup=7,coverage=19}
+}
+KswepAddNPCArmor(tbl)
