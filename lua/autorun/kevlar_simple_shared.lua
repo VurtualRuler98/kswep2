@@ -9,6 +9,7 @@ CreateConVar("kswep_bleeding","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_med_advanced","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_giveammo","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_fullarmor","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
+CreateConVar("kswep_armor_maxhits","1000",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 KSWEP_ARMOR_I=5
 KSWEP_ARMOR_IIA=10
 KSWEP_ARMOR_II=15

@@ -1,4 +1,5 @@
 util.AddNetworkString("showvestmenu")
+util.AddNetworkString("kswepHitIcons")
 function kevlardebugprint(str)
 	if (GetConVar("kevlar_debug"):GetBool()==true) then print(str) end
 end
@@ -24,12 +25,33 @@ local choice=net.ReadString()
 		table.Empty(pl.kdmg)
 	end
 end)
+function KswepHitIcons(ply,ent)
+	if (IsValid(ent) and istable(ent.kdmg)) then
+		net.Start("KswepHitIcons")
+		net.WriteTable({ent=ent,kdmg=ent.kdmg})
+		net.Send(ply)
+	end
+end
 function KSSetArmor(pl,choice)
 	if (choice and kswep_armors[choice]) then
 		pl.ksarmor=kswep_armors[choice]
 		table.Empty(pl.kdmg)
 	end
 end
+local function KSGetBone(ent,pos)
+	local nearestbone=0
+	local neardist=9999
+	for i=0,(ent:GetBoneCount()-1) do
+		local dist=pos:Distance(ent:GetBoneMatrix(i):GetTranslation())
+		if (dist<neardist) then
+			nearestbone=i
+			neardist=dist
+		end
+	end
+	return nearestbone
+end
+		
+
 local function KSGetArmorDir(ent,dmginfo)
 	local dmgangle=(dmginfo:GetDamagePosition()-ent:GetPos()):GetNormalized():Angle()[2]
 	local dir=1
@@ -71,6 +93,9 @@ local function KSArmorCovers(hitgroup,v,dir)
 end
 local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 	local dir=KSGetArmorDir(ent,dmginfo)
+	local bone=KSGetBone(ent,dmginfo:GetDamagePosition())
+	local bonedmg=dmginfo:GetDamagePosition()-ent:GetBoneMatrix(bone):GetTranslation()
+	local boneang=ent:GetBoneMatrix(bone):GetAngles()
 	for k,v in SortedPairs(ksarmor.hitpoints) do
 		local covers=KSArmorCovers(hitgroup,v,dir)
 		local rating=kswep_armor_ratings[v.rating]
@@ -81,11 +106,18 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 			local hitdmg=1
 			if (KSGetBullet(dmginfo)<rating.dmg_half) then hitdmg=0.5 end
 			hitdmg=hitdmg*vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())].hitscale
-
+			local maxhits=0
 			for j,u in pairs(ent.kdmg) do
+				maxhits=maxhits+1
+				if (GetConVar("kswep_armor_maxhits"):GetInt()<maxhits) then return "NONE" end
 				if (u.hitpoint==k and u.dir==dir) then
 					hits=hits+u.hit
-					local dist=u.pos:Distance(dmginfo:GetDamagePosition()-ent:GetPos())
+					local bonepos=Vector()
+					bonepos:Set(u.pos)
+					local matrix=ent:GetBoneMatrix(u.bone)
+					bonepos:Rotate(matrix:GetAngles()-u.ang)
+					bonepos=bonepos+matrix:GetTranslation()
+					local dist=dmginfo:GetDamagePosition():Distance(bonepos)
 					if (dist<rating.spacing) then
 						local pen_a=dist-rating.space_min
 						local pen_b=rating.spacing-rating.space_min
@@ -103,14 +135,14 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 				end
 			end
 			if (rating.hits>0) then
-				table.insert(ent.kdmg,{hitpoint=k,pos=dmginfo:GetDamagePosition()-ent:GetPos(),dir=dir,hit=hitdmg})
+				table.insert(ent.kdmg,{hitpoint=k,pos=bonedmg,dir=dir,hit=hitdmg,bone=bone,ang=boneang})
 			end
 			if (pass) then
 				if (spall>0) then
 					local sublayer=false
 					for j,u in SortedPairs(ksarmor.hitpoints) do
 						if (sublayer and spall>0 and KSArmorCovers(hitgroup,u,dir)) then
-							table.insert(ent.kdmg,{hitpoint=j,pos=dmginfo:GetDamagePosition()-ent:GetPos(),dir=dir,hit=hitdmg})
+							table.insert(ent.kdmg,{hitpoint=j,pos=bonedmg,dir=dir,hit=hitdmg,bone=bone,ang=boneang})
 							if (kswep_armor_ratings[u.rating].protection>=spall) then
 								spall=0
 							end
@@ -128,7 +160,7 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 				return v.rating
 			end
 		elseif (covers) then
-			table.insert(ent.kdmg,{hitpoint=k,pos=dmginfo:GetDamagePosition()-ent:GetPos(),dir=dir,hit=1})
+			table.insert(ent.kdmg,{hitpoint=k,pos=bonedmg,dir=dir,hit=1,bone=bone,ang=boneang})
 		end
 	end
 	return "NONE"
@@ -562,3 +594,4 @@ local function KswepMedicalHandler()
 	end
 end
 hook.Add("Think","KswepMedicalHandler",KswepMedicalHandler)
+

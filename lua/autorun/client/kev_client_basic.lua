@@ -173,6 +173,30 @@ kswep_med_a=0
 kswep_med_b=0
 kswep_med_c=0
 kswep_med_p=0
+kswep_renderdmg={}
+hook.Add("PostDrawTranslucentRenderables","KswepHitIcons",function()
+	render.SetColorMaterial()
+	for k,v in pairs(kswep_renderdmg) do
+		if (IsValid(v.ent)) then
+			for j,u in pairs(v.kdmg) do
+				local pos=Vector()
+				pos:Set(u.pos)
+				local matrix=v.ent:GetBoneMatrix(u.bone)
+				pos:Rotate(matrix:GetAngles()-u.ang)
+				pos=pos+matrix:GetTranslation()
+				render.DrawSphere(pos,1,5,5,Color(255,255,0,100))
+			end
+		else
+			table.remove(kswep_renderdmg,k)
+		end
+	end
+end)
+net.Receive("kswepHitIcons",function()
+	local tbl=net.ReadTable()
+	kswep_renderdmg[tbl.ent:EntIndex()]=tbl
+end)
+
+
 hook.Add("HUDPaint","KswepMedicalHUD",function()
 	local size=ScrW()/50
 	local hudx=ScrW()/2
