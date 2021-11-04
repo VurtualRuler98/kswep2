@@ -85,23 +85,27 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 
 	local tbl = table.Copy(ar2base)
 	tbl.name="StriderMinigun"
-	tbl.vestpenetration=KSWEP_ARMOR_IV
+	tbl.vestpenetration=KSWEP_ARMOR_IV+1
 	AddAmmodata(tbl)
 	local tbl = table.Copy(ar2base)
 	tbl.name="CombineCannon"
-	tbl.vestpenetration=KSWEP_ARMOR_III
+	tbl.vestpenetration=KSWEP_ARMOR_IV
 	AddAmmodata(tbl)
 	local tbl = table.Copy(ar2base)
 	tbl.name="HelicopterGun"
-	tbl.vestpenetration=KSWEP_ARMOR_CRISAT
+	tbl.vestpenetration=KSWEP_ARMOR_III
 	AddAmmodata(tbl)
 	local tbl = table.Copy(ar2base)
 	tbl.name="AirboatGun"
-	tbl.vestpenetration=KSWEP_ARMOR_CRISAT
+	tbl.vestpenetration=KSWEP_ARMOR_III
 	AddAmmodata(tbl)
 	local tbl = table.Copy(ar2base)
 	tbl.name="GaussEnergy"
-	tbl.vestpenetration=KSWEP_ARMOR_IV
+	tbl.vestpenetration=KSWEP_ARMOR_IV+1
+	AddAmmodata(tbl)
+	local tbl = table.Copy(ar2base)
+	tbl.name="SniperRound"
+	tbl.vestpenetration=KSWEP_ARMOR_IV+1
 	AddAmmodata(tbl)
 	
 
