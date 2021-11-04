@@ -64,6 +64,7 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	tbl.velocity = 1125 --speed of sound because why not
 	tbl.mass=100 --idk
 	AddAmmodata(tbl)
+	local ar2base=table.Copy(tbl)
 
 	local tbl = table.Copy(kswep_default_ammo)
 	tbl.name="357"
@@ -82,6 +83,26 @@ hook.Add("VurtualAmmotypes","vammo_hl2", function()
 	AddAmmodata(tbl)
 
 
+	local tbl = table.Copy(ar2base)
+	tbl.name="StriderMinigun"
+	tbl.vestpenetration=KSWEP_ARMOR_IV
+	AddAmmodata(tbl)
+	local tbl = table.Copy(ar2base)
+	tbl.name="CombineCannon"
+	tbl.vestpenetration=KSWEP_ARMOR_III
+	AddAmmodata(tbl)
+	local tbl = table.Copy(ar2base)
+	tbl.name="HelicopterGun"
+	tbl.vestpenetration=KSWEP_ARMOR_CRISAT
+	AddAmmodata(tbl)
+	local tbl = table.Copy(ar2base)
+	tbl.name="AirboatGun"
+	tbl.vestpenetration=KSWEP_ARMOR_CRISAT
+	AddAmmodata(tbl)
+	local tbl = table.Copy(ar2base)
+	tbl.name="GaussEnergy"
+	tbl.vestpenetration=KSWEP_ARMOR_IV
+	AddAmmodata(tbl)
 	
 
 end)

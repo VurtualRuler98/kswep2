@@ -38,6 +38,13 @@ function KSSetArmor(pl,choice)
 		table.Empty(pl.kdmg)
 	end
 end
+local function KSGetAmmoData(ammo)
+	if (vurtual_ammodata[ammo]==nil) then
+		kevlardebugprint(ammo)
+		return vurtual_ammodata["Pistol"]
+	end
+	return vurtual_ammodata[ammo]
+end
 local function KSGetBone(ent,pos)
 	local nearestbone=0
 	local neardist=9999
@@ -65,7 +72,7 @@ local function KSGetArmorDir(ent,dmginfo)
 	return dir
 end
 local function KSGetBullet(dmginfo)
-	local bullet=vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())]
+	local bullet=KSGetAmmoData(game.GetAmmoName(dmginfo:GetAmmoType()))
 	if (not bullet) then
 		bullet=vurtual_ammodata["Pistol"]
 	end
@@ -105,7 +112,8 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 			local hits=0
 			local hitdmg=1
 			if (KSGetBullet(dmginfo)<rating.dmg_half) then hitdmg=0.5 end
-			hitdmg=hitdmg*vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())].hitscale
+			
+			hitdmg=hitdmg*KSGetAmmoData(game.GetAmmoName(dmginfo:GetAmmoType())).hitscale
 			local maxhits=0
 			for j,u in pairs(ent.kdmg) do
 				maxhits=maxhits+1
@@ -419,7 +427,7 @@ function KSDamageHandler(ent,hitgroup,dmginfo)
 	if (scale == 0) then return true end
 end	
 function KSScaleDamage(armor,dmginfo,ent)
-	local bullet=vurtual_ammodata[game.GetAmmoName(dmginfo:GetAmmoType())]
+	local bullet=KSGetAmmoData(game.GetAmmoName(dmginfo:GetAmmoType()))
 	if (not bullet) then
 		bullet=vurtual_ammodata["Pistol"]
 	end
