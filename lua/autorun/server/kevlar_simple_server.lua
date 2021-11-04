@@ -140,7 +140,6 @@ local function KSGetArmorNew(ent,ksarmor,hitgroup,dmginfo)
 			if (pass) then
 				if (ent:IsPlayer()) then
 					if (ent.ksarmordmgtime~=CurTime()) then
-						PrintTable(rating)
 						if (rating.hits>0 or rating.spacing>0) then
 							timer.Create("KevlarHitSound",0.1,1,function() ent:EmitSound("player/bhit_helmet-1.wav",100,100) end)
 						else
