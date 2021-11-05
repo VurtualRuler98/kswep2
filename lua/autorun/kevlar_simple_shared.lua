@@ -16,7 +16,7 @@ hook.Add("PlayerFootstep","KswepFootstep",function(ply,pos,foot,sound,volume,rf)
 	--if (not table.HasValue(rf:GetPlayers(),LocalPlayer())) then return end
 	if (ply.ksarmor==nil) then return end
 	if (ply.ksarmor.step==nil) then return end
-	if (not ply:OnGround()) then
+	if (not ply:OnGround() and ply:GetMoveType()~=MOVETYPE_LADDER) then
 		ply:EmitSound(ply.ksarmor.step.jump,100,100,volume)
 		return
 	end
