@@ -200,5 +200,5 @@ tbl.nervegas=100
 tbl.club=70
 tbl.crush=50
 tbl.radiation=20
-tbl.step = { left = "npc_dog.footstepleft", right = "npc_dog.footstepright", runleft = "npc_dog.runfootstepleft", runright = "npc_dog.runfootstepright", jump="NPC_dog.Pneumatic_1", land="outland_07.advisor_podopen", falldamage="outland_03.liftimpact"}
+tbl.step = { left = "npc_dog.footstepleft", right = "npc_dog.footstepright", runleft = "npc_dog.runfootstepleft", runright = "npc_dog.runfootstepright", jump="NPC_dog.Pneumatic_1", land="NPC_dog.PoundGround_Light", fall="outland_07.advisor_podopen", falldamage="outland_03.liftimpact"}
 KswepAddArmor(tbl)

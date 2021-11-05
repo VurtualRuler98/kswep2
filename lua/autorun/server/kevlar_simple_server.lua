@@ -1,4 +1,5 @@
 util.AddNetworkString("showvestmenu")
+util.AddNetworkString("kswep_armors_client")
 util.AddNetworkString("kswepHitIcons")
 function kevlardebugprint(str)
 	if (GetConVar("kevlar_debug"):GetBool()==true) then print(str) end
@@ -10,8 +11,8 @@ local kmedic_base={
 	checkup=0
 }
 function KSSetSpawnArmor(ply)
-	ply.ksarmor=kswep_armors["none"]
 	ply.kdmg={}
+	KSSetArmor(ply,"none")
 	ply.kmedic=table.Copy(kmedic_base)
 	ply.kmedic_admg=0
 	ply.kmedic_cdmg=0
@@ -20,10 +21,7 @@ end
 hook.Add("PlayerSpawn","SetSpawnArmor",KSSetSpawnArmor)
 net.Receive("showvestmenu",function(len,pl)
 local choice=net.ReadString()
-	if (choice and kswep_armors[choice]) then
-		pl.ksarmor=kswep_armors[choice]
-		table.Empty(pl.kdmg)
-	end
+	KSSetArmor(pl,choice)
 end)
 function KswepHitIcons(ply,ent)
 	if (IsValid(ent) and istable(ent.kdmg)) then
@@ -36,6 +34,9 @@ function KSSetArmor(pl,choice)
 	if (choice and kswep_armors[choice]) then
 		pl.ksarmor=kswep_armors[choice]
 		table.Empty(pl.kdmg)
+		net.Start("kswep_armors_client")
+		net.WriteString(choice)
+		net.Send(pl)
 	end
 end
 local function KSGetAmmoData(ammo)

@@ -25,6 +25,10 @@ net.Receive("kswep_flashlight_cl",function(len)
 		end
 	end
 end)
+net.Receive("kswep_armors_client",function(len)
+	local armor=net.ReadString()
+	LocalPlayer().ksarmor=kswep_armors[armor]
+end)
 net.Receive("kswep_swapslot_cl",function(len)
 	local wep=net.ReadEntity()
 	local slot=net.ReadBool()

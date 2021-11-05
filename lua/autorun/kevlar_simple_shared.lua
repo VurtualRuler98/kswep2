@@ -12,7 +12,7 @@ CreateConVar("kswep_fullarmor","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_armor_maxhits","1000",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 
 hook.Add("PlayerFootstep","KswepFootstep",function(ply,pos,foot,sound,volume,rf)
-	--if (SERVER and not game.SinglePlayer()) then return end
+	if (SERVER and not game.SinglePlayer()) then return end
 	--if (not table.HasValue(rf:GetPlayers(),LocalPlayer())) then return end
 	if (ply.ksarmor==nil) then return end
 	if (ply.ksarmor.step==nil) then return end
@@ -20,7 +20,10 @@ hook.Add("PlayerFootstep","KswepFootstep",function(ply,pos,foot,sound,volume,rf)
 		ply:EmitSound(ply.ksarmor.step.jump,100,100,volume)
 		return
 	end
-	if (ply:GetVelocity()[3]<-200) then
+	print(ply:GetVelocity()[3])
+	if (ply:GetVelocity()[3]<-500) then
+		ply:EmitSound(ply.ksarmor.step.fall,100,100,volume)
+	elseif (ply:GetVelocity()[3]<-200) then
 		ply:EmitSound(ply.ksarmor.step.land,100,100,volume)
 	end
 
