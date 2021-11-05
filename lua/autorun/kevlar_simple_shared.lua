@@ -20,7 +20,6 @@ hook.Add("PlayerFootstep","KswepFootstep",function(ply,pos,foot,sound,volume,rf)
 		ply:EmitSound(ply.ksarmor.step.jump,100,100,volume)
 		return
 	end
-	print(ply:GetVelocity()[3])
 	if (ply:GetVelocity()[3]<-500) then
 		ply:EmitSound(ply.ksarmor.step.fall,100,100,volume)
 	elseif (ply:GetVelocity()[3]<-200) then
