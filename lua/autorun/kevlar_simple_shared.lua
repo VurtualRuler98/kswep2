@@ -10,6 +10,35 @@ CreateConVar("kswep_med_advanced","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_giveammo","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_fullarmor","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_armor_maxhits","1000",FCVAR_REPLICATED+FCVAR_ARCHIVE )
+
+hook.Add("PlayerFootstep","KswepFootstep",function(ply,pos,foot,sound,volume,rf)
+	--if (SERVER and not game.SinglePlayer()) then return end
+	--if (not table.HasValue(rf:GetPlayers(),LocalPlayer())) then return end
+	if (ply.ksarmor==nil) then return end
+	if (ply.ksarmor.step==nil) then return end
+	if (not ply:OnGround()) then
+		ply:EmitSound(ply.ksarmor.step.jump,100,100,volume)
+		return
+	end
+	if (ply:GetVelocity()[3]<-200) then
+		ply:EmitSound(ply.ksarmor.step.land,100,100,volume)
+	end
+
+	if (ply:IsSprinting()) then
+		if (foot==0) then
+			ply:EmitSound(ply.ksarmor.step.runleft,100,100,volume)
+		else
+			ply:EmitSound(ply.ksarmor.step.runright,100,100,volume)
+		end
+	else
+		if (foot==0) then
+			ply:EmitSound(ply.ksarmor.step.left,100,100,volume)
+		else
+			ply:EmitSound(ply.ksarmor.step.right,100,100,volume)
+		end
+	end
+	--return true
+end)
 KSWEP_ARMOR_I=5
 KSWEP_ARMOR_IIA=10
 KSWEP_ARMOR_II=15

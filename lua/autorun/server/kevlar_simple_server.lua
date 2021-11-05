@@ -272,6 +272,9 @@ local function KSDamageHandlerEnt(ent,dmginfo)
 	if (ent:IsPlayer()) then
 		scalevalue=KSSuitHandler(ent,dmginfo,ent.ksarmor)
 		dmginfo:ScaleDamage(scalevalue)
+		if (dmginfo:IsFallDamage() and ent.ksarmor~=nil and ent.ksarmor.step~=nil) then
+			timer.Create("KevlarHitSound",0.1,1,function() ent:EmitSound(ent.ksarmor.step.falldamage) end)
+		end
 	end
 	if (ent:IsNPC()) then
 		local class=ent:GetClass()
