@@ -1,6 +1,7 @@
 hook.Add("VurtualAmmotypes","vammo_scifi", function()
 	local tbl = table.Copy(kswep_default_ammo)
 	tbl.vestpenetration=999
+	tbl.dmgtype = DMG_BULLET+DMG_BLAST
 	tbl.dmgbase = 100
 	tbl.dmgvitalmin = 6
 	tbl.dmgvitalmax = 8

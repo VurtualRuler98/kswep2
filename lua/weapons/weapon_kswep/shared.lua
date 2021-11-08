@@ -179,6 +179,7 @@ SWEP.ReloadDelay=0
 SWEP.ReloadSingleDelay=0
 SWEP.ReloadPostDelay=0
 SWEP.IronZoom=90
+SWEP.BasePos=Vector()
 SWEP.InsAttachments=false
 SWEP.IronOffsetPos=Vector()
 SWEP.ScopeOffsetPos=Vector()
@@ -3031,6 +3032,12 @@ function SWEP:CalcViewModelView(vm,oldPos,oldAng,pos,ang)
 		modpos=modpos+ironpos.y * ang:Forward()
 		modpos=modpos+ironpos.z * ang:Up()
 	end
+	ang:RotateAroundAxis(ang:Right(),self.BasePos.x)
+	ang:RotateAroundAxis(ang:Up(),self.BasePos.y)
+	ang:RotateAroundAxis(ang:Forward(),self.BasePos.z)
+	modpos=modpos+self.BasePos.x * ang:Right()
+	modpos=modpos+self.BasePos.y * ang:Forward()
+	modpos=modpos+self.BasePos.z * ang:Up()
 	modpos = modpos - oldPos
 	self.smoothAng=LerpAngle(engine.TickInterval()*30,self.smoothAng,ang)
 	self.smoothPos=LerpVector(engine.TickInterval()*30,self.smoothPos,modpos)
