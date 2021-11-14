@@ -12,7 +12,7 @@ CreateConVar("kswep_fullarmor","0",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_armor_maxhits","1000",FCVAR_REPLICATED+FCVAR_ARCHIVE )
 
 hook.Add("PlayerFootstep","KswepFootstep",function(ply,pos,foot,sound,volume,rf)
-	if (SERVER and not game.SinglePlayer()) then return end
+	if (CLIENT) then return end
 	--if (not table.HasValue(rf:GetPlayers(),LocalPlayer())) then return end
 	if (ply.ksarmor==nil) then return end
 	if (ply.ksarmor.step==nil) then return end
