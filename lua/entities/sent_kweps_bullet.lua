@@ -28,7 +28,7 @@ function ENT:Initialize()
 end
 end
 function ENT:Think()
-	if (SERVER and self.stopped and not kswep_timestop_check()) then
+	if (SERVER and self.stopped and not kswep_timestop_check() and not KswepShowAllBullets()) then
 		self:Remove()
 	end
 end

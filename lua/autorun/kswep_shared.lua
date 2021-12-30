@@ -50,6 +50,7 @@ kswep_validitems= {
 	"nothing"
 }
 function kswep_timestop_check()
+	if (GetConVar("kswep_timescale"):GetFloat()==0) then return true end
 	if (#ents.FindByClass("ent_stop_time")>0) then return true end
 	if (TW_TIMESTOPWORLD_ENABLED) then return true end
 	return false 
@@ -64,6 +65,8 @@ function AddKswepHands(tbl)
 	kswep_hands[tbl.name]=table.Copy(tbl)
 end
 CreateConVar("kswep_slow",0,FCVAR_REPLICATED )
+CreateConVar("kswep_timescale",1,FCVAR_REPLICATED )
+CreateConVar("kswep_show_all_bullets",0,FCVAR_REPLICATED )
 CreateConVar("kswep_npc_wander",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )
 CreateConVar("kswep_timestop_delay",0,FCVAR_REPLICATED+FCVAR_ARCHIVE,"How many ticks can a bullet move when fired in stopped time")
 CreateConVar("kswep_npc_randompos",0,FCVAR_REPLICATED+FCVAR_ARCHIVE )

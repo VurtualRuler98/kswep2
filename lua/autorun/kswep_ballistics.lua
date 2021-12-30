@@ -54,6 +54,7 @@ local kswep_func_g1 = {0.0176,0.0176,
 	0.4418, --4200
 	0.4516 --4300 or above
 }
+
 function KswepGetDrag(func,speed)
 	local drag = 0
 	if (func~="G1") then func="G1" end --Always use G1 if nothing else, check to make sure it's not any other implemented function first though.
@@ -102,8 +103,20 @@ function KswepBulletThink()
 	end
 end
 hook.Add("Think","KswepBulletThink",KswepBulletThink)
+local function KswepTimeScale()
+	local timescale=GetConVar("kswep_timescale"):GetFloat()
+	if (timescale>10) then return engine.TickInterval()*10 end
+	if (timescale<=0) then return engine.TickInterval() end
+	return timescale*GetConVar("host_timescale"):GetFloat()*game.GetTimeScale()
+end
+local function KswepTickInterval()
+	return engine.TickInterval()*KswepTimeScale()
+end
+function KswepShowAllBullets()
+	return GetConVar("kswep_show_all_bullets"):GetBool()
+end
 function KswepFlyBullet(shot)
-	if (kswep_timestop_check()) then
+	if (kswep_timestop_check() or KswepShowAllBullets()) then
 		if (SERVER and shot.visible and not shot.shown) then
 			shot.shown=true
 			shot.model:SetColor(shot.color)
@@ -113,24 +126,32 @@ function KswepFlyBullet(shot)
 			shot.timedelay=shot.timedelay-1
 		else
 			if (SERVER and not shot.stopped and (not shot.visible or shot.trailonly)) then
-				local shotmodel = ents.Create("sent_kweps_bullet")
-				shotmodel:SetPos(shot.pos)
-				shotmodel:SetAngles(shot.dragvector:Angle())
-				shotmodel.stopped=true
-				shotmodel:Spawn()
-				shotmodel:SetModel(shot.basemodel)
-				shotmodel:SetModelScale(shot.basemodelscale)
-				shotmodel:SetColor(shot.basecolor)
-				shotmodel:SetMaterial(shot.basematerial)
+				shot.model = ents.Create("sent_kweps_bullet")
+				shot.model:SetPos(shot.pos)
+				shot.model:SetAngles(shot.dragvector:Angle())
+				shot.model.stopped=true
+				shot.model:Spawn()
+				shot.model:SetModel(shot.basemodel)
+				shot.model:SetModelScale(shot.basemodelscale)
+				shot.model:SetColor(shot.basecolor)
+				shot.model:SetMaterial(shot.basematerial)
 				shot.stopped=true
 			end
-			return shot
+			if (kswep_timestop_check()) then
+				return shot
+			end
+			if (SERVER and shot.stopped and (not shot.visible or shot.trailonly)) then
+				shot.model:SetPos(shot.pos+shot.dragvector*KswepTickInterval())
+				shot.model:SetAngles(shot.dragvector:Angle())
+			end
 		end
 	end
-	shot.stopped=false
-	shot.ticks=shot.ticks-1
+	if (not kswep_timestop_check() and not KswepShowAllBullets()) then
+		shot.stopped=false
+	end
+	shot.ticks=shot.ticks-(KswepTimeScale())
 	if (SERVER and shot.visible) then
-		shot.model:SetPos(shot.pos+shot.dragvector*engine.TickInterval())
+		shot.model:SetPos(shot.pos+shot.dragvector*KswepTickInterval())
 		shot.model:SetAngles(shot.dragvector:Angle())
 		if (not shot.shown and shot.flytime > 1) then
 			--if (shot.flytime*engine.TickInterval()>shot.tracestart) then
@@ -139,7 +160,7 @@ function KswepFlyBullet(shot)
 				shot.shown=true
 			--end
 		end
-		if (shot.tracetime>0 and shot.flytime*engine.TickInterval()>shot.tracetime) then
+		if (shot.tracetime>0 and shot.flytime*KswepTickInterval()>shot.tracetime) then
 			shot.visible=false
 			shot.shown=false
 			table.insert(kswep_shotmodels,{model=shot.model,lifetime=shot.modellifetime+CurTime()})
@@ -151,7 +172,7 @@ function KswepFlyBullet(shot)
 	if (shot.dist~=nil) then
 		travel=shot.dist
 	else
-		travel = shot.pos + (shot.dragvector*12*engine.TickInterval())*shot.scale
+		travel = shot.pos + (shot.dragvector*12*KswepTickInterval())*shot.scale
 	end
 	local tr=util.TraceLine( {
 		filter = shot.filter,
@@ -183,7 +204,7 @@ function KswepFlyBullet(shot)
 			fakebullet.Src = shot.pos
 			fakebullet.AmmoType="pistol"
 			fakebullet.Force = 0
-			fakebullet.Distance=(shot.dragvector:Length()*12*engine.TickInterval())
+			fakebullet.Distance=(shot.dragvector:Length()*12*KswepTickInterval())
 			KswepFireShot(shot,fakebullet)
 		end
 	end
@@ -194,7 +215,7 @@ function KswepFlyBullet(shot)
 		wind=Vector(math.sin(windang),math.cos(windang),0)*windvel*3.28
 	end
 	local oldspeed=shot.dragvector:Length()
-	shot.dragvector=shot.dragvector+(-1*drag)*(shot.dragvector-wind)*engine.TickInterval()-Vector(0,0,(386/12)*(engine.TickInterval()))
+	shot.dragvector=shot.dragvector+(-1*drag)*(shot.dragvector-wind)*KswepTickInterval()-Vector(0,0,(386/12)*(KswepTickInterval()))
 	if (oldspeed-shot.dragvector:Length()>1125) then shot.dragvector=Vector(0,0,0) end
 	if ((not tr.Hit or (not tr.HitSky or not shot.sky)) and shot.pos:WithinAABox( Vector(-16384,-16384,-16384),Vector(16384,16384,16384)) ) then
 		if (SERVER and tr.HitSky) then
@@ -206,7 +227,7 @@ function KswepFlyBullet(shot)
 				shot.sky=true
 				shot.pos=travel
 			else
-				if (SERVER and shot.visible) then
+				if (SERVER and (shot.visible or shot.stopped)) then
 					table.insert(kswep_shotmodels,{model=shot.model,lifetime=shot.modellifetime+CurTime()})
 				end
 				return nil
@@ -263,13 +284,13 @@ function KswepFlyBullet(shot)
 			return shot
 			end
 		else
-			if (SERVER and shot.visible) then
+			if (SERVER and shot.visible or shot.stopped) then
 				table.insert(kswep_shotmodels,{model=shot.model,lifetime=shot.modellifetime+CurTime()})
 			end
 			return nil
 		end
 	else
-		if (SERVER and shot.visible) then
+		if (SERVER and (shot.visible or shot.stopped)) then
 			table.insert(kswep_shotmodels,{model=shot.model,lifetime=shot.modellifetime+CurTime()})
 		end
 		return nil
