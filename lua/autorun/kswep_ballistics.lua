@@ -236,7 +236,7 @@ function KswepFlyBullet(shot)
 			local armor=0
 			local tempshot = {}
 			tempshot.dragvector, tempshot.pos, tempshot.dist=KswepCalcPenetration(tr.MatType,shot,tr.HitPos+(tr.Normal*2),travel,tr.HitTexture,tr.Entity)
-			if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.dragvector:Length()>100) then
+			if ((tr.Hit or shot.ticks<1) and not tr.AllSolid and shot.dragvector:Length()>100 and (shot.dist==nil or not tr.HitWorld)) then
 				shot.bullet.Src=shot.pos
 				--local energybase=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*vurtual_ammodata[shot.bullet.AmmoType].velocity^2
 				--local energynew=0.5*vurtual_ammodata[shot.bullet.AmmoType].mass*shot.dragvector:Length()^2
@@ -261,7 +261,8 @@ function KswepFlyBullet(shot)
 		end
 		if (shot.dragvector:Length()>100 and shot.ticks>0) then --TODO: better minimum lethal velocity
 			if (shot.dist~=nil) then
-			return KswepFlyBullet(shot)
+			--return KswepFlyBullet(shot)
+				return shot
 			else
 			if (SERVER and shot.dragvector:Length()>1125) then
 				for k,v in pairs(player.GetAll()) do
@@ -369,7 +370,7 @@ function KswepCalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		local basespeed=vurtual_ammodata[shot.bullet.AmmoType].velocity --standard velocity of bullet
 		local wallcost=basespeed/vurtual_ammodata[shot.bullet.AmmoType].wallbang --how much speed is required to penetrate one unit of dirt
 		local barrier=tr.FractionLeftSolid*(hitpos:Distance(travel)) --Amount of wall we're going through
-		if (tr.FractionLeftSolid>0.9) then barrier=hitpos:Distance(travel) end
+		if (tr.FractionLeftSolid>0.9 or tr.FractionLeftSolid==0) then barrier=hitpos:Distance(travel) end
 		local hitprop=false
 		if (((tr.HitNonWorld and IsValid(tr.Entity)) or (tr.SurfaceProps~=0 and tr.HitTexture=="**studio**" and util.GetSurfacePropName(tr.SurfaceProps)~="default"))) then 
 		if (not tr.Entity:IsPlayer() and not tr.Entity:IsNPC()) then
@@ -391,7 +392,7 @@ function KswepCalcPenetration(mat,shot,hitpos,travel,tex,ent)
 		local newvector=Vector()
 		if (tex=="**empty**" or tex=="**displacement**") then speed=0 end
 		--if (tr.Entity:IsNPC()) then speed = 0 end
-		if (speed>0 and (not tr.AllSolid or hitprop)) then
+		if (speed>0 and (not tr.AllSolid or hitprop) and shot.dist==nil) then
 			if (not tr.Entity:IsNPC()) then
 				local fakebullet=table.Copy(shot.bullet)
 				fakebullet.Damage = 0
@@ -406,8 +407,14 @@ function KswepCalcPenetration(mat,shot,hitpos,travel,tex,ent)
 			end
 			dist=travel
 			newvector=shot.dragvector*(speed/oldspeed)
+		elseif (speed>0) then
+			dist=travel
+			newvector=shot.dragvector*(speed/oldspeed)
 		end
 		local traveladj=hitpos+((travel-hitpos)*tr.FractionLeftSolid)+(tr.Normal*10)
+		if (tr.FractionLeftSolid==0) then
+			traveladj=hitpos+((travel-hitpos))+(tr.Normal*10)
+		end
 		if (hitprop) then 
 			traveladj=propexit+(tr.Normal*2)
 		end
