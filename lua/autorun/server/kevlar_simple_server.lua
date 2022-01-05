@@ -487,10 +487,12 @@ function KSGetArmorNPC(npc,hitgroup)
 		elseif (hitgroup==HITGROUP_HEAD) then
 			return 0
 		end
+		--[[
 	elseif (class=="npc_antlion") then
 		return KSWEP_ARMOR_IIA
 	elseif (class=="npc_antlionguard") then
 		return KSWEP_ARMOR_III
+		]]--
 	elseif (class=="monster_human_grunt") then
 		if (hitgroup==HITGROUP_CHEST) then
 			return KSWEP_ARMOR_IV
